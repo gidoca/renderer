@@ -5,7 +5,7 @@ Plane::Plane(QVector4D planeVector) : planeVector(planeVector)
 
 }
 
-const bool Plane::intersect(Ray ray)
+bool Plane::intersect(Ray ray) const
 {
   double d = QVector3D::dotProduct(ray.getDirection(), planeVector.toVector3D());
   return d > 0;

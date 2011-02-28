@@ -9,8 +9,8 @@ class Ray
   public:
     Ray(QVector3D origin, QVector3D direction);
     
-    const QVector3D getOrigin();
-    const QVector3D getDirection();
+    QVector3D getOrigin() const;
+    QVector3D getDirection() const;
 
   private:
     QVector3D origin, direction;

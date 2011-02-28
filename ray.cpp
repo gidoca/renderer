@@ -5,12 +5,12 @@ Ray::Ray(QVector3D origin, QVector3D direction) : origin(origin), direction(dire
 
 }
 
-const QVector3D Ray::getOrigin()
+QVector3D Ray::getOrigin() const
 {
   return origin;
 }
 
-const QVector3D Ray::getDirection()
+QVector3D Ray::getDirection() const
 {
   return direction;
 }

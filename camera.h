@@ -13,7 +13,7 @@ class Camera
   public:
     Camera(QVector3D cop, QVector3D look_at, QVector3D up, double fov, QSize resolution);
     
-    const Ray getRay(QPoint point);
+    Ray getRay(QPoint point) const;
   private:
     QVector3D u, v, w, cop;
     double fov, t, b, l, r, aspect;

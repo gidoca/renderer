@@ -23,7 +23,7 @@ Camera::Camera(QVector3D cop, QVector3D look_at, QVector3D up, double fov, QSize
 				     0,     0,     0,     1);
 }
 
-const Ray Camera::getRay(QPoint point)
+Ray Camera::getRay(QPoint point) const
 {
   QVector3D pixelLocation = QVector3D(l + (r - l) * (point.x() + 0.5) / resolution.width(), 
 				      b + (t - b) * (point.y() + 0.5) / resolution.height(), 
