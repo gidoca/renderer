@@ -10,7 +10,7 @@ class Sphere : public Intersectable
 {
   public:
     Sphere(QVector3D center, double radius);
-    virtual bool intersect(Ray ray) const;
+    HitRecord intersect(Ray ray) const;
     
   private:
     QVector3D center;

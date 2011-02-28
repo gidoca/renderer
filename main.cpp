@@ -19,7 +19,7 @@ int main(int argc, char **argv) {
     {
       QPoint point = QPoint(i, j);
       Ray ray = camera.getRay(point);
-      if(object.intersect(ray))
+      if(object.intersect(ray).getIntersects())
       {
 	image.setPixel(point, qRgb(255, 255, 255));
       }

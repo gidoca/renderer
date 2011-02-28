@@ -12,7 +12,7 @@ class Plane : Intersectable
   public:
     Plane(QVector4D planeVector);
     
-    virtual bool intersect(Ray ray) const;
+    virtual HitRecord intersect(Ray ray) const;
     
   private:
     QVector4D planeVector;
