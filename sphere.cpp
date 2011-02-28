@@ -14,7 +14,7 @@ HitRecord Sphere::intersect(Ray ray) const
   double a = ray.getDirection().lengthSquared();
   double b = 2 * QVector3D::dotProduct(ray.getDirection(), diff);
   double c = diff.lengthSquared() - radiusSquared;
-  if(b * b - 2 * a * c < 0)
+  if(b * b - 4 * a * c < 0)
   {
     return HitRecord::noIntersection();
   }
