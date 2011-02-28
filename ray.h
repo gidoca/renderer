@@ -11,6 +11,8 @@ class Ray
     
     QVector3D getOrigin() const;
     QVector3D getDirection() const;
+    
+    QVector3D evaluate(double u) const;
 
   private:
     QVector3D origin, direction;

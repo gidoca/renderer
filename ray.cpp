@@ -15,3 +15,7 @@ QVector3D Ray::getDirection() const
   return direction;
 }
 
+QVector3D Ray::evaluate(double u) const
+{
+  return origin + u * direction;
+}

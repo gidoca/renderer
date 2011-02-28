@@ -3,8 +3,6 @@
 #include "sphere.h"
 #include "binaryintegrator.h"
 
-#include <iostream>
-
 #include <QSize>
 #include <QImage>
 
@@ -28,6 +26,7 @@ int main(int argc, char **argv) {
       image.setPixel(point, integrator.integrate(object, ray));
     }
   }
+  
   image.save("tst.png");
   return 0;
 }
