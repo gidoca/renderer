@@ -1,6 +1,7 @@
 #include "camera.h"
 #include "plane.h"
 #include "sphere.h"
+#include "binaryintegrator.h"
 
 #include <iostream>
 
@@ -8,11 +9,15 @@
 #include <QImage>
 
 int main(int argc, char **argv) {
-  QSize resolution(64, 64);
+  QSize resolution(512, 512);
   Camera camera(QVector3D(0, 0, 0), QVector3D(0, 1, 0), QVector3D(0, 0, 1), 1.5, resolution);
+  
   //Plane object(QVector4D(0, 0, -1, 1));
   Sphere object(QVector3D(0, 2, 0), 0.5);
+  
   QImage image(resolution, QImage::Format_RGB32);
+  BinaryIntegrator integrator;
+  
   for(int i = 0; i < image.width(); i++)
   {
     for(int j = 0; j < image.height(); j++)
@@ -20,14 +25,7 @@ int main(int argc, char **argv) {
       QPoint point = QPoint(i, j);
       Ray ray = camera.getRay(point);
       HitRecord hitRecord = object.intersect(ray);
-      if(hitRecord.getIntersects())
-      {
-	image.setPixel(point, qRgb(255, 255, 255));
-      }
-      else
-      {
-	image.setPixel(point, qRgb(0, 0, 0));
-      }
+      image.setPixel(point, integrator.integrate(object, ray));
     }
   }
   image.save("tst.png");

@@ -8,7 +8,8 @@
 
 class Intersectable
 {
-  virtual HitRecord intersect(Ray ray) const = 0;
+  public:
+    virtual HitRecord intersect(Ray ray) const = 0;
 };
 
 #endif // INTERSECTABLE_H
