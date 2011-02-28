@@ -5,22 +5,20 @@
 Camera::Camera(QVector3D cop, QVector3D look_at, QVector3D up, double fov, QSize resolution)
 {
   this->cop = cop;
-  this->w = cop - look_at;
-  this->w /= w.length();
-  this->u = QVector3D::crossProduct(up, w);
-  this->u /= u.length();
-  this->v = QVector3D::crossProduct(w, u);
+  w = (cop - look_at).normalized();
+  u = QVector3D::crossProduct(up, w).normalized();
+  v = QVector3D::crossProduct(w, u);
   this->resolution = resolution;
   this->fov = fov;
-  this->aspect = (double) resolution.width() / resolution.height();
-  this->t = tan(fov / 2);
-  this->b = -t;
-  this->r = aspect * t;
-  this->l = -r;
-  this->extrinsicMatrix = QMatrix4x4(u.x(), v.x(), w.x(), cop.x(),
-				     u.y(), v.y(), w.y(), cop.y(),
-				     u.z(), v.z(), w.z(), cop.z(),
-				     0,     0,     0,     1);
+  aspect = (double) resolution.width() / resolution.height();
+  t = tan(fov / 2);
+  b = -t;
+  r = aspect * t;
+  l = -r;
+  extrinsicMatrix.setColumn(0, u.toVector4D());
+  extrinsicMatrix.setColumn(1, v.toVector4D());
+  extrinsicMatrix.setColumn(2, w.toVector4D());
+  extrinsicMatrix.setColumn(3, QVector4D(cop, 1));
 }
 
 Ray Camera::getRay(QPoint point) const
