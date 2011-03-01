@@ -19,7 +19,7 @@ HitRecord Plane::intersect(Ray ray) const
   if(d > 0)
   {
     double u = QVector4D::dotProduct(QVector4D(ray.getOrigin(), 1), planeVector) / d;
-    return HitRecord(u);
+    return HitRecord(u, ray);
   }
   else
   {

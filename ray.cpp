@@ -1,6 +1,6 @@
 #include "ray.h"
 
-Ray::Ray(QVector3D origin, QVector3D direction) : origin(origin), direction(direction)
+Ray::Ray(QVector3D origin, QVector3D direction) : origin(origin), direction(direction.normalized())
 {
 
 }
@@ -18,4 +18,9 @@ QVector3D Ray::getDirection() const
 QVector3D Ray::evaluate(double u) const
 {
   return origin + u * direction;
+}
+
+Ray Ray::transform(QMatrix4x4 matrix)
+{
+  return Ray(matrix.map(origin), matrix.map(direction));
 }

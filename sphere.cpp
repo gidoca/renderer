@@ -20,6 +20,7 @@ HitRecord Sphere::intersect(Ray ray) const
   }
   else
   {
-    return HitRecord(-b - pow(b * b - 4 * a * c, 0.5) / (2 * a));
+    double rayParameter = -b - pow(b * b - 4 * a * c, 0.5) / (2 * a);
+    return HitRecord(rayParameter, ray);
   }
 }
