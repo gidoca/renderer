@@ -12,8 +12,9 @@ class Triangle : public Intersectable
     Triangle(QVector3D p1, QVector3D p2, QVector3D p3);
     
     virtual HitRecord intersect(Ray ray) const;
+    
   private:
-    Plane trianglePlane;
+    QVector3D p1, p2, p3;
 };
 
 #endif // TRIANGLE_H

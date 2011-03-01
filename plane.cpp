@@ -15,10 +15,10 @@ Plane Plane::fromPoints(QVector3D p1, QVector3D p2, QVector3D p3)
 
 HitRecord Plane::intersect(Ray ray) const
 {
-  double d = QVector3D::dotProduct(ray.getDirection(), planeVector.toVector3D());
+  double d = QVector3D::dotProduct(ray.getDirection().toVector3D(), planeVector.toVector3D());
   if(d > 0)
   {
-    double u = QVector4D::dotProduct(QVector4D(ray.getOrigin(), 1), planeVector) / d;
+    double u = QVector4D::dotProduct(ray.getOrigin(), planeVector) / d;
     return HitRecord(u, ray);
   }
   else

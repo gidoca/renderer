@@ -13,8 +13,8 @@ int main(int argc, char **argv) {
   Camera camera(QVector3D(0, 0, 0), QVector3D(0, 1, 0), QVector3D(0, 0, 1), 1.5, resolution);
   
   //Plane object(QVector4D(0, 0, -1, 1));
-  //Sphere sphere(QVector3D(0, 0, 0), 0.5);
-  Triangle object(QVector3D(.1, 1, .1), QVector3D(0, 1, .1), QVector3D(.1, 1, 0));
+  Sphere object(QVector3D(0.3, 2, 0), 0.5);
+  //Triangle object(QVector3D(.1, 1, .1), QVector3D(.1, 1, 0), QVector3D(0, 1, .1));
   /*QMatrix4x4 transform;
   transform.translate(0, 2, 0);
   IntersectableInstance object(transform, sphere);*/

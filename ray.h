@@ -9,16 +9,19 @@ class Ray
 
   public:
     Ray(QVector3D origin, QVector3D direction);
+    Ray(QVector4D origin, QVector4D direction);
     
-    QVector3D getOrigin() const;
-    QVector3D getDirection() const;
+    QVector4D getOrigin() const;
+    QVector4D getDirection() const;
     
     QVector3D evaluate(double u) const;
     
     Ray transform(QMatrix4x4 matrix);
 
   private:
-    QVector3D origin, direction;
+    void init(QVector4D origin, QVector4D direction);
+    
+    QVector4D origin, direction;
 };
 
 #endif // RAY_H

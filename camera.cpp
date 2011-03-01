@@ -23,8 +23,10 @@ Camera::Camera(QVector3D cop, QVector3D look_at, QVector3D up, double fov, QSize
 
 Ray Camera::getRay(QPoint point) const
 {
-  QVector3D pixelLocation = QVector3D(l + (r - l) * (point.x() + 0.5) / resolution.width(), 
+  QVector4D pixelLocation = QVector4D(l + (r - l) * (point.x() + 0.5) / resolution.width(), 
 				      b + (t - b) * (point.y() + 0.5) / resolution.height(), 
-				      -1);
-  return Ray(extrinsicMatrix.map(QVector3D()), extrinsicMatrix.map(pixelLocation));
+				      -1,
+				      0
+ 				    );
+  return Ray(QVector4D(0, 0, 0, 1), pixelLocation).transform(extrinsicMatrix);
 }
