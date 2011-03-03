@@ -2,7 +2,7 @@
 
 #include <cmath>
 
-Sphere::Sphere(QVector3D center, double radius) : center(center), radius(radius)
+Sphere::Sphere(QVector3D center, double radius, Material & material) : center(center), radius(radius), material(material)
 {
 
 }
@@ -21,6 +21,7 @@ HitRecord Sphere::intersect(Ray ray) const
   else
   {
     double rayParameter = -b - pow(b * b - 4 * a * c, 0.5) / (2 * a);
-    return HitRecord(rayParameter, ray);
+    return HitRecord(rayParameter, ray, material);
   }
 }
+

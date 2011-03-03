@@ -2,9 +2,10 @@
 
 Spectrum BinaryIntegrator::integrate(const Intersectable& scene, Ray ray)
 {
-  if(scene.intersect(ray).getIntersects())
+  HitRecord hit = scene.intersect(ray);
+  if(hit.getIntersects())
   {
-    return Spectrum(1, 1, 1);
+    return hit.getMaterial().shade(QVector3D(), QVector3D());
   }
   else
   {
