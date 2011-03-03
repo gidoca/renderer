@@ -4,6 +4,7 @@
 #include "triangle.h"
 #include "binaryintegrator.h"
 #include "intersectableinstance.h"
+#include "spectrum.h"
 
 #include <QSize>
 #include <QImage>
@@ -29,7 +30,9 @@ int main(int argc, char **argv) {
       QPoint point = QPoint(i, j);
       Ray ray = camera.getRay(point);
       HitRecord hitRecord = object.intersect(ray);
-      image.setPixel(point, integrator.integrate(object, ray));
+      Spectrum irradiance = 255 * integrator.integrate(object, ray);
+      
+      image.setPixel(point, qRgb((int) irradiance.x(), (int) irradiance.y(), (int) irradiance.z()));
     }
   }
   

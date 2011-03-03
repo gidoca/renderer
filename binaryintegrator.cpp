@@ -1,16 +1,14 @@
 #include "binaryintegrator.h"
 
-#include <QColor>
-
-uint BinaryIntegrator::integrate(const Intersectable& scene, Ray ray)
+Spectrum BinaryIntegrator::integrate(const Intersectable& scene, Ray ray)
 {
   if(scene.intersect(ray).getIntersects())
   {
-    return QColor(Qt::white).rgb();
+    return Spectrum(1, 1, 1);
   }
   else
   {
-    return QColor(Qt::black).rgb();
+    return Spectrum(0, 0, 0);
   }
 }
 
