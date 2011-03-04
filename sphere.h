@@ -10,14 +10,14 @@
 class Sphere : public Intersectable
 {
   public:
-    Sphere(QVector3D center, double radius, Material & material);
+    Sphere(QVector3D center, double radius, QSharedPointer<Material> material);
 
     HitRecord intersect(Ray ray) const;
     
   private:
     QVector3D center;
     double radius;
-    Material & material;
+    QSharedPointer<Material> material;
 };
 
 #endif // SPHERE_H

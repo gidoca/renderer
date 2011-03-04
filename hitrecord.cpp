@@ -1,15 +1,14 @@
 #include "hitrecord.h"
 
-HitRecord::HitRecord(double rayParameter, Ray ray, const Material & material) : intersects(true), rayParameter(rayParameter), intersectingPoint(ray.evaluate(rayParameter)), material(material)
+HitRecord::HitRecord() : rayParameter(0), intersects(false), material(new DarkMatter)
 {
-  
 }
 
-HitRecord HitRecord::noIntersection()
-{
-  HitRecord record;
-  record.intersects = false;
-  return record;
+
+HitRecord::HitRecord(double rayParameter, Ray ray, QSharedPointer < Material > material
+)
+  : intersects(true), rayParameter(rayParameter), intersectingPoint(ray.evaluate(rayParameter)), material(material)
+{ 
 }
 
 bool HitRecord::getIntersects() const
@@ -27,9 +26,9 @@ QVector3D HitRecord::getIntersectingPoint() const
   return intersectingPoint;
 }
 
-const Material & HitRecord::getMaterial() const
+Material & HitRecord::getMaterial() const
 {
-  return material;
+  return *material;
 }
 
 void HitRecord::transform(QMatrix4x4 matrix)

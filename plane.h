@@ -11,13 +11,13 @@ class Plane : public Intersectable
 {
 
   public:
-    Plane(QVector4D planeVector, Material & material);
+    Plane(QVector4D planeVector, QSharedPointer<Material> material);
     
     virtual HitRecord intersect(Ray ray) const;
     
   private:
     QVector4D planeVector;
-    Material & material;
+    QSharedPointer<Material> material;
 };
 
 #endif // PLANE_H

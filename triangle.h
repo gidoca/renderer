@@ -5,17 +5,18 @@
 #include "hitrecord.h"
 
 #include <QVector3D>
+#include <QSharedPointer>
 
 class Triangle : public Intersectable
 {
   public:
-    Triangle(QVector3D p1, QVector3D p2, QVector3D p3, Material & material);
+    Triangle(QVector3D p1, QVector3D p2, QVector3D p3, QSharedPointer<Material> material);
     
     virtual HitRecord intersect(Ray ray) const;
     
   private:
     QVector3D p1, p2, p3;
-    const Material & material;
+    QSharedPointer<Material> material;
 };
 
 #endif // TRIANGLE_H

@@ -2,7 +2,7 @@
 
 #include <cmath>
 
-Sphere::Sphere(QVector3D center, double radius, Material & material) : center(center), radius(radius), material(material)
+Sphere::Sphere(QVector3D center, double radius, QSharedPointer<Material> material) : center(center), radius(radius), material(material)
 {
 
 }
@@ -16,7 +16,7 @@ HitRecord Sphere::intersect(Ray ray) const
   double c = diff.lengthSquared() - radiusSquared;
   if(b * b - 4 * a * c < 0)
   {
-    return HitRecord::noIntersection();
+    return HitRecord();
   }
   else
   {

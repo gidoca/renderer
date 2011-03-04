@@ -1,6 +1,6 @@
 #include "plane.h"
 
-Plane::Plane(QVector4D planeVector, Material & material) : planeVector(planeVector), material(material)
+Plane::Plane(QVector4D planeVector, QSharedPointer<Material> material) : planeVector(planeVector), material(material)
 {
 
 }
@@ -15,6 +15,6 @@ HitRecord Plane::intersect(Ray ray) const
   }
   else
   {
-    return HitRecord::noIntersection();
+    return HitRecord();
   }
 }

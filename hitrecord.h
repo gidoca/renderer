@@ -5,29 +5,28 @@
 #include "darkmatter.h"
 
 #include <QVector3D>
+#include <QSharedPointer>
 
 class HitRecord
 {
 
   public:
-    HitRecord(double rayParameter, Ray ray, const Material & material);
-    static HitRecord noIntersection();
+    HitRecord();
+    HitRecord(double rayParameter, Ray ray, QSharedPointer<Material> material);
     
     void transform(QMatrix4x4 matrix);
     
     double getRayParameter() const;
     QVector3D getIntersectingPoint() const;
     bool getIntersects() const;
-    const Material & getMaterial() const;
+    Material & getMaterial() const;
     
   private:
     double rayParameter;
     QVector3D intersectingPoint;
-    const Material & material;
+    QSharedPointer<Material> material;
     
     bool intersects;
-    
-    HitRecord() : rayParameter(0), material(DarkMatter()) {};
 
 };
 
