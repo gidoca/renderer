@@ -6,6 +6,7 @@
 
 #include <QVector4D>
 #include <QVector3D>
+#include <QSharedPointer>
 
 class Plane : public Intersectable
 {

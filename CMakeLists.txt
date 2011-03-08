@@ -9,8 +9,9 @@ include(${QT_USE_FILE})
 set(renderingproject_SRCS main.cpp camera.cpp ray.cpp plane.cpp sphere.cpp
 	hitrecord.cpp binaryintegrator.cpp triangle.cpp
 	intersectableinstance.cpp darkmatter.cpp diffusematerial.cpp
-	directionallight.cpp )
+	directionallight.cpp intersectablelist.cpp)
 qt4_automoc(${renderingproject_SRCS})
 add_executable(renderingproject ${renderingproject_SRCS})
 target_link_libraries(renderingproject ${QT_LIBRARIES})
 
+set(CMAKE_CXX_FLAGS "-Wall -ggdb")

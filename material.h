@@ -2,13 +2,13 @@
 #define MATERIAL_H
 
 #include "spectrum.h"
-
-#include <QVector3D>
+#include "light.h"
+class HitRecord;
 
 class Material
 {
   public:
-    virtual Spectrum shade(QVector3D location, QVector3D normal) const = 0;
+    virtual Spectrum shade(HitRecord & hit, Light & light) const = 0;
 };
 
 #endif

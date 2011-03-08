@@ -10,7 +10,7 @@
 class Integrator
 {
   public:
-    virtual Spectrum integrate(const Intersectable & scene, Ray ray) = 0;
+    virtual Spectrum integrate(const Intersectable & scene, Ray ray, Light & light) = 0;
 };
 
 #endif // INTEGRATOR_H

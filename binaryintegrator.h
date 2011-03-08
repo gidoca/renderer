@@ -6,7 +6,7 @@
 class BinaryIntegrator : public Integrator
 {
   public:
-    virtual Spectrum integrate(const Intersectable & scene, Ray ray);
+    virtual Spectrum integrate(const Intersectable & scene, Ray ray, Light & light);
 };
 
 #endif // BINARYINTEGRATOR_H

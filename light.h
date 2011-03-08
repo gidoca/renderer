@@ -2,13 +2,13 @@
 #define LIGHT_H
 
 #include "spectrum.h"
-#include "ray.h"
 
 class Light
 {
 
   public:
-    virtual Spectrum getIntensity(Ray ray) const = 0;
+    virtual QVector3D getDirection(QVector3D location) const = 0;
+    virtual Spectrum getIntensity(QVector3D location) const = 0;
 
 };
 

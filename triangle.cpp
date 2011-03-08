@@ -4,6 +4,8 @@
 
 #include <QMatrix4x4>
 
+#include <QVector3D>
+
 Triangle::Triangle(QVector3D p1, QVector3D p2, QVector3D p3, QSharedPointer<Material> material) : p1(p1), p2(p2), p3(p3), material(material)
 {
   
@@ -22,7 +24,7 @@ HitRecord Triangle::intersect(Ray ray) const
     0 < result.x() && result.x() < 1 &&
     0 < result.y() && result.y() < 1)
   {
-    return HitRecord(result.z(), ray, material);
+    return HitRecord(result.z(), ray, material, QVector3D::crossProduct(p1 - p2, p1 - p3));
   }
   else
   {

@@ -3,6 +3,7 @@
 
 #include "ray.h"
 #include "hitrecord.h"
+#include "light.h"
 
 #include <QVector3D>
 

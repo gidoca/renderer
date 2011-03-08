@@ -12,22 +12,21 @@ class HitRecord
 
   public:
     HitRecord();
-    HitRecord(double rayParameter, Ray ray, QSharedPointer<Material> material);
+    HitRecord(double rayParameter, Ray ray, QSharedPointer<Material> material, QVector3D surfaceNormal);
     
     void transform(QMatrix4x4 matrix);
     
     double getRayParameter() const;
     QVector3D getIntersectingPoint() const;
-    bool getIntersects() const;
-    Material & getMaterial() const;
+    const Material & getMaterial() const;
+    QVector3D getSurfaceNormal() const;
     
   private:
+    QSharedPointer<Material> material;
     double rayParameter;
     QVector3D intersectingPoint;
-    QSharedPointer<Material> material;
+    QVector3D surfaceNormal;
     
-    bool intersects;
-
 };
 
 #endif // HITRECORD_H

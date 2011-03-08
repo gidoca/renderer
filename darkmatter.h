@@ -6,7 +6,7 @@
 class DarkMatter : public Material
 {
   public:
-    Spectrum shade(QVector3D, QVector3D) const;
+    Spectrum shade(HitRecord &, Light &) const;
 };
 
 #endif

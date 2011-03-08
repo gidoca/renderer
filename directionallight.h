@@ -8,7 +8,8 @@ class DirectionalLight : public Light
   public:
     DirectionalLight(QVector3D direction, Spectrum intensity);
 
-    Spectrum getIntensity(Ray ray) const;
+    Spectrum getDirection(QVector3D) const;
+    Spectrum getIntensity(QVector3D) const;
 
   private:
     QVector3D direction;

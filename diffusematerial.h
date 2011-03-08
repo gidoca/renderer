@@ -8,7 +8,7 @@ class DiffuseMaterial : public Material
   public:
     DiffuseMaterial(Spectrum color);
 
-    Spectrum shade(QVector3D location, QVector3D normal) const;
+    Spectrum shade(HitRecord & hit, Light & light) const;
 
   private:
     const Spectrum color;
