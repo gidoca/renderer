@@ -21,8 +21,15 @@ HitRecord Sphere::intersect(Ray ray) const
   else
   {
     double rayParameter = (-b - pow(b * b - 4 * a * c, 0.5)) / (2 * a);
-    QVector3D location = ray.evaluate(rayParameter);
-    return HitRecord(rayParameter, ray, material, location - center);
+    if(rayParameter < 0)
+    {
+      return HitRecord();
+    }
+    else
+    {
+      QVector3D location = ray.evaluate(rayParameter);
+      return HitRecord(rayParameter, ray, material, location - center);
+    }
   }
 }
 
