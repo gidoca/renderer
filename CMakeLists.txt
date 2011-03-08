@@ -14,4 +14,4 @@ qt4_automoc(${renderingproject_SRCS})
 add_executable(renderingproject ${renderingproject_SRCS})
 target_link_libraries(renderingproject ${QT_LIBRARIES})
 
-set(CMAKE_CXX_FLAGS "-Wall -ggdb")
+set(CMAKE_CXX_FLAGS "-Wall -ggdb -fopenmp")
