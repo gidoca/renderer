@@ -44,6 +44,7 @@ bool HitRecord::intersects() const
 
 void HitRecord::transform(QMatrix4x4 matrix)
 {
+  //TODO transform normal
   intersectingPoint = matrix.map(intersectingPoint);
 }
 

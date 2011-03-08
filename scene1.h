@@ -52,12 +52,13 @@ Intersectable * getScene(void)
   normal = QVector4D(0.f, -1.f, 0.f, 1.f);
   kd = Spectrum(0.8f, 0.8f, 0.8f);
   plane = new Plane(normal, QSharedPointer<Material>(new DiffuseMaterial(kd, kd, 32)));
-  objects.push_back(QSharedPointer<Intersectable>(plane));
+  //objects.push_back(QSharedPointer<Intersectable>(plane));
 
   return new IntersectableList(objects);
 }
 
 Light * getLight(void)
 {
-  return new PointLight(QVector3D(0, 0.8, 0.8), Spectrum(1, 1, 1));
+  //return new PointLight(QVector3D(0, 0.8, 0.8), Spectrum(1, 1, 1));
+  return new DirectionalLight(QVector3D(0, -1, -1), Spectrum(1, 1, 1));
 }
