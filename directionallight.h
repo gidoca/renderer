@@ -10,6 +10,7 @@ class DirectionalLight : public Light
 
     Spectrum getDirection(QVector3D) const;
     Spectrum getIntensity(QVector3D) const;
+    bool isOccluded(QVector3D location, const Intersectable & scene) const;
 
   private:
     QVector3D direction;

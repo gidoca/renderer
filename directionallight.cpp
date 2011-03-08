@@ -14,3 +14,8 @@ Spectrum DirectionalLight::getIntensity(QVector3D) const
 {
   return intensity;
 }
+
+bool DirectionalLight::isOccluded(QVector3D location, const Intersectable & scene) const
+{
+  return false;
+}

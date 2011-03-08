@@ -2,8 +2,9 @@
 #define MATERIAL_H
 
 #include "spectrum.h"
-#include "light.h"
+
 class HitRecord;
+class Light;
 
 class Material
 {

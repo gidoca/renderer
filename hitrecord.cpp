@@ -32,12 +32,18 @@ QVector3D HitRecord::getSurfaceNormal() const
   return surfaceNormal;
 }
 
+Ray HitRecord::getRay() const
+{
+  return ray;
+}
+
+bool HitRecord::intersects() const
+{
+  return rayParameter < std::numeric_limits< double >::infinity();
+}
+
 void HitRecord::transform(QMatrix4x4 matrix)
 {
   intersectingPoint = matrix.map(intersectingPoint);
 }
 
-Ray HitRecord::getRay() const
-{
-  return ray;
-}

@@ -5,6 +5,7 @@
 
 #include "camera.h"
 #include "pointlight.h"
+#include "directionallight.h"
 #include "sphere.h"
 #include "plane.h"
 #include "intersectablelist.h"

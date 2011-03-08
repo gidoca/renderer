@@ -1,6 +1,6 @@
 #include "binaryintegrator.h"
 
-#include "scene0.h"
+#include "scene1.h"
 
 #include <QSize>
 #include <QImage>

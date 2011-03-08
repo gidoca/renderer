@@ -14,3 +14,8 @@ QVector3D PointLight::getDirection (QVector3D at) const
 {
   return at - location;
 }
+
+bool PointLight::isOccluded(QVector3D location, const Intersectable & scene) const
+{
+  return false;
+}

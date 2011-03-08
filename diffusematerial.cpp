@@ -1,5 +1,6 @@
 #include "diffusematerial.h"
 #include "hitrecord.h"
+#include "light.h"
 
 #include <cmath>
 
@@ -19,5 +20,5 @@ Spectrum DiffuseMaterial::shade(HitRecord & hit, Light & light) const
   Spectrum diffuseSpectrum(lightIntensity.x() * color.x(), lightIntensity.y() * color.y(), lightIntensity.z() * color.z());
   Spectrum specularSpectrum(lightIntensity.x() * specularColor.x(), lightIntensity.y() * specularColor.y(), lightIntensity.z() * specularColor.z());
   specularSpectrum *= pow(QVector3D::dotProduct(reflected.normalized(), hit.getRay().getDirection().toVector3D().normalized()), specularCoefficient);
-  return diffuseSpectrum + specularSpectrum;
+  return diffuseSpectrum + specularSpectrum + Spectrum(.04, .04, .04);
 }
