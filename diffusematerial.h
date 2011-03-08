@@ -6,12 +6,13 @@
 class DiffuseMaterial : public Material
 {
   public:
-    DiffuseMaterial(Spectrum color);
+    DiffuseMaterial(Spectrum color, Spectrum specularColor, double specularCoefficient);
 
     Spectrum shade(HitRecord & hit, Light & light) const;
 
   private:
-    const Spectrum color;
+    const Spectrum color, specularColor;
+    const float specularCoefficient;
 };
 
 #endif

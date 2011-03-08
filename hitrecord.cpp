@@ -8,7 +8,7 @@ HitRecord::HitRecord() : material(QSharedPointer<Material>(new DarkMatter)), ray
 
 
 HitRecord::HitRecord(double rayParameter, Ray ray, QSharedPointer < Material > material, QVector3D surfaceNormal)
-  : material(material), rayParameter(rayParameter), intersectingPoint(ray.evaluate(rayParameter)), surfaceNormal(surfaceNormal)
+  : material(material), rayParameter(rayParameter), intersectingPoint(ray.evaluate(rayParameter)), surfaceNormal(surfaceNormal), ray(ray)
 { 
 }
 
@@ -35,4 +35,9 @@ QVector3D HitRecord::getSurfaceNormal() const
 void HitRecord::transform(QMatrix4x4 matrix)
 {
   intersectingPoint = matrix.map(intersectingPoint);
+}
+
+Ray HitRecord::getRay() const
+{
+  return ray;
 }

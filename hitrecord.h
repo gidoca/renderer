@@ -20,12 +20,14 @@ class HitRecord
     QVector3D getIntersectingPoint() const;
     const Material & getMaterial() const;
     QVector3D getSurfaceNormal() const;
+    Ray getRay() const;
     
   private:
     QSharedPointer<Material> material;
     double rayParameter;
     QVector3D intersectingPoint;
     QVector3D surfaceNormal;
+    Ray ray;
     
 };
 

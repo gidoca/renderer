@@ -8,6 +8,7 @@ class Ray
 {
 
   public:
+    Ray();
     Ray(QVector3D origin, QVector3D direction);
     Ray(QVector4D origin, QVector4D direction);
     

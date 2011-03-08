@@ -1,7 +1,9 @@
 #include "diffusematerial.h"
 #include "hitrecord.h"
 
-DiffuseMaterial::DiffuseMaterial(Spectrum color) : color(color)
+#include <cmath>
+
+DiffuseMaterial::DiffuseMaterial(Spectrum color, Spectrum specularColor, double specularCoefficient) : color(color), specularColor(specularColor), specularCoefficient(specularCoefficient)
 {
 
 }
@@ -9,8 +11,13 @@ DiffuseMaterial::DiffuseMaterial(Spectrum color) : color(color)
 Spectrum DiffuseMaterial::shade(HitRecord & hit, Light & light) const
 {
   Spectrum lightIntensity = light.getIntensity(hit.getIntersectingPoint());
-  QVector3D direction = light.getDirection(hit.getIntersectingPoint());
-  double coefficient = QVector3D::dotProduct(-direction.normalized(), hit.getSurfaceNormal().normalized());
+  QVector3D direction = -light.getDirection(hit.getIntersectingPoint());
+  QVector3D normal = hit.getSurfaceNormal();
+  double coefficient = QVector3D::dotProduct(direction.normalized(), hit.getSurfaceNormal().normalized());
   lightIntensity = coefficient > 0 ? coefficient * lightIntensity : Spectrum();
-  return Spectrum(lightIntensity.x() * color.x(), lightIntensity.y() * color.y(), lightIntensity.z() * color.z());
+  QVector3D reflected = 2 * QVector3D::dotProduct(direction, normal) * normal - direction;
+  Spectrum diffuseSpectrum(lightIntensity.x() * color.x(), lightIntensity.y() * color.y(), lightIntensity.z() * color.z());
+  Spectrum specularSpectrum(lightIntensity.x() * specularColor.x(), lightIntensity.y() * specularColor.y(), lightIntensity.z() * specularColor.z());
+  specularSpectrum *= pow(QVector3D::dotProduct(reflected.normalized(), hit.getRay().getDirection().toVector3D().normalized()), specularCoefficient);
+  return diffuseSpectrum + specularSpectrum;
 }
