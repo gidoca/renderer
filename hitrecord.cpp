@@ -1,6 +1,8 @@
 #include "hitrecord.h"
 
-HitRecord::HitRecord() : material(QSharedPointer<Material>(new DarkMatter)), rayParameter(0)
+#include <limits>
+
+HitRecord::HitRecord() : material(QSharedPointer<Material>(new DarkMatter)), rayParameter(std::numeric_limits< double >::infinity())
 {
 }
 

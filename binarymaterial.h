@@ -1,7 +1,7 @@
 #ifndef BINARYMATERIAL_H
 #define BINARYMATERIAL_H
 
-#include <../../mnt/files/uni/info/rendering/renderingproject/material.h>
+#include "material.h"
 
 
 class BinaryMaterial:public Material
