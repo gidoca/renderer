@@ -1,6 +1,6 @@
 #include "binaryintegrator.h"
 
-#include "scene2.h"
+#include "tmscene.h"
 
 #include <QSize>
 #include <QImage>
@@ -8,7 +8,7 @@
 #include <iostream>
 
 int main(int argc, char **argv) {
-  QSize resolution(128, 128);
+  QSize resolution(256, 256);
 
   QImage image(resolution, QImage::Format_RGB32);
   BinaryIntegrator integrator;
