@@ -1,13 +1,14 @@
 #include "binaryintegrator.h"
 
-#include "scene1.h"
+#include "scene2.h"
 
 #include <QSize>
 #include <QImage>
 #include <list>
+#include <iostream>
 
 int main(int argc, char **argv) {
-  QSize resolution(512, 512);
+  QSize resolution(128, 128);
 
   QImage image(resolution, QImage::Format_RGB32);
   BinaryIntegrator integrator;
@@ -31,6 +32,7 @@ int main(int argc, char **argv) {
 	image.setPixel(point, qRgb((int) irradiance.x(), (int) irradiance.y(), (int) irradiance.z()));
       }
     }
+    std::cout << "Line " << i << " complete" << std::endl;
   }
   
   delete light;

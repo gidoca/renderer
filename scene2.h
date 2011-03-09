@@ -9,6 +9,8 @@
 #include "sphere.h"
 #include "plane.h"
 #include "intersectablelist.h"
+#include "intersectableinstance.h"
+#include "objreader.h"
 
 Camera getCamera(QSize resolution)
 {
@@ -22,12 +24,25 @@ Camera getCamera(QSize resolution)
 
 Intersectable * getScene(void)
 {
-  QVector3D center(0.f,0.f,0.f);
-  float radius = 0.2f;
   Spectrum kd(0.8f, 0.8f, 0.8f);
-  Sphere * sphere = new Sphere(center, radius, QSharedPointer<Material>(new DiffuseMaterial(kd, kd, 32)));
+  IntersectableList * mesh = ObjReader::getMesh("objfiles/teapot.obj", QSharedPointer<Material>(new DiffuseMaterial(kd, kd, 32)));
+
   std::list< QSharedPointer<Intersectable> > objects;
-  objects.push_back(QSharedPointer<Intersectable>(sphere));
+
+  QMatrix4x4 t;
+
+  // Instance one
+  t.scale(0.5f);
+  t.translate(0.f, -0.25f, 0.f);
+  IntersectableInstance * instance = new IntersectableInstance(t, QSharedPointer<Intersectable>(mesh));
+  objects.push_back(QSharedPointer<Intersectable>(instance));
+
+  // Instance two
+  t = QMatrix4x4();
+  t.scale(0.5f);
+  t.translate(0.f, 0.25f, 0.f);
+  instance = new IntersectableInstance(t, QSharedPointer<Intersectable>(mesh));
+  objects.push_back(QSharedPointer<Intersectable>(instance));
 
   QVector4D normal(0.f, 1.f, 0.f, 1.f);
   kd = Spectrum(0.f, 0.8f, 0.8f);
