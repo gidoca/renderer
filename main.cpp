@@ -1,6 +1,6 @@
 #include "binaryintegrator.h"
 
-#include "tmscene.h"
+#include "scene2.h"
 
 #include <QSize>
 #include <QImage>
@@ -10,7 +10,7 @@
 #define clamp(x) ((x) <= 0 ? 0 : ((x) >= 255 ? 255 : (x)))
 
 int main(int argc, char **argv) {
-  QSize resolution(256, 192);
+  QSize resolution(256, 256);
 
   QImage image(resolution, QImage::Format_RGB32);
   BinaryIntegrator integrator;
