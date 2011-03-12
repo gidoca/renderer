@@ -20,7 +20,7 @@ Spectrum DirectionalLight::getIntensity(QVector3D) const
 bool DirectionalLight::isOccluded(QVector3D location, const Intersectable & scene) const
 {
   HitRecord hit = scene.intersect(Ray(location - EPSILON * direction.normalized(), -direction));
-  if(hit.intersects()) std::cout << "Shadow!" << std::endl;
+  //if(hit.intersects()) std::cout << "Shadow!" << std::endl;
   return hit.intersects();
   //return false;
 }

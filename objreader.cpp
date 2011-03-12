@@ -20,7 +20,7 @@ IntersectableList * ObjReader::getMesh(const char * fileName, QSharedPointer<Mat
   for(int i = 0; i < nIndices; i += 3)
   {
     QVector3D v1(vertices[3 * indices[i]], vertices[3 * indices[i] + 1], vertices[3 * indices[i] + 2]);
-    QVector3D v2(vertices[3 * indices[i + 1]], vertices[3 * indices[i + 1] + 1], vertices[3 * indices[i + 2] + 2]);
+    QVector3D v2(vertices[3 * indices[i + 1]], vertices[3 * indices[i + 1] + 1], vertices[3 * indices[i + 1] + 2]);
     QVector3D v3(vertices[3 * indices[i + 2]], vertices[3 * indices[i + 2] + 1], vertices[3 * indices[i + 2] + 2]);
     Triangle * triangle = new Triangle(v1, v2, v3, material);
     triangles.push_back(QSharedPointer<Intersectable>(triangle));

@@ -4,6 +4,7 @@
 #include "intersectablelist.h"
 #include "triangle.h"
 #include "plane.h"
+#include "objreader.h"
 
 #include <list>
 #include <QSize>
@@ -18,7 +19,7 @@ Intersectable * getScene(void)
   
   triangles.push_back(QSharedPointer<Intersectable>(new Triangle(QVector3D(-1, 0, -1), QVector3D(1, 0, -1), QVector3D(0, 1, 0), material)));
   triangles.push_back(QSharedPointer<Intersectable>(new Triangle(QVector3D(-1, 0, 1), QVector3D(1, 0, 1), QVector3D(0, 1, 0), material)));
-  //triangles.push_back(QSharedPointer<Intersectable>(new Triangle(QVector3D(-1, 0, -1), QVector3D(1, 0, -1), QVector3D(0, 1, 0), material)));
+  //triangles.push_back(QSharedPointer<Intersectable>(ObjReader::getMesh("objfiles/tr.obj", material)));
   
   triangles.push_back(QSharedPointer<Intersectable>(new Plane(QVector4D(0, 1, 0, 0), material2)));
   
