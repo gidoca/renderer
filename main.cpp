@@ -7,8 +7,10 @@
 #include <list>
 #include <iostream>
 
+#define clamp(x) ((x) <= 0 ? 0 : ((x) >= 255 ? 255 : (x)))
+
 int main(int argc, char **argv) {
-  QSize resolution(256, 256);
+  QSize resolution(256, 192);
 
   QImage image(resolution, QImage::Format_RGB32);
   BinaryIntegrator integrator;
@@ -29,7 +31,7 @@ int main(int argc, char **argv) {
   
       #pragma omp critical
       {
-	image.setPixel(point, qRgb((int) irradiance.x(), (int) irradiance.y(), (int) irradiance.z()));
+	image.setPixel(point, qRgb((int) clamp(irradiance.x()), (int) clamp(irradiance.y()), (int) clamp(irradiance.z())));
       }
     }
     std::cout << "Line " << i << " complete" << std::endl;
