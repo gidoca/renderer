@@ -16,7 +16,6 @@ IntersectableList * ObjReader::getMesh(const char * fileName, QSharedPointer<Mat
   int *indices;
   std::list<QSharedPointer<Intersectable> > triangles;
   readObj(fileName, nVertices, &vertices, &normals, &texcoords, nIndices, &indices);
-  printf("%i\n", nIndices);
   for(int i = 0; i < nIndices; i += 3)
   {
     Triangle * triangle;

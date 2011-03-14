@@ -11,13 +11,13 @@
 
 Intersectable * getScene(void)
 {
-  QSharedPointer<Material> material(new DiffuseMaterial(Spectrum(0, 0, 1), Spectrum(0, 0, 1), 64));
+  QSharedPointer<Material> material(new DiffuseMaterial(Spectrum(0, 0, 1), Spectrum(1, 1, 1), 64));
 
   IntersectableList * obj = ObjReader::getMesh("objfiles/teapot.obj", material);
   
   std::list<QSharedPointer<Intersectable> > scene;
   QMatrix4x4 t;
-  //t.scale(0.5);
+  t.scale(0.5);
   t.translate(0.5, 0, 0);
   scene.push_back(QSharedPointer<Intersectable>(new IntersectableInstance(t, QSharedPointer<Intersectable>(obj))));
   scene.push_back(QSharedPointer<Intersectable>(new Plane(QVector4D(0, 1, 0, 0), material)));

@@ -19,22 +19,20 @@ int main(int argc, char **argv) {
   Light * light = getLight();
   Camera camera = getCamera(resolution);
   
-  #pragma omp parallel for
-  for(int i = 0; i < image.width(); i++)
+  for(int i = 0; i < image.height(); i++)
   {
-    for(int j = 0; j < image.height(); j++)
+    QRgb * scanline = (QRgb *) image.scanLine(i);
+    #pragma omp parallel for
+    for(int j = 0; j < image.width(); j++)
     {
-      QPoint point = QPoint(i, j);
+      QPoint point = QPoint(j, i);
       Ray ray = camera.getRay(point);
       HitRecord hitRecord = object->intersect(ray);
       Spectrum irradiance = 255 * integrator.integrate(*object, ray, *light);
   
-      #pragma omp critical
-      {
-	image.setPixel(point, qRgb((int) clamp(irradiance.x()), (int) clamp(irradiance.y()), (int) clamp(irradiance.z())));
-      }
+      scanline[j] = qRgb((int) clamp(irradiance.x()), (int) clamp(irradiance.y()), (int) clamp(irradiance.z()));
     }
-    std::cout << "Line " << i << " complete" << std::endl;
+    std::cout << i * 100 / image.height() << "% complete" << std::endl;
   }
   
   delete light;

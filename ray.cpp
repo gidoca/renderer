@@ -7,7 +7,7 @@ Ray::Ray()
 
 Ray::Ray(QVector3D origin, QVector3D direction)
 {
-  init(origin, QVector4D(direction, 0));
+  init(QVector4D(origin, 1), direction);
 }
 
 Ray::Ray(QVector4D origin, QVector4D direction)
