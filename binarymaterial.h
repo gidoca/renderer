@@ -8,7 +8,7 @@ class BinaryMaterial:public Material
 {
 
   public:
-    virtual Spectrum shade (HitRecord & hit, Light & light) const;
+    virtual Spectrum shade (HitRecord&, Light&, const Intersectable&) const;
     BinaryMaterial (Spectrum color);
     
   private:

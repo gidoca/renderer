@@ -6,7 +6,7 @@
 class DarkMatter : public Material
 {
   public:
-    Spectrum shade(HitRecord &, Light &) const;
+    Spectrum shade(HitRecord&, Light&, const Intersectable&) const;
 };
 
 #endif

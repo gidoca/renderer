@@ -17,5 +17,7 @@ QVector3D PointLight::getDirection (QVector3D at) const
 
 bool PointLight::isOccluded(QVector3D location, const Intersectable & scene) const
 {
-  return false;
+  QVector3D direction = getDirection(location);
+  HitRecord hit = scene.intersect(Ray(location - EPSILON * direction.normalized(), -direction));
+  return hit.intersects() && hit.getRayParameter() < 1;
 }

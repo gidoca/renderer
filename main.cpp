@@ -1,6 +1,4 @@
-#include "binaryintegrator.h"
-
-#include "tmscene.h"
+#include "scene1.h"
 
 #include <QSize>
 #include <QImage>
@@ -13,7 +11,6 @@ int main(int argc, char **argv) {
   QSize resolution(256, 256);
 
   QImage image(resolution, QImage::Format_RGB32);
-  BinaryIntegrator integrator;
   
   Intersectable * object = getScene();
   Light * light = getLight();
@@ -28,7 +25,7 @@ int main(int argc, char **argv) {
       QPoint point = QPoint(j, i);
       Ray ray = camera.getRay(point);
       HitRecord hitRecord = object->intersect(ray);
-      Spectrum irradiance = 255 * integrator.integrate(*object, ray, *light);
+      Spectrum irradiance = 255 * hitRecord.getMaterial().shade(hitRecord, *light, *object);
   
       scanline[j] = qRgb((int) clamp(irradiance.x()), (int) clamp(irradiance.y()), (int) clamp(irradiance.z()));
     }

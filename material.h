@@ -5,11 +5,12 @@
 
 class HitRecord;
 class Light;
+class Intersectable;
 
 class Material
 {
   public:
-    virtual Spectrum shade(HitRecord & hit, Light & light) const = 0;
+    virtual Spectrum shade(HitRecord & hit, Light & light, const Intersectable & scene) const = 0;
 };
 
 #endif
