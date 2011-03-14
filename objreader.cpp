@@ -16,6 +16,10 @@ IntersectableList * ObjReader::getMesh(const char * fileName, QSharedPointer<Mat
   int *indices;
   std::list<QSharedPointer<Intersectable> > triangles;
   readObj(fileName, nVertices, &vertices, &normals, &texcoords, nIndices, &indices);
+  if(vertices == NULL)
+  {
+    return new IntersectableList(triangles);
+  }
   for(int i = 0; i < nIndices; i += 3)
   {
     Triangle * triangle;
@@ -40,7 +44,7 @@ IntersectableList * ObjReader::getMesh(const char * fileName, QSharedPointer<Mat
 
 void ObjReader::get_indices(char *word, int *vindex, int *tindex, int *nindex)
 {
-	char *null = " ";
+	char null[] = " ";
 	char *ptr;
 	char *tp;
 	char *np;
@@ -72,6 +76,12 @@ void ObjReader::get_indices(char *word, int *vindex, int *tindex, int *nindex)
 void ObjReader::readObj(const char* fileName, int &nVertices, float **vertices, float **normals, float **texcoords, int &nIndices, int **indices)
 {
 	FILE * fp = fopen(fileName,"r");
+	if(fp == NULL)
+	{
+	  fprintf(stderr, "File not found: %s\n", fileName);
+	  *vertices = NULL;
+	  return;
+	}
 	int nv=0, nn=0, nf=0, nt=0;
 	char line[81];
 
