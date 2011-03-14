@@ -1,6 +1,6 @@
 #include "binarymaterial.h"
 
-Spectrum BinaryMaterial::shade (HitRecord & , Light & , const Intersectable &) const
+Spectrum BinaryMaterial::shade (HitRecord &, Light &, const Intersectable &, int) const
 {
   return color;
 }

@@ -9,7 +9,7 @@ DiffuseMaterial::DiffuseMaterial(Spectrum color, Spectrum specularColor, double 
 
 }
 
-Spectrum DiffuseMaterial::shade(HitRecord& hit, Light& light, const Intersectable& scene) const
+Spectrum DiffuseMaterial::shade(HitRecord& hit, Light& light, const Intersectable& scene, int depth) const
 {
   if(light.isOccluded(hit.getIntersectingPoint(), scene))
   {

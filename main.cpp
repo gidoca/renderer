@@ -1,4 +1,4 @@
-#include "scene1.h"
+#include "scene2.h"
 
 #include <QSize>
 #include <QImage>
@@ -12,7 +12,7 @@ int main(int argc, char **argv) {
 
   QImage image(resolution, QImage::Format_RGB32);
   
-  Intersectable * object = getScene();
+  const Intersectable * object = getScene();
   Light * light = getLight();
   Camera camera = getCamera(resolution);
   
@@ -25,7 +25,7 @@ int main(int argc, char **argv) {
       QPoint point = QPoint(j, i);
       Ray ray = camera.getRay(point);
       HitRecord hitRecord = object->intersect(ray);
-      Spectrum irradiance = 255 * hitRecord.getMaterial().shade(hitRecord, *light, *object);
+      Spectrum irradiance = 255 * hitRecord.getMaterial().shade(hitRecord, *light, *object, 0);
   
       scanline[j] = qRgb((int) clamp(irradiance.x()), (int) clamp(irradiance.y()), (int) clamp(irradiance.z()));
     }

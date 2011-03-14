@@ -11,6 +11,7 @@
 #include "intersectablelist.h"
 #include "intersectableinstance.h"
 #include "objreader.h"
+#include "mirrormaterial.h"
 
 Camera getCamera(QSize resolution)
 {
