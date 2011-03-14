@@ -4,7 +4,7 @@
 #include <list>
 #include <iostream>
 
-#include "scene2.h"
+#include "tmscene.h"
 
 #define clamp(x) ((x) <= 0 ? 0 : ((x) >= 255 ? 255 : (x)))
 
@@ -23,6 +23,10 @@ int main(int argc, char **argv) {
     #pragma omp parallel for
     for(int j = 0; j < image.width(); j++)
     {
+      if(i == 145 && j == 128)
+      {
+	i = i;
+      }
       QPoint point = QPoint(j, i);
       Ray ray = camera.getRay(point);
       HitRecord hitRecord = object->intersect(ray);

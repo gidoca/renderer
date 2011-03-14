@@ -25,7 +25,7 @@ Intersectable * getScene(void)
   float radius = 0.2f;
   Spectrum kd(0.8f, 0.8f, 0.8f);
 //   Sphere * sphere = new Sphere(center, radius, QSharedPointer<Material>(new DiffuseMaterial(kd, kd, 32)));
-  Sphere * sphere = new Sphere(center, radius, QSharedPointer<Material>(new MirrorMaterial()));
+  Sphere * sphere = new Sphere(center, radius, QSharedPointer<Material>(new MirrorMaterial(0.7)));
   std::list< QSharedPointer<Intersectable> > objects;
   objects.push_back(QSharedPointer<Intersectable>(sphere));
 

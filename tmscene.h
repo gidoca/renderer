@@ -17,8 +17,8 @@ Intersectable * getScene(void)
   
   std::list<QSharedPointer<Intersectable> > scene;
   QMatrix4x4 t;
-  t.scale(0.5);
-  t.translate(0.5, 0, 0);
+//   t.scale(0.5);
+//   t.translate(0.5, 0, 0);
   scene.push_back(QSharedPointer<Intersectable>(new IntersectableInstance(t, QSharedPointer<Intersectable>(obj))));
   scene.push_back(QSharedPointer<Intersectable>(new Plane(QVector4D(0, 1, 0, 0), material)));
   
@@ -33,6 +33,6 @@ Camera getCamera(QSize resolution)
 std::list<QSharedPointer<Light> > getLight(void)
 {
   std::list<QSharedPointer<Light> > lights;
-  lights.push_back(new DirectionalLight(QVector3D(4, -1, -2), Spectrum(1, 1, 1)));
+  lights.push_back(QSharedPointer<Light>(new DirectionalLight(QVector3D(4, -1, -2), Spectrum(1, 1, 1))));
   return lights;
 }
