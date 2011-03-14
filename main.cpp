@@ -1,9 +1,10 @@
-#include "scene2.h"
-
 #include <QSize>
 #include <QImage>
+#include <QSharedPointer>
 #include <list>
 #include <iostream>
+
+#include "scene1.h"
 
 #define clamp(x) ((x) <= 0 ? 0 : ((x) >= 255 ? 255 : (x)))
 
@@ -13,7 +14,7 @@ int main(int argc, char **argv) {
   QImage image(resolution, QImage::Format_RGB32);
   
   const Intersectable * object = getScene();
-  Light * light = getLight();
+  std::list<QSharedPointer<Light> > light = getLight();
   Camera camera = getCamera(resolution);
   
   for(int i = 0; i < image.height(); i++)
@@ -25,14 +26,17 @@ int main(int argc, char **argv) {
       QPoint point = QPoint(j, i);
       Ray ray = camera.getRay(point);
       HitRecord hitRecord = object->intersect(ray);
-      Spectrum irradiance = 255 * hitRecord.getMaterial().shade(hitRecord, *light, *object, 0);
+      Spectrum irradiance;
+      for(std::list<QSharedPointer<Light> >::iterator i = light.begin(); i != light.end(); i++)
+      {
+        irradiance += 255 * hitRecord.getMaterial().shade(hitRecord, **i, *object, 0);
+      }
   
       scanline[j] = qRgb((int) clamp(irradiance.x()), (int) clamp(irradiance.y()), (int) clamp(irradiance.z()));
     }
     std::cout << i * 100 / image.height() << "% complete" << std::endl;
   }
   
-  delete light;
   delete object;
   
   image.save("tst.png");

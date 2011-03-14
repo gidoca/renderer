@@ -19,7 +19,9 @@ Intersectable * getScene(void)
   return new Sphere(QVector3D(), 1, QSharedPointer<Material>(new DiffuseMaterial(Spectrum(1, 0, 0), Spectrum(1.4, 0, 0), 32)));
 }
 
-Light * getLight(void)
+std::list<QSharedPointer<Light> > getLight(void)
 {
-  return new PointLight(QVector3D(2, 2, 2), Spectrum(4, 4, 4));
+  std::list<QSharedPointer<Light> > lights;
+  lights.push_back(QSharedPointer<Light>(PointLight(QVector3D(2, 2, 2), Spectrum(4, 4, 4))));
+  return lights;
 }

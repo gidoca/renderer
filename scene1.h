@@ -1,8 +1,6 @@
 #include <QVector3D>
 #include <QSize>
 
-#include "list"
-
 #include "camera.h"
 #include "pointlight.h"
 #include "directionallight.h"
@@ -59,7 +57,10 @@ Intersectable * getScene(void)
   return new IntersectableList(objects);
 }
 
-Light * getLight(void)
+std::list<QSharedPointer<Light> > getLight(void)
 {
-  return new PointLight(QVector3D(0, 0.8, 0.8), Spectrum(1, 1, 1));
+  std::list<QSharedPointer<Light> > lights;
+  lights.push_back(QSharedPointer<Light>(new PointLight(QVector3D(0, 0.8, 0.8), Spectrum(1, 1, 1))));
+  lights.push_back(QSharedPointer<Light>(new PointLight(QVector3D(0, 0.6, 0.8), Spectrum(1, 1, 1))));
+  return lights;
 }

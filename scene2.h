@@ -33,15 +33,15 @@ Intersectable * getScene(void)
   QMatrix4x4 t;
 
   // Instance one
-  t.scale(0.5f);
   t.translate(0.f, -0.25f, 0.f);
+  t.scale(0.25f);
   IntersectableInstance * instance = new IntersectableInstance(t, QSharedPointer<Intersectable>(mesh));
   objects.push_back(QSharedPointer<Intersectable>(instance));
 
   // Instance two
   t = QMatrix4x4();
-  t.scale(0.5f);
   t.translate(0.f, 0.25f, 0.f);
+  t.scale(0.25f);
   instance = new IntersectableInstance(t, QSharedPointer<Intersectable>(mesh));
   objects.push_back(QSharedPointer<Intersectable>(instance));
 
@@ -73,8 +73,10 @@ Intersectable * getScene(void)
   return new IntersectableList(objects);
 }
 
-Light * getLight(void)
+std::list<QSharedPointer<Light> > getLight(void)
 {
-  return new PointLight(QVector3D(0, 0.8, 0.8), Spectrum(1, 1, 1));
+  std::list<QSharedPointer<Light> > lights;
+  lights.push_back(QSharedPointer<Light>(new PointLight(QVector3D(0, 0.8, 0.8), Spectrum(1, 1, 1))));
   //return new DirectionalLight(QVector3D(0, -1, -1), Spectrum(1, 1, 1));
+  return lights;
 }
