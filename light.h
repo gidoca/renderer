@@ -1,7 +1,7 @@
 #ifndef LIGHT_H
 #define LIGHT_H
 
-#define EPSILON 0.00001
+#define EPSILON 0.00005
 
 #include "spectrum.h"
 #include "intersectable.h"

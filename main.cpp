@@ -4,7 +4,7 @@
 #include <list>
 #include <iostream>
 
-#include "tmscene.h"
+#include "scene4.h"
 
 #define clamp(x) ((x) <= 0 ? 0 : ((x) >= 255 ? 255 : (x)))
 
@@ -23,7 +23,7 @@ int main(int argc, char **argv) {
     #pragma omp parallel for
     for(int j = 0; j < image.width(); j++)
     {
-      if(i == 145 && j == 128)
+      if(i == 110 && j == 150)
       {
 	i = i;
       }
