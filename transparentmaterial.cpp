@@ -34,6 +34,6 @@ Spectrum TransparentMaterial::shade(HitRecord& hit, Light& light, const Intersec
   HitRecord newHit = scene.intersect(Ray(newOrigin, refractedDirection));
   double f = pow(1 - refractionCoefficient, 2) / pow(1 + refractionCoefficient, 2);
   double F = f + (1 - f) * pow(1 - QVector3D::dotProduct(rayDirection, -surfaceNormal), 5);
-  return (1 - F) * newHit.getMaterial().shade(hit, light, scene, depth + 1) + F * mirrorComponent;
+  return (1 - F) * newHit.getMaterial().shade(newHit, light, scene, depth + 1) + F * mirrorComponent;
 }
 
