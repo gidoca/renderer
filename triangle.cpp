@@ -18,7 +18,7 @@ Triangle::Triangle(QVector3D p1, QVector3D p2, QVector3D p3, QVector3D n1, QVect
 
 HitRecord Triangle::intersect(Ray ray) const
 {
-  if(QVector3D::dotProduct(ray.getDirection().toVector3D(), n1) > 0) return HitRecord();
+  if(QVector3D::dotProduct(ray.getDirection().toVector3D(), QVector3D::crossProduct(p1 - p2, p1 - p3)) > 0) return HitRecord();
   QMatrix4x4 intersectionMatrix;
   intersectionMatrix.setColumn(0, p1 - p2);
   intersectionMatrix.setColumn(1, p1 - p3);
