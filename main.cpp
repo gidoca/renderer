@@ -4,7 +4,7 @@
 #include <list>
 #include <iostream>
 
-#include "scene3.h"
+#include "scene2.h"
 
 #define clamp(x) ((x) <= 0 ? 0 : ((x) >= 255 ? 255 : (x)))
 
