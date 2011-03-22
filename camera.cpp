@@ -6,7 +6,7 @@ Camera::Camera(QVector3D cop, QVector3D look_at, QVector3D up, double fov, QSize
 {
   this->cop = cop;
   w = (cop - look_at).normalized();
-  u = QVector3D::crossProduct(up, w).normalized();
+  u = QVector3D::normal(up, w);
   v = QVector3D::crossProduct(w, u);
   this->resolution = resolution;
   this->fov = fov;
