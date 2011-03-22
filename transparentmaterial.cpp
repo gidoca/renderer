@@ -28,7 +28,7 @@ Spectrum TransparentMaterial::shade(HitRecord& hit, Light& light, const Intersec
   double outAngle = asin(refractionCoefficient * sin(angle));
   QVector3D refractedDirection = refractionCoefficient * rayDirection + (refractionCoefficient * cosAngle - cos(outAngle)) * hit.getSurfaceNormal();
   refractedDirection.normalize();
-  QVector3D newOrigin = hit.getIntersectingPoint() + EPSILON * refractedDirection;
+  QVector3D newOrigin = hit.getIntersectingPoint();
   HitRecord newHit = scene.intersect(Ray(newOrigin, refractedDirection));
   double f = pow(1 - refractionCoefficient, 2) / pow(1 + refractionCoefficient, 2);
   double F = f + (1 - f) * pow(1 - QVector3D::dotProduct(rayDirection, -surfaceNormal), 5);
