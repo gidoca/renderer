@@ -1,7 +1,5 @@
 #include "transparentmaterial.h"
 
-#define EPSILON 0.0001
-
 #include "hitrecord.h"
 #include "material.h"
 #include "intersectable.h"

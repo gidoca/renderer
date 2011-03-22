@@ -17,10 +17,10 @@ int main(int argc, char **argv) {
   std::list<QSharedPointer<Light> > light = getLight();
   Camera camera = getCamera(resolution);
   
+  #pragma omp parallel for schedule(dynamic)
   for(int i = 0; i < image.height(); i++)
   {
     QRgb * scanline = (QRgb *) image.scanLine(i);
-    #pragma omp parallel for
     for(int j = 0; j < image.width(); j++)
     {
       if(i == 110 && j == 150)

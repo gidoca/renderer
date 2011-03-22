@@ -5,13 +5,14 @@ Plane::Plane(QVector4D planeVector, QSharedPointer<Material> material) : planeVe
 
 }
 
-HitRecord Plane::intersect(Ray ray) const
+HitRecord Plane::intersect(Ray ray, double from, double to) const
 {
   double d = -QVector3D::dotProduct(ray.getDirection().toVector3D(), planeVector.toVector3D());
   double u = QVector4D::dotProduct(ray.getOrigin(), planeVector);
-  if(d > 0 && u > 0)
+  double t = u / d;
+  if(from < t && t < to)
   {
-    return HitRecord(u / d, ray, material, planeVector.toVector3D());
+    return HitRecord(t, ray, material, planeVector.toVector3D());
   }
   else
   {

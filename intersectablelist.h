@@ -12,7 +12,7 @@ class IntersectableList : public Intersectable
   public:
     IntersectableList(std::list< QSharedPointer<Intersectable> > components);
 
-    HitRecord intersect(Ray ray) const;
+    HitRecord intersect(Ray ray, double from, double to) const;
 
   private:
     std::list<QSharedPointer<Intersectable> > components;

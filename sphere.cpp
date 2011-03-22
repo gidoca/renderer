@@ -7,7 +7,7 @@ Sphere::Sphere(QVector3D center, double radius, QSharedPointer<Material> materia
 
 }
 
-HitRecord Sphere::intersect(Ray ray) const
+HitRecord Sphere::intersect(Ray ray, double from, double to) const
 {
   QVector3D diff = ray.getOrigin().toVector3DAffine() - center;
   double radiusSquared = radius * radius;
@@ -21,13 +21,9 @@ HitRecord Sphere::intersect(Ray ray) const
   else
   {
     double rayParameter = (-b - pow(b * b - 4 * a * c, 0.5)) / (2 * a);
-    if(rayParameter < 0)
+    if(from >= rayParameter || rayParameter >= to)
     {
-      //rayParameter = (-b + pow(b * b - 4 * a * c, 0.5)) / (2 * a);
-      if(rayParameter < 0)
-      {
-	return HitRecord();
-      }
+      return HitRecord();
     }
     
     QVector3D location = ray.evaluate(rayParameter);

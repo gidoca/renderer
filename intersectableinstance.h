@@ -10,7 +10,7 @@ class IntersectableInstance : public Intersectable
 {
 
 public:
-  virtual HitRecord intersect(Ray ray) const;
+  virtual HitRecord intersect(Ray ray, double from, double to) const;
   IntersectableInstance(QMatrix4x4 transform, QSharedPointer<Intersectable> intersectable);
     
 private:

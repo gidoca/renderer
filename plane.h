@@ -14,7 +14,7 @@ class Plane : public Intersectable
   public:
     Plane(QVector4D planeVector, QSharedPointer<Material> material);
     
-    virtual HitRecord intersect(Ray ray) const;
+    virtual HitRecord intersect(Ray ray, double from, double to) const;
     
   private:
     QVector4D planeVector;

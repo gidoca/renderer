@@ -5,10 +5,10 @@ IntersectableInstance::IntersectableInstance(QMatrix4x4 transform, QSharedPointe
 
 }
 
-HitRecord IntersectableInstance::intersect(Ray ray) const
+HitRecord IntersectableInstance::intersect(Ray ray, double from, double to) const
 {
   Ray transformedRay = ray.transform(inverseTransform);
-  HitRecord hitRecord = intersectable->intersect(transformedRay);
+  HitRecord hitRecord = intersectable->intersect(transformedRay, from, to);
   hitRecord.transform(transform);
   return hitRecord;
 }

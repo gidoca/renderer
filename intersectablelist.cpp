@@ -7,15 +7,15 @@ IntersectableList::IntersectableList(std::list<QSharedPointer<Intersectable> > c
 
 }
 
-HitRecord IntersectableList::intersect (Ray ray) const
+HitRecord IntersectableList::intersect(Ray ray, double from, double to) const
 {
   HitRecord hit;
 
   for(std::list< QSharedPointer<Intersectable> >::const_iterator i = components.begin(); i != components.end(); i++)
   {
     Intersectable & component = **i;
-    HitRecord currentHit = component.intersect(ray);
-    if(currentHit.getRayParameter() < hit.getRayParameter())
+    HitRecord currentHit = component.intersect(ray, from, (to < hit.getRayParameter() ? to : hit.getRayParameter()));
+    if(currentHit.intersects())
     {
       hit = currentHit;
     }

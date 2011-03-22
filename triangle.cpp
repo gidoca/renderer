@@ -16,7 +16,7 @@ Triangle::Triangle(QVector3D p1, QVector3D p2, QVector3D p3, QVector3D n1, QVect
 
 }
 
-HitRecord Triangle::intersect(Ray ray) const
+HitRecord Triangle::intersect(Ray ray, double from, double to) const
 {
   if(QVector3D::dotProduct(ray.getDirection().toVector3D(), QVector3D::crossProduct(p1 - p2, p1 - p3)) > 0) return HitRecord();
   QMatrix4x4 intersectionMatrix;
@@ -27,7 +27,7 @@ HitRecord Triangle::intersect(Ray ray) const
   
   double beta = result.x(), gamma = result.y(), alpha = 1 - beta - gamma;
 
-  if(result.z() > 0 &&
+  if(from < result.z() && result.z() < to &&
     0 < alpha && alpha < 1 &&
     0 < beta && beta < 1 &&
     0 < gamma && gamma < 1)
