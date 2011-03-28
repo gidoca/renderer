@@ -4,12 +4,12 @@
 #include <list>
 #include <iostream>
 
-#include "scene3.h"
+#include "scene1.h"
 
 #define clamp(x) ((x) <= 0 ? 0 : ((x) >= 255 ? 255 : (x)))
 
 int main(int argc, char **argv) {
-  QSize resolution(256, 256);
+  QSize resolution(512, 512);
 
   QImage image(resolution, QImage::Format_RGB32);
   

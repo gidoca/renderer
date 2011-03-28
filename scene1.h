@@ -10,6 +10,7 @@
 #include "plane.h"
 #include "intersectablelist.h"
 #include "mirrormaterial.h"
+#include "axisalignedbox.h"
 
 Camera getCamera(QSize resolution)
 {
@@ -26,10 +27,12 @@ Intersectable * getScene(void)
   QVector3D center(0.f,0.f,0.f);
   float radius = 0.2f;
   Spectrum kd(0.8f, 0.8f, 0.8f);
+  QSharedPointer<Material> material(new MirrorMaterial(0.7));
 //   Sphere * sphere = new Sphere(center, radius, QSharedPointer<Material>(new DiffuseMaterial(kd, kd, 32)));
-  Sphere * sphere = new Sphere(center, radius, QSharedPointer<Material>(new MirrorMaterial(0.7)));
+  Sphere * sphere = new Sphere(center, radius, material);
+  AxisAlignedBox * box = new AxisAlignedBox(QVector3D(-.2, -.2, -.2), QVector3D(.2, .2, .2), material);
   std::list< QSharedPointer<Intersectable> > objects;
-  objects.push_back(QSharedPointer<Intersectable>(sphere));
+  objects.push_back(QSharedPointer<Intersectable>(box));
 
   QVector4D normal(0.f, 1.f, 0.f, 1.f);
   kd = Spectrum(0.f, 0.8f, 0.8f);

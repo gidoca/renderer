@@ -8,9 +8,10 @@ include(${QT_USE_FILE})
 
 set(renderingproject_SRCS main.cpp camera.cpp ray.cpp plane.cpp sphere.cpp
   hitrecord.cpp triangle.cpp
-  intersectableinstance.cpp darkmatter.cpp diffusematerial.cpp
+  darkmatter.cpp diffusematerial.cpp
   directionallight.cpp intersectablelist.cpp binarymaterial.cpp
-  pointlight.cpp objreader.cpp mirrormaterial.cpp transparentmaterial.cpp)
+  pointlight.cpp objreader.cpp mirrormaterial.cpp transparentmaterial.cpp
+  axisalignedbox.cpp)
 qt4_automoc(${renderingproject_SRCS})
 add_executable(renderingproject ${renderingproject_SRCS})
 target_link_libraries(renderingproject ${QT_LIBRARIES})
