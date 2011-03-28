@@ -61,3 +61,8 @@ HitRecord Triangle::intersect(Ray ray, double from, double to) const
     return HitRecord();
   }*/
 }
+
+AxisAlignedBox * Triangle::boundingBox() const
+{
+  return 0;
+}

@@ -13,6 +13,7 @@ class Sphere : public Intersectable
     Sphere(QVector3D center, double radius, QSharedPointer<Material> material);
 
     HitRecord intersect(Ray ray, double from, double to) const;
+    AxisAlignedBox * boundingBox() const;
     
   private:
     QVector3D center;

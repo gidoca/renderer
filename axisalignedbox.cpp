@@ -9,6 +9,12 @@ AxisAlignedBox::AxisAlignedBox(QVector3D min, QVector3D max, QSharedPointer<Mate
   
 }
 
+AxisAlignedBox::AxisAlignedBox(const AxisAlignedBox& other): min(other.min), max(other.max), material(other.material)
+{
+
+}
+
+
 HitRecord AxisAlignedBox::intersect(Ray ray, double from, double to) const
 {
   double a;
@@ -70,3 +76,17 @@ HitRecord AxisAlignedBox::intersect(Ray ray, double from, double to) const
   }
 }
 
+AxisAlignedBox* AxisAlignedBox::boundingBox() const
+{
+  return new AxisAlignedBox(*this);
+}
+
+QVector3D AxisAlignedBox::getMin() const
+{
+  return min;
+}
+
+QVector3D AxisAlignedBox::getMax() const
+{
+  return max;
+}

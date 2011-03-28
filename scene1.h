@@ -30,9 +30,10 @@ Intersectable * getScene(void)
   QSharedPointer<Material> material(new MirrorMaterial(0.7));
 //   Sphere * sphere = new Sphere(center, radius, QSharedPointer<Material>(new DiffuseMaterial(kd, kd, 32)));
   Sphere * sphere = new Sphere(center, radius, material);
-  AxisAlignedBox * box = new AxisAlignedBox(QVector3D(-.2, -.2, -.2), QVector3D(.2, .2, .2), material);
+  //AxisAlignedBox * box = new AxisAlignedBox(QVector3D(-.2, -.2, -.2), QVector3D(.2, .2, .2), material);
+  AxisAlignedBox * box = sphere->boundingBox();
   std::list< QSharedPointer<Intersectable> > objects;
-  objects.push_back(QSharedPointer<Intersectable>(box));
+  objects.push_back(QSharedPointer<Intersectable>(sphere));
 
   QVector4D normal(0.f, 1.f, 0.f, 1.f);
   kd = Spectrum(0.f, 0.8f, 0.8f);

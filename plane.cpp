@@ -1,5 +1,9 @@
 #include "plane.h"
 
+#include "axisalignedbox.h"
+
+#include <limits>
+
 Plane::Plane(QVector4D planeVector, QSharedPointer<Material> material) : planeVector(planeVector), material(material)
 {
 
@@ -18,4 +22,10 @@ HitRecord Plane::intersect(Ray ray, double from, double to) const
   {
     return HitRecord();
   }
+}
+
+AxisAlignedBox* Plane::boundingBox() const
+{
+  double inf = std::numeric_limits< double >::infinity();
+  return new AxisAlignedBox(QVector3D(-inf, -inf, -inf), QVector3D(inf, inf, inf), QSharedPointer<Material>(new DarkMatter()));
 }

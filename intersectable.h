@@ -10,10 +10,13 @@
 
 #include <limits>
 
+class AxisAlignedBox;
+
 class Intersectable
 {
   public:
     virtual HitRecord intersect(Ray ray, double from = EPSILON, double to = std::numeric_limits< double >::infinity()) const = 0;
+    virtual AxisAlignedBox * boundingBox() const = 0;
 };
 
 #endif // INTERSECTABLE_H
