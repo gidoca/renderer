@@ -11,7 +11,7 @@ set(renderingproject_SRCS main.cpp camera.cpp ray.cpp plane.cpp sphere.cpp
   darkmatter.cpp diffusematerial.cpp
   directionallight.cpp intersectablelist.cpp binarymaterial.cpp
   pointlight.cpp objreader.cpp mirrormaterial.cpp transparentmaterial.cpp
-  axisalignedbox.cpp)
+  axisalignedbox.cpp bsp.cpp)
 qt4_automoc(${renderingproject_SRCS})
 add_executable(renderingproject ${renderingproject_SRCS})
 target_link_libraries(renderingproject ${QT_LIBRARIES})

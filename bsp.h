@@ -10,27 +10,28 @@ class IntersectableList;
 class BSPNode
 {
   public:
-    virtual ~BSPNode();
-    
     static BSPNode * buildTree(IntersectableList * intersectables);
     
   private:
-    static BSPNode * buildTree(std::list< QSharedPointer< Intersectable > > intersectables, int depth, int maxDepth);
+    static BSPNode * buildTree(IntersectableList * intersectables, int depth, int maxDepth);
 };
 
 class BSPLeafNode : public BSPNode
 {
-  protected:
-    std::list< QSharedPointer<Intersectable> > objects;
+  public:
+    BSPLeafNode(IntersectableList * objects);
+  private:
+    IntersectableList * objects;
 };
 
 class BSPInternalNode : public BSPNode
 {
   public:
+    BSPInternalNode(double planePosition, short axis, BSPNode * lowerNode, BSPNode * upperNode);
     virtual ~BSPInternalNode();
   protected:
     double planePosition;
-    char axis;
+    short axis;
     BSPNode * lowerNode, * upperNode;
 };
 
