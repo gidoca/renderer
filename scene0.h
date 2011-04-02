@@ -12,7 +12,7 @@ Camera getCamera(QSize resolution)
   QVector3D eye(0.f,0.f,2.f);
   QVector3D lookAt(0.f,0.f,0.f);
   QVector3D up(0.f,1.f,0.f);
-  float fov = M_PI;
+  float fov = M_PI / 3;
   return Camera(eye, lookAt, up, fov, resolution);
 }
 
