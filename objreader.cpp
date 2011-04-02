@@ -1,12 +1,13 @@
 #include "objreader.h"
 #include "triangle.h"
+#include "bsp.h"
 
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
 #include <list>
 
-IntersectableList * ObjReader::getMesh(const char * fileName, QSharedPointer<Material> material)
+BSPNode * ObjReader::getMesh(const char * fileName, QSharedPointer<Material> material)
 {
   int nVertices;
   float *vertices;
@@ -18,7 +19,7 @@ IntersectableList * ObjReader::getMesh(const char * fileName, QSharedPointer<Mat
   readObj(fileName, nVertices, &vertices, &normals, &texcoords, nIndices, &indices);
   if(vertices == NULL)
   {
-    return new IntersectableList(triangles);
+    return new BSPLeafNode(new IntersectableList(triangles));
   }
   for(int i = 0; i < nIndices; i += 3)
   {
@@ -39,7 +40,7 @@ IntersectableList * ObjReader::getMesh(const char * fileName, QSharedPointer<Mat
     }
     triangles.push_back(QSharedPointer<Intersectable>(triangle));
   }
-  return new IntersectableList(triangles);
+  return BSPNode::buildTree(new IntersectableList(triangles));
 }
 
 void ObjReader::get_indices(char *word, int *vindex, int *tindex, int *nindex)

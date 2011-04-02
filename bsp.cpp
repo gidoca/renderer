@@ -10,7 +10,8 @@ BSPNode * BSPNode::buildTree(IntersectableList * intersectables)
 
 BSPNode* BSPNode::buildTree(IntersectableList * intersectables, int depth, int maxDepth)
 {
-  if(depth >= maxDepth)
+  std::list< QSharedPointer<Intersectable> > components = intersectables->getComponents();
+  if(depth >= maxDepth || components.size() <= 1)
   {
     return new BSPLeafNode(intersectables);
   }
@@ -21,13 +22,13 @@ BSPNode* BSPNode::buildTree(IntersectableList * intersectables, int depth, int m
     QVector3D diff = boundingBox->getMax() - boundingBox->getMin();
     short axis;
     double planePosition;
-    if(diff.x() > diff.z())
+    if(diff.x() >= diff.z())
     {
-      if(diff.x() > diff.y())
+      if(diff.x() >= diff.y())
       {
 	axis = 0;
 	planePosition = boundingBox->getMin().x() + diff.x() / 2;
-	for(std::list< QSharedPointer<Intersectable> >::const_iterator i = intersectables->getComponents().begin(); i != intersectables->getComponents().end(); i++)
+	for(std::list< QSharedPointer<Intersectable> >::const_iterator i = components.begin(); i != components.end(); i++)
 	{
 	  AxisAlignedBox * componentBoundingBox = (*i)->boundingBox();
 	  if(planePosition <= componentBoundingBox->getMax().x())
@@ -45,7 +46,7 @@ BSPNode* BSPNode::buildTree(IntersectableList * intersectables, int depth, int m
       {
 	axis = 1;
  	planePosition = boundingBox->getMin().y() + diff.y() / 2;
- 	for(std::list< QSharedPointer<Intersectable> >::const_iterator i = intersectables->getComponents().begin(); i != intersectables->getComponents().end(); i++)
+ 	for(std::list< QSharedPointer<Intersectable> >::const_iterator i = components.begin(); i != components.end(); i++)
 	{
 	  AxisAlignedBox * componentBoundingBox = (*i)->boundingBox();
 	  if(planePosition <= componentBoundingBox->getMax().y())
@@ -64,7 +65,7 @@ BSPNode* BSPNode::buildTree(IntersectableList * intersectables, int depth, int m
     {
       axis = 2;
       planePosition = boundingBox->getMin().z() + diff.z() / 2;
-      for(std::list< QSharedPointer<Intersectable> >::const_iterator i = intersectables->getComponents().begin(); i != intersectables->getComponents().end(); i++)
+      for(std::list< QSharedPointer<Intersectable> >::const_iterator i = components.begin(); i != components.end(); i++)
       {
 	AxisAlignedBox * componentBoundingBox = (*i)->boundingBox();
 	if(planePosition <= componentBoundingBox->getMax().z())
@@ -85,6 +86,17 @@ BSPNode* BSPNode::buildTree(IntersectableList * intersectables, int depth, int m
     return  new BSPInternalNode(planePosition, axis, leftNode, rightNode);
   }
 }
+
+HitRecord BSPNode::intersect(Ray ray, double from, double to) const
+{
+  return HitRecord();
+}
+
+AxisAlignedBox* BSPNode::boundingBox() const
+{
+  return 0;
+}
+
 
 BSPLeafNode::BSPLeafNode(IntersectableList* objects): objects(objects)
 {

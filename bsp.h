@@ -1,16 +1,21 @@
 #ifndef BSP_H
 #define BSP_H
 
+#include "intersectable.h"
+
 #include <list>
 #include <QSharedPointer>
 
-class Intersectable;
 class IntersectableList;
+class Ray;
 
-class BSPNode
+class BSPNode : public Intersectable
 {
   public:
     static BSPNode * buildTree(IntersectableList * intersectables);
+    
+    HitRecord intersect(Ray ray, double from, double to) const;
+    AxisAlignedBox * boundingBox() const;
     
   private:
     static BSPNode * buildTree(IntersectableList * intersectables, int depth, int maxDepth);

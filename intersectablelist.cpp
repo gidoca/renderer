@@ -30,8 +30,10 @@ AxisAlignedBox * IntersectableList::boundingBox() const
   QVector3D max = -min;
   for(std::list<QSharedPointer<Intersectable> >::const_iterator i = components.begin(); i != components.end(); i++)
   {
-    QVector3D currentMin = (*i)->boundingBox()->getMin();
-    QVector3D currentMax = (*i)->boundingBox()->getMax();
+    AxisAlignedBox * boundingBox = (*i)->boundingBox();
+    QVector3D currentMin = boundingBox->getMin();
+    QVector3D currentMax = boundingBox->getMax();
+    delete boundingBox;
     if(currentMin.x() < min.x()) min.setX(currentMin.x());
     if(currentMin.y() < min.y()) min.setY(currentMin.y());   
     if(currentMin.z() < min.z()) min.setZ(currentMin.z());   

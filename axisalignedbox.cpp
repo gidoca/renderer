@@ -1,8 +1,18 @@
 #include "axisalignedbox.h"
 
 #include "material.h"
+#include "darkmatter.h"
 
 #include <cmath>
+
+AxisAlignedBox::AxisAlignedBox() :
+  min(QVector3D(std::numeric_limits< double >::infinity(), std::numeric_limits< double >::infinity(), std::numeric_limits< double >::infinity())),
+  max(QVector3D(-std::numeric_limits< double >::infinity(), -std::numeric_limits< double >::infinity(), -std::numeric_limits< double >::infinity())),
+  material(QSharedPointer<Material>(new DarkMatter()))
+{
+
+}
+
 
 AxisAlignedBox::AxisAlignedBox(QVector3D min, QVector3D max, QSharedPointer<Material> material): min(min), max(max), material(material)
 {
@@ -89,4 +99,14 @@ QVector3D AxisAlignedBox::getMin() const
 QVector3D AxisAlignedBox::getMax() const
 {
   return max;
+}
+
+void AxisAlignedBox::includePoint(QVector3D point)
+{
+  if(point.x() < min.x()) min.setX(point.x());
+  if(point.y() < min.y()) min.setY(point.y());
+  if(point.z() < min.z()) min.setZ(point.z());
+  if(point.x() > max.x()) max.setX(point.x());
+  if(point.y() > max.y()) max.setY(point.y());
+  if(point.z() > max.z()) max.setZ(point.z());
 }

@@ -14,6 +14,7 @@ class AxisAlignedBox : public Intersectable
 {
 
   public:
+    AxisAlignedBox();
     AxisAlignedBox(QVector3D min, QVector3D max, QSharedPointer<Material> material);
     AxisAlignedBox(const AxisAlignedBox& other);
     
@@ -22,6 +23,8 @@ class AxisAlignedBox : public Intersectable
     
     QVector3D getMin() const;
     QVector3D getMax() const;
+    
+    void includePoint(QVector3D point);
   
   private:
     QVector3D min, max;
