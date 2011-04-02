@@ -1,7 +1,20 @@
 #include "bsp.h"
 #include "intersectablelist.h"
+#include "plane.h"
 
 #include <cmath>
+
+BSPNode::BSPNode(AxisAlignedBox* boundingBox): bBox(boundingBox)
+{
+
+}
+
+
+BSPNode::~BSPNode()
+{
+  delete bBox;
+}
+
 
 BSPNode * BSPNode::buildTree(IntersectableList * intersectables)
 {
@@ -79,31 +92,31 @@ BSPNode* BSPNode::buildTree(IntersectableList * intersectables, int depth, int m
 	delete componentBoundingBox;
       }
     }
-    delete boundingBox;
-    delete intersectables;
     BSPNode * leftNode = buildTree(new IntersectableList(leftList), depth + 1, maxDepth);
     BSPNode * rightNode = buildTree(new IntersectableList(rightList), depth + 1, maxDepth);
-    return  new BSPInternalNode(planePosition, axis, leftNode, rightNode);
+    BSPInternalNode * result = new BSPInternalNode(planePosition, axis, leftNode, rightNode, intersectables->boundingBox());
+    delete boundingBox;
+    delete intersectables;
+    return result;
   }
-}
-
-HitRecord BSPNode::intersect(Ray ray, double from, double to) const
-{
-  return HitRecord();
 }
 
 AxisAlignedBox* BSPNode::boundingBox() const
 {
-  return 0;
+  return new AxisAlignedBox(*bBox);
 }
 
-
-BSPLeafNode::BSPLeafNode(IntersectableList* objects): objects(objects)
+BSPLeafNode::BSPLeafNode(IntersectableList* objects): BSPNode(objects->boundingBox()), objects(objects)
 {
 
 }
 
-BSPInternalNode::BSPInternalNode(double planePosition, short int axis, BSPNode* lowerNode, BSPNode* upperNode): planePosition(planePosition), axis(axis), lowerNode(lowerNode), upperNode(upperNode)
+HitRecord BSPLeafNode::intersect(Ray ray, double from, double to) const
+{
+  return objects->intersect(ray, from, to);
+}
+
+BSPInternalNode::BSPInternalNode(double planePosition, short int axis, BSPNode* lowerNode, BSPNode* upperNode, AxisAlignedBox* boundingBox): BSPNode(boundingBox), planePosition(planePosition), axis(axis), lowerNode(lowerNode), upperNode(upperNode)
 {
 
 }
@@ -112,4 +125,70 @@ BSPInternalNode::~BSPInternalNode()
 {
   delete lowerNode;
   delete upperNode;
+}
+
+HitRecord BSPInternalNode::intersect(Ray ray, double from, double to) const
+{
+  BSPNode *first, *second;
+  double rayOrigin, rayDirection;
+  QVector4D splitPlaneVector;
+  switch(axis)
+  {
+    case 0:
+      rayOrigin = ray.getOrigin().x();
+      rayDirection = ray.getDirection().x();
+      splitPlaneVector = QVector4D(1, 0, 0, planePosition);
+      break;
+    case 1:
+      rayOrigin = ray.getOrigin().y();
+      rayDirection = ray.getDirection().y();
+      splitPlaneVector = QVector4D(0, 1, 0, planePosition);
+      break;
+    case 2:
+      rayOrigin = ray.getOrigin().z();
+      rayDirection = ray.getDirection().z();
+      splitPlaneVector = QVector4D(0, 0, 1, planePosition);
+      break;
+  }
+  
+  Plane splitPlane(splitPlaneVector, QSharedPointer<Material>(new DarkMatter));
+  HitRecord splitPlaneHit = splitPlane.intersect(ray, -std::numeric_limits<double>::infinity());
+  double tsplit = splitPlane.intersect(ray, -std::numeric_limits<double>::infinity()).getRayParameter();
+  IntersectionParameter intersection = bBox->getIntersectionParameter(ray);
+  double rayTowardsFirst;
+  
+  if(rayOrigin < planePosition)
+  {
+    first = lowerNode;
+    second = upperNode;
+    rayTowardsFirst = rayDirection < 0;
+  }
+  else
+  {
+    first = upperNode;
+    second = lowerNode;
+    rayTowardsFirst = rayDirection > 0;
+  }
+  
+  if(tsplit > intersection.tmax || tsplit < 0 || (tsplit == 0 && rayTowardsFirst))
+  {
+    return first->intersect(ray, (from > intersection.tmin ? from : intersection.tmin), (to < intersection.tmax ? to : intersection.tmax));
+  }
+  else if(tsplit < intersection.tmin || (tsplit == 0 && !rayTowardsFirst))
+  {
+    return second->intersect(ray, (from > intersection.tmin ? from : intersection.tmin), (to < intersection.tmax ? to : intersection.tmax));
+  }
+  else
+  {
+    HitRecord firstHit = first->intersect(ray, (from > intersection.tmin ? from : intersection.tmin), tsplit);
+    if(firstHit.intersects())
+    {
+      return firstHit;
+    }
+    else
+    {
+      return second->intersect(ray, tsplit, intersection.tmax);
+    }
+  }
+  return HitRecord();
 }

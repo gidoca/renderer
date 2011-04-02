@@ -14,7 +14,7 @@ class Plane : public Intersectable
   public:
     Plane(QVector4D planeVector, QSharedPointer<Material> material);
     
-    HitRecord intersect(Ray ray, double from, double to) const;
+    HitRecord intersect(Ray ray, double from = EPSILON, double to = std::numeric_limits<double>::infinity()) const;
     AxisAlignedBox * boundingBox() const;
     
   private:

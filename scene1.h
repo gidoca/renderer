@@ -11,6 +11,7 @@
 #include "intersectablelist.h"
 #include "mirrormaterial.h"
 #include "axisalignedbox.h"
+#include "bsp.h"
 
 Camera getCamera(QSize resolution)
 {
@@ -60,7 +61,7 @@ Intersectable * getScene(void)
   plane = new Plane(normal, QSharedPointer<Material>(new DiffuseMaterial(kd, kd, 32)));
   objects.push_back(QSharedPointer<Intersectable>(plane));
 
-  return new IntersectableList(objects);
+  return BSPNode::buildTree(new IntersectableList(objects));
 }
 
 std::list<QSharedPointer<Light> > getLight(void)

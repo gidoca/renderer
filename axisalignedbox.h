@@ -10,6 +10,12 @@
 
 class Material;
 
+class IntersectionParameter
+{
+  public:
+    float tmin, tmax;
+};
+
 class AxisAlignedBox : public Intersectable
 {
 
@@ -20,6 +26,8 @@ class AxisAlignedBox : public Intersectable
     
     HitRecord intersect(Ray ray, double from = 0.00005, double to = std::numeric_limits< double >::infinity()) const;
     AxisAlignedBox * boundingBox() const;
+    
+    IntersectionParameter getIntersectionParameter(Ray ray) const;
     
     QVector3D getMin() const;
     QVector3D getMax() const;

@@ -27,25 +27,37 @@ AxisAlignedBox::AxisAlignedBox(const AxisAlignedBox& other): min(other.min), max
 
 HitRecord AxisAlignedBox::intersect(Ray ray, double from, double to) const
 {
-  double a;
-  double tmin, tmax;
-  double temp_tmin, temp_tmax;
-  QVector3D rayDirection = ray.getDirection().toVector3D();
-  QVector3D rayOrigin = ray.getOrigin().toVector3DAffine();
-  QVector3D surfaceNormal;
-  a = 1 / rayDirection.x();
-  if(a >= 0)
+  IntersectionParameter intersectionParameter = getIntersectionParameter(ray);
+  if(intersectionParameter.tmin < intersectionParameter.tmax && from < intersectionParameter.tmin && intersectionParameter.tmax < to)
   {
-    tmin = (min.x() - rayOrigin.x());
-    tmax = (max.x() - rayOrigin.x());
+    return HitRecord(intersectionParameter.tmin, ray, material, QVector3D());
   }
   else
   {
-    tmin = (max.x() - rayOrigin.x());
-    tmax = (min.x() - rayOrigin.x());
+    return HitRecord();
   }
-  tmin *= a;
-  tmax *= a;
+}
+
+IntersectionParameter AxisAlignedBox::getIntersectionParameter(Ray ray) const
+{
+  IntersectionParameter result;
+  double a;
+  double temp_tmin, temp_tmax;
+  QVector3D rayDirection = ray.getDirection().toVector3D();
+  QVector3D rayOrigin = ray.getOrigin().toVector3DAffine();
+  a = 1 / rayDirection.x();
+  if(a >= 0)
+  {
+    result.tmin = (min.x() - rayOrigin.x());
+    result.tmax = (max.x() - rayOrigin.x());
+  }
+  else
+  {
+    result.tmin = (max.x() - rayOrigin.x());
+    result.tmax = (min.x() - rayOrigin.x());
+  }
+  result.tmin *= a;
+  result.tmax *= a;
   a = 1 / rayDirection.y();
   if(a >= 0)
   {
@@ -59,8 +71,8 @@ HitRecord AxisAlignedBox::intersect(Ray ray, double from, double to) const
   }
   temp_tmin *= a;
   temp_tmax *= a;
-  if(temp_tmin > tmin) tmin = temp_tmin;
-  if(temp_tmax < tmax) tmax = temp_tmax;
+  if(temp_tmin > result.tmin) result.tmin = temp_tmin;
+  if(temp_tmax < result.tmax) result.tmax = temp_tmax;
   a = 1 / rayDirection.z();
   if(a >= 0)
   {
@@ -74,16 +86,9 @@ HitRecord AxisAlignedBox::intersect(Ray ray, double from, double to) const
   }
   temp_tmin *= a;
   temp_tmax *= a;
-  if(temp_tmin > tmin) tmin = temp_tmin;
-  if(temp_tmax < tmax) tmax = temp_tmax;
-  if(tmin < tmax)
-  {
-    return HitRecord(tmin, ray, material, QVector3D());
-  }
-  else
-  {
-    return HitRecord();
-  }
+  if(temp_tmin > result.tmin) result.tmin = temp_tmin;
+  if(temp_tmax < result.tmax) result.tmax = temp_tmax;
+  return result;
 }
 
 AxisAlignedBox* AxisAlignedBox::boundingBox() const

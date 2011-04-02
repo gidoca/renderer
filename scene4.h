@@ -6,6 +6,7 @@
 #include "plane.h"
 #include "intersectableinstance.h"
 #include "sphere.h"
+#include "bsp.h"
 
 #include <list>
 #include <QSize>
@@ -16,7 +17,7 @@ Intersectable * getScene(void)
   QSharedPointer<Material> material(new DiffuseMaterial(Spectrum(0, 0, 1), Spectrum(1, 1, 1), 64));
   QSharedPointer<Material> transparentMaterial(new TransparentMaterial(.8));
 
-  IntersectableList * obj = ObjReader::getMesh("objfiles/teapot.obj", transparentMaterial);
+  BSPNode * obj = ObjReader::getMesh("objfiles/teapot.obj", transparentMaterial);
   
   std::list<QSharedPointer<Intersectable> > scene;
   QMatrix4x4 t;
