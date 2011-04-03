@@ -14,8 +14,8 @@ int main(int argc, char **argv) {
   QImage image(resolution, QImage::Format_RGB32);
   
   const Intersectable * object = getScene();
-  std::list<QSharedPointer<Light> > light = getLight();
-  Camera camera = getCamera(resolution);
+  const std::list<QSharedPointer<Light> > light = getLight();
+  const Camera camera = getCamera(resolution);
   
   #pragma omp parallel for schedule(dynamic)
   for(int i = 0; i < image.height(); i++)
@@ -23,15 +23,15 @@ int main(int argc, char **argv) {
     QRgb * scanline = (QRgb *) image.scanLine(i);
     for(int j = 0; j < image.width(); j++)
     {
-      if(i == 110 && j == 150)
+      if(i == 200 && j == 300)
       {
-	i = i;
+        std::cout << "break" << std::endl;
       }
       QPoint point = QPoint(j, i);
       Ray ray = camera.getRay(point);
       HitRecord hitRecord = object->intersect(ray);
       Spectrum irradiance;
-      for(std::list<QSharedPointer<Light> >::iterator i = light.begin(); i != light.end(); i++)
+      for(std::list<QSharedPointer<Light> >::const_iterator i = light.begin(); i != light.end(); i++)
       {
         irradiance += 255 * hitRecord.getMaterial().shade(hitRecord, **i, *object, 0);
       }

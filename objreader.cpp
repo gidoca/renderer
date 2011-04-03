@@ -19,7 +19,8 @@ BSPNode * ObjReader::getMesh(const char * fileName, QSharedPointer<Material> mat
   readObj(fileName, nVertices, &vertices, &normals, &texcoords, nIndices, &indices);
   if(vertices == NULL)
   {
-    return new BSPLeafNode(new IntersectableList(triangles));
+    IntersectableList * list = new IntersectableList(triangles);
+    return new BSPLeafNode(list, list->boundingBox());
   }
   for(int i = 0; i < nIndices; i += 3)
   {

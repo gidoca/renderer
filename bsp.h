@@ -22,14 +22,14 @@ class BSPNode : public Intersectable
     AxisAlignedBox * bBox;
     
   private:
-    static BSPNode * buildTree(IntersectableList * intersectables, int depth, int maxDepth);
+    static BSPNode * buildTree(IntersectableList * intersectables, int depth, int maxDepth, AxisAlignedBox * boundingBox);
     
 };
 
 class BSPLeafNode : public BSPNode
 {
   public:
-    BSPLeafNode(IntersectableList * objects);
+    BSPLeafNode(IntersectableList * objects, AxisAlignedBox * boundingBox);
     
     HitRecord intersect(Ray ray, double from, double to) const;
   private:
