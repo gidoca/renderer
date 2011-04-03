@@ -13,7 +13,7 @@ class Material;
 class IntersectionParameter
 {
   public:
-    float tmin, tmax;
+    double tmin, tmax;
 };
 
 class AxisAlignedBox : public Intersectable

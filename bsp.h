@@ -17,7 +17,8 @@ class BSPNode : public Intersectable
     static BSPNode * buildTree(IntersectableList * intersectables);
     
     AxisAlignedBox * boundingBox() const;
-    
+    static int cnt;
+
   protected:
     AxisAlignedBox * bBox;
     

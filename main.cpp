@@ -16,6 +16,7 @@ int main(int argc, char **argv) {
   const Intersectable * object = getScene();
   const std::list<QSharedPointer<Light> > light = getLight();
   const Camera camera = getCamera(resolution);
+  std::cout << BSPNode::cnt << std::endl;
   
   #pragma omp parallel for schedule(dynamic)
   for(int i = 0; i < image.height(); i++)
@@ -23,7 +24,7 @@ int main(int argc, char **argv) {
     QRgb * scanline = (QRgb *) image.scanLine(i);
     for(int j = 0; j < image.width(); j++)
     {
-      if(i == 200 && j == 300)
+      if(i == 250 && j == 200)
       {
         std::cout << "break" << std::endl;
       }
@@ -31,14 +32,14 @@ int main(int argc, char **argv) {
       Ray ray = camera.getRay(point);
       HitRecord hitRecord = object->intersect(ray);
       Spectrum irradiance;
-      for(std::list<QSharedPointer<Light> >::const_iterator i = light.begin(); i != light.end(); i++)
+      for(std::list<QSharedPointer<Light> >::const_iterator lights = light.begin(); lights != light.end(); lights++)
       {
-        irradiance += 255 * hitRecord.getMaterial().shade(hitRecord, **i, *object, 0);
+        irradiance += 255 * hitRecord.getMaterial().shade(hitRecord, **lights, *object, 0);
       }
   
       scanline[j] = qRgb((int) clamp(irradiance.x()), (int) clamp(irradiance.y()), (int) clamp(irradiance.z()));
     }
-    std::cout << i * 100 / image.height() << "% complete" << std::endl;
+    //std::cout << i * 100 / image.height() << "% complete" << std::endl;
   }
   
   delete object;

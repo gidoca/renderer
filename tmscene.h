@@ -18,10 +18,11 @@ Intersectable * getScene(void)
   
   std::list<QSharedPointer<Intersectable> > scene;
   QMatrix4x4 t;
-//   t.scale(0.5);
-//   t.translate(0.5, 0, 0);
-  //scene.push_back(QSharedPointer<Intersectable>(new IntersectableInstance(t, QSharedPointer<Intersectable>(obj))));
+//  t.scale(0.5);
+//  t.translate(0.5, 0, 0);
+//  scene.push_back(QSharedPointer<Intersectable>(new IntersectableInstance(t, QSharedPointer<Intersectable>(obj))));
   scene.push_back(QSharedPointer<Intersectable>(QSharedPointer<Intersectable>(obj)));
+//  scene.push_back(QSharedPointer<Intersectable>(new AxisAlignedBox(QVector3D(-.5, -.5, -.5), QVector3D(.5, .5, .5), material)));
   scene.push_back(QSharedPointer<Intersectable>(new Plane(QVector4D(0, 1, 0, 0), material)));
   
   return new IntersectableList(scene);

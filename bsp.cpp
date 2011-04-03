@@ -3,11 +3,17 @@
 #include "plane.h"
 
 #include <cmath>
+#include <algorithm>
 #include <iostream>
+
+using namespace std;
+
+int BSPNode::cnt = 0;
+
 
 BSPNode::BSPNode(AxisAlignedBox* boundingBox): bBox(boundingBox)
 {
-  
+  BSPNode::cnt++;
 }
 
 
@@ -139,6 +145,9 @@ BSPInternalNode::~BSPInternalNode()
 
 HitRecord BSPInternalNode::intersect(Ray ray, double from, double to) const
 {
+  IntersectionParameter intersection = bBox->getIntersectionParameter(ray);
+//  if(intersection.tmin >= intersection.tmax) return HitRecord();
+//  if(intersection.tmin < intersection.tmax) std::cout << "I";
   BSPNode *first, *second;
   double rayOrigin, rayDirection;
   QVector4D splitPlaneVector;
@@ -164,7 +173,6 @@ HitRecord BSPInternalNode::intersect(Ray ray, double from, double to) const
   Plane splitPlane(splitPlaneVector, QSharedPointer<Material>(new DarkMatter));
   HitRecord splitPlaneHit = splitPlane.intersect(ray, -std::numeric_limits<double>::infinity());
   double tsplit = splitPlaneHit.getRayParameter();
-  IntersectionParameter intersection = bBox->getIntersectionParameter(ray);
   bool rayTowardsFirst;
   
   if(rayOrigin < planePosition)
@@ -180,7 +188,7 @@ HitRecord BSPInternalNode::intersect(Ray ray, double from, double to) const
     rayTowardsFirst = rayDirection > 0;
   }
   
-  if(tsplit > intersection.tmax || tsplit < 0 || (tsplit == 0 && rayTowardsFirst))
+  /*if(tsplit > intersection.tmax || tsplit < 0 || (tsplit == 0 && rayTowardsFirst))
   {
     return first->intersect(ray, (from > intersection.tmin ? from : intersection.tmin), (to < intersection.tmax ? to : intersection.tmax));
   }
@@ -199,6 +207,21 @@ HitRecord BSPInternalNode::intersect(Ray ray, double from, double to) const
     {
       return second->intersect(ray, tsplit, intersection.tmax);
     }
+  }*/
+  AxisAlignedBox * bb = first->boundingBox();
+  if(bb->intersect(ray, from, to).intersects())
+  {
+    HitRecord firstHit = first->intersect(ray, max(from, intersection.tmin), min(min(to, intersection.tmax), tsplit));
+    if(firstHit.intersects()) return firstHit;
   }
-  return HitRecord();
+  //delete bb;
+  bb = second->boundingBox();
+  if(bb->intersect(ray, from, to).intersects())
+  {
+    return second->intersect(ray, max(max(from, tsplit), intersection.tmin), min(to, intersection.tmax));
+  }
+  else
+  {
+    return HitRecord();
+  }
 }
