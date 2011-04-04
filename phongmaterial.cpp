@@ -15,10 +15,10 @@ Spectrum PhongMaterial::shade(HitRecord& hit, const Light& light) const
   Spectrum lightIntensity = light.getIntensity(hit.getIntersectingPoint(), direction);
   QVector3D normal = hit.getSurfaceNormal();
   double coefficient = QVector3D::dotProduct(direction.normalized(), hit.getSurfaceNormal().normalized());
-  lightIntensity = coefficient > 0 ? coefficient * lightIntensity : Spectrum();
+  coefficient = coefficient > 0 ? coefficient : 0;
   QVector3D reflected = 2 * QVector3D::dotProduct(direction, normal) * normal - direction;
   Spectrum diffuseSpectrum(lightIntensity.x() * color.x(), lightIntensity.y() * color.y(), lightIntensity.z() * color.z());
   Spectrum specularSpectrum(lightIntensity.x() * specularColor.x(), lightIntensity.y() * specularColor.y(), lightIntensity.z() * specularColor.z());
   specularSpectrum *= pow(QVector3D::dotProduct(reflected.normalized(), hit.getRay().getDirection().toVector3D().normalized()), specularCoefficient);
-  return diffuseSpectrum + specularSpectrum;// + Spectrum(.04, .04, .04);
+  return coefficient * diffuseSpectrum + specularSpectrum;// + Spectrum(.04, .04, .04);
 }

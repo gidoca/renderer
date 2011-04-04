@@ -6,7 +6,7 @@ JitteredSampler::JitteredSampler(int width, int height, unsigned int seed) : Sam
   {
     for(int j = 0; j < height; j++)
     {
-      QPointF sample(getRandom() * (double) i / width, getRandom() * (double) j / width);
+      QPointF sample((getRandom() + (double) i) / (width + 1), (getRandom() + (double) j) / (width + 1));
       samples.push_back(sample);
     }
   }
