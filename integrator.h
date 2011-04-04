@@ -3,6 +3,9 @@
 
 #include "spectrum.h"
 
+#include <list>
+#include <QSharedPointer>
+
 #define MAX_DEPTH 6
 
 class Ray;
@@ -12,10 +15,10 @@ class Light;
 class Integrator
 {
 public:
-    Spectrum integrate(const Ray & ray, const Intersectable & scene, const Light & light) const;
+  Spectrum integrate(const Ray & ray, const Intersectable & scene, std::list< QSharedPointer<Light> > light) const;
 
 private:
-    Spectrum integrate(const Ray &ray, const Intersectable &scene, const Light & light, int recursionDepth) const;
+  Spectrum integrate(const Ray &ray, const Intersectable &scene, const Light & light, int recursionDepth) const;
 };
 
 #endif // INTEGRATOR_H

@@ -21,7 +21,7 @@ Camera::Camera(QVector3D cop, QVector3D look_at, QVector3D up, double fov, QSize
   extrinsicMatrix.setColumn(3, QVector4D(cop, 1));
 }
 
-Ray Camera::getRay(QPoint point) const
+Ray Camera::getRay(QPointF point) const
 {
   QVector4D pixelLocation = QVector4D(l + (r - l) * (point.x() + 0.5) / resolution.width(), 
 				      t + (b - t) * (point.y() + 0.5) / resolution.height(), 

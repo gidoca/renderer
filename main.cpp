@@ -1,6 +1,8 @@
 #include <QSize>
 #include <QImage>
 #include <QSharedPointer>
+#include <QTime>
+
 #include <list>
 #include <iostream>
 
@@ -10,6 +12,8 @@
 #define clamp(x) ((x) <= 0 ? 0 : ((x) >= 255 ? 255 : (x)))
 
 int main(int argc, char **argv) {
+  QTime time;
+  time.start();
   QSize resolution(512, 512);
 
   QImage image(resolution, QImage::Format_RGB32);
@@ -26,13 +30,9 @@ int main(int argc, char **argv) {
     QRgb * scanline = (QRgb *) image.scanLine(i);
     for(int j = 0; j < image.width(); j++)
     {
-      QPoint point = QPoint(j, i);
+      QPointF point = QPoint(j, i);
       Ray ray = camera.getRay(point);
-      Spectrum irradiance;
-      for(std::list<QSharedPointer<Light> >::const_iterator lights = light.begin(); lights != light.end(); lights++)
-      {
-        irradiance += 255 * integrator.integrate(ray, *object, **lights);
-      }
+      Spectrum irradiance = 255 * integrator.integrate(ray, *object, light);
   
       scanline[j] = qRgb((int) clamp(irradiance.x()), (int) clamp(irradiance.y()), (int) clamp(irradiance.z()));
     }
@@ -42,5 +42,6 @@ int main(int argc, char **argv) {
   delete object;
   
   image.save("tst.png");
+  std::cout << time.elapsed() << "ms\n";
   return 0;
 }
