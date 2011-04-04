@@ -13,6 +13,7 @@
 #include "intersectableinstance.h"
 #include "objreader.h"
 #include "transparentmaterial.h"
+#include "bsp.h"
 
 Camera getCamera(QSize resolution)
 {

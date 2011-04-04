@@ -7,7 +7,7 @@ include_directories(${QT_INCLUDES} ${CMAKE_CURRENT_BINARY_DIR})
 include(${QT_USE_FILE})
 
 set(renderingproject_SRCS main.cpp camera.cpp ray.cpp plane.cpp sphere.cpp
-  hitrecord.cpp triangle.cpp
+  hitrecord.cpp triangle.cpp intersectableinstance.cpp
   darkmatter.cpp diffusematerial.cpp
   directionallight.cpp intersectablelist.cpp binarymaterial.cpp
   pointlight.cpp objreader.cpp mirrormaterial.cpp transparentmaterial.cpp

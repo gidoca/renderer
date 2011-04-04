@@ -1,4 +1,5 @@
 #include "intersectableinstance.h"
+#include "axisalignedbox.h"
 
 IntersectableInstance::IntersectableInstance(QMatrix4x4 transform, QSharedPointer<Intersectable> intersectable) : transform(transform), inverseTransform(transform.inverted()), intersectable(intersectable)
 {
@@ -13,3 +14,19 @@ HitRecord IntersectableInstance::intersect(Ray ray, double from, double to) cons
   return hitRecord;
 }
 
+AxisAlignedBox * IntersectableInstance::boundingBox() const
+{
+  AxisAlignedBox * untransformed = intersectable->boundingBox();
+  AxisAlignedBox * result = new AxisAlignedBox();
+  QVector3D min = untransformed->getMin(), max = untransformed->getMax();
+  result->includePoint(QVector3D(min.x(), min.y(), min.z()));
+  result->includePoint(QVector3D(min.x(), min.y(), max.z()));
+  result->includePoint(QVector3D(min.x(), max.y(), min.z()));
+  result->includePoint(QVector3D(min.x(), max.y(), max.z()));
+  result->includePoint(QVector3D(max.x(), min.y(), min.z()));
+  result->includePoint(QVector3D(max.x(), min.y(), max.z()));
+  result->includePoint(QVector3D(max.x(), max.y(), min.z()));
+  result->includePoint(QVector3D(max.x(), max.y(), max.z()));
+  delete untransformed;
+  return result;
+}

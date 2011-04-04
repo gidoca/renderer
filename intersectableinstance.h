@@ -10,9 +10,11 @@ class IntersectableInstance : public Intersectable
 {
 
 public:
-  virtual HitRecord intersect(Ray ray, double from, double to) const;
   IntersectableInstance(QMatrix4x4 transform, QSharedPointer<Intersectable> intersectable);
-    
+
+  HitRecord intersect(Ray ray, double from, double to) const;
+  AxisAlignedBox * boundingBox() const;
+
 private:
   QMatrix4x4 transform;
   QMatrix4x4 inverseTransform;
