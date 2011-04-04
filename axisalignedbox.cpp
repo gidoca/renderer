@@ -24,6 +24,10 @@ AxisAlignedBox::AxisAlignedBox(const AxisAlignedBox& other): min(other.min), max
 
 }
 
+AxisAlignedBox::~AxisAlignedBox()
+{
+
+}
 
 HitRecord AxisAlignedBox::intersect(Ray ray, double from, double to) const
 {

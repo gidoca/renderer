@@ -25,7 +25,8 @@ BSPNode::~BSPNode()
 
 BSPNode * BSPNode::buildTree(IntersectableList * intersectables)
 {
-  return buildTree(intersectables, 0, 8 + (int) (1.3 * log(intersectables->getComponents().size())), intersectables->boundingBox());
+//  return buildTree(intersectables, 0, 8 + (int) (1.3 * log(intersectables->getComponents().size())), intersectables->boundingBox());
+  return buildTree(intersectables, 0, 1, intersectables->boundingBox());
 }
 
 BSPNode* BSPNode::buildTree(IntersectableList * intersectables, int depth, int maxDepth, AxisAlignedBox * boundingBox)
@@ -127,6 +128,11 @@ BSPLeafNode::BSPLeafNode(IntersectableList* objects, AxisAlignedBox * boundingBo
   
 }
 
+BSPLeafNode::~BSPLeafNode()
+{
+
+}
+
 HitRecord BSPLeafNode::intersect(Ray ray, double from, double to) const
 {
   return objects->intersect(ray, from, to);
@@ -188,40 +194,43 @@ HitRecord BSPInternalNode::intersect(Ray ray, double from, double to) const
     rayTowardsFirst = rayDirection > 0;
   }
   
-  /*if(tsplit > intersection.tmax || tsplit < 0 || (tsplit == 0 && rayTowardsFirst))
+  if(tsplit > intersection.tmax || tsplit < 0 || (tsplit == 0 && rayTowardsFirst))
   {
-    return first->intersect(ray, (from > intersection.tmin ? from : intersection.tmin), (to < intersection.tmax ? to : intersection.tmax));
+    return first->intersect(ray, max(from, intersection.tmin), min(to, intersection.tmax));
   }
   else if(tsplit < intersection.tmin || (tsplit == 0 && !rayTowardsFirst))
   {
-    return second->intersect(ray, (from > intersection.tmin ? from : intersection.tmin), (to < intersection.tmax ? to : intersection.tmax));
+    return second->intersect(ray, max(from, intersection.tmin), min(to, intersection.tmax));
   }
   else
   {
-    HitRecord firstHit = first->intersect(ray, (from > intersection.tmin ? from : intersection.tmin), tsplit);
+//    HitRecord firstHit = first->intersect(ray, (from > intersection.tmin ? from : intersection.tmin), tsplit);
+    HitRecord firstHit = first->intersect(ray, from, tsplit);
     if(firstHit.intersects())
     {
       return firstHit;
     }
     else
     {
-      return second->intersect(ray, tsplit, intersection.tmax);
+//      return second->intersect(ray, tsplit, intersection.tmax);
+      return second->intersect(ray, tsplit, to);
     }
-  }*/
-  AxisAlignedBox * bb = first->boundingBox();
-  if(bb->intersect(ray, from, to).intersects())
-  {
-    HitRecord firstHit = first->intersect(ray, max(from, intersection.tmin), min(min(to, intersection.tmax), tsplit));
-    if(firstHit.intersects()) return firstHit;
   }
-  //delete bb;
-  bb = second->boundingBox();
-  if(bb->intersect(ray, from, to).intersects())
-  {
-    return second->intersect(ray, max(max(from, tsplit), intersection.tmin), min(to, intersection.tmax));
-  }
-  else
-  {
-    return HitRecord();
-  }
+//  AxisAlignedBox * bb = first->boundingBox();
+//  if(bb->intersect(ray, from, to).intersects())
+//  {
+//    HitRecord firstHit = first->intersect(ray, max(from, intersection.tmin), min(min(to, intersection.tmax), tsplit));
+//    if(firstHit.intersects()) return firstHit;
+//  }
+//  delete bb;
+//  bb = second->boundingBox();
+//  if(bb->intersect(ray, from, to).intersects())
+//  {
+//    return second->intersect(ray, max(max(from, tsplit), intersection.tmin), min(to, intersection.tmax));
+//  }
+//  else
+//  {
+//    return HitRecord();
+//  }
+//  delete bb;
 }

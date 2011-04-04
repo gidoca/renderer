@@ -24,7 +24,7 @@ int main(int argc, char **argv) {
     QRgb * scanline = (QRgb *) image.scanLine(i);
     for(int j = 0; j < image.width(); j++)
     {
-      if(i == 250 && j == 200)
+      if(i == 220 && j == 175)
       {
         std::cout << "break" << std::endl;
       }

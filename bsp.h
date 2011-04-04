@@ -31,6 +31,7 @@ class BSPLeafNode : public BSPNode
 {
   public:
     BSPLeafNode(IntersectableList * objects, AxisAlignedBox * boundingBox);
+    virtual ~BSPLeafNode();
     
     HitRecord intersect(Ray ray, double from, double to) const;
   private:

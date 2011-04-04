@@ -23,6 +23,7 @@ class AxisAlignedBox : public Intersectable
     AxisAlignedBox();
     AxisAlignedBox(QVector3D min, QVector3D max, QSharedPointer<Material> material);
     AxisAlignedBox(const AxisAlignedBox& other);
+    virtual ~AxisAlignedBox();
     
     HitRecord intersect(Ray ray, double from = 0.00005, double to = std::numeric_limits< double >::infinity()) const;
     AxisAlignedBox * boundingBox() const;
