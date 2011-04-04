@@ -8,6 +8,7 @@
 
 #include "scene1.h"
 #include "integrator.h"
+#include "jitteredsampler.h"
 
 #define clamp(x) ((x) <= 0 ? 0 : ((x) >= 255 ? 255 : (x)))
 
@@ -27,12 +28,19 @@ int main(int argc, char **argv) {
   #pragma omp parallel for schedule(dynamic)
   for(int i = 0; i < image.height(); i++)
   {
+    JitteredSampler sampler(5, 5, i);
+    std::list<QPointF> samples = sampler.getSamples();
     QRgb * scanline = (QRgb *) image.scanLine(i);
     for(int j = 0; j < image.width(); j++)
     {
       QPointF point = QPoint(j, i);
-      Ray ray = camera.getRay(point);
-      Spectrum irradiance = 255 * integrator.integrate(ray, *object, light);
+      Spectrum irradiance;
+      for(std::list<QPointF>::iterator i = samples.begin(); i != samples.end(); i++)
+      {
+        QPointF samplePoint = point + *i;
+        Ray ray = camera.getRay(samplePoint);
+        irradiance += 255 * integrator.integrate(ray, *object, light) / samples.size();
+      }
   
       scanline[j] = qRgb((int) clamp(irradiance.x()), (int) clamp(irradiance.y()), (int) clamp(irradiance.z()));
     }
