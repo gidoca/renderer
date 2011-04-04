@@ -11,8 +11,8 @@ PhongMaterial::PhongMaterial(Spectrum color, Spectrum specularColor, double spec
 
 Spectrum PhongMaterial::shade(HitRecord& hit, const Light& light) const
 {
-  Spectrum lightIntensity = light.getIntensity(hit.getIntersectingPoint());
-  QVector3D direction = -light.getDirection(hit.getIntersectingPoint());
+  QVector3D direction;
+  Spectrum lightIntensity = light.getIntensity(hit.getIntersectingPoint(), direction);
   QVector3D normal = hit.getSurfaceNormal();
   double coefficient = QVector3D::dotProduct(direction.normalized(), hit.getSurfaceNormal().normalized());
   lightIntensity = coefficient > 0 ? coefficient * lightIntensity : Spectrum();

@@ -5,9 +5,10 @@ PointLight::PointLight(QVector3D location, Spectrum intensity) : location(locati
   
 }
 
-Spectrum PointLight::getIntensity (QVector3D at) const
+Spectrum PointLight::getIntensity (QVector3D at, QVector3D & direction) const
 {
-  return intensity / getDirection(at).lengthSquared();
+  direction = -getDirection(at);
+  return intensity / direction.lengthSquared();
 }
 
 QVector3D PointLight::getDirection (QVector3D at) const

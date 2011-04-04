@@ -7,13 +7,14 @@ DirectionalLight::DirectionalLight(QVector3D direction, Spectrum intensity) : di
 
 }
 
-Spectrum DirectionalLight::getDirection(QVector3D) const
+Spectrum DirectionalLight::getDirection() const
 {
   return direction;
 }
 
-Spectrum DirectionalLight::getIntensity(QVector3D) const
+Spectrum DirectionalLight::getIntensity(QVector3D, QVector3D & direction) const
 {
+  direction = getDirection();
   return intensity;
 }
 

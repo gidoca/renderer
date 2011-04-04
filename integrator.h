@@ -11,14 +11,15 @@
 class Ray;
 class Intersectable;
 class Light;
+class Sampler;
 
 class Integrator
 {
 public:
-  Spectrum integrate(const Ray & ray, const Intersectable & scene, std::list< QSharedPointer<Light> > light) const;
+  Spectrum integrate(const Ray & ray, const Intersectable & scene, std::list< QSharedPointer<Light> > light, Sampler & sampler) const;
 
 private:
-  Spectrum integrate(const Ray &ray, const Intersectable &scene, const Light & light, int recursionDepth) const;
+  Spectrum integrate(const Ray &ray, const Intersectable &scene, const Light & light, Sampler & sampler, int recursionDepth) const;
 };
 
 #endif // INTEGRATOR_H
