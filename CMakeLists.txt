@@ -12,9 +12,10 @@ set(renderingproject_SRCS main.cpp camera.cpp ray.cpp plane.cpp sphere.cpp
   directionallight.cpp intersectablelist.cpp binarymaterial.cpp
   pointlight.cpp objreader.cpp mirrormaterial.cpp
   axisalignedbox.cpp bsp.cpp integrator.cpp
-  sampler.cpp jitteredsampler.cpp arealight.cpp)
+  sampler.cpp jitteredsampler.cpp arealight.cpp
+  hdrloader.cpp environmentmap.cpp)
 qt4_automoc(${renderingproject_SRCS})
 add_executable(renderingproject ${renderingproject_SRCS})
 target_link_libraries(renderingproject ${QT_LIBRARIES})
 
-set(CMAKE_CXX_FLAGS "-Wall -ggdb")
+set(CMAKE_CXX_FLAGS "-Wall -ggdb -O3 -fopenmp")

@@ -6,7 +6,7 @@
 #include <list>
 #include <iostream>
 
-#include "scene1.h"
+#include "emscene.h"
 #include "integrator.h"
 #include "jitteredsampler.h"
 
@@ -28,7 +28,7 @@ int main(int argc, char **argv) {
   #pragma omp parallel for schedule(dynamic)
   for(int i = 0; i < image.height(); i++)
   {
-    JitteredSampler sampler(2, 2, i);
+    JitteredSampler sampler(4, 4, i);
     std::list<QPointF> samples = sampler.getSamples();
     QRgb * scanline = (QRgb *) image.scanLine(i);
     for(int j = 0; j < image.width(); j++)
