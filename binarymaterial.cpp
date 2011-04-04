@@ -1,6 +1,6 @@
 #include "binarymaterial.h"
 
-Spectrum BinaryMaterial::shade (HitRecord &, const Light &) const
+Spectrum BinaryMaterial::shade (HitRecord &, QVector3D) const
 {
   return color;
 }

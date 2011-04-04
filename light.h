@@ -4,14 +4,15 @@
 #include "spectrum.h"
 #include "intersectable.h"
 
-//class Intersectable;
+#include <QPointF>
+
+class HitRecord;
 
 class Light
 {
 
   public:
-    virtual Spectrum getIntensity(QVector3D location, QVector3D & direction) const = 0;
-    virtual bool isOccluded(QVector3D location, const Intersectable & scene) const = 0;
+    virtual Spectrum getIntensity(HitRecord & hit, QVector3D & direction, const Intersectable & scene, QPointF sample) const = 0;
 };
 
 #endif

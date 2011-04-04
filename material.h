@@ -10,7 +10,7 @@ class Intersectable;
 class Material
 {
   public:
-    virtual Spectrum shade(HitRecord & hit, const Light & light) const = 0;
+    virtual Spectrum shade(HitRecord & hit, QVector3D direction) const = 0;
     virtual bool isMirror() const = 0;
 };
 

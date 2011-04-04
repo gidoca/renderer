@@ -14,6 +14,8 @@ public:
 
 private:
     std::list<QPointF> samples;
+    int width;
+    int height;
 };
 
 #endif // JITTEREDSAMPLER_H

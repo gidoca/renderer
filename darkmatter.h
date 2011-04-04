@@ -6,7 +6,7 @@
 class DarkMatter : public DiffuseMaterial
 {
   public:
-    Spectrum shade(HitRecord&, const Light&) const;
+    Spectrum shade(HitRecord&, QVector3D direction) const;
 };
 
 #endif

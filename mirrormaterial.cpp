@@ -10,7 +10,7 @@ MirrorMaterial::MirrorMaterial(double coefficient): coefficient(coefficient)
 }
 
 
-Spectrum MirrorMaterial::shade(HitRecord& , const Light& ) const
+Spectrum MirrorMaterial::shade(HitRecord& , QVector3D direction) const
 {
   return Spectrum();
 }

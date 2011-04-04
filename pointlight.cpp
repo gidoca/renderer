@@ -5,10 +5,17 @@ PointLight::PointLight(QVector3D location, Spectrum intensity) : location(locati
   
 }
 
-Spectrum PointLight::getIntensity (QVector3D at, QVector3D & direction) const
+Spectrum PointLight::getIntensity (HitRecord & hit, QVector3D & direction, const Intersectable & scene, QPointF) const
 {
-  direction = -getDirection(at);
-  return intensity / direction.lengthSquared();
+  direction = getDirection(hit.getIntersectingPoint());
+  if(isOccluded(hit.getIntersectingPoint(), scene))
+  {
+    return Spectrum();
+  }
+  else
+  {
+    return intensity / direction.lengthSquared();
+  }
 }
 
 QVector3D PointLight::getDirection (QVector3D at) const

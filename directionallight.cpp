@@ -1,4 +1,5 @@
 #include "directionallight.h"
+#include "hitrecord.h"
 
 #include <iostream>
 
@@ -12,10 +13,17 @@ Spectrum DirectionalLight::getDirection() const
   return direction;
 }
 
-Spectrum DirectionalLight::getIntensity(QVector3D, QVector3D & direction) const
+Spectrum DirectionalLight::getIntensity(HitRecord & hit, QVector3D & direction, const Intersectable & scene, QPointF) const
 {
   direction = getDirection();
-  return intensity;
+  if(isOccluded(hit.getIntersectingPoint(), scene))
+  {
+    return Spectrum();
+  }
+  else
+  {
+    return intensity;
+  }
 }
 
 bool DirectionalLight::isOccluded(QVector3D location, const Intersectable & scene) const

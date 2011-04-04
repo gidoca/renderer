@@ -32,13 +32,13 @@ Spectrum Integrator::integrate(const Ray & ray, const Intersectable & scene, con
   else
   {
     Spectrum result;
+    QVector3D direction;
     std::list<QPointF> samples = sampler.getSamples();
     for(std::list<QPointF>::iterator i = samples.begin(); i != samples.end(); i++)
     {
-      if(!light.isOccluded(hit.getIntersectingPoint(), scene))
-      {
-        result += hit.getMaterial().shade(hit, light);
-      }
+      Spectrum lightIntensity = light.getIntensity(hit, direction, scene, *i);
+      Spectrum shade = hit.getMaterial().shade(hit, direction);
+      result += QVector3D(shade.x() * lightIntensity.x(), shade.y() * lightIntensity.y(), shade.z() * lightIntensity.z());
     }
     return result / samples.size();
   }
