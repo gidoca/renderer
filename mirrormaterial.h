@@ -9,7 +9,8 @@ class MirrorMaterial : public Material
 
 public:
   MirrorMaterial(double coefficient);
-  Spectrum shade(HitRecord& hit, Light& light, const Intersectable& scene, int depth) const;
+  Spectrum shade(HitRecord& hit, const Light& light) const;
+  bool isMirror() const;
   
 private:
   double coefficient;

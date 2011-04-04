@@ -1,8 +1,6 @@
 #ifndef MATERIAL_H
 #define MATERIAL_H
 
-#define MAX_NUM_BOUNCES 6
-
 #include "spectrum.h"
 
 class HitRecord;
@@ -12,7 +10,8 @@ class Intersectable;
 class Material
 {
   public:
-    virtual Spectrum shade(HitRecord & hit, Light & light, const Intersectable & scene, int depth) const = 0;
+    virtual Spectrum shade(HitRecord & hit, const Light & light) const = 0;
+    virtual bool isMirror() const = 0;
 };
 
 #endif

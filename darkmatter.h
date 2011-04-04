@@ -1,12 +1,12 @@
 #ifndef DARKMATTER_H
 #define DARKMATTER_H
 
-#include "material.h"
+#include "diffusematerial.h"
 
-class DarkMatter : public Material
+class DarkMatter : public DiffuseMaterial
 {
   public:
-    Spectrum shade(HitRecord&, Light&, const Intersectable&, int) const;
+    Spectrum shade(HitRecord&, const Light&) const;
 };
 
 #endif

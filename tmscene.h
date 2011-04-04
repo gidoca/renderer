@@ -12,7 +12,7 @@
 
 Intersectable * getScene(void)
 {
-  QSharedPointer<Material> material(new DiffuseMaterial(Spectrum(0, 0, 1), Spectrum(1, 1, 1), 64));
+  QSharedPointer<Material> material(new PhongMaterial(Spectrum(0, 0, 1), Spectrum(1, 1, 1), 64));
 
   BSPNode * obj = ObjReader::getMesh("objfiles/teapot.obj", material);
   

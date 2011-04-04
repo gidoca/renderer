@@ -26,7 +26,7 @@ BSPNode::~BSPNode()
 BSPNode * BSPNode::buildTree(IntersectableList * intersectables)
 {
 //  return buildTree(intersectables, 0, 8 + (int) (1.3 * log(intersectables->getComponents().size())), intersectables->boundingBox());
-  return buildTree(intersectables, 0, 1, intersectables->boundingBox());
+  return buildTree(intersectables, 0, 2, intersectables->boundingBox());
 }
 
 BSPNode* BSPNode::buildTree(IntersectableList * intersectables, int depth, int maxDepth, AxisAlignedBox * boundingBox)
@@ -193,8 +193,19 @@ HitRecord BSPInternalNode::intersect(Ray ray, double from, double to) const
     second = lowerNode;
     rayTowardsFirst = rayDirection > 0;
   }
+
+  HitRecord firstHit = first->intersect(ray, from, to);
+  HitRecord secondHit = second->intersect(ray, from, to);
+  if(firstHit.getRayParameter() < secondHit.getRayParameter())
+  {
+    return firstHit;
+  }
+  else
+  {
+    return secondHit;
+  }
   
-  if(tsplit > intersection.tmax || tsplit < 0 || (tsplit == 0 && rayTowardsFirst))
+  /*if(tsplit > intersection.tmax || tsplit < 0 || (tsplit == 0 && rayTowardsFirst))
   {
     return first->intersect(ray, max(from, intersection.tmin), min(to, intersection.tmax));
   }
@@ -215,7 +226,7 @@ HitRecord BSPInternalNode::intersect(Ray ray, double from, double to) const
 //      return second->intersect(ray, tsplit, intersection.tmax);
       return second->intersect(ray, tsplit, to);
     }
-  }
+  }*/
 //  AxisAlignedBox * bb = first->boundingBox();
 //  if(bb->intersect(ray, from, to).intersects())
 //  {

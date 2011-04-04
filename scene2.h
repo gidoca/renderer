@@ -13,6 +13,7 @@
 #include "intersectableinstance.h"
 #include "objreader.h"
 #include "transparentmaterial.h"
+#include "phongmaterial.h"
 #include "bsp.h"
 
 Camera getCamera(QSize resolution)
@@ -29,7 +30,7 @@ Intersectable * getScene(void)
 {
   Spectrum kd(0.8f, 0.8f, 0.8f);
 //  BSPNode * mesh = ObjReader::getMesh("objfiles/teapot.obj", QSharedPointer<Material>(new TransparentMaterial(0.9)));
-  BSPNode * mesh = ObjReader::getMesh("objfiles/teapot.obj", QSharedPointer<Material>(new DiffuseMaterial(kd, kd, 32)));
+  BSPNode * mesh = ObjReader::getMesh("objfiles/teapot.obj", QSharedPointer<Material>(new PhongMaterial(kd, kd, 32)));
 
   std::list< QSharedPointer<Intersectable> > objects;
 
@@ -50,27 +51,27 @@ Intersectable * getScene(void)
 
   QVector4D normal(0.f, 1.f, 0.f, 1.f);
   kd = Spectrum(0.f, 0.8f, 0.8f);
-  Plane * plane = new Plane(normal, QSharedPointer<Material>(new DiffuseMaterial(kd, kd, 32)));
+  Plane * plane = new Plane(normal, QSharedPointer<Material>(new PhongMaterial(kd, kd, 32)));
   objects.push_back(QSharedPointer<Intersectable>(plane));
 
   normal = QVector4D(0.f, 0.f, 1.f, 1.f);
   kd = Spectrum(0.3f, 0.8f, 0.8f);
-  plane = new Plane(normal, QSharedPointer<Material>(new DiffuseMaterial(kd, kd, 32)));
+  plane = new Plane(normal, QSharedPointer<Material>(new PhongMaterial(kd, kd, 32)));
   objects.push_back(QSharedPointer<Intersectable>(plane));
 
   normal = QVector4D(-1.f, 0.f, 0.f, 1.f);
   kd = Spectrum(1.f, 0.8f, 0.8f);
-  plane = new Plane(normal, QSharedPointer<Material>(new DiffuseMaterial(kd, kd, 32)));
+  plane = new Plane(normal, QSharedPointer<Material>(new PhongMaterial(kd, kd, 32)));
   objects.push_back(QSharedPointer<Intersectable>(plane));
 
   normal = QVector4D(1.f, 0.f, 0.f, 1.f);
   kd = Spectrum(0.f, 0.8f, 0.f);
-  plane = new Plane(normal, QSharedPointer<Material>(new DiffuseMaterial(kd, kd, 32)));
+  plane = new Plane(normal, QSharedPointer<Material>(new PhongMaterial(kd, kd, 32)));
   objects.push_back(QSharedPointer<Intersectable>(plane));
 
   normal = QVector4D(0.f, -1.f, 0.f, 1.f);
   kd = Spectrum(0.8f, 0.8f, 0.8f);
-  plane = new Plane(normal, QSharedPointer<Material>(new DiffuseMaterial(kd, kd, 32)));
+  plane = new Plane(normal, QSharedPointer<Material>(new PhongMaterial(kd, kd, 32)));
   objects.push_back(QSharedPointer<Intersectable>(plane));
 
   return new IntersectableList(objects);

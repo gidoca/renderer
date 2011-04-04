@@ -1,14 +1,14 @@
 #ifndef BINARYMATERIAL_H
 #define BINARYMATERIAL_H
 
-#include "material.h"
+#include "diffusematerial.h"
 
 
-class BinaryMaterial:public Material
+class BinaryMaterial:public DiffuseMaterial
 {
 
   public:
-    virtual Spectrum shade (HitRecord&, Light&, const Intersectable&, int) const;
+    Spectrum shade (HitRecord&, const Light&) const;
     BinaryMaterial (Spectrum color);
     
   private:
