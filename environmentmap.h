@@ -7,12 +7,14 @@
 class EnvironmentMap : public Light
 {
 public:
-    EnvironmentMap(const char *filename);
+    EnvironmentMap(const char *filename, float coefficient);
+    virtual ~EnvironmentMap();
 
     Spectrum getIntensity(HitRecord & hit, QVector3D & direction, const Intersectable & scene, QPointF sample) const;
 
 private:
     HDRLoaderResult data;
+    float coefficient;
 };
 
 #endif // ENVIRONMENTMAP_H

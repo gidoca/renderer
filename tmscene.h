@@ -1,10 +1,11 @@
 #include "objreader.h"
 #include "directionallight.h"
 #include "camera.h"
-#include "diffusematerial.h"
 #include "plane.h"
 #include "intersectableinstance.h"
 #include "bsp.h"
+#include "phongmaterial.h"
+#include "arealight.h"
 
 #include <list>
 #include <QSize>
@@ -36,6 +37,7 @@ Camera getCamera(QSize resolution)
 std::list<QSharedPointer<Light> > getLight(void)
 {
   std::list<QSharedPointer<Light> > lights;
-  lights.push_back(QSharedPointer<Light>(new DirectionalLight(QVector3D(4, -1, -2), Spectrum(1, 1, 1))));
+//  lights.push_back(QSharedPointer<Light>(new DirectionalLight(QVector3D(4, -1, -2), Spectrum(1, 1, 1))));
+  lights.push_back(QSharedPointer<Light>(new AreaLight(QVector3D(-2, 6, -5), QVector3D(0, -8, 0), QVector3D(8, 0, 0), Spectrum(3, 3, 3))));
   return lights;
 }

@@ -3,10 +3,15 @@
 #include <cmath>
 #include <QVector2D>
 
-EnvironmentMap::EnvironmentMap(const char *filename)
+EnvironmentMap::EnvironmentMap(const char *filename, float coefficient) : coefficient(coefficient)
 {
   HDRLoader loader;
   loader.load(filename, data);
+}
+
+EnvironmentMap::~EnvironmentMap()
+{
+  delete data.cols;
 }
 
 Spectrum EnvironmentMap::getIntensity(HitRecord &hit, QVector3D &direction, const Intersectable &scene, QPointF sample) const
@@ -25,6 +30,6 @@ Spectrum EnvironmentMap::getIntensity(HitRecord &hit, QVector3D &direction, cons
     int x = (int) (((imageCoords.x() + 1) / 2) * data.width - 1);
     int y = (int) (((imageCoords.y() + 1) / 2) * data.height - 1);
     int index = 3 * (x + data.width * y);
-    return 20 * Spectrum(data.cols[index], data.cols[index + 1],data.cols[index + 2]);
+    return coefficient * Spectrum(data.cols[index], data.cols[index + 1],data.cols[index + 2]);
   }
 }

@@ -6,7 +6,7 @@
 #include <list>
 #include <iostream>
 
-#include "emscene.h"
+#include "tmscene.h"
 #include "integrator.h"
 #include "jitteredsampler.h"
 
@@ -15,7 +15,7 @@
 int main(int argc, char **argv) {
   QTime time;
   time.start();
-  QSize resolution(512, 512);
+  QSize resolution(256, 256);
 
   QImage image(resolution, QImage::Format_RGB32);
 
@@ -28,13 +28,11 @@ int main(int argc, char **argv) {
   #pragma omp parallel for schedule(dynamic)
   for(int i = 0; i < image.height(); i++)
   {
-    JitteredSampler sampler(4, 4, i);
+    JitteredSampler sampler(2, 2, i);
     std::list<QPointF> samples = sampler.getSamples();
     QRgb * scanline = (QRgb *) image.scanLine(i);
     for(int j = 0; j < image.width(); j++)
     {
-      if(i == 150 && j == 150)
-        std::cout << 'B' << std::endl;
       QPointF point = QPoint(j, i);
       Spectrum irradiance;
       for(std::list<QPointF>::iterator i = samples.begin(); i != samples.end(); i++)

@@ -152,7 +152,7 @@ BSPInternalNode::~BSPInternalNode()
 HitRecord BSPInternalNode::intersect(Ray ray, double from, double to) const
 {
   IntersectionParameter intersection = bBox->getIntersectionParameter(ray);
-  if(intersection.tmin >= intersection.tmax) return HitRecord();
+//  if(intersection.tmin >= intersection.tmax) return HitRecord();
 //  if(intersection.tmin < intersection.tmax) std::cout << "I";
   BSPNode *first, *second;
   double rayOrigin, rayDirection;
