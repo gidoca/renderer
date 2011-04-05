@@ -30,6 +30,6 @@ Spectrum EnvironmentMap::getIntensity(HitRecord &hit, QVector3D &direction, cons
     int x = (int) (((imageCoords.x() + 1) / 2) * data.width - 1);
     int y = (int) (((imageCoords.y() + 1) / 2) * data.height - 1);
     int index = 3 * (x + data.width * y);
-    return coefficient * Spectrum(data.cols[index], data.cols[index + 1],data.cols[index + 2]);
+    return coefficient * M_PI / atan(sqrt(sample.x() / (1 - sample.x()))) * Spectrum(data.cols[index], data.cols[index + 1],data.cols[index + 2]);
   }
 }
