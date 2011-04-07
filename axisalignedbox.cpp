@@ -8,7 +8,7 @@
 AxisAlignedBox::AxisAlignedBox() :
   min(QVector3D(std::numeric_limits< double >::infinity(), std::numeric_limits< double >::infinity(), std::numeric_limits< double >::infinity())),
   max(QVector3D(-std::numeric_limits< double >::infinity(), -std::numeric_limits< double >::infinity(), -std::numeric_limits< double >::infinity())),
-  material(QSharedPointer<Material>(new DarkMatter()))
+  material(DarkMatter::getInstance())
 {
 
 }
@@ -19,10 +19,10 @@ AxisAlignedBox::AxisAlignedBox(QVector3D min, QVector3D max, QSharedPointer<Mate
   
 }
 
-AxisAlignedBox::AxisAlignedBox(const AxisAlignedBox& other): min(other.min), max(other.max), material(other.material)
+/*AxisAlignedBox::AxisAlignedBox(const AxisAlignedBox& other): min(other.min), max(other.max), material(other.material)
 {
 
-}
+}*/
 
 AxisAlignedBox::~AxisAlignedBox()
 {

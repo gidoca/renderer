@@ -27,5 +27,5 @@ HitRecord Plane::intersect(Ray ray, double from, double to) const
 AxisAlignedBox* Plane::boundingBox() const
 {
   double inf = std::numeric_limits< double >::infinity();
-  return new AxisAlignedBox(QVector3D(-inf, -inf, -inf), QVector3D(inf, inf, inf), QSharedPointer<Material>(new DarkMatter()));
+  return new AxisAlignedBox(QVector3D(-inf, -inf, -inf), QVector3D(inf, inf, inf), DarkMatter::getInstance());
 }

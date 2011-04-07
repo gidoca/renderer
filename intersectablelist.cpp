@@ -41,7 +41,7 @@ AxisAlignedBox * IntersectableList::boundingBox() const
     if(currentMax.y() > max.y()) max.setY(currentMax.y());   
     if(currentMax.z() > max.z()) max.setZ(currentMax.z());   
   }
-  return new AxisAlignedBox(min, max, QSharedPointer<Material>(new DarkMatter()));
+  return new AxisAlignedBox(min, max, DarkMatter::getInstance());
 }
 
 

@@ -71,7 +71,7 @@ std::list<QSharedPointer<Light> > getLight(void)
 {
   std::list<QSharedPointer<Light> > lights;
 //  lights.push_back(QSharedPointer<Light>(new PointLight(QVector3D(0, 0.8, 0.8), Spectrum(1, 1, 1))));
-  //lights.push_back(QSharedPointer<Light>(new PointLight(QVector3D(0.3, 0.6, 0.8), Spectrum(1, 1, 1))));
-  lights.push_back(QSharedPointer<Light>(new AreaLight(QVector3D(0.3, 0.6, 0.8), QVector3D(1, 0, 0), QVector3D(0, 0, 1), Spectrum(4, 4, 4))));
+//  lights.push_back(QSharedPointer<Light>(new PointLight(QVector3D(0.3, 0.6, 0.8), Spectrum(1, 1, 1))));
+  lights.push_back(QSharedPointer<Light>(new AreaLight(QVector3D(-0.5, 0.9, -0.5), QVector3D(1, 0, 0), QVector3D(0, 0, 1), Spectrum(4, 4, 4))));
   return lights;
 }

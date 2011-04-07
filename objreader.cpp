@@ -8,7 +8,7 @@
 #include <math.h>
 #include <list>
 
-BSPNode * ObjReader::getMesh(const char * fileName, QSharedPointer<Material> material)
+IntersectableList * ObjReader::getMesh(const char * fileName, QSharedPointer<Material> material)
 {
   int nVertices;
   float *vertices;
@@ -21,8 +21,8 @@ BSPNode * ObjReader::getMesh(const char * fileName, QSharedPointer<Material> mat
   if(vertices == NULL)
   {
     IntersectableList * list = new IntersectableList(triangles);
-    return new BSPLeafNode(list, list->boundingBox());
-//    return list;
+//    return new BSPLeafNode(list, list->boundingBox());
+    return list;
   }
   for(int i = 0; i < nIndices; i += 3)
   {
@@ -43,8 +43,8 @@ BSPNode * ObjReader::getMesh(const char * fileName, QSharedPointer<Material> mat
     }
     triangles.push_back(QSharedPointer<Intersectable>(triangle));
   }
-  return BSPNode::buildTree(new IntersectableList(triangles));
-//  return new IntersectableList(triangles);
+//  return BSPNode::buildTree(new IntersectableList(triangles));
+  return new IntersectableList(triangles);
 }
 
 void ObjReader::get_indices(char *word, int *vindex, int *tindex, int *nindex)

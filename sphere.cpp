@@ -36,5 +36,5 @@ HitRecord Sphere::intersect(Ray ray, double from, double to) const
 AxisAlignedBox* Sphere::boundingBox() const
 {
   QVector3D radiusVector(radius, radius, radius);
-  return new AxisAlignedBox(center - radiusVector, center + radiusVector, QSharedPointer<Material>(new DarkMatter()));
+  return new AxisAlignedBox(center - radiusVector, center + radiusVector, DarkMatter::getInstance());
 }

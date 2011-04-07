@@ -15,7 +15,7 @@ Spectrum AreaLight::getIntensity(HitRecord & hit, QVector3D &direction, const In
   }
   else
   {
-    double c = QVector3D::dotProduct(-direction.normalized(), hit.getSurfaceNormal().normalized()) * QVector3D::dotProduct(direction.normalized(), normal.normalized()) / direction.lengthSquared() * normal.length();
+    double c = QVector3D::dotProduct(direction.normalized(), normal.normalized()) / direction.lengthSquared() * normal.length();
     if(c < 0) c = 0;
     return c * intensity;
   }

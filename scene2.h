@@ -30,7 +30,7 @@ Intersectable * getScene(void)
 {
   Spectrum kd(0.8f, 0.8f, 0.8f);
 //  BSPNode * mesh = ObjReader::getMesh("objfiles/teapot.obj", QSharedPointer<Material>(new TransparentMaterial(0.9)));
-  BSPNode * mesh = ObjReader::getMesh("objfiles/teapot.obj", QSharedPointer<Material>(new PhongMaterial(kd, kd, 32)));
+  Intersectable * mesh = ObjReader::getMesh("objfiles/teapot.obj", QSharedPointer<Material>(new PhongMaterial(kd, kd, 32)));
 
   std::list< QSharedPointer<Intersectable> > objects;
 
