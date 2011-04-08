@@ -19,16 +19,6 @@ AxisAlignedBox::AxisAlignedBox(QVector3D min, QVector3D max, QSharedPointer<Mate
   
 }
 
-/*AxisAlignedBox::AxisAlignedBox(const AxisAlignedBox& other): min(other.min), max(other.max), material(other.material)
-{
-
-}*/
-
-AxisAlignedBox::~AxisAlignedBox()
-{
-
-}
-
 HitRecord AxisAlignedBox::intersect(Ray ray, double from, double to) const
 {
   IntersectionParameter intersectionParameter = getIntersectionParameter(ray);
