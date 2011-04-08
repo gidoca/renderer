@@ -2,7 +2,7 @@
 
 #include <cmath>
 
-Camera::Camera(QVector3D cop, QVector3D look_at, QVector3D up, double fov, QSize resolution) : fov(fov), resolution(resolution)
+Camera::Camera(QVector3D cop, QVector3D look_at, QVector3D up, double fov, QSize resolution) : resolution(resolution)
 {
   QVector3D w = (cop - look_at).normalized();
   QVector3D u = QVector3D::normal(up, w);

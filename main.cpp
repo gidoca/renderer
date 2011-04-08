@@ -7,7 +7,7 @@
 #include <iostream>
 
 #include "scene2.h"
-#include "integrator.h"
+#include "simpleintegrator.h"
 #include "jitteredsampler.h"
 
 #define clamp(x) ((x) <= 0 ? 0 : ((x) >= 255 ? 255 : (x)))
@@ -19,7 +19,7 @@ int main(int argc, char **argv) {
 
   QImage image(resolution, QImage::Format_RGB32);
 
-  Integrator integrator;
+  Integrator * integrator = new SimpleIntegrator();
   
   const Intersectable * object = getScene();
   const std::list<QSharedPointer<Light> > light = getLight();
@@ -37,9 +37,9 @@ int main(int argc, char **argv) {
       Spectrum irradiance;
       for(std::list<QPointF>::iterator i = samples.begin(); i != samples.end(); i++)
       {
-        QPointF samplePoint = point + *i;
+        QPointF samplePoint = point /*+ *i*/;
         Ray ray = camera.getRay(samplePoint);
-        irradiance += 255 * integrator.integrate(ray, *object, light, sampler) / samples.size();
+        irradiance += 255 * integrator->integrate(ray, *object, light, sampler) / samples.size();
       }
   
       scanline[j] = qRgb((int) clamp(irradiance.x()), (int) clamp(irradiance.y()), (int) clamp(irradiance.z()));

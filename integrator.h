@@ -18,8 +18,8 @@ class Integrator
 public:
   Spectrum integrate(const Ray & ray, const Intersectable & scene, std::list< QSharedPointer<Light> > light, Sampler & sampler) const;
 
-private:
-  Spectrum integrate(const Ray &ray, const Intersectable &scene, const Light & light, Sampler & sampler, int recursionDepth) const;
+protected:
+  virtual Spectrum integrate(const Ray &ray, const Intersectable &scene, const Light & light, Sampler & sampler, int recursionDepth) const = 0;
 };
 
 #endif // INTEGRATOR_H
