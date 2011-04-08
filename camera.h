@@ -15,7 +15,6 @@ class Camera
     
     Ray getRay(QPointF point) const;
   private:
-    QVector3D u, v, w, cop;
     double fov, t, b, l, r, aspect;
     QSize resolution;
     QMatrix4x4 extrinsicMatrix;

@@ -1,9 +1,5 @@
 #include "jitteredsampler.h"
 
-JitteredSampler::JitteredSampler(int width, int height, unsigned int seed) : Sampler(seed), width(width), height(height)
-{
-}
-
 std::list<QPointF> JitteredSampler::getSamples()
 {
   std::list<QPointF> samples;

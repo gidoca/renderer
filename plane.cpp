@@ -4,11 +4,6 @@
 
 #include <limits>
 
-Plane::Plane(QVector4D planeVector, QSharedPointer<Material> material) : planeVector(planeVector), material(material)
-{
-
-}
-
 HitRecord Plane::intersect(Ray ray, double from, double to) const
 {
   double d = -QVector3D::dotProduct(ray.getDirection().toVector3D(), planeVector.toVector3D());

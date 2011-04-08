@@ -7,16 +7,6 @@
 #include <QVector3D>
 #include "axisalignedbox.h"
 
-Triangle::Triangle(QVector3D p1, QVector3D p2, QVector3D p3, QSharedPointer<Material> material) : p1(p1), p2(p2), p3(p3), n1(QVector3D::crossProduct(p1 - p2, p1 - p3)), n2(n1), n3(n1), material(material)
-{
-  
-}
-
-Triangle::Triangle(QVector3D p1, QVector3D p2, QVector3D p3, QVector3D n1, QVector3D n2, QVector3D n3, QSharedPointer< Material > material) : p1(p1), p2(p2), p3(p3), n1(n1), n2(n2), n3(n3), material(material)
-{
-
-}
-
 HitRecord Triangle::intersect(Ray ray, double from, double to) const
 {
   if(QVector3D::dotProduct(ray.getDirection().toVector3D(), QVector3D::crossProduct(p1 - p2, p1 - p3)) > 0) return HitRecord();

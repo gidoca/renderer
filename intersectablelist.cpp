@@ -3,11 +3,6 @@
 
 #include <limits>
 
-IntersectableList::IntersectableList(std::list<QSharedPointer<Intersectable> > components) : components(components)
-{
-
-}
-
 HitRecord IntersectableList::intersect(Ray ray, double from, double to) const
 {
   HitRecord hit;

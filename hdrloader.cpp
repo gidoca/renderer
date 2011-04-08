@@ -36,7 +36,7 @@ bool HDRLoader::load(const char *fileName, HDRLoaderResult &res)
 	if (!file)
 		return false;
 
-	fread(str, 10, 1, file);
+  if(fread(str, 10, 1, file) == 0) return false;
 	if (memcmp(str, "#?RADIANCE", 10)) {
 		fclose(file);
 		return false;
@@ -65,7 +65,7 @@ bool HDRLoader::load(const char *fileName, HDRLoaderResult &res)
 	}
 
 	int w, h;
-	if (!sscanf(reso, "-Y %ld +X %ld", &h, &w)) {
+  if (!sscanf(reso, "-Y %d +X %d", &h, &w)) {
 		fclose(file);
 		return false;
 	}

@@ -4,11 +4,6 @@
 
 #include <cmath>
 
-PhongMaterial::PhongMaterial(Spectrum color, Spectrum specularColor, double specularCoefficient) : color(color), specularColor(specularColor), specularCoefficient(specularCoefficient)
-{
-
-}
-
 Spectrum PhongMaterial::shade(HitRecord& hit, QVector3D direction) const
 {
   QVector3D normal = hit.getSurfaceNormal();

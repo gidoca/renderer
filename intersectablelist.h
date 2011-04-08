@@ -11,7 +11,11 @@ class IntersectableList : public Intersectable
 {
 
   public:
-    IntersectableList(std::list< QSharedPointer<Intersectable> > components);
+    IntersectableList(std::list<QSharedPointer<Intersectable> > components) : components(components)
+    {
+
+    }
+
 
     HitRecord intersect(Ray ray, double from, double to) const;
     AxisAlignedBox* boundingBox() const;

@@ -4,12 +4,9 @@
 
 Camera::Camera(QVector3D cop, QVector3D look_at, QVector3D up, double fov, QSize resolution)
 {
-  this->cop = cop;
-  w = (cop - look_at).normalized();
-  u = QVector3D::normal(up, w);
-  v = QVector3D::crossProduct(w, u);
-  this->resolution = resolution;
-  this->fov = fov;
+  QVector3D w = (cop - look_at).normalized();
+  QVector3D u = QVector3D::normal(up, w);
+  QVector3D v = QVector3D::crossProduct(w, u);
   aspect = (double) resolution.width() / resolution.height();
   t = tan(fov / 2);
   b = -t;

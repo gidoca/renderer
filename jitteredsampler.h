@@ -8,7 +8,10 @@
 class JitteredSampler : public Sampler
 {
 public:
-    JitteredSampler(int width, int height, unsigned int seed);
+    JitteredSampler(int width, int height, unsigned int seed) : Sampler(seed), width(width), height(height)
+    {
+    }
+
 
     std::list<QPointF> getSamples();
 

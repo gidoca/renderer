@@ -8,7 +8,11 @@ class MirrorMaterial : public Material
 {
 
 public:
-  MirrorMaterial(double coefficient);
+  MirrorMaterial(double coefficient): coefficient(coefficient)
+  {
+
+  }
+
   Spectrum shade(HitRecord& hit, QVector3D direction) const;
   bool isMirror() const;
   

@@ -4,11 +4,6 @@
 
 #include "axisalignedbox.h"
 
-Sphere::Sphere(QVector3D center, double radius, QSharedPointer<Material> material) : center(center), radius(radius), material(material)
-{
-
-}
-
 HitRecord Sphere::intersect(Ray ray, double from, double to) const
 {
   QVector3D diff = ray.getOrigin().toVector3DAffine() - center;

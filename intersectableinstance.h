@@ -10,7 +10,10 @@ class IntersectableInstance : public Intersectable
 {
 
 public:
-  IntersectableInstance(QMatrix4x4 transform, QSharedPointer<Intersectable> intersectable);
+  IntersectableInstance(QMatrix4x4 transform, QSharedPointer<Intersectable> intersectable) : transform(transform), inverseTransform(transform.inverted()), intersectable(intersectable)
+  {
+
+  }
 
   HitRecord intersect(Ray ray, double from, double to) const;
   AxisAlignedBox * boundingBox() const;

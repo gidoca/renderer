@@ -5,8 +5,7 @@
 
 EnvironmentMap::EnvironmentMap(const char *filename, float coefficient) : coefficient(coefficient)
 {
-  HDRLoader loader;
-  loader.load(filename, data);
+  HDRLoader::load(filename, data);
 }
 
 EnvironmentMap::~EnvironmentMap()
