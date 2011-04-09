@@ -6,7 +6,7 @@
 #include <list>
 #include <iostream>
 
-#include "scene2.h"
+#include "scene1.h"
 #include "simpleintegrator.h"
 #include "jitteredsampler.h"
 
@@ -28,8 +28,9 @@ int main(int argc, char **argv) {
   #pragma omp parallel for schedule(dynamic)
   for(int i = 0; i < image.height(); i++)
   {
-    JitteredSampler sampler(1, 1, i);
-    std::list<QPointF> samples = sampler.getSamples();
+    JitteredSampler multiSampler(2, 2, i);
+    JitteredSampler lightSampler(5, 5, i);
+    std::list<QPointF> samples = multiSampler.getSamples();
     QRgb * scanline = (QRgb *) image.scanLine(i);
     for(int j = 0; j < image.width(); j++)
     {
@@ -37,9 +38,9 @@ int main(int argc, char **argv) {
       Spectrum irradiance;
       for(std::list<QPointF>::iterator i = samples.begin(); i != samples.end(); i++)
       {
-        QPointF samplePoint = point /*+ *i*/;
+        QPointF samplePoint = point + *i - QPointF(0.5, 0.5);
         Ray ray = camera.getRay(samplePoint);
-        irradiance += 255 * integrator->integrate(ray, *object, light, sampler) / samples.size();
+        irradiance += 255 * integrator->integrate(ray, *object, light, lightSampler) / samples.size();
       }
   
       scanline[j] = qRgb((int) clamp(irradiance.x()), (int) clamp(irradiance.y()), (int) clamp(irradiance.z()));
