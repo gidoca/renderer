@@ -5,6 +5,8 @@
 
 HitRecord IntersectableList::intersect(Ray ray, double from, double to) const
 {
+  if(!bBox->intersect(ray, from, to).intersects()) return HitRecord();
+
   HitRecord hit;
 
   for(std::list< QSharedPointer<Intersectable> >::const_iterator i = components.begin(); i != components.end(); i++)

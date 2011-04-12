@@ -11,7 +11,7 @@ class IntersectableList : public Intersectable
 {
 
   public:
-    IntersectableList(std::list<QSharedPointer<Intersectable> > components) : components(components)
+    IntersectableList(std::list<QSharedPointer<Intersectable> > components) : components(components), bBox(boundingBox())
     {
 
     }
@@ -24,6 +24,7 @@ class IntersectableList : public Intersectable
 
   private:
     std::list<QSharedPointer<Intersectable> > components;
+    const AxisAlignedBox* bBox;
   
 };
 

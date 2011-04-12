@@ -22,7 +22,7 @@ AxisAlignedBox::AxisAlignedBox(QVector3D min, QVector3D max, QSharedPointer<Mate
 HitRecord AxisAlignedBox::intersect(Ray ray, double from, double to) const
 {
   IntersectionParameter intersectionParameter = getIntersectionParameter(ray);
-  if(intersectionParameter.tmin < intersectionParameter.tmax && from < intersectionParameter.tmin && intersectionParameter.tmax < to)
+  if(intersectionParameter.tmin < intersectionParameter.tmax && from < intersectionParameter.tmax && intersectionParameter.tmin < to)
   {
     return HitRecord(intersectionParameter.tmin, ray, material, QVector3D());
   }
