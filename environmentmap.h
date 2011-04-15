@@ -10,7 +10,7 @@ public:
     EnvironmentMap(const char *filename, float coefficient);
     virtual ~EnvironmentMap();
 
-    Spectrum getIntensity(HitRecord & hit, QVector3D & direction, const Intersectable & scene, QPointF sample) const;
+    Spectrum getIntensity(HitRecord & hit, QVector3D & direction, const Intersectable & scene, Sample sample) const;
 
 private:
     HDRLoaderResult data;

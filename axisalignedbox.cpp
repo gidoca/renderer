@@ -37,8 +37,8 @@ IntersectionParameter AxisAlignedBox::getIntersectionParameter(Ray ray) const
   IntersectionParameter result;
   double a;
   double temp_tmin, temp_tmax;
-  QVector3D rayDirection = ray.getDirection().toVector3D();
-  QVector3D rayOrigin = ray.getOrigin().toVector3DAffine();
+  QVector3D rayDirection = ray.getDirection();
+  QVector3D rayOrigin = ray.getOrigin();
   a = 1 / rayDirection.x();
   if(a >= 0)
   {

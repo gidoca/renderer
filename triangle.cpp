@@ -9,7 +9,7 @@
 
 HitRecord Triangle::intersect(Ray ray, double from, double to) const
 {
-  if(QVector3D::dotProduct(ray.getDirection().toVector3D(), QVector3D::crossProduct(p1 - p2, p1 - p3)) > 0) return HitRecord();
+  if(QVector3D::dotProduct(ray.getDirection(), QVector3D::crossProduct(p1 - p2, p1 - p3)) > 0) return HitRecord();
   
   /*QVector3D edge1 = p1 - p2;
   QVector3D edge2 = p1 - p3;

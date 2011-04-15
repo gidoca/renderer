@@ -6,10 +6,10 @@
 
 HitRecord Sphere::intersect(Ray ray, double from, double to) const
 {
-  QVector3D diff = ray.getOrigin().toVector3DAffine() - center;
+  QVector3D diff = ray.getOrigin() - center;
   double radiusSquared = radius * radius;
   double a = ray.getDirection().lengthSquared();
-  double b = 2 * QVector3D::dotProduct(ray.getDirection().toVector3D(), diff);
+  double b = 2 * QVector3D::dotProduct(ray.getDirection(), diff);
   double c = diff.lengthSquared() - radiusSquared;
   if(b * b - 4 * a * c < 0)
   {

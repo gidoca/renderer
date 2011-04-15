@@ -12,8 +12,8 @@ class Ray
     Ray(QVector3D origin, QVector3D direction);
     Ray(QVector4D origin, QVector4D direction);
     
-    QVector4D getOrigin() const;
-    QVector4D getDirection() const;
+    QVector3D getOrigin() const;
+    QVector3D getDirection() const;
     
     QVector3D evaluate(double u) const;
     
@@ -22,15 +22,15 @@ class Ray
   private:
     void init(QVector4D origin, QVector4D direction);
     
-    QVector4D origin, direction;
+    QVector3D origin, direction;
 };
 
-inline QVector4D Ray::getOrigin() const
+inline QVector3D Ray::getOrigin() const
 {
   return origin;
 }
 
-inline QVector4D Ray::getDirection() const
+inline QVector3D Ray::getDirection() const
 {
   return direction;
 }
@@ -52,18 +52,18 @@ inline Ray::Ray(QVector4D origin, QVector4D direction)
 
 inline void Ray::init(QVector4D origin, QVector4D direction)
 {
-  this->origin = origin;
-  this->direction = direction;
+  this->origin = origin.toVector3DAffine();
+  this->direction = direction.toVector3D();
 }
 
 inline QVector3D Ray::evaluate(double u) const
 {
-  return origin.toVector3DAffine() + u * direction.toVector3D();
+  return origin + u * direction;
 }
 
 inline Ray Ray::transform(QMatrix4x4 matrix)
 {
-  return Ray(matrix.map(origin), matrix.map(direction));
+  return Ray(matrix.map(QVector4D(origin, 1)), matrix.map(QVector4D(direction, 0)));
 }
 
 #endif // RAY_H

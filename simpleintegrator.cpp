@@ -12,7 +12,7 @@ Spectrum SimpleIntegrator::integrate(const Ray & ray, const Intersectable & scen
   HitRecord hit = scene.intersect(ray);
   if(hit.getMaterial().isMirror())
   {
-    QVector3D oldRayDirection = hit.getRay().getDirection().toVector3D();
+    QVector3D oldRayDirection = hit.getRay().getDirection();
     QVector3D surfaceNormal = hit.getSurfaceNormal();
     surfaceNormal.normalize();
     QVector3D newDirection = oldRayDirection - 2 * QVector3D::dotProduct(oldRayDirection, surfaceNormal) * surfaceNormal;
@@ -25,8 +25,8 @@ Spectrum SimpleIntegrator::integrate(const Ray & ray, const Intersectable & scen
     {
     Spectrum result;
     QVector3D direction;
-    std::list<QPointF> samples = sampler.getSamples();
-    for(std::list<QPointF>::iterator i = samples.begin(); i != samples.end(); i++)
+    std::list<Sample> samples = sampler.getSamples();
+    for(std::list<Sample>::iterator i = samples.begin(); i != samples.end(); i++)
     {
       Spectrum lightIntensity = light.getIntensity(hit, direction, scene, *i);
       Spectrum shade = hit.getMaterial().shade(hit, direction);
@@ -36,8 +36,8 @@ Spectrum SimpleIntegrator::integrate(const Ray & ray, const Intersectable & scen
   }
     else
     {
-      /*QVector3D dir = ray.getDirection().toVector3D();
-      return light.getIntensity(hit, dir, scene, QPointF());*/
+//      QVector3D dir = ray.getDirection();
+//      return light.getIntensity(hit, dir, scene, QPointF());
       return Spectrum();
     }
   }

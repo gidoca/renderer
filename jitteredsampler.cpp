@@ -1,8 +1,8 @@
 #include "jitteredsampler.h"
 
-std::list<QPointF> JitteredSampler::getSamples()
+std::list<Sample> JitteredSampler::getSamples()
 {
-  std::list<QPointF> samples;
+  std::list<Sample> samples;
   for(int i = 0; i < width; i++)
   {
     for(int j = 0; j < height; j++)

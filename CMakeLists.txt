@@ -13,9 +13,11 @@ set(renderingproject_SRCS main.cpp camera.cpp plane.cpp sphere.cpp
   pointlight.cpp objreader.cpp mirrormaterial.cpp
   axisalignedbox.cpp bsp.cpp integrator.cpp
   sampler.cpp jitteredsampler.cpp arealight.cpp
-  hdrloader.cpp environmentmap.cpp simpleintegrator.cpp)
+  hdrloader.cpp environmentmap.cpp simpleintegrator.cpp pathtracingintegrator.cpp)
 qt4_automoc(${renderingproject_SRCS})
 add_executable(renderingproject ${renderingproject_SRCS})
 target_link_libraries(renderingproject ${QT_LIBRARIES})
 
 set(CMAKE_CXX_FLAGS "-Wall -O2 -fopenmp")
+#set(CMAKE_CXX_FLAGS "-Wall -pg")
+#set(CMAKE_CXX_FLAGS "-Wall -g")

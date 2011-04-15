@@ -6,8 +6,8 @@
 
 HitRecord Plane::intersect(Ray ray, double from, double to) const
 {
-  double d = -QVector3D::dotProduct(ray.getDirection().toVector3D(), planeVector.toVector3D());
-  double u = QVector4D::dotProduct(ray.getOrigin(), planeVector);
+  double d = -QVector3D::dotProduct(ray.getDirection(), planeVector.toVector3D());
+  double u = QVector4D::dotProduct(QVector4D(ray.getOrigin(), 1), planeVector);
   double t = u / d;
   if(from < t && t < to)
   {

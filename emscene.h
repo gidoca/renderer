@@ -30,12 +30,12 @@ Intersectable * getScene(void)
 {
   QVector3D center(0.f,0.f,0.f);
   float radius = 0.6f;
-  Spectrum kd(0.8f, 0.8f, 0.8f);
-  QSharedPointer<Material> material(QSharedPointer<Material>(new PhongMaterial(Spectrum(), kd, 100)));
+  Spectrum kd(8, 8, 8);
+  QSharedPointer<Material> material(QSharedPointer<Material>(new PhongMaterial(Spectrum(14, 14, 14), kd, 32)));
 //   Sphere * sphere = new Sphere(center, radius, QSharedPointer<Material>(new PhongMaterial(kd, kd, 32)));
   Sphere * sphere = new Sphere(center, radius, material);
   //AxisAlignedBox * box = new AxisAlignedBox(QVector3D(-.2, -.2, -.2), QVector3D(.2, .2, .2), material);
-  AxisAlignedBox * box = sphere->boundingBox();
+//  AxisAlignedBox * box = sphere->boundingBox();
   std::list< QSharedPointer<Intersectable> > objects;
   objects.push_back(QSharedPointer<Intersectable>(sphere));
 

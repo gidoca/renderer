@@ -30,11 +30,11 @@ Intersectable * getScene(void)
   QVector3D center(0.f,0.f,0.f);
   float radius = 0.2f;
   Spectrum kd(0.8f, 0.8f, 0.8f);
-  QSharedPointer<Material> material(new MirrorMaterial(0.7));
-//   Sphere * sphere = new Sphere(center, radius, QSharedPointer<Material>(new PhongMaterial(kd, kd, 32)));
+//  QSharedPointer<Material> material(new MirrorMaterial(0.7));
+  QSharedPointer<Material> material(new PhongMaterial(kd, kd, 32));
   Sphere * sphere = new Sphere(center, radius, material);
   //AxisAlignedBox * box = new AxisAlignedBox(QVector3D(-.2, -.2, -.2), QVector3D(.2, .2, .2), material);
-  AxisAlignedBox * box = sphere->boundingBox();
+//  AxisAlignedBox * box = sphere->boundingBox();
   std::list< QSharedPointer<Intersectable> > objects;
   objects.push_back(QSharedPointer<Intersectable>(sphere));
 
@@ -44,7 +44,7 @@ Intersectable * getScene(void)
   objects.push_back(QSharedPointer<Intersectable>(plane));
 
   normal = QVector4D(0.f, 0.f, 1.f, 1.f);
-  kd = Spectrum(0.3f, 0.8f, 0.8f);
+  kd = Spectrum(0.8f, 0.8f, 0.8f);
   plane = new Plane(normal, QSharedPointer<Material>(new PhongMaterial(kd, kd, 32)));
   objects.push_back(QSharedPointer<Intersectable>(plane));
 
@@ -71,7 +71,7 @@ std::list<QSharedPointer<Light> > getLight(void)
 {
   std::list<QSharedPointer<Light> > lights;
 //  lights.push_back(QSharedPointer<Light>(new PointLight(QVector3D(0, 0.8, 0.8), Spectrum(1, 1, 1))));
-//  lights.push_back(QSharedPointer<Light>(new PointLight(QVector3D(0.3, 0.6, 0.8), Spectrum(1, 1, 1))));
-  lights.push_back(QSharedPointer<Light>(new AreaLight(QVector3D(-0.5, 0.9, -0.5), QVector3D(1, 0, 0), QVector3D(0, 0, 1), Spectrum(4, 4, 4))));
+  lights.push_back(QSharedPointer<Light>(new PointLight(QVector3D(0.3, 0.6, 0.8), Spectrum(1, 1, 1))));
+//  lights.push_back(QSharedPointer<Light>(new AreaLight(.7 * QVector3D(-0.5, 0.9, -0.5), QVector3D(1, 0, 0), QVector3D(0, 0, 1), Spectrum(4, 4, 4))));
   return lights;
 }

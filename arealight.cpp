@@ -4,9 +4,10 @@ AreaLight::AreaLight(QVector3D origin, QVector3D uDirection, QVector3D vDirectio
 {
 }
 
-Spectrum AreaLight::getIntensity(HitRecord & hit, QVector3D &direction, const Intersectable &scene, QPointF sample) const
+Spectrum AreaLight::getIntensity(HitRecord & hit, QVector3D &direction, const Intersectable &scene, Sample sample) const
 {
-  QVector3D lightLocation = origin + sample.x() * uDirection + sample.y() * vDirection;
+  QPointF p = sample.getSample();
+  QVector3D lightLocation = origin + p.x() * uDirection + p.y() * vDirection;
   direction = hit.getIntersectingPoint() - lightLocation;
   HitRecord shadowHit = scene.intersect(Ray(hit.getIntersectingPoint(), -direction.normalized()), EPSILON, direction.length());
   if(shadowHit.intersects())

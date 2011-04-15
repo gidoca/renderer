@@ -13,10 +13,10 @@ public:
     }
 
 
-    std::list<QPointF> getSamples();
+    std::list<Sample> getSamples();
 
 private:
-    std::list<QPointF> samples;
+    std::list<Sample> samples;
     int width;
     int height;
 };

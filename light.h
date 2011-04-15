@@ -3,6 +3,7 @@
 
 #include "spectrum.h"
 #include "intersectable.h"
+#include "sampler.h"
 
 #include <QPointF>
 
@@ -12,7 +13,7 @@ class Light
 {
 
   public:
-    virtual Spectrum getIntensity(HitRecord & hit, QVector3D & direction, const Intersectable & scene, QPointF sample) const = 0;
+    virtual Spectrum getIntensity(HitRecord & hit, QVector3D & direction, const Intersectable & scene, Sample sample) const = 0;
 };
 
 #endif

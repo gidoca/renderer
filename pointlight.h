@@ -13,7 +13,7 @@ public:
   }
 
 
-  Spectrum getIntensity (HitRecord & hit, QVector3D & direction, const Intersectable & scene, QPointF sample) const;
+  Spectrum getIntensity (HitRecord & hit, QVector3D & direction, const Intersectable & scene, Sample sample) const;
   QVector3D getDirection (QVector3D at) const;
   bool isOccluded(QVector3D location, const Intersectable & scene) const;
   

@@ -160,17 +160,17 @@ HitRecord BSPInternalNode::intersect(Ray ray, double from, double to) const
   switch(axis)
   {
   case 0:
-    rayOrigin = ray.getOrigin().toVector3DAffine().x();
+    rayOrigin = ray.getOrigin().x();
     rayDirection = ray.getDirection().x();
     splitPlaneVector = QVector4D(-1, 0, 0, planePosition);
     break;
   case 1:
-    rayOrigin = ray.getOrigin().toVector3DAffine().y();
+    rayOrigin = ray.getOrigin().y();
     rayDirection = ray.getDirection().y();
     splitPlaneVector = QVector4D(0, -1, 0, planePosition);
     break;
   case 2:
-    rayOrigin = ray.getOrigin().toVector3DAffine().z();
+    rayOrigin = ray.getOrigin().z();
     rayDirection = ray.getDirection().z();
     splitPlaneVector = QVector4D(0, 0, -1, planePosition);
     break;
