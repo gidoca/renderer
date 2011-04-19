@@ -2,18 +2,18 @@
 
 #include <cstdlib>
 #include <cmath>
+#include <assert.h>
+
 #include <QtGlobal>
 #include <QTime>
 #include <QMatrix4x4>
 
-QPointF Sample::getSample() const
-{
-  return sample;
-}
+#include <iostream>
 
-QVector3D Sample::getCosineWeightedDirection(QVector3D w) const
+QVector3D Sample::getCosineWeightedDirection(QVector3D w, double & pdf) const
 {
   QVector3D normalizedDirection = QVector3D(cos(2 * M_PI * sample.y()) * sqrt(sample.x()), sin(2 * M_PI * sample.y()) * sqrt(sample.x()), sqrt(1 - sample.x()));
+  pdf = normalizedDirection.z() / M_PI;
   normalizedDirection.normalize();
   QVector3D v;
   if(abs(w.x()) < abs(w.y()) && abs(w.x()) < abs(w.z()))
@@ -34,7 +34,9 @@ QVector3D Sample::getCosineWeightedDirection(QVector3D w) const
   transform.setColumn(0, u);
   transform.setColumn(1, v);
   transform.setColumn(2, w);
-  return transform.map(normalizedDirection);
+  QVector3D randomDirection = transform.map(normalizedDirection);
+  assert(QVector3D::dotProduct(randomDirection, w) >= 0);
+  return randomDirection;
 }
 
 Sampler::Sampler(unsigned int seed)

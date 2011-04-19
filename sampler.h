@@ -12,7 +12,7 @@ public:
   Sample(QPointF sample) : sample(sample) {}
 
   QPointF getSample() const;
-  QVector3D getCosineWeightedDirection(QVector3D w) const;
+  QVector3D getCosineWeightedDirection(QVector3D w, double & pdf) const;
 
 private:
   QPointF sample;
@@ -28,5 +28,10 @@ public:
 protected:
     static double getRandom();
 };
+
+inline QPointF Sample::getSample() const
+{
+  return sample;
+}
 
 #endif // SAMPLER_H

@@ -20,8 +20,8 @@ int main(int, char **) {
 
   QImage image(resolution, QImage::Format_RGB32);
 
-//  Integrator * integrator = new PathTracingIntegrator();
-  Integrator * integrator = new SimpleIntegrator();
+  Integrator * integrator = new PathTracingIntegrator();
+//  Integrator * integrator = new SimpleIntegrator();
   
   const Intersectable * object = getScene();
   const std::list<QSharedPointer<Light> > light = getLight();

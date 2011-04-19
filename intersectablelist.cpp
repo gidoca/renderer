@@ -5,7 +5,7 @@
 
 HitRecord IntersectableList::intersect(Ray ray, double from, double to) const
 {
-  if(!bBox->intersect(ray, from, to).intersects()) return HitRecord();
+//  if(!bBox->intersect(ray, from, to).intersects()) return HitRecord();
 
   HitRecord hit;
 

@@ -11,21 +11,24 @@ Spectrum PathTracingIntegrator::integrate(const Ray& ray, const Intersectable& s
 {
   std::list<Sample> samples = sampler.getSamples();
   Spectrum color;
+  HitRecord firstHit = scene.intersect(ray);
   for(std::list<Sample>::iterator i = samples.begin(); i != samples.end(); i++)
   {
     Ray currentRay = ray;
     Spectrum alpha(1, 1, 1);
-    HitRecord hit = scene.intersect(currentRay);
-    for(int k = 0; k < 10; k++)
+    HitRecord hit = firstHit;
+    for(int k = 0; k < 3; k++)
     {
       QVector3D direction;
       Spectrum lightIntensity = light.getIntensity(hit, direction, scene, *i);
       color += alpha * hit.getMaterial().shade(hit, direction) * lightIntensity;
-      if(qrand() < RAND_MAX / 3) break;
+//      if(qrand() < RAND_MAX / 3) break;
 
+      double pdf;
+      QVector3D outDirection = i->getCosineWeightedDirection(hit.getSurfaceNormal(), pdf);
+      Spectrum brdf = hit.getMaterial().shade(hit, -outDirection);
+      alpha *= brdf * QVector3D::dotProduct(outDirection.normalized(), hit.getSurfaceNormal().normalized()) / pdf /* / 0.66 */;
       hit = scene.intersect(currentRay);
-      QVector3D outDirection = i->getCosineWeightedDirection(hit.getSurfaceNormal());
-      alpha *= hit.getMaterial().shade(hit, -outDirection);
       currentRay = Ray(hit.getIntersectingPoint(), outDirection);
     }
   }
