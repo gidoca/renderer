@@ -14,6 +14,7 @@ class IntersectionParameter
 {
   public:
     double tmin, tmax;
+    QVector3D normal;
 };
 
 class AxisAlignedBox : public Intersectable

@@ -6,22 +6,22 @@
 #include <list>
 #include <iostream>
 
-#include "scene1.h"
+#include "cornellscene.h"
 #include "pathtracingintegrator.h"
 #include "simpleintegrator.h"
 #include "jitteredsampler.h"
 
 #define clamp(x) ((x) <= 0 ? 0 : ((x) >= 255 ? 255 : (x)))
 
-int main(int argc, char **argv) {
+int main(int, char **) {
   QTime time;
   time.start();
   QSize resolution(256, 256);
 
   QImage image(resolution, QImage::Format_RGB32);
 
-  Integrator * integrator = new PathTracingIntegrator();
-//    Integrator * integrator = new SimpleIntegrator();
+//  Integrator * integrator = new PathTracingIntegrator();
+  Integrator * integrator = new SimpleIntegrator();
   
   const Intersectable * object = getScene();
   const std::list<QSharedPointer<Light> > light = getLight();
@@ -31,7 +31,7 @@ int main(int argc, char **argv) {
   for(int i = 0; i < image.height(); i++)
   {
     JitteredSampler multiSampler(2, 2, i);
-    JitteredSampler lightSampler(5, 5, i);
+    JitteredSampler lightSampler(3, 3, i);
     std::list<Sample> samples = multiSampler.getSamples();
     QRgb * scanline = (QRgb *) image.scanLine(i);
     for(int j = 0; j < image.width(); j++)
