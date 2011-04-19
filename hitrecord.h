@@ -48,7 +48,7 @@ inline void HitRecord::transform(QMatrix4x4 matrix)
 {
   intersectingPoint = matrix.map(intersectingPoint);
   ray = ray.transform(matrix);
-  surfaceNormal = matrix.inverted().transposed().map(surfaceNormal);
+  surfaceNormal = QMatrix4x4(matrix.normalMatrix()).map(surfaceNormal);
 }
 
 inline double HitRecord::getRayParameter() const
