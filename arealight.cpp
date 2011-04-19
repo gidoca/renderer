@@ -1,5 +1,8 @@
 #include "arealight.h"
 
+#include <cassert>
+#include <cmath>
+
 AreaLight::AreaLight(QVector3D origin, QVector3D uDirection, QVector3D vDirection, Spectrum intensity) : origin(origin), uDirection(uDirection), vDirection(vDirection), intensity(intensity), normal(QVector3D::crossProduct(uDirection, vDirection))
 {
 }
@@ -17,6 +20,7 @@ Spectrum AreaLight::getIntensity(HitRecord & hit, QVector3D &direction, const In
   else
   {
     double c = QVector3D::dotProduct(direction.normalized(), normal.normalized()) / direction.lengthSquared() * normal.length();
+    assert(!isnan(c));
     if(c < 0) c = 0;
     return c * intensity;
   }

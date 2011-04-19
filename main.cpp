@@ -30,12 +30,17 @@ int main(int, char **) {
   #pragma omp parallel for schedule(dynamic)
   for(int i = 0; i < image.height(); i++)
   {
+    std::cout << i * 100 / image.height() << "% complete, ETA " << time.elapsed() * (image.height() - i) / ((i + 1) * 1000) << "s" << std::endl;
     JitteredSampler multiSampler(2, 2, i);
-    JitteredSampler lightSampler(3, 3, i);
+    JitteredSampler lightSampler(4, 4, i);
     std::list<Sample> samples = multiSampler.getSamples();
     QRgb * scanline = (QRgb *) image.scanLine(i);
     for(int j = 0; j < image.width(); j++)
     {
+      if(i == 5 && j == 0)
+      {
+        std::cout << std::endl;
+      }
       QPointF point = QPoint(j, i);
       Spectrum irradiance;
       for(std::list<Sample>::iterator i = samples.begin(); i != samples.end(); i++)
@@ -47,12 +52,11 @@ int main(int, char **) {
   
       scanline[j] = qRgb((int) clamp(irradiance.x()), (int) clamp(irradiance.y()), (int) clamp(irradiance.z()));
     }
-    std::cout << i * 100 / image.height() << "% complete" << std::endl;
   }
   
   delete object;
   
   image.save("tst.png");
-  std::cout << time.elapsed() << "ms\n";
+  std::cout << "100% complete, time elapsed: " << time.elapsed() / 1000 << "s\n";
   return 0;
 }
