@@ -71,6 +71,6 @@ Intersectable * getScene(void)
 std::list<QSharedPointer<Light> > getLight(void)
 {
   std::list<QSharedPointer<Light> > lights;
-  lights.push_back(QSharedPointer<Light>(new AreaLight(QVector3D(213, 548.8, 227), QVector3D(130, 0, 0), QVector3D(0, 0, 105), Spectrum(200, 200, 200))));
+  lights.push_back(QSharedPointer<Light>(new AreaLight(QVector3D(213, 548.8, 227), QVector3D(130, 0, 0), QVector3D(0, 0, 105), Spectrum(200, 200, 120))));
   return lights;
 }

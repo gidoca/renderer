@@ -37,7 +37,7 @@ int main(int, char **) {
     QRgb * scanline = (QRgb *) image.scanLine(i);
     for(int j = 0; j < image.width(); j++)
     {
-      if(i == 5 && j == 0)
+      if(i == 150 && j == 70)
       {
         std::cout << std::endl;
       }
