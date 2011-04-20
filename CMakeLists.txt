@@ -17,7 +17,9 @@ set(renderingproject_SRCS main.cpp camera.cpp plane.cpp sphere.cpp
   quad.cpp)
 qt4_automoc(${renderingproject_SRCS})
 add_executable(renderingproject ${renderingproject_SRCS})
+#add_executable(stst stst.cpp sampler.cpp jitteredsampler.cpp)
 target_link_libraries(renderingproject ${QT_LIBRARIES})
+#target_link_libraries(stst ${QT_LIBRARIES})
 
 set(CMAKE_CXX_FLAGS "-Wall -O2 -fopenmp -DNDEBUG")
 #set(CMAKE_CXX_FLAGS "-Wall -pg")

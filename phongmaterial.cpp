@@ -13,5 +13,5 @@ Spectrum PhongMaterial::shade(HitRecord& hit, QVector3D direction) const
   assert(coefficient >= 0);
   QVector3D reflected = 2 * QVector3D::dotProduct(-direction, normal) * normal + direction;
   double spec = pow(QVector3D::dotProduct(reflected.normalized(), hit.getRay().getDirection().normalized()), specularCoefficient);
-  return coefficient * color / M_PI; //+ spec * specularColor;
+  return /* coefficient * */ color / M_PI; //+ spec * specularColor;
 }

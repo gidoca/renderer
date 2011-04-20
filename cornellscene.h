@@ -49,7 +49,7 @@ Intersectable * getScene(void)
   plane = new Quad(QVector3D(552.8, 0, 0), QVector3D(549.6, 0, 559.2), QVector3D(556.0, 548.8, 559.2), QVector3D(556, 548.8, 0), QSharedPointer<Material>(new PhongMaterial(kd, Spectrum(), 32)));
   objects.push_back(QSharedPointer<Intersectable>(plane));
 
-  kd = Spectrum(1, 1, 1);
+  kd = Spectrum(.5, .5, .5);
   AxisAlignedBox * smallBox = new AxisAlignedBox(QVector3D(-82.5, -82.5, -82.5), QVector3D(82.5, 82.5, 82.5), QSharedPointer<Material>(new PhongMaterial(kd, Spectrum(), 32)));
   QMatrix4x4 transform;
   transform.translate(185, 82.5, 169);
@@ -71,6 +71,7 @@ Intersectable * getScene(void)
 std::list<QSharedPointer<Light> > getLight(void)
 {
   std::list<QSharedPointer<Light> > lights;
-  lights.push_back(QSharedPointer<Light>(new AreaLight(QVector3D(213, 548.8, 227), QVector3D(130, 0, 0), QVector3D(0, 0, 105), Spectrum(200, 200, 120))));
+  lights.push_back(QSharedPointer<Light>(new AreaLight(QVector3D(213, 548.8, 227), QVector3D(130, 0, 0), QVector3D(0, 0, 105), 250 * Spectrum(1, 0.85, 0.43))));
+//  lights.push_back(QSharedPointer<Light>(new PointLight(QVector3D(213, 548, 227), 10 * Spectrum(200, 200, 200))));
   return lights;
 }

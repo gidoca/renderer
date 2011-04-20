@@ -8,7 +8,7 @@
 #include <list>
 #include <iostream>
 #include <cmath>
-#include <assert.h>
+#include <cassert>
 
 Spectrum PathTracingIntegrator::integrate(const Ray& ray, const Intersectable& scene, const Light& light, Sampler& sampler, int recursionDepth) const
 {
@@ -20,20 +20,21 @@ Spectrum PathTracingIntegrator::integrate(const Ray& ray, const Intersectable& s
     Ray currentRay = ray;
     Spectrum alpha(1, 1, 1);
     HitRecord hit = firstHit;
-    for(int k = 0; k < 2; k++)
+    for(int k = 0; k < 5; k++)
     {
       QVector3D direction;
       Spectrum lightIntensity = light.getIntensity(hit, direction, scene, *i);
       assert(!isnan(lightIntensity.x()) && !isnan(lightIntensity.y()) && !isnan(lightIntensity.z()));
       Spectrum brdf = hit.getMaterial().shade(hit, direction);
       assert(brdf.x() >= 0 && brdf.y() >= 0 && brdf.z() >= 0);
-      color += alpha * brdf * lightIntensity;
+      color += alpha * brdf * lightIntensity * QVector3D::dotProduct(-direction.normalized(), hit.getSurfaceNormal().normalized());
       if(k >= 2 && qrand() < RAND_MAX / 2) break;
 
       double pdf;
       QVector3D outDirection = i->getCosineWeightedDirection(hit.getSurfaceNormal(), pdf);
       brdf = hit.getMaterial().shade(hit, -outDirection);
       double cos = QVector3D::dotProduct(outDirection.normalized(), hit.getSurfaceNormal().normalized());
+//      std::cout << cos << std::endl;
       assert(cos >= 0);
       assert(pdf >= 0);
       assert(brdf.x() >= 0 && brdf.y() >= 0 && brdf.z() >= 0);

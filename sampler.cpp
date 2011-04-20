@@ -12,9 +12,12 @@
 
 QVector3D Sample::getCosineWeightedDirection(QVector3D w, double & pdf) const
 {
+  w.normalize();
   QVector3D normalizedDirection = QVector3D(cos(2 * M_PI * sample.y()) * sqrt(sample.x()), sin(2 * M_PI * sample.y()) * sqrt(sample.x()), sqrt(1 - sample.x()));
+//  std::cout << sample.x() << std::endl;
   pdf = normalizedDirection.z() / M_PI;
-  normalizedDirection.normalize();
+//  std::cout << normalizedDirection.z() << std::endl;
+//  normalizedDirection.normalize();
   QVector3D v;
   if(abs(w.x()) < abs(w.y()) && abs(w.x()) < abs(w.z()))
   {
