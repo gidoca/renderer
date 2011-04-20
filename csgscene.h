@@ -11,9 +11,9 @@
 #include "intersectablelist.h"
 #include "mirrormaterial.h"
 #include "axisalignedbox.h"
-#include "bsp.h"
 #include "phongmaterial.h"
 #include "arealight.h"
+#include "csgintersection.h"
 
 Camera getCamera(QSize resolution)
 {
@@ -32,7 +32,9 @@ Intersectable * getScene(void)
   Spectrum kd(0.4f, 0.4f, 0.4f);
 //  QSharedPointer<Material> material(new MirrorMaterial(0.7));
   QSharedPointer<Material> material(new PhongMaterial(kd, kd, 32));
-  Sphere * sphere = new Sphere(center, radius, material);
+  Sphere * sphere1 = new Sphere(center, radius, material);
+  Sphere * sphere2 = new Sphere(QVector3D(.2, 0, 0), radius, material);
+  CSGIntersection * sphere = new CSGIntersection(QSharedPointer<CSGObject>(sphere1), QSharedPointer<CSGObject>(sphere2));
   //AxisAlignedBox * box = new AxisAlignedBox(QVector3D(-.2, -.2, -.2), QVector3D(.2, .2, .2), material);
 //  AxisAlignedBox * box = sphere->boundingBox();
   std::list< QSharedPointer<Intersectable> > objects;

@@ -2,27 +2,26 @@
 #define SPHERE_H
 
 #include "ray.h"
-#include "intersectable.h"
+#include "csgobject.h"
 #include "diffusematerial.h"
 
 #include <QVector3D>
 
-class Sphere : public Intersectable
+class Sphere : public CSGObject
 {
   public:
-    Sphere(QVector3D center, double radius, QSharedPointer<Material> material) : center(center), radius(radius), material(material)
+    Sphere(QVector3D center, double radius, QSharedPointer<Material> material) : material(material), center(center), radius(radius)
     {
 
     }
 
-
-    HitRecord intersect(Ray ray, double from, double to) const;
+    IntersectionParameter getCSGIntersection(Ray ray) const;
     AxisAlignedBox * boundingBox() const;
     
   private:
+    QSharedPointer<Material> material;
     QVector3D center;
     double radius;
-    QSharedPointer<Material> material;
 };
 
 #endif // SPHERE_H

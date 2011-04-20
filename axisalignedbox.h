@@ -1,42 +1,43 @@
 #ifndef AXISALIGNEDBOX_H
 #define AXISALIGNEDBOX_H
 
-#include "intersectable.h"
+#include "csgobject.h"
 
 #include <limits>
 
 #include <QVector3D>
 #include <QSharedPointer>
 
-class Material;
-
-class IntersectionParameter
-{
-  public:
-    double tmin, tmax;
-    QVector3D normal;
-};
-
-class AxisAlignedBox : public Intersectable
+class AxisAlignedBox : public CSGObject
 {
 
-  public:
-    AxisAlignedBox();
-    AxisAlignedBox(QVector3D min, QVector3D max, QSharedPointer<Material> material);
+public:
+  AxisAlignedBox() :
+    material(DarkMatter::getInstance()),
+    min(QVector3D(std::numeric_limits< double >::infinity(), std::numeric_limits< double >::infinity(), std::numeric_limits< double >::infinity())),
+    max(QVector3D(-std::numeric_limits< double >::infinity(), -std::numeric_limits< double >::infinity(), -std::numeric_limits< double >::infinity()))
+  {
+
+  }
+
+
+  AxisAlignedBox(QVector3D min, QVector3D max, QSharedPointer<Material> material = DarkMatter::getInstance()): material(material), min(min), max(max)
+  {
+
+  }
+
+  AxisAlignedBox * boundingBox() const;
     
-    HitRecord intersect(Ray ray, double from = 0.00005, double to = std::numeric_limits< double >::infinity()) const;
-    AxisAlignedBox * boundingBox() const;
+  IntersectionParameter getCSGIntersection(Ray ray) const;
+
+  QVector3D getMin() const;
+  QVector3D getMax() const;
     
-    IntersectionParameter getIntersectionParameter(Ray ray) const;
-    
-    QVector3D getMin() const;
-    QVector3D getMax() const;
-    
-    void includePoint(QVector3D point);
+  void includePoint(QVector3D point);
   
-  private:
-    QVector3D min, max;
-    QSharedPointer<Material> material;
+private:
+  QSharedPointer<Material> material;
+  QVector3D min, max;
     
 };
 

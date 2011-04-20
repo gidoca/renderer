@@ -5,56 +5,29 @@
 
 #include <cmath>
 
-AxisAlignedBox::AxisAlignedBox() :
-  min(QVector3D(std::numeric_limits< double >::infinity(), std::numeric_limits< double >::infinity(), std::numeric_limits< double >::infinity())),
-  max(QVector3D(-std::numeric_limits< double >::infinity(), -std::numeric_limits< double >::infinity(), -std::numeric_limits< double >::infinity())),
-  material(DarkMatter::getInstance())
-{
-
-}
-
-
-AxisAlignedBox::AxisAlignedBox(QVector3D min, QVector3D max, QSharedPointer<Material> material): min(min), max(max), material(material)
-{
-  
-}
-
-HitRecord AxisAlignedBox::intersect(Ray ray, double from, double to) const
-{
-  IntersectionParameter intersectionParameter = getIntersectionParameter(ray);
-  if(intersectionParameter.tmin < intersectionParameter.tmax && from < intersectionParameter.tmax && intersectionParameter.tmin < to)
-  {
-    return HitRecord(intersectionParameter.tmin, ray, material, intersectionParameter.normal);
-  }
-  else
-  {
-    return HitRecord();
-  }
-}
-
-IntersectionParameter AxisAlignedBox::getIntersectionParameter(Ray ray) const
+IntersectionParameter AxisAlignedBox::getCSGIntersection(Ray ray) const
 {
   IntersectionParameter result;
   double a;
-  double temp_tmin, temp_tmax;
+  double tmin, tmax, temp_tmin, temp_tmax;
   QVector3D rayDirection = ray.getDirection();
   QVector3D rayOrigin = ray.getOrigin();
   QVector3D temp_normal;
   a = 1 / rayDirection.x();
   if(a >= 0)
   {
-    result.tmin = (min.x() - rayOrigin.x());
-    result.tmax = (max.x() - rayOrigin.x());
+    tmin = (min.x() - rayOrigin.x());
+    tmax = (max.x() - rayOrigin.x());
     result.normal = QVector3D(-1, 0, 0);
   }
   else
   {
-    result.tmin = (max.x() - rayOrigin.x());
-    result.tmax = (min.x() - rayOrigin.x());
+    tmin = (max.x() - rayOrigin.x());
+    tmax = (min.x() - rayOrigin.x());
     result.normal = QVector3D(1, 0, 0);
   }
-  result.tmin *= a;
-  result.tmax *= a;
+  tmin *= a;
+  tmax *= a;
   a = 1 / rayDirection.y();
   if(a >= 0)
   {
@@ -70,12 +43,12 @@ IntersectionParameter AxisAlignedBox::getIntersectionParameter(Ray ray) const
   }
   temp_tmin *= a;
   temp_tmax *= a;
-  if(temp_tmin > result.tmin)
+  if(temp_tmin > tmin)
   {
-    result.tmin = temp_tmin;
+    tmin = temp_tmin;
     result.normal = temp_normal;
   }
-  if(temp_tmax < result.tmax) result.tmax = temp_tmax;
+  if(temp_tmax < tmax) tmax = temp_tmax;
   a = 1 / rayDirection.z();
   if(a >= 0)
   {
@@ -91,12 +64,18 @@ IntersectionParameter AxisAlignedBox::getIntersectionParameter(Ray ray) const
   }
   temp_tmin *= a;
   temp_tmax *= a;
-  if(temp_tmin > result.tmin)
+  if(temp_tmin > tmin)
   {
-    result.tmin = temp_tmin;
+    tmin = temp_tmin;
     result.normal = temp_normal;
   }
-  if(temp_tmax < result.tmax) result.tmax = temp_tmax;
+  if(temp_tmax < tmax) tmax = temp_tmax;
+  if(tmin <= tmax)
+  {
+    result.intersections.push_back(tmin);
+    result.intersections.push_back(tmax);
+  }
+  result.material = material;
   return result;
 }
 

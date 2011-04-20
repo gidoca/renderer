@@ -1,7 +1,7 @@
 #ifndef INTERSECTABLE_H
 #define INTERSECTABLE_H
 
-#define EPSILON 0.00005
+#define EPSILON 0.0001
 
 #include "ray.h"
 #include "hitrecord.h"

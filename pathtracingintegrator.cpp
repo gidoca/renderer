@@ -15,6 +15,7 @@ Spectrum PathTracingIntegrator::integrate(const Ray& ray, const Intersectable& s
   std::list<Sample> samples = sampler.getSamples();
   Spectrum color;
   HitRecord firstHit = scene.intersect(ray);
+  if(!firstHit.intersects()) return Spectrum();
   for(std::list<Sample>::iterator i = samples.begin(); i != samples.end(); i++)
   {
     Ray currentRay = ray;
@@ -24,10 +25,15 @@ Spectrum PathTracingIntegrator::integrate(const Ray& ray, const Intersectable& s
     {
       QVector3D direction;
       Spectrum lightIntensity = light.getIntensity(hit, direction, scene, *i);
-      assert(!isnan(lightIntensity.x()) && !isnan(lightIntensity.y()) && !isnan(lightIntensity.z()));
-      Spectrum brdf = hit.getMaterial().shade(hit, direction);
-      assert(brdf.x() >= 0 && brdf.y() >= 0 && brdf.z() >= 0);
-      color += alpha * brdf * lightIntensity * QVector3D::dotProduct(-direction.normalized(), hit.getSurfaceNormal().normalized());
+      double inCos = QVector3D::dotProduct(-direction.normalized(), hit.getSurfaceNormal().normalized());
+      Spectrum brdf;
+      if(inCos > 0)
+      {
+        assert(!isnan(lightIntensity.x()) && !isnan(lightIntensity.y()) && !isnan(lightIntensity.z()));
+        brdf = hit.getMaterial().shade(hit, direction);
+        assert(brdf.x() >= 0 && brdf.y() >= 0 && brdf.z() >= 0);
+        color += alpha * brdf * lightIntensity * inCos;
+      }
       if(k >= 2 && qrand() < RAND_MAX / 2) break;
 
       double pdf;

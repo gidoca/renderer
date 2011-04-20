@@ -37,6 +37,8 @@ int main(int, char **) {
     QRgb * scanline = (QRgb *) image.scanLine(i);
     for(int j = 0; j < image.width(); j++)
     {
+      if(j == 130 && i == 140)
+        std::cout << std::endl;
       QPointF point = QPoint(j, i);
       Spectrum irradiance;
       for(std::list<Sample>::iterator i = samples.begin(); i != samples.end(); i++)

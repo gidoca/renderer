@@ -1,31 +1,28 @@
 #include "sphere.h"
 
 #include <cmath>
+#include <limits>
 
 #include "axisalignedbox.h"
 
-HitRecord Sphere::intersect(Ray ray, double from, double to) const
+IntersectionParameter Sphere::getCSGIntersection(Ray ray) const
 {
+  IntersectionParameter result;
   QVector3D diff = ray.getOrigin() - center;
   double radiusSquared = radius * radius;
   double a = ray.getDirection().lengthSquared();
   double b = 2 * QVector3D::dotProduct(ray.getDirection(), diff);
   double c = diff.lengthSquared() - radiusSquared;
-  if(b * b - 4 * a * c < 0)
+  if(b * b - 4 * a * c >= 0)
   {
-    return HitRecord();
+    result.intersections.push_back((-b - sqrt(b * b - 4 * a * c)) / (2 * a));
+    result.intersections.push_back((-b + sqrt(b * b - 4 * a * c)) / (2 * a));
+
+    QVector3D location = ray.evaluate(result.intersections.front());
+    result.normal = location - center;
   }
-  else
-  {
-    double rayParameter = (-b - pow(b * b - 4 * a * c, 0.5)) / (2 * a);
-    if(from >= rayParameter || rayParameter >= to)
-    {
-      return HitRecord();
-    }
-    
-    QVector3D location = ray.evaluate(rayParameter);
-    return HitRecord(rayParameter, ray, material, location - center);
-  }
+  result.material = material;
+  return result;
 }
 
 AxisAlignedBox* Sphere::boundingBox() const
