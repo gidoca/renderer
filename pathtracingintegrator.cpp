@@ -21,7 +21,7 @@ Spectrum PathTracingIntegrator::integrate(const Ray& ray, const Intersectable& s
     Ray currentRay = ray;
     Spectrum alpha(1, 1, 1);
     HitRecord hit = firstHit;
-    for(int k = 0; k < 5; k++)
+    for(int k = 0; k < 1; k++)
     {
       QVector3D direction;
       Spectrum lightIntensity = light.getIntensity(hit, direction, scene, *i);
