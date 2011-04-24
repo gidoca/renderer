@@ -8,17 +8,15 @@
 class JitteredSampler : public Sampler
 {
 public:
-    JitteredSampler(int width, int height, unsigned int seed) : Sampler(seed), width(width), height(height)
-    {
-    }
+  JitteredSampler(int width, int height) : width(width), height(height) {}
 
 
-    std::list<Sample> getSamples();
+  std::list<Sample> getSamples();
 
 private:
-    std::list<Sample> samples;
-    int width;
-    int height;
+  std::list<Sample> samples;
+  int width;
+  int height;
 };
 
 #endif // JITTEREDSAMPLER_H

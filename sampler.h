@@ -21,8 +21,6 @@ private:
 class Sampler
 {
 public:
-    Sampler(unsigned int seed);
-
     virtual std::list<Sample> getSamples() = 0;
 
 protected:

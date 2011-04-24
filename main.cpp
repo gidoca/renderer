@@ -16,7 +16,7 @@
 int main(int, char **) {
   QTime time;
   time.start();
-  QSize resolution(256, 256);
+  QSize resolution(64, 64);
 
   QImage image(resolution, QImage::Format_RGB32);
 
@@ -31,8 +31,7 @@ int main(int, char **) {
   for(int i = 0; i < image.height(); i++)
   {
     std::cout << i * 100 / image.height() << "% complete, ETA: " << time.elapsed() * (image.height() - i) / ((i + 1) * 1000) << "s" << std::endl;
-    JitteredSampler multiSampler(2, 2, i);
-    JitteredSampler lightSampler(4, 4, i);
+    JitteredSampler multiSampler(8, 8);
     std::list<Sample> samples = multiSampler.getSamples();
     QRgb * scanline = (QRgb *) image.scanLine(i);
     for(int j = 0; j < image.width(); j++)
@@ -45,7 +44,7 @@ int main(int, char **) {
       {
         QPointF samplePoint = point + i->getSample() - QPointF(0.5, 0.5);
         Ray ray = camera.getRay(samplePoint);
-        irradiance += 255 * integrator->integrate(ray, *object, light, lightSampler) / samples.size();
+        irradiance += 255 * integrator->integrate(ray, *object, light) / samples.size();
       }
   
       scanline[j] = qRgb((int) clamp(irradiance.x()), (int) clamp(irradiance.y()), (int) clamp(irradiance.z()));

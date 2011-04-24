@@ -6,7 +6,7 @@
 class SimpleIntegrator : public Integrator
 {
 protected:
-  Spectrum integrate(const Ray & ray, const Intersectable & scene, const Light & light, Sampler & sampler, int depth) const;
+  Spectrum integrate(const Ray & ray, const Intersectable & scene, const Light & light, int depth) const;
 };
 
 #endif // SIMPLEINTEGRATOR_H

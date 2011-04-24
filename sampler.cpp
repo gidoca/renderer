@@ -42,11 +42,6 @@ QVector3D Sample::getCosineWeightedDirection(QVector3D w, double & pdf) const
   return randomDirection;
 }
 
-Sampler::Sampler(unsigned int seed)
-{
-  qsrand(seed);
-}
-
 double Sampler::getRandom()
 {
   return (double) qrand() / RAND_MAX;

@@ -2,11 +2,12 @@
 
 #include "hitrecord.h"
 #include "intersectable.h"
-#include "sampler.h"
+#include "jitteredsampler.h"
 #include "light.h"
 
-Spectrum SimpleIntegrator::integrate(const Ray & ray, const Intersectable & scene, const Light & light, Sampler & sampler, int depth) const
+Spectrum SimpleIntegrator::integrate(const Ray & ray, const Intersectable & scene, const Light & light, int depth) const
 {
+  JitteredSampler sampler(2, 2);
   if(depth > MAX_DEPTH) return Spectrum();
 
   HitRecord hit = scene.intersect(ray);
@@ -17,7 +18,7 @@ Spectrum SimpleIntegrator::integrate(const Ray & ray, const Intersectable & scen
     surfaceNormal.normalize();
     QVector3D newDirection = oldRayDirection - 2 * QVector3D::dotProduct(oldRayDirection, surfaceNormal) * surfaceNormal;
     Ray mirrorRay(hit.getIntersectingPoint(), newDirection);
-    return integrate(mirrorRay, scene, light, sampler, depth + 1);
+    return integrate(mirrorRay, scene, light, depth + 1);
   }
   else
   {

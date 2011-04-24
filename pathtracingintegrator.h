@@ -7,7 +7,7 @@ class PathTracingIntegrator : public Integrator
 {
 
 protected:
-virtual Spectrum integrate(const Ray& ray, const Intersectable& scene, const Light& light, Sampler& sampler, int recursionDepth) const;
+  virtual Spectrum integrate(const Ray& ray, const Intersectable& scene, const Light& light, int recursionDepth) const;
 };
 
 #endif // PATHTRACINGINTEGRATOR_H
