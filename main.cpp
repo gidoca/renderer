@@ -16,7 +16,7 @@
 int main(int, char **) {
   QTime time;
   time.start();
-  QSize resolution(64, 64);
+  QSize resolution(256, 256);
 
   QImage image(resolution, QImage::Format_RGB32);
 
