@@ -4,6 +4,7 @@
 #include "jitteredsampler.h"
 #include "intersectable.h"
 #include "light.h"
+#include "path.h"
 
 #include <list>
 #include <iostream>
@@ -13,44 +14,63 @@
 Spectrum PathTracingIntegrator::integrate(const Ray& ray, const Intersectable& scene, const Light& light, int recursionDepth) const
 {
   JitteredSampler sampler(1, 1);
-  std::list<Sample> samples = sampler.getSamples();
   Spectrum color;
-  HitRecord hit = scene.intersect(ray);
-  if(!hit.intersects()) return Spectrum();
+  Path path = createPath(ray, scene);
 
-  Ray currentRay = ray;
-  Spectrum alpha(1, 1, 1);
+  std::list<Spectrum>::iterator alphaIt = path.alphaValues.begin();
+  std::list<HitRecord>::iterator hitIt = path.hitRecords.begin();
 
-  for(int k = 0; k < 3; k++)
+  while(alphaIt != path.alphaValues.end() && hitIt != path.hitRecords.end())
   {
     QVector3D direction;
-    Spectrum lightIntensity = light.getIntensity(hit, direction, scene, sampler.getSamples().front());
-    double inCos = QVector3D::dotProduct(-direction.normalized(), hit.getSurfaceNormal().normalized());
+    Spectrum lightIntensity = light.getIntensity(*hitIt, direction, scene, sampler.getSamples().front());
+    double inCos = QVector3D::dotProduct(-direction.normalized(), hitIt->getSurfaceNormal().normalized());
     Spectrum brdf;
     if(inCos > 0)
     {
       assert(!isnan(lightIntensity.x()) && !isnan(lightIntensity.y()) && !isnan(lightIntensity.z()));
-      brdf = hit.getMaterial().shade(hit, direction);
+      brdf = hitIt->getMaterial().shade(*hitIt, direction);
       assert(brdf.x() >= 0 && brdf.y() >= 0 && brdf.z() >= 0);
-      color += alpha * brdf * lightIntensity * inCos;
+      color += *alphaIt * brdf * lightIntensity * inCos;
     }
-    if(k >= 2 && qrand() < RAND_MAX / 2) break;
+
+    alphaIt++;
+    hitIt++;
+  }
+
+  return color;
+}
+
+Path PathTracingIntegrator::createPath(const Ray& primaryRay, const Intersectable &scene) const
+{
+  Path result;
+  HitRecord hit = scene.intersect(primaryRay);
+  Spectrum alpha(1, 1, 1);
+  JitteredSampler sampler(1, 1);
+  for(int i = 0; i < MAX_DEPTH; i++)
+  {
+    if(!hit.intersects()) return result;
+
+#ifdef ROUSSIAN_ROULETTE
+    const double terminationProb = 0.7;
+    if(i >= 2 && qrand() < RAND_MAX * terminationProb) return result;
+    double russianRoulettePdf = (i < 2 ? 1 : 1 - terminationProb);
+#else
+    const double russianRoulettePdf = 1;
+#endif
+
+    result.alphaValues.push_back(alpha);
+    result.hitRecords.push_back(hit);
 
     double pdf;
     QVector3D outDirection = sampler.getSamples().front().getCosineWeightedDirection(hit.getSurfaceNormal(), pdf);
-    brdf = hit.getMaterial().shade(hit, -outDirection);
+    Spectrum brdf = hit.getMaterial().shade(hit, -outDirection);
     double cos = QVector3D::dotProduct(outDirection.normalized(), hit.getSurfaceNormal().normalized());
-    //      std::cout << cos << std::endl;
     assert(cos >= 0);
     assert(pdf >= 0);
     assert(brdf.x() >= 0 && brdf.y() >= 0 && brdf.z() >= 0);
-    double russianRoulettePdf = (k < 2 ? 1 : .5);
     alpha *= brdf * cos / pdf / russianRoulettePdf;
-    currentRay = Ray(hit.getIntersectingPoint(), outDirection);
-    hit = scene.intersect(currentRay);
-    if(!hit.intersects()) break;
+    hit = scene.intersect(Ray(hit.getIntersectingPoint(), outDirection));
   }
-
-  return color / samples.size();
+  return result;
 }
-
