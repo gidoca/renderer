@@ -4,8 +4,8 @@
 #include "plane.h"
 #include "hitrecord.h"
 
-#include <QVector3D>
-#include <QSharedPointer>
+#include <QtGui/QVector3D>
+#include <QtCore/QSharedPointer>
 
 class Triangle : public Intersectable
 {

@@ -3,10 +3,10 @@
 
 #include "ray.h"
 
-#include <QVector3D>
-#include <QPointF>
-#include <QSize>
-#include <QMatrix4x4>
+#include <QtGui/QVector3D>
+#include <QtCore/QPointF>
+#include <QtCore/QSize>
+#include <QtGui/QMatrix4x4>
 
 class Camera
 {

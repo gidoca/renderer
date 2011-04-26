@@ -4,7 +4,7 @@
 #include "spectrum.h"
 
 #include <list>
-#include <QSharedPointer>
+#include <QtCore/QSharedPointer>
 
 #define MAX_DEPTH 6
 

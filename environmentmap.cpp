@@ -1,7 +1,7 @@
 #include "environmentmap.h"
 
 #include <cmath>
-#include <QVector2D>
+#include <QtGui/QVector2D>
 
 EnvironmentMap::EnvironmentMap(const char *filename, float coefficient) : coefficient(coefficient)
 {

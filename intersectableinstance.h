@@ -3,8 +3,8 @@
 
 #include "intersectable.h"
 
-#include <QMatrix4x4>
-#include <QSharedPointer>
+#include <QtGui/QMatrix4x4>
+#include <QtCore/QSharedPointer>
 
 class IntersectableInstance : public Intersectable
 {

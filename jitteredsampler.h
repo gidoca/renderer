@@ -3,7 +3,7 @@
 
 #include "sampler.h"
 
-#include <QPointF>
+#include <QtCore/QPointF>
 
 class JitteredSampler : public Sampler
 {

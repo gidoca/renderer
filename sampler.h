@@ -3,8 +3,8 @@
 
 #include <list>
 
-#include <QPointF>
-#include <QVector3D>
+#include <QtCore/QPointF>
+#include <QtGui/QVector3D>
 
 class Sample
 {

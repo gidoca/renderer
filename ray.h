@@ -1,8 +1,8 @@
 #ifndef RAY_H
 #define RAY_H
 
-#include <QVector3D>
-#include <QMatrix4x4>
+#include <QtGui/QVector3D>
+#include <QtGui/QMatrix4x4>
 
 class Ray
 {

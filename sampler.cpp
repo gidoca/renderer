@@ -4,9 +4,9 @@
 #include <cmath>
 #include <assert.h>
 
-#include <QtGlobal>
-#include <QTime>
-#include <QMatrix4x4>
+#include <QtCore/QtGlobal>
+#include <QtCore/QTime>
+#include <QtGui/QMatrix4x4>
 
 #include <iostream>
 

@@ -5,8 +5,8 @@
 
 #include <limits>
 
-#include <QVector3D>
-#include <QSharedPointer>
+#include <QtGui/QVector3D>
+#include <QtCore/QSharedPointer>
 
 class AxisAlignedBox : public CSGObject
 {

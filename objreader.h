@@ -1,7 +1,7 @@
 #ifndef __ObjReader_h__
 #define __ObjReader_h__
 
-#include <QSharedPointer>
+#include <QtCore/QSharedPointer>
 
 #include "intersectablelist.h"
 

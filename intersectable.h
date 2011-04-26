@@ -6,7 +6,7 @@
 #include "ray.h"
 #include "hitrecord.h"
 
-#include <QVector3D>
+#include <QtGui/QVector3D>
 
 #include <limits>
 

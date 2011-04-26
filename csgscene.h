@@ -1,5 +1,5 @@
-#include <QVector3D>
-#include <QSize>
+#include <QtGui/QVector3D>
+#include <QtCore/QSize>
 
 #include <cmath>
 

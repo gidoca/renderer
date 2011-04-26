@@ -1,7 +1,7 @@
 #ifndef CSGINTERSECTION_H
 #define CSGINTERSECTION_H
 
-#include <QSharedPointer>
+#include <QtCore/QSharedPointer>
 
 #include "csgobject.h"
 

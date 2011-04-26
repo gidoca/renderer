@@ -4,8 +4,8 @@
 #include "ray.h"
 #include "darkmatter.h"
 
-#include <QVector3D>
-#include <QSharedPointer>
+#include <QtGui/QVector3D>
+#include <QtCore/QSharedPointer>
 
 #include <limits>
 

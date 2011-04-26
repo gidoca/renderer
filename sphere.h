@@ -5,7 +5,7 @@
 #include "csgobject.h"
 #include "diffusematerial.h"
 
-#include <QVector3D>
+#include <QtGui/QVector3D>
 
 class Sphere : public CSGObject
 {

@@ -4,9 +4,9 @@
 #include "intersectable.h"
 #include "material.h"
 
-#include <QVector4D>
-#include <QVector3D>
-#include <QSharedPointer>
+#include <QtGui/QVector4D>
+#include <QtGui/QVector3D>
+#include <QtCore/QSharedPointer>
 
 class Plane : public Intersectable
 {

@@ -1,7 +1,7 @@
-#include <QSize>
-#include <QImage>
-#include <QSharedPointer>
-#include <QTime>
+#include <QtCore/QSize>
+#include <QtGui/QImage>
+#include <QtCore/QSharedPointer>
+#include <QtCore/QTime>
 
 #include <list>
 #include <iostream>
@@ -53,7 +53,7 @@ int main(int, char **) {
   
   delete object;
   
-  image.save("tst.png");
+  if(!image.save("/tmp/tst.png")) std::cout << "Failed to save file.\n";
   std::cout << "100% complete, time elapsed: " << time.elapsed() / 1000 << "s\n";
   return 0;
 }

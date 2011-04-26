@@ -5,7 +5,7 @@
 #include "spectrum.h"
 #include "jitteredsampler.h"
 
-#include <QVector3D>
+#include <QtGui/QVector3D>
 
 class AreaLight : public Light
 {

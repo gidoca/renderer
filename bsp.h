@@ -4,7 +4,7 @@
 #include "intersectable.h"
 
 #include <list>
-#include <QSharedPointer>
+#include <QtCore/QSharedPointer>
 
 class IntersectableList;
 class Ray;

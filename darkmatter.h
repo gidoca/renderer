@@ -3,7 +3,7 @@
 
 #include "diffusematerial.h"
 
-#include <QSharedPointer>
+#include <QtCore/QSharedPointer>
 
 class DarkMatter : public DiffuseMaterial
 {

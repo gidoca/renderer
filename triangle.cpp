@@ -2,9 +2,9 @@
 
 #include <iostream>
 
-#include <QMatrix4x4>
+#include <QtGui/QMatrix4x4>
 
-#include <QVector3D>
+#include <QtGui/QVector3D>
 #include "axisalignedbox.h"
 
 HitRecord Triangle::intersect(Ray ray, double from, double to) const

@@ -5,7 +5,7 @@
 #include "axisalignedbox.h"
 
 #include <list>
-#include <QSharedPointer>
+#include <QtCore/QSharedPointer>
 
 class IntersectableList : public Intersectable
 {

@@ -5,7 +5,7 @@
 #include "intersectable.h"
 #include "sampler.h"
 
-#include <QPointF>
+#include <QtCore/QPointF>
 
 class HitRecord;
 

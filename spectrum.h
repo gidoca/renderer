@@ -1,7 +1,7 @@
 #ifndef SPECTRUM_H
 #define SPECTRUM_H
 
-#include <QVector3D>
+#include <QtGui/QVector3D>
 
 class Spectrum : public QVector3D
 {

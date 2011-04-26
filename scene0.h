@@ -3,7 +3,7 @@
 #include "pointlight.h"
 #include "phongmaterial.h"
 
-#include <QSize>
+#include <QtCore/QSize>
 
 #include <cmath>
 

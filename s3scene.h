@@ -7,8 +7,8 @@
 #include "objreader.h"
 
 #include <list>
-#include <QSize>
-#include <QSharedPointer>
+#include <QtCore/QSize>
+#include <QtCore/QSharedPointer>
 
 Intersectable * getScene(void)
 {
