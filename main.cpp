@@ -7,7 +7,7 @@
 #include <iostream>
 
 #include "cornellscene.h"
-#include "pathtracingintegrator.h"
+#include "unidipathtracingintegrator.h"
 #include "simpleintegrator.h"
 #include "jitteredsampler.h"
 
@@ -20,7 +20,7 @@ int main(int, char **) {
 
   QImage image(resolution, QImage::Format_RGB32);
 
-  Integrator * integrator = new PathTracingIntegrator();
+  Integrator * integrator = new UniDiPathTracingIntegrator();
 //  Integrator * integrator = new SimpleIntegrator();
   
   const Intersectable * object = getScene();
