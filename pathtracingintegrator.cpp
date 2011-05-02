@@ -11,11 +11,10 @@
 #include <cmath>
 #include <cassert>
 
-Path PathTracingIntegrator::createPath(const Ray& primaryRay, const Intersectable &scene) const
+Path PathTracingIntegrator::createPath(const Ray& primaryRay, const Intersectable &scene, Spectrum alpha) const
 {
   Path result;
   HitRecord hit = scene.intersect(primaryRay);
-  Spectrum alpha(1, 1, 1);
   JitteredSampler sampler(1, 1);
   for(int i = 0; i < MAX_DEPTH; i++)
   {

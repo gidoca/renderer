@@ -4,6 +4,7 @@
 #define ROUSSIAN_ROULETTE
 
 #include "integrator.h"
+#include "spectrum.h"
 
 class Path;
 
@@ -11,7 +12,7 @@ class PathTracingIntegrator : public Integrator
 {
 
 protected:
-  Path createPath(const Ray& primaryRay, const Intersectable& scene) const;
+  Path createPath(const Ray& primaryRay, const Intersectable& scene, Spectrum initialAlpha = Spectrum(1, 1, 1)) const;
 };
 
 #endif // PATHTRACINGINTEGRATOR_H
