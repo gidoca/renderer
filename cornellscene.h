@@ -57,7 +57,7 @@ Intersectable * getScene(void)
   IntersectableInstance * smallBoxInstance = new IntersectableInstance(transform, QSharedPointer<Intersectable>(smallBox));
   objects.push_back(QSharedPointer<Intersectable>(smallBoxInstance));
 
-  AxisAlignedBox * largeBox = new AxisAlignedBox(QVector3D(-82.5, -165, -82.5), QVector3D(82.5, 165, 82.5), QSharedPointer<Material>(new PhongMaterial(kd, Spectrum(), 32)));
+  AxisAlignedBox * largeBox = new AxisAlignedBox(QVector3D(-82.5, -165, -82.5), QVector3D(82.5, 165, 82.5), QSharedPointer<Material>(new MirrorMaterial(1)));
   transform.setToIdentity();
   transform.translate(368, 165, 351);
   transform.rotate(-1.27 * 180 / M_PI, 0, 1, 0);

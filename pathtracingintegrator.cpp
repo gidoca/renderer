@@ -32,13 +32,25 @@ Path PathTracingIntegrator::createPath(const Ray& primaryRay, const Intersectabl
     result.hitRecords.push_back(hit);
 
     double pdf;
-    QVector3D outDirection = sampler.getSamples().front().getCosineWeightedDirection(hit.getSurfaceNormal(), pdf);
-    Spectrum brdf = hit.getMaterial().shade(hit, -outDirection);
-    double cos = QVector3D::dotProduct(outDirection.normalized(), hit.getSurfaceNormal().normalized());
-    assert(cos >= 0);
-    assert(pdf >= 0);
-    assert(brdf.x() >= 0 && brdf.y() >= 0 && brdf.z() >= 0);
-    alpha *= brdf * cos / pdf / russianRoulettePdf;
+    QVector3D outDirection;
+    if(hit.getMaterial().isMirror())
+    {
+      QVector3D oldRayDirection = hit.getRay().getDirection();
+      QVector3D surfaceNormal = hit.getSurfaceNormal();
+      surfaceNormal.normalize();
+      outDirection = oldRayDirection - 2 * QVector3D::dotProduct(oldRayDirection, surfaceNormal) * surfaceNormal;
+
+    }
+    else
+    {
+      outDirection = sampler.getSamples().front().getCosineWeightedDirection(hit.getSurfaceNormal(), pdf);
+      Spectrum brdf = hit.getMaterial().shade(hit, -outDirection);
+      double cos = QVector3D::dotProduct(outDirection.normalized(), hit.getSurfaceNormal().normalized());
+      assert(cos >= 0);
+      assert(pdf >= 0);
+      assert(brdf.x() >= 0 && brdf.y() >= 0 && brdf.z() >= 0);
+      alpha *= brdf * cos / pdf / russianRoulettePdf;
+    }
     hit = scene.intersect(Ray(hit.getIntersectingPoint(), outDirection));
   }
   return result;
