@@ -32,8 +32,10 @@ Intersectable * getScene(void)
   Spectrum kd(0.4f, 0.4f, 0.4f);
 //  QSharedPointer<Material> material(new MirrorMaterial(0.7));
   QSharedPointer<Material> material(new PhongMaterial(kd, kd, 32));
-  Sphere * sphere1 = new Sphere(center, radius, material);
+//   Sphere * sphere1 = new Sphere(center, radius, material);
   Sphere * sphere2 = new Sphere(QVector3D(.2, 0, 0), radius, material);
+  AxisAlignedBox * sphere1 = new AxisAlignedBox(QVector3D(-.2, -.2, -.2), QVector3D(.2, .2, .2), material);
+//   AxisAlignedBox * sphere2 = new AxisAlignedBox(QVector3D(0, -.2, -.2), QVector3D(.4, .2, .2), material);
   CSGIntersection * sphere = new CSGIntersection(QSharedPointer<CSGObject>(sphere1), QSharedPointer<CSGObject>(sphere2));
   //AxisAlignedBox * box = new AxisAlignedBox(QVector3D(-.2, -.2, -.2), QVector3D(.2, .2, .2), material);
 //  AxisAlignedBox * box = sphere->boundingBox();
@@ -73,7 +75,8 @@ std::list<QSharedPointer<Light> > getLight(void)
 {
   std::list<QSharedPointer<Light> > lights;
 //  lights.push_back(QSharedPointer<Light>(new PointLight(QVector3D(0, 0.8, 0.8), Spectrum(1, 1, 1))));
-  lights.push_back(QSharedPointer<Light>(new PointLight(QVector3D(0.3, 0.6, 0.8), Spectrum(4, 4, 4))));
-//  lights.push_back(QSharedPointer<Light>(new AreaLight(.7 * QVector3D(-0.25, 0.9, -0.25), QVector3D(.5, 0, 0), QVector3D(0, 0, .5), 4 * Spectrum(4, 4, 4))));
+//   lights.push_back(QSharedPointer<Light>(new PointLight(QVector3D(0.3, 0.6, 0.8), Spectrum(4, 4, 4))));
+//   lights.push_back(QSharedPointer<Light>(new AreaLight(.7 * QVector3D(-0.25, 0.9, -0.25), QVector3D(.5, 0, 0), QVector3D(0, 0, .5), 4 * Spectrum(4, 4, 4))));
+  lights.push_back(QSharedPointer<Light>(new AreaLight(QVector3D(-0.05, 0.9, -0.05), QVector3D(.1, 0, 0), QVector3D(0, 0, .1), 70 * Spectrum(4, 4, 4))));
   return lights;
 }

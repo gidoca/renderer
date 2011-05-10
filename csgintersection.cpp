@@ -15,17 +15,6 @@ IntersectionParameter CSGIntersection::getCSGIntersection(Ray ray) const
   std::list<double>::iterator leftIterator = leftIntersection.intersections.begin();
   std::list<double>::iterator rightIterator = rightIntersection.intersections.begin();
 
-  if(*leftIterator > *rightIterator)
-  {
-    result.material = leftIntersection.material;
-    result.normal = leftIntersection.normal;
-  }
-  else
-  {
-    result.material = rightIntersection.material;
-    result.normal = rightIntersection.normal;
-  }
-
   while(leftIterator != leftIntersection.intersections.end() && rightIterator != rightIntersection.intersections.end())
   {
     if(*leftIterator <= *rightIterator)
@@ -34,6 +23,11 @@ IntersectionParameter CSGIntersection::getCSGIntersection(Ray ray) const
       if(leftInside && rightInside)
       {
         result.intersections.push_back(*leftIterator);
+	if(result.material.isNull())
+	{
+	  result.material = leftIntersection.material;
+	  result.normal = leftIntersection.normal;
+	}
       }
       leftIterator++;
     }
@@ -42,7 +36,12 @@ IntersectionParameter CSGIntersection::getCSGIntersection(Ray ray) const
       rightInside = !rightInside;
       if(leftInside && rightInside)
       {
-        result.intersections.push_back(*leftIterator);
+        result.intersections.push_back(*rightIterator);
+	if(result.material.isNull())
+	{
+	  result.material = rightIntersection.material;
+	  result.normal = rightIntersection.normal;
+	}
       }
       rightIterator++;
     }
