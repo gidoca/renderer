@@ -1,5 +1,8 @@
 #include "pointlight.h"
 
+#include "hitrecord.h"
+#include "intersectable.h"
+
 Spectrum PointLight::getIntensity (HitRecord & hit, QVector3D & direction, const Intersectable & scene, Sample) const
 {
   direction = getDirection(hit.getIntersectingPoint());

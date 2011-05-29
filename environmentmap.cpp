@@ -1,5 +1,9 @@
 #include "environmentmap.h"
 
+#include "spectrum.h"
+#include "hitrecord.h"
+#include "intersectable.h"
+
 #include <cmath>
 #include <QtGui/QVector2D>
 

@@ -1,7 +1,10 @@
 #ifndef DIRECTIONALLIGHT_H
 #define DRIECTINOALLIGHT_H
 
+#include "spectrum.h"
 #include "light.h"
+
+#include <QVector3D>
 
 class DirectionalLight : public Light
 {

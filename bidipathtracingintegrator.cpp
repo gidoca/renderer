@@ -3,6 +3,9 @@
 #include "light.h"
 #include "jitteredsampler.h"
 #include "path.h"
+#include "ray.h"
+#include "hitrecord.h"
+#include "intersectable.h"
 
 #include <list>
 #include <cassert>

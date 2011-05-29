@@ -1,6 +1,8 @@
 #include "arealight.h"
 
 #include "path.h"
+#include "hitrecord.h"
+#include "intersectable.h"
 
 #include <cassert>
 #include <cmath>

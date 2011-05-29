@@ -2,6 +2,9 @@
 #define POINTLIGHT_H
 
 #include "light.h"
+#include "spectrum.h"
+
+#include <QVector3D>
 
 class PointLight:public Light
 {

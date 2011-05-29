@@ -1,5 +1,7 @@
 #include "directionallight.h"
 #include "hitrecord.h"
+#include "ray.h"
+#include "intersectable.h"
 
 #include <iostream>
 

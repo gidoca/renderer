@@ -1,15 +1,13 @@
 #ifndef LIGHT_H
 #define LIGHT_H
 
-#include "spectrum.h"
-#include "intersectable.h"
 #include "sampler.h"
-
-#include <QtCore/QPointF>
 
 class HitRecord;
 class Sample;
 class Ray;
+class Intersectable;
+class Spectrum;
 
 class Light
 {
