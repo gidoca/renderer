@@ -6,6 +6,7 @@
 
 #include <cassert>
 #include <cmath>
+#include <iostream>
 
 AreaLight::AreaLight(QVector3D origin, QVector3D uDirection, QVector3D vDirection, Spectrum intensity) : origin(origin), uDirection(uDirection), vDirection(vDirection), intensity(intensity), normal(QVector3D::crossProduct(uDirection, vDirection))
 {
@@ -17,8 +18,18 @@ Spectrum AreaLight::getIntensity(HitRecord & hit, QVector3D &direction, const In
   QVector3D lightLocation = getLocation(p);
   direction = hit.getIntersectingPoint() - lightLocation;
   HitRecord shadowHit = scene.intersect(Ray(hit.getIntersectingPoint(), -direction.normalized()), EPSILON, direction.length());
+  double q = false;
+  while(shadowHit.intersects() && shadowHit.getMaterial().isParticipating())
+  {
+    shadowHit = scene.intersect(Ray(shadowHit.getIntersectingPoint(), -direction.normalized()), 20 * EPSILON, (shadowHit.getIntersectingPoint() - lightLocation).length());
+    q = true;
+  }
   if(shadowHit.intersects())
   {
+#ifndef NDEBUG
+    if(q)
+      std::cout << "";
+#endif
     return Spectrum();
   }
   else

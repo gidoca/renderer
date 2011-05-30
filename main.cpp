@@ -7,7 +7,7 @@
 #include <iostream>
 
 #include "cornellscene.h"
-#include "bidipathtracingintegrator.h"
+#include "unidipathtracingintegrator.h"
 #include "simpleintegrator.h"
 #include "jitteredsampler.h"
 
@@ -20,7 +20,7 @@ int main(int, char **) {
 
   QImage image(resolution, QImage::Format_RGB32);
 
-  Integrator * integrator = new BiDiPathTracingIntegrator();
+  Integrator * integrator = new UniDiPathTracingIntegrator();
 //  Integrator * integrator = new SimpleIntegrator();
   
   const Intersectable * object = getScene();
@@ -31,13 +31,15 @@ int main(int, char **) {
   for(int i = 0; i < image.height(); i++)
   {
     std::cout << i * 100 / image.height() << "% complete, ETA: " << time.elapsed() * (image.height() - i) / ((i + 1) * 1000) << "s" << std::endl;
-    JitteredSampler multiSampler(2, 2);
+    JitteredSampler multiSampler(6, 6);
     std::list<Sample> samples = multiSampler.getSamples();
     QRgb * scanline = (QRgb *) image.scanLine(i);
     for(int j = 0; j < image.width(); j++)
     {
-      if(j == 130 && i == 140)
-        std::cout << std::endl;
+#ifndef NDEBUG
+      if(j == 180 && i == 180)
+        std::cout << "";
+#endif
       QPointF point = QPoint(j, i);
       Spectrum irradiance;
       for(std::list<Sample>::iterator i = samples.begin(); i != samples.end(); i++)

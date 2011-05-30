@@ -6,6 +6,8 @@
 #include "integrator.h"
 #include "spectrum.h"
 
+const double dt = 3;
+
 class Path;
 
 class PathTracingIntegrator : public Integrator

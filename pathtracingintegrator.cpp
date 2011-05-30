@@ -5,6 +5,7 @@
 #include "intersectable.h"
 #include "light.h"
 #include "path.h"
+#include "participatingmaterial.h"
 
 #include <list>
 #include <iostream>
@@ -40,6 +41,25 @@ Path PathTracingIntegrator::createPath(const Ray& primaryRay, const Intersectabl
       surfaceNormal.normalize();
       outDirection = oldRayDirection - 2 * QVector3D::dotProduct(oldRayDirection, surfaceNormal) * surfaceNormal;
 
+    }
+    else if(hit.getMaterial().isParticipating())
+    {
+      outDirection = hit.getRay().getDirection();
+      QVector3D initialLocation = hit.getIntersectingPoint();
+      QVector3D currentLocation = initialLocation;
+      Ray outRay(currentLocation, outDirection);
+      hit = scene.intersect(outRay);
+//      QVector3D dt = (hit.getIntersectingPoint() - currentLocation) / PARTICIPATING_SAMPLES;
+      QVector3D dist = hit.getIntersectingPoint() - currentLocation;
+      for(double t = 0; t < dist.length(); t += dt)
+      {
+        currentLocation = initialLocation + t * dist.normalized();
+        Ray marchingRay(currentLocation, outDirection.normalized());
+        HitRecord currentHit((currentLocation - initialLocation).length(), marchingRay, QSharedPointer<Material>(new ParticipatingMaterial()), QVector3D());
+        result.alphaValues.push_back(alpha);
+        result.hitRecords.push_back(currentHit);
+      }
+      alpha *= (Spectrum(1, 1, 1) - .5 * Spectrum(1, 1, 1)) * dt;
     }
     else
     {

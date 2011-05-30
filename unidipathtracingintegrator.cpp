@@ -21,7 +21,15 @@ Spectrum UniDiPathTracingIntegrator::integrate(const Ray& ray, const Intersectab
   {
     QVector3D direction;
     Spectrum lightIntensity = light.getIntensity(*hitIt, direction, scene, sampler.getSamples().front());
-    double inCos = QVector3D::dotProduct(-direction.normalized(), hitIt->getSurfaceNormal().normalized());
+    double inCos;
+    if(hitIt->getMaterial().isParticipating())
+    {
+      inCos = 1;
+    }
+    else
+    {
+      inCos = QVector3D::dotProduct(-direction.normalized(), hitIt->getSurfaceNormal().normalized());
+    }
     Spectrum brdf;
     if(inCos > 0)
     {
