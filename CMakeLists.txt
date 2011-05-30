@@ -9,7 +9,7 @@ include(${QT_USE_FILE})
 set(renderingproject_SRCS main.cpp camera.cpp plane.cpp sphere.cpp
   triangle.cpp intersectableinstance.cpp
   darkmatter.cpp diffusematerial.cpp phongmaterial.cpp participatingmaterial.cpp
-  directionallight.cpp intersectablelist.cpp binarymaterial.cpp
+  directionallight.cpp conelight.cpp intersectablelist.cpp binarymaterial.cpp
   pointlight.cpp objreader.cpp mirrormaterial.cpp
   axisalignedbox.cpp bsp.cpp integrator.cpp
   sampler.cpp jitteredsampler.cpp arealight.cpp
