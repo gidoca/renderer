@@ -7,6 +7,7 @@ class DiffuseMaterial : public Material
 {
 public:
     bool isMirror() const;
+    bool isParticipating() const;
 };
 
 #endif // DIFFUSEMATERIAL_H

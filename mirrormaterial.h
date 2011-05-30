@@ -15,6 +15,7 @@ public:
 
   Spectrum shade(HitRecord& hit, QVector3D direction) const;
   bool isMirror() const;
+  bool isParticipating() const;
   
 private:
   double coefficient;
