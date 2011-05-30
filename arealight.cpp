@@ -18,18 +18,14 @@ Spectrum AreaLight::getIntensity(HitRecord & hit, QVector3D &direction, const In
   QVector3D lightLocation = getLocation(p);
   direction = hit.getIntersectingPoint() - lightLocation;
   HitRecord shadowHit = scene.intersect(Ray(hit.getIntersectingPoint(), -direction.normalized()), EPSILON, direction.length());
-  double q = false;
+  Spectrum part = Spectrum(1, 1, 1);
   while(shadowHit.intersects() && shadowHit.getMaterial().isParticipating())
   {
     shadowHit = scene.intersect(Ray(shadowHit.getIntersectingPoint(), -direction.normalized()), 20 * EPSILON, (shadowHit.getIntersectingPoint() - lightLocation).length());
-    q = true;
+    part *= (shadowHit.getIntersectingPoint() - lightLocation).length() * .001;
   }
   if(shadowHit.intersects())
   {
-#ifndef NDEBUG
-    if(q)
-      std::cout << "";
-#endif
     return Spectrum();
   }
   else
@@ -37,7 +33,7 @@ Spectrum AreaLight::getIntensity(HitRecord & hit, QVector3D &direction, const In
     double c = QVector3D::dotProduct(direction.normalized(), normal.normalized()) / direction.lengthSquared() * normal.length();
     assert(!isnan(c));
     if(c < 0) c = 0;
-    return c * intensity;
+    return c * intensity * part;
   }
 }
 
