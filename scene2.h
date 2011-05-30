@@ -7,8 +7,10 @@
 #include "camera.h"
 #include "pointlight.h"
 #include "directionallight.h"
+#include "arealight.h"
 #include "sphere.h"
 #include "plane.h"
+#include "axisalignedbox.h"
 #include "intersectablelist.h"
 #include "intersectableinstance.h"
 #include "objreader.h"
@@ -30,15 +32,17 @@ Intersectable * getScene(void)
 {
   Spectrum kd(0.8f, 0.8f, 0.8f);
 //  BSPNode * mesh = ObjReader::getMesh("objfiles/teapot.obj", QSharedPointer<Material>(new TransparentMaterial(0.9)));
-  Intersectable * mesh = ObjReader::getMesh("objfiles/teapot.obj", QSharedPointer<Material>(new PhongMaterial(kd, kd, 32)));
+  Intersectable * mesh = ObjReader::getMesh("objfiles/car.obj", QSharedPointer<Material>(new PhongMaterial(kd, kd, 32)));
 
   std::list< QSharedPointer<Intersectable> > objects;
 
   QMatrix4x4 t;
 
   // Instance one
-  t.translate(0.f, -0.25f, 0.f);
-  t.scale(0.25f);
+//  t.translate(0.f, -0.25f, 0.f);
+  t.rotate(30, 0, 1, 0);
+  t.scale(0.005f);
+  t.translate(-101, -54, 15);
   IntersectableInstance * instance = new IntersectableInstance(t, QSharedPointer<Intersectable>(mesh));
   objects.push_back(QSharedPointer<Intersectable>(instance));
 
@@ -47,7 +51,7 @@ Intersectable * getScene(void)
   t.translate(0.f, 0.25f, 0.f);
   t.scale(0.25f);
   instance = new IntersectableInstance(t, QSharedPointer<Intersectable>(mesh));
-  objects.push_back(QSharedPointer<Intersectable>(instance));
+//  objects.push_back(QSharedPointer<Intersectable>(instance));
 
   QVector4D normal(0.f, 1.f, 0.f, 1.f);
   kd = Spectrum(0.f, 0.8f, 0.8f);
@@ -80,8 +84,9 @@ Intersectable * getScene(void)
 std::list<QSharedPointer<Light> > getLight(void)
 {
   std::list<QSharedPointer<Light> > lights;
-  lights.push_back(QSharedPointer<Light>(new PointLight(QVector3D(0, 0.8, 0.8), Spectrum(.7, .7, .7))));
-  lights.push_back(QSharedPointer<Light>(new PointLight(QVector3D(-0.8, 0.2, 1), Spectrum(.5, .5, .5))));
+  lights.push_back(QSharedPointer<Light>(new AreaLight(.7 * QVector3D(-0.25, 0.9, -0.25), QVector3D(.5, 0, 0), QVector3D(0, 0, .5), 4 * Spectrum(4, 4, 4))));
+//  lights.push_back(QSharedPointer<Light>(new PointLight(QVector3D(0, 0.8, 0.8), Spectrum(.7, .7, .7))));
+//  lights.push_back(QSharedPointer<Light>(new PointLight(QVector3D(-0.8, 0.2, 1), Spectrum(.5, .5, .5))));
   //return new DirectionalLight(QVector3D(0, -1, -1), Spectrum(1, 1, 1));
   return lights;
 }

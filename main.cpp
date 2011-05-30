@@ -6,7 +6,7 @@
 #include <list>
 #include <iostream>
 
-#include "cornellscene.h"
+#include "scene2.h"
 #include "unidipathtracingintegrator.h"
 #include "simpleintegrator.h"
 #include "jitteredsampler.h"
@@ -31,7 +31,7 @@ int main(int, char **) {
   for(int i = 0; i < image.height(); i++)
   {
     std::cout << i * 100 / image.height() << "% complete, ETA: " << time.elapsed() * (image.height() - i) / ((i + 1) * 1000) << "s" << std::endl;
-    JitteredSampler multiSampler(2, 2);
+    JitteredSampler multiSampler(1, 1);
     std::list<Sample> samples = multiSampler.getSamples();
     QRgb * scanline = (QRgb *) image.scanLine(i);
     for(int j = 0; j < image.width(); j++)

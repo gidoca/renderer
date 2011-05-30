@@ -21,7 +21,7 @@ Spectrum AreaLight::getIntensity(HitRecord & hit, QVector3D &direction, const In
   Spectrum part = Spectrum(1, 1, 1);
   while(shadowHit.intersects() && shadowHit.getMaterial().isParticipating())
   {
-    shadowHit = scene.intersect(Ray(shadowHit.getIntersectingPoint(), -direction.normalized()), 20 * EPSILON, (shadowHit.getIntersectingPoint() - lightLocation).length());
+    shadowHit = scene.intersect(Ray(shadowHit.getIntersectingPoint(), -direction.normalized()), EPSILON, (shadowHit.getIntersectingPoint() - lightLocation).length());
     part *= (shadowHit.getIntersectingPoint() - lightLocation).length() * .001;
   }
   if(shadowHit.intersects())

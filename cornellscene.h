@@ -6,6 +6,7 @@
 #include "camera.h"
 #include "pointlight.h"
 #include "directionallight.h"
+#include "conelight.h"
 #include "sphere.h"
 #include "plane.h"
 #include "quad.h"
@@ -70,7 +71,7 @@ Intersectable * getScene(void)
   const double s = .6;
   const double t = 1 - s;
   Sphere * smallSphere = new Sphere(QVector3D(t * 185 + s * 219 + 50, s * 548, t * 169 + s * 232), 60, QSharedPointer<Material>(new PhongMaterial(kd, Spectrum(), 32)));
-  objects.push_back(QSharedPointer<Intersectable>(smallSphere));
+//  objects.push_back(QSharedPointer<Intersectable>(smallSphere));
 
 //  return BSPNode::buildTree(new IntersectableList(objects));
   return new IntersectableList(objects);
@@ -79,9 +80,10 @@ Intersectable * getScene(void)
 std::list<QSharedPointer<Light> > getLight(void)
 {
   std::list<QSharedPointer<Light> > lights;
-  lights.push_back(QSharedPointer<Light>(new AreaLight(QVector3D(213, 548, 227), QVector3D(13, 0, 0), QVector3D(0, 0, 10.5), 2500 * Spectrum(1, 0.85, 0.43))));
+//  lights.push_back(QSharedPointer<Light>(new AreaLight(QVector3D(213, 548, 227), QVector3D(13, 0, 0), QVector3D(0, 0, 10.5), 2500 * Spectrum(1, 0.85, 0.43))));
 //  lights.push_back(QSharedPointer<Light>(new AreaLight(QVector3D(213, 548, 227), QVector3D(130, 0, 0), QVector3D(0, 0, 105), 250 * Spectrum(1, 0.85, 0.43))));
-  lights.push_back(QSharedPointer<Light>(new AreaLight(QVector3D(368, 166, 351), QVector3D(10, 0, 0), QVector3D(0, 0, 7), 2500 * Spectrum(1, 0.85, 0.43))));
+//  lights.push_back(QSharedPointer<Light>(new AreaLight(QVector3D(368, 166, 351), QVector3D(10, 0, 0), QVector3D(0, 0, 7), 1000 * Spectrum(1, 0.85, 0.43))));
 //  lights.push_back(QSharedPointer<Light>(new PointLight(QVector3D(213, 548, 227), 10 * Spectrum(200, 200, 200))));
+    lights.push_back(QSharedPointer<Light>(new ConeLight(QVector3D(213, 548, 227), QVector3D(0, -1, 0), M_PI / 32, 10000 * Spectrum(200, 200, 200))));
   return lights;
 }
