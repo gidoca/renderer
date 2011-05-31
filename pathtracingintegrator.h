@@ -6,7 +6,7 @@
 #include "integrator.h"
 #include "spectrum.h"
 
-const double dt = .03;
+const double dt = 20;
 
 class Path;
 

@@ -12,5 +12,5 @@ bool ParticipatingMaterial::isParticipating() const
 
 Spectrum ParticipatingMaterial::shade(HitRecord &, QVector3D) const
 {
-  return .01 * Spectrum(1, 1, 1);
+  return .001 * Spectrum(1, 1, 1);
 }

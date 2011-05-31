@@ -21,6 +21,6 @@ add_executable(renderingproject ${renderingproject_SRCS})
 target_link_libraries(renderingproject ${QT_LIBRARIES})
 #target_link_libraries(stst ${QT_LIBRARIES})
 
-set(CMAKE_CXX_FLAGS "-Wall -O2 -fopenmp -DNDEBUG")
+set(CMAKE_CXX_FLAGS "-Wall -O2 -fopenmp -DNDEBUG -march=native")
 #set(CMAKE_CXX_FLAGS "-Wall -pg")
 #set(CMAKE_CXX_FLAGS "-Wall -g")

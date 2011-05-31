@@ -59,7 +59,7 @@ Path PathTracingIntegrator::createPath(const Ray& primaryRay, const Intersectabl
         result.alphaValues.push_back(alpha);
         result.hitRecords.push_back(currentHit);
       }
-      alpha *= Spectrum(1, 1, 1) - .05 * Spectrum(1, 1, 1) * dt;
+      alpha *= Spectrum(1, 1, 1) - .0005 * Spectrum(1, 1, 1) * dt;
     }
     else
     {

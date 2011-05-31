@@ -6,7 +6,7 @@
 #include <list>
 #include <iostream>
 
-#include "scene2.h"
+#include "competitionscene2.h"
 #include "unidipathtracingintegrator.h"
 #include "simpleintegrator.h"
 #include "jitteredsampler.h"
@@ -16,7 +16,7 @@
 int main(int, char **) {
   QTime time;
   time.start();
-  QSize resolution(256, 256);
+  QSize resolution(512, 128);
 
   QImage image(resolution, QImage::Format_RGB32);
 
@@ -31,13 +31,13 @@ int main(int, char **) {
   for(int i = 0; i < image.height(); i++)
   {
     std::cout << i * 100 / image.height() << "% complete, ETA: " << time.elapsed() * (image.height() - i) / ((i + 1) * 1000) << "s" << std::endl;
-    JitteredSampler multiSampler(1, 1);
+    JitteredSampler multiSampler(4, 4);
     std::list<Sample> samples = multiSampler.getSamples();
     QRgb * scanline = (QRgb *) image.scanLine(i);
     for(int j = 0; j < image.width(); j++)
     {
 #ifndef NDEBUG
-      if(j == 180 && i == 180)
+      if(j == 70 && i == 120)
         std::cout << "";
 #endif
       QPointF point = QPoint(j, i);
