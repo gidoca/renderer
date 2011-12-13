@@ -6,7 +6,7 @@
 #include <list>
 #include <iostream>
 
-#include "competitionscene2.h"
+#include "scene1.h"
 #include "unidipathtracingintegrator.h"
 #include "simpleintegrator.h"
 #include "jitteredsampler.h"
@@ -16,7 +16,7 @@
 int main(int, char **) {
   QTime time;
   time.start();
-  QSize resolution(512, 128);
+  QSize resolution(256, 256);
 
   QImage image(resolution, QImage::Format_RGB32);
 
@@ -30,9 +30,8 @@ int main(int, char **) {
   #pragma omp parallel for schedule(dynamic)
   for(int i = 0; i < image.height(); i++)
   {
+    qsrand(i);
     std::cout << i * 100 / image.height() << "% complete, ETA: " << time.elapsed() * (image.height() - i) / ((i + 1) * 1000) << "s" << std::endl;
-    JitteredSampler multiSampler(4, 4);
-    std::list<Sample> samples = multiSampler.getSamples();
     QRgb * scanline = (QRgb *) image.scanLine(i);
     for(int j = 0; j < image.width(); j++)
     {
@@ -40,6 +39,8 @@ int main(int, char **) {
       if(j == 70 && i == 120)
         std::cout << "";
 #endif
+      JitteredSampler multiSampler(10, 10);
+      std::list<Sample> samples = multiSampler.getSamples();
       QPointF point = QPoint(j, i);
       Spectrum irradiance;
       for(std::list<Sample>::iterator i = samples.begin(); i != samples.end(); i++)
