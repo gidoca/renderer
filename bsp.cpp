@@ -1,6 +1,8 @@
 #include "bsp.h"
+
 #include "intersectablelist.h"
 #include "plane.h"
+#include "vechelper.h"
 
 #include <cmath>
 #include <algorithm>

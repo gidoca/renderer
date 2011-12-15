@@ -3,14 +3,13 @@
 
 #include <QtCore/QSharedPointer>
 
-#include "intersectablelist.h"
-
-class BSPNode;
+class Intersectable;
+class Material;
 
 class ObjReader
 {
   public:
-    static IntersectableList* getMesh(const char* fileName, QSharedPointer< Material > material);
+    static Intersectable* getMesh(const char* fileName, QSharedPointer< Material > material);
     
   private:
     static void readObj(const char* fileName, int &nVertices, float **vertices, float **normals, float **texcoords, int &nIndices, int **indices);

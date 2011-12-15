@@ -3,7 +3,15 @@
 
 #include <QtGui/QVector3D>
 
-QVector3D operator*(const QVector3D &, const QVector3D &);
-QVector3D operator/(const QVector3D &, const QVector3D &);
+inline double get(const QVector3D& v, int i)
+{
+  switch(i)
+  {
+    case 0: return v.x();
+    case 1: return v.y();
+    case 2: return v.z();
+    default: return 0;
+  }
+}
 
 #endif

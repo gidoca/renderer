@@ -6,6 +6,7 @@
 #include "bsp.h"
 #include "phongmaterial.h"
 #include "arealight.h"
+#include "intersectablelist.h"
 
 #include <list>
 #include <QtCore/QSize>
