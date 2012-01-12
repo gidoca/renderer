@@ -2,10 +2,11 @@
 
 #include "hitrecord.h"
 #include "intersectable.h"
+#include "sampler.h"
 
 #include <cmath>
 
-Spectrum ConeLight::getIntensity(HitRecord &hit, QVector3D &direction, const Intersectable &scene, Sample sample) const
+Spectrum ConeLight::getIntensity(HitRecord &hit, QVector3D &direction, const Intersectable &scene, const Sample & sample) const
 {
   direction = hit.getIntersectingPoint() - location;
   HitRecord shadowHit = scene.intersect(Ray(hit.getIntersectingPoint(), -direction.normalized()), EPSILON, direction.length());

@@ -2,11 +2,14 @@
 
 #include "hitrecord.h"
 #include "intersectable.h"
+#include "sampler.h"
 
-Spectrum PointLight::getIntensity (HitRecord & hit, QVector3D & direction, const Intersectable & scene, Sample) const
+#include <cmath>
+
+Spectrum PointLight::getIntensity (const QVector3D& at, QVector3D& direction, const Intersectable& scene, const Sample& sample) const
 {
-  direction = getDirection(hit.getIntersectingPoint());
-  if(isOccluded(hit.getIntersectingPoint(), scene))
+  direction = getDirection(at);
+  if(isOccluded(at, scene))
   {
     return Spectrum();
   }
@@ -14,6 +17,13 @@ Spectrum PointLight::getIntensity (HitRecord & hit, QVector3D & direction, const
   {
     return intensity / direction.lengthSquared();
   }
+}
+
+Ray PointLight::getRandomRay(const Sample& sample, double& pdf) const
+{
+  //TODO verify
+  pdf = 1;
+  return Ray(location, sample.getUniformSphereDirection());
 }
 
 QVector3D PointLight::getDirection (QVector3D at) const

@@ -22,7 +22,7 @@ Path PathTracingIntegrator::createPath(const Ray& primaryRay, const Intersectabl
     if(!hit.intersects()) return result;
 
 #ifdef ROUSSIAN_ROULETTE
-    const double terminationProb = 0.7;
+    const double terminationProb = 0.5;
     if(i >= 2 && qrand() < RAND_MAX * terminationProb) return result;
     double russianRoulettePdf = (i < 2 ? 1 : 1 - terminationProb);
 #else

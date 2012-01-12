@@ -42,7 +42,7 @@ Camera getCamera(QSize resolution)
 std::list<QSharedPointer<Light> > getLight(void)
 {
   std::list<QSharedPointer<Light> > lights;
-  lights.push_back(QSharedPointer<Light>(new DirectionalLight(QVector3D(-2, -1, -2), Spectrum(1, 1, 1))));
+  lights.push_back(QSharedPointer<Light>(new PointLight(QVector3D(2, 1, 2), Spectrum(1, 1, 1))));
   lights.push_back(QSharedPointer<Light>(new PointLight(QVector3D(2, 2, 2), Spectrum(1, 1, 1))));
   return lights;
 }

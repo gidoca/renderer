@@ -33,7 +33,7 @@ Intersectable * getScene(void)
 //  QSharedPointer<Material> material(new MirrorMaterial(0.7));
   QSharedPointer<Material> material(new PhongMaterial(kd, kd, 32));
   Sphere * sphere1 = new Sphere(center, radius, material);
-  Sphere * sphere2 = new Sphere(QVector3D(.2, 0, 0), radius, material);
+//   Sphere * sphere2 = new Sphere(QVector3D(.2, 0, 0), radius, material);
 //   AxisAlignedBox * sphere1 = new AxisAlignedBox(QVector3D(-.2, -.2, -.2), QVector3D(.2, .2, .2), material);
 //   AxisAlignedBox * sphere2 = new AxisAlignedBox(QVector3D(0, -.2, -.2), QVector3D(.4, .2, .2), material);
   CSGIntersection * sphere = new CSGIntersection(QSharedPointer<CSGObject>(sphere1), QSharedPointer<CSGObject>(sphere2));

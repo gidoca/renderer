@@ -6,7 +6,7 @@
 #include <list>
 #include <QtCore/QSharedPointer>
 
-#define MAX_DEPTH 3
+#define MAX_DEPTH 6
 
 class Ray;
 class Intersectable;

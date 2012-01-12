@@ -3,6 +3,7 @@
 #include "spectrum.h"
 #include "hitrecord.h"
 #include "intersectable.h"
+#include "sampler.h"
 
 #include <cmath>
 #include <QtGui/QVector2D>
@@ -17,7 +18,7 @@ EnvironmentMap::~EnvironmentMap()
   delete data.cols;
 }
 
-Spectrum EnvironmentMap::getIntensity(HitRecord &hit, QVector3D &direction, const Intersectable &scene, Sample sample) const
+Spectrum EnvironmentMap::getIntensity(HitRecord &hit, QVector3D &direction, const Intersectable &scene, const Sample &sample) const
 {
   double pdf;
   direction = sample.getCosineWeightedDirection(hit.getSurfaceNormal(), pdf);

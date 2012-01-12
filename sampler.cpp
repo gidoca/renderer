@@ -75,6 +75,16 @@ QVector3D Sample::getCosineWeightedDirection(QVector3D w, double &pdf, double op
   return randomDirection;
 }
 
+QVector3D Sample::getUniformSphereDirection() const
+{
+  double z = 2 * sample.x() - 1;
+  double t = 2 * M_PI * sample.y();
+  double f = sqrt(1 - z * z);
+  double x = f * cos(t);
+  double y = f * sin(t);
+  return QVector3D(x, y, z);
+}
+
 double Sampler::getRandom()
 {
   return (double) qrand() / RAND_MAX;

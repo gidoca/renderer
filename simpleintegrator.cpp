@@ -29,7 +29,7 @@ Spectrum SimpleIntegrator::integrate(const Ray & ray, const Intersectable & scen
     std::list<Sample> samples = sampler.getSamples();
     for(std::list<Sample>::iterator i = samples.begin(); i != samples.end(); i++)
     {
-      Spectrum lightIntensity = light.getIntensity(hit, direction, scene, *i);
+      Spectrum lightIntensity = light.getIntensity(hit.getIntersectingPoint(), direction, scene, *i);
       Spectrum shade = hit.getMaterial().shade(hit, direction);
       result += shade * lightIntensity;
     }

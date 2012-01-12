@@ -20,7 +20,7 @@ Spectrum BiDiPathTracingIntegrator::integrate(const Ray &ray, const Intersectabl
   Ray primaryLightRay = light.getRandomRay(lightSample, directionPdf);
   HitRecord initialLightHit = scene.intersect(primaryLightRay);
   QVector3D initialLightDirection;
-  Spectrum lightIntensity = light.getIntensity(initialLightHit, initialLightDirection, scene, lightSample);
+  Spectrum lightIntensity = light.getIntensity(initialLightHit.getIntersectingPoint(), initialLightDirection, scene, lightSample);
 
   Path lightPath = createPath(primaryLightRay, scene, lightIntensity / directionPdf);
   Path eyePath = createPath(ray, scene);
@@ -63,7 +63,7 @@ Spectrum BiDiPathTracingIntegrator::integrate(const Ray &ray, const Intersectabl
   while(eyeAlphaIt != eyePath.alphaValues.end() && eyeHitIt != eyePath.hitRecords.end())
   {
     QVector3D lightDirection;
-    lightIntensity = light.getIntensity(*eyeHitIt, lightDirection, scene, lightSample);
+    lightIntensity = light.getIntensity(eyeHitIt->getIntersectingPoint(), lightDirection, scene, lightSample);
 
     double inCos = QVector3D::dotProduct(-lightDirection.normalized(), eyeHitIt->getSurfaceNormal().normalized());
     Spectrum brdf;

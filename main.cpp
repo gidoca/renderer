@@ -42,7 +42,7 @@ int main(int argc, char **argv) {
       if(j == 70 && i == 120)
         std::cout << "";
 #endif
-      JitteredSampler multiSampler(4, 4);
+      JitteredSampler multiSampler(1, 1);
       std::list<Sample> samples = multiSampler.getSamples();
       QPointF point = QPoint(j, i);
       Spectrum irradiance;
@@ -58,10 +58,11 @@ int main(int argc, char **argv) {
   }
   
   delete object;
+  if(!image.save("/tmp/tst.png")) std::cout << "Failed to save file.\n";
+  std::cout << "100% complete, time elapsed: " << time.elapsed() / 1000 << "s\n";
+  std::cout.flush();
   QLabel l;
   l.setPixmap(QPixmap::fromImage(image));
-  std::cout << "100% complete, time elapsed: " << time.elapsed() / 1000 << "s\n";
   l.show();
-  if(!image.save("/tmp/tst.png")) std::cout << "Failed to save file.\n";
   return app.exec();
 }

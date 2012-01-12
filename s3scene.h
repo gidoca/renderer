@@ -1,6 +1,6 @@
 #include "directionallight.h"
 #include "camera.h"
-#include "diffusematerial.h"
+#include "phongmaterial.h"
 #include "intersectablelist.h"
 #include "triangle.h"
 #include "plane.h"
@@ -9,11 +9,12 @@
 #include <list>
 #include <QtCore/QSize>
 #include <QtCore/QSharedPointer>
+#include "pointlight.h"
 
 Intersectable * getScene(void)
 {
-  QSharedPointer<Material> material(new DiffuseMaterial(Spectrum(0, 0, 1), Spectrum(0, 0, 1), 64));
-  QSharedPointer<Material> material2(new DiffuseMaterial(Spectrum(0, 1, 1), Spectrum(0, 1, 1), 64));
+  QSharedPointer<Material> material(new PhongMaterial(Spectrum(0, 0, 1), Spectrum(0, 0, 1), 64));
+  QSharedPointer<Material> material2(new PhongMaterial(Spectrum(0, 1, 1), Spectrum(0, 1, 1), 64));
 
   std::list<QSharedPointer<Intersectable> > triangles;
   
@@ -34,6 +35,6 @@ Camera getCamera(QSize resolution)
 std::list<QSharedPointer<Light> > getLight(void)
 {
   std::list<QSharedPointer<Light> > lights;
-  lights.push_back(new DirectionalLight(QVector3D(0, -1, -2), Spectrum(1, 1, 1)));
+  lights.push_back(QSharedPointer<Light>(new PointLight(QVector3D(0, 1, 2), Spectrum(1, 1, 1))));
   return lights;
 }
