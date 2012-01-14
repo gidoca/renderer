@@ -3,7 +3,10 @@
 #include "spectrum.h"
 #include "film.h"
 
-#define clamp(x) ((x) <= 0 ? 0 : ((x) >= 255 ? 255 : (x)))
+int clamp(int x)
+{
+  return x <= 0 ? 0 : (x >= 255 ? 255 : x);
+}
 
 QImage Tonemapper::tonemap(const Film& film)
 {
