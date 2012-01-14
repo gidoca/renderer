@@ -15,7 +15,7 @@ class AxisAlignedBox;
 class Intersectable
 {
   public:
-    virtual HitRecord intersect(Ray ray, double from = EPSILON, double to = std::numeric_limits< double >::infinity()) const = 0;
+    virtual HitRecord intersect(Ray ray, float from = EPSILON, float to = std::numeric_limits< float >::infinity()) const = 0;
     virtual AxisAlignedBox * boundingBox() const = 0;
 };
 

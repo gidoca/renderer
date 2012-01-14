@@ -44,7 +44,7 @@ BSPNode* BSPNode::buildTree(IntersectableList * intersectables, int depth, int m
     QVector3D diff = boundingBox->getMax() - boundingBox->getMin();
     QVector3D splitMin = boundingBox->getMin(), splitMax = boundingBox->getMax();
     short axis;
-    double planePosition;
+    float planePosition;
     if(diff.x() >= diff.z())
     {
       if(diff.x() >= diff.y())
@@ -135,12 +135,12 @@ BSPLeafNode::~BSPLeafNode()
 
 }
 
-HitRecord BSPLeafNode::intersect(Ray ray, double from, double to) const
+HitRecord BSPLeafNode::intersect(Ray ray, float from, float to) const
 {
   return objects->intersect(ray, from, to);
 }
 
-BSPInternalNode::BSPInternalNode(double planePosition, short int axis, BSPNode* lowerNode, BSPNode* upperNode, AxisAlignedBox* boundingBox): BSPNode(boundingBox), planePosition(planePosition), axis(axis), lowerNode(lowerNode), upperNode(upperNode)
+BSPInternalNode::BSPInternalNode(float planePosition, short int axis, BSPNode* lowerNode, BSPNode* upperNode, AxisAlignedBox* boundingBox): BSPNode(boundingBox), planePosition(planePosition), axis(axis), lowerNode(lowerNode), upperNode(upperNode)
 {
   
 }
@@ -151,13 +151,13 @@ BSPInternalNode::~BSPInternalNode()
   delete upperNode;
 }
 
-HitRecord BSPInternalNode::intersect(Ray ray, double from, double to) const
+HitRecord BSPInternalNode::intersect(Ray ray, float from, float to) const
 {
 //  IntersectionParameter intersection = bBox->getIntersectionParameter(ray);
 //  if(intersection.tmin >= intersection.tmax) return HitRecord();
 //  if(intersection.tmin < intersection.tmax) std::cout << "I";
   BSPNode *first, *second;
-  double rayOrigin, rayDirection;
+  float rayOrigin, rayDirection;
   QVector4D splitPlaneVector;
   switch(axis)
   {
@@ -179,8 +179,8 @@ HitRecord BSPInternalNode::intersect(Ray ray, double from, double to) const
   }
   
   Plane splitPlane(splitPlaneVector, DarkMatter::getInstance());
-  HitRecord splitPlaneHit = splitPlane.intersect(ray, -std::numeric_limits<double>::infinity());
-  double tsplit = splitPlaneHit.getRayParameter();
+  HitRecord splitPlaneHit = splitPlane.intersect(ray, -std::numeric_limits<float>::infinity());
+  float tsplit = splitPlaneHit.getRayParameter();
   bool rayTowardsFirst;
   
   if(rayOrigin < planePosition)

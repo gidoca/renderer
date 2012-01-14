@@ -11,11 +11,11 @@
 class Camera
 {
   public:
-    Camera(QVector3D cop, QVector3D look_at, QVector3D up, double fov, QSize resolution);
+    Camera(QVector3D cop, QVector3D look_at, QVector3D up, float fov, QSize resolution);
     
     Ray getRay(QPointF point) const;
   private:
-    double t, b, l, r, aspect;
+    float t, b, l, r, aspect;
     QSize resolution;
     QMatrix4x4 extrinsicMatrix;
 };

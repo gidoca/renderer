@@ -8,7 +8,7 @@ class Spectrum : public QVector3D
 public:
   Spectrum() {}
   Spectrum(const QVector3D & other) : QVector3D(other) {}
-  Spectrum(double x, double y, double z) : QVector3D(x, y, z) {}
+  Spectrum(float x, float y, float z) : QVector3D(x, y, z) {}
 
   Spectrum operator*(const Spectrum & other);
 };

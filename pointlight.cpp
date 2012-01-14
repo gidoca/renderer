@@ -19,7 +19,7 @@ Spectrum PointLight::getIntensity (const QVector3D& at, QVector3D& direction, co
   }
 }
 
-Ray PointLight::getRandomRay(const Sample& sample, double& pdf) const
+Ray PointLight::getRandomRay(const Sample& sample, float& pdf) const
 {
   //TODO verify
   pdf = 1;

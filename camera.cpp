@@ -2,12 +2,12 @@
 
 #include <cmath>
 
-Camera::Camera(QVector3D cop, QVector3D look_at, QVector3D up, double fov, QSize resolution) : resolution(resolution)
+Camera::Camera(QVector3D cop, QVector3D look_at, QVector3D up, float fov, QSize resolution) : resolution(resolution)
 {
   QVector3D w = (cop - look_at).normalized();
   QVector3D u = QVector3D::normal(up, w);
   QVector3D v = QVector3D::crossProduct(w, u);
-  aspect = (double) resolution.width() / resolution.height();
+  aspect = (float) resolution.width() / resolution.height();
   t = tan(fov / 2);
   b = -t;
   r = aspect * t;

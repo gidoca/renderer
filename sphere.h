@@ -10,7 +10,7 @@
 class Sphere : public CSGObject
 {
   public:
-    Sphere(QVector3D center, double radius, QSharedPointer<Material> material) : material(material), center(center), radius(radius)
+    Sphere(QVector3D center, float radius, QSharedPointer<Material> material) : material(material), center(center), radius(radius)
     {
 
     }
@@ -21,7 +21,7 @@ class Sphere : public CSGObject
   private:
     QSharedPointer<Material> material;
     QVector3D center;
-    double radius;
+    float radius;
 };
 
 #endif // SPHERE_H

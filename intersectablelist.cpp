@@ -3,7 +3,12 @@
 
 #include <limits>
 
-HitRecord IntersectableList::intersect(Ray ray, double from, double to) const
+IntersectableList::~IntersectableList()
+{
+  delete bBox;
+}
+
+HitRecord IntersectableList::intersect(Ray ray, float from, float to) const
 {
 //  if(!bBox->intersect(ray, from, to).intersects()) return HitRecord();
 
@@ -23,7 +28,7 @@ HitRecord IntersectableList::intersect(Ray ray, double from, double to) const
 
 AxisAlignedBox * IntersectableList::boundingBox() const
 {
-  QVector3D min(std::numeric_limits< double >::infinity(), std::numeric_limits< double >::infinity(), std::numeric_limits< double >::infinity());
+  QVector3D min(std::numeric_limits< float >::infinity(), std::numeric_limits< float >::infinity(), std::numeric_limits< float >::infinity());
   QVector3D max = -min;
   for(std::list<QSharedPointer<Intersectable> >::const_iterator i = components.begin(); i != components.end(); i++)
   {

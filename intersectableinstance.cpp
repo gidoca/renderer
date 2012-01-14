@@ -1,7 +1,7 @@
 #include "intersectableinstance.h"
 #include "axisalignedbox.h"
 
-HitRecord IntersectableInstance::intersect(Ray ray, double from, double to) const
+HitRecord IntersectableInstance::intersect(Ray ray, float from, float to) const
 {
   Ray transformedRay = ray.transform(inverseTransform);
   HitRecord hitRecord = intersectable->intersect(transformedRay, from, to);

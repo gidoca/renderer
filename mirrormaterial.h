@@ -8,7 +8,7 @@ class MirrorMaterial : public Material
 {
 
 public:
-  MirrorMaterial(double coefficient): coefficient(coefficient)
+  MirrorMaterial(float coefficient): coefficient(coefficient)
   {
 
   }
@@ -18,7 +18,7 @@ public:
   bool isParticipating() const;
   
 private:
-  double coefficient;
+  float coefficient;
 };
 
 #endif // MIRRORMATERIAL_H

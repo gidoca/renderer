@@ -8,8 +8,8 @@
 IntersectionParameter AxisAlignedBox::getCSGIntersection(Ray ray) const
 {
   IntersectionParameter result;
-  double a;
-  double tmin, tmax, temp_tmin, temp_tmax;
+  float a;
+  float tmin, tmax, temp_tmin, temp_tmax;
   QVector3D rayDirection = ray.getDirection();
   QVector3D rayOrigin = ray.getOrigin();
   QVector3D temp_normal;

@@ -1,25 +1,23 @@
 #ifndef PERPIXELRENDERER_H
 #define PERPIXELRENDERER_H
 
-#include <QImage>
+#include "renderer.h"
+
 #include <QSize>
-#include <QSharedPointer>
 
-#include <list>
+class Integrator;
 
-class Intersectable;
-class Light;
-class Camera;
-
-class PerPixelRenderer
+class PerPixelRenderer: public Renderer
 {
 public:
-	PerPixelRenderer(QSize size);
+	PerPixelRenderer(QSize size, Integrator * integrator);
+  virtual ~PerPixelRenderer();
 	
-	QImage render(const Intersectable & scene, const Camera & camera, std::list<QSharedPointer<Light> > lights);
+	Film render(const Intersectable & scene, const Camera & camera, std::list<QSharedPointer<Light> > lights);
 	
 private:
-	QImage image;
+  Integrator * integrator;
+  QSize resolution;
 };
 
 #endif // PERPIXELRENDERER_H

@@ -14,7 +14,7 @@ public:
     AreaLight(QVector3D origin, QVector3D uDirection, QVector3D vDirection, Spectrum intensity);
 
     Spectrum getIntensity(const QVector3D & at, QVector3D &direction, const Intersectable & scene, const Sample &sample) const;
-    Ray getRandomRay(const Sample &sample, double &pdf) const;
+    Ray getRandomRay(const Sample &sample, float &pdf) const;
 
 private:
     QVector3D getLocation(QPointF p) const;

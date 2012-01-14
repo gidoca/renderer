@@ -7,7 +7,7 @@ std::list<Sample> JitteredSampler::getSamples()
   {
     for(int j = 0; j < height; j++)
     {
-      QPointF sample((getRandom() + (double) i) / width, (getRandom() + (double) j) / height);
+      QPointF sample((getRandom() + (float) i) / width, (getRandom() + (float) j) / height);
       samples.push_back(sample);
     }
   }

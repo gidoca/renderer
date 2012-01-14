@@ -14,8 +14,8 @@ class AxisAlignedBox : public CSGObject
 public:
   AxisAlignedBox() :
     material(DarkMatter::getInstance()),
-    min(QVector3D(std::numeric_limits< double >::infinity(), std::numeric_limits< double >::infinity(), std::numeric_limits< double >::infinity())),
-    max(QVector3D(-std::numeric_limits< double >::infinity(), -std::numeric_limits< double >::infinity(), -std::numeric_limits< double >::infinity()))
+    min(QVector3D(std::numeric_limits< float >::infinity(), std::numeric_limits< float >::infinity(), std::numeric_limits< float >::infinity())),
+    max(QVector3D(-std::numeric_limits< float >::infinity(), -std::numeric_limits< float >::infinity(), -std::numeric_limits< float >::infinity()))
   {
 
   }

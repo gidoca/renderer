@@ -9,10 +9,10 @@ IntersectionParameter Sphere::getCSGIntersection(Ray ray) const
 {
   IntersectionParameter result;
   QVector3D diff = ray.getOrigin() - center;
-  double radiusSquared = radius * radius;
-  double a = ray.getDirection().lengthSquared();
-  double b = 2 * QVector3D::dotProduct(ray.getDirection(), diff);
-  double c = diff.lengthSquared() - radiusSquared;
+  float radiusSquared = radius * radius;
+  float a = ray.getDirection().lengthSquared();
+  float b = 2 * QVector3D::dotProduct(ray.getDirection(), diff);
+  float c = diff.lengthSquared() - radiusSquared;
   if(b * b - 4 * a * c >= 0)
   {
     result.intersections.push_back((-b - sqrt(b * b - 4 * a * c)) / (2 * a));

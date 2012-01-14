@@ -12,7 +12,7 @@ public:
   BVHNode(Intersectable * left, Intersectable * right, AxisAlignedBox * bb);
   static Intersectable* create(IntersectableList * list, int maxDepth);
   virtual AxisAlignedBox* boundingBox() const;
-  virtual HitRecord intersect(Ray ray, double from, double to) const;  
+  virtual HitRecord intersect(Ray ray, float from, float to) const;  
   
 private:
   AxisAlignedBox* bb;

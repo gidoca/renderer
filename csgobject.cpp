@@ -2,12 +2,12 @@
 
 #include <list>
 
-HitRecord CSGObject::intersect(Ray ray, double from, double to) const
+HitRecord CSGObject::intersect(Ray ray, float from, float to) const
 {
   IntersectionParameter parameter = getCSGIntersection(ray);
-  std::list<double> intersections = parameter.intersections;
+  std::list<float> intersections = parameter.intersections;
   if(intersections.empty() || from > intersections.back()) return HitRecord();
-  for(std::list<double>::iterator i = intersections.begin(); i != intersections.end(); i++)
+  for(std::list<float>::iterator i = intersections.begin(); i != intersections.end(); i++)
   {
     if(*i >= from)
     {

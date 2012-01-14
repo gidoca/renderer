@@ -10,7 +10,7 @@
 
 #include <iostream>
 
-QVector3D Sample::getCosineWeightedDirection(QVector3D w, double & pdf) const
+QVector3D Sample::getCosineWeightedDirection(QVector3D w, float & pdf) const
 {
   w.normalize();
   QVector3D normalizedDirection = QVector3D(cos(2 * M_PI * sample.y()) * sqrt(sample.x()), sin(2 * M_PI * sample.y()) * sqrt(sample.x()), sqrt(1 - sample.x()));
@@ -42,9 +42,9 @@ QVector3D Sample::getCosineWeightedDirection(QVector3D w, double & pdf) const
   return randomDirection;
 }
 
-QVector3D Sample::getCosineWeightedDirection(QVector3D w, double &pdf, double openingAngle) const
+QVector3D Sample::getCosineWeightedDirection(QVector3D w, float &pdf, float openingAngle) const
 {
-  double radiusFactor = sin(openingAngle);
+  float radiusFactor = sin(openingAngle);
   w.normalize();
   QVector3D normalizedDirection = QVector3D(cos(2 * M_PI * sample.y()) * sqrt(sample.x()) * radiusFactor, sin(2 * M_PI * sample.y()) * sqrt(sample.x()) * radiusFactor, sqrt(1 - sample.x() * radiusFactor * radiusFactor));
 //  std::cout << sample.x() << std::endl;
@@ -77,15 +77,15 @@ QVector3D Sample::getCosineWeightedDirection(QVector3D w, double &pdf, double op
 
 QVector3D Sample::getUniformSphereDirection() const
 {
-  double z = 2 * sample.x() - 1;
-  double t = 2 * M_PI * sample.y();
-  double f = sqrt(1 - z * z);
-  double x = f * cos(t);
-  double y = f * sin(t);
+  float z = 2 * sample.x() - 1;
+  float t = 2 * M_PI * sample.y();
+  float f = sqrt(1 - z * z);
+  float x = f * cos(t);
+  float y = f * sin(t);
   return QVector3D(x, y, z);
 }
 
-double Sampler::getRandom()
+float Sampler::getRandom()
 {
-  return (double) qrand() / RAND_MAX;
+  return (float) qrand() / RAND_MAX;
 }

@@ -6,7 +6,7 @@
 class IntersectionParameter
 {
   public:
-    std::list<double> intersections;
+    std::list<float> intersections;
     QVector3D normal;
     QSharedPointer<Material> material;
 };
@@ -14,7 +14,7 @@ class IntersectionParameter
 class CSGObject : public Intersectable
 {
 public:
-  HitRecord intersect(Ray ray, double from = 0.00005, double to = std::numeric_limits< double >::infinity()) const;
+  HitRecord intersect(Ray ray, float from = 0.00005, float to = std::numeric_limits< float >::infinity()) const;
   virtual IntersectionParameter getCSGIntersection(Ray ray) const = 0;
 };
 

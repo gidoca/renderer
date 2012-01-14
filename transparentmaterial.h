@@ -7,11 +7,11 @@ class TransparentMaterial : public MirrorMaterial
 {
 
   public:
-    TransparentMaterial(double refractionCoefficient);
+    TransparentMaterial(float refractionCoefficient);
     virtual Spectrum shade(HitRecord& hit, Light& light, const Intersectable& scene, int depth) const;
     
   private:
-    double refractionCoefficient;
+    float refractionCoefficient;
 };
 
 #endif // TRANSPARENTMATERIAL_H

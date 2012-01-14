@@ -3,7 +3,7 @@
 
 #include <QtGui/QVector3D>
 
-inline double get(const QVector3D& v, int i)
+inline float get(const QVector3D& v, int i)
 {
   switch(i)
   {

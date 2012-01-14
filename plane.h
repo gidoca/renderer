@@ -18,7 +18,7 @@ class Plane : public Intersectable
     }
 
 
-    HitRecord intersect(Ray ray, double from = EPSILON, double to = std::numeric_limits<double>::infinity()) const;
+    HitRecord intersect(Ray ray, float from = EPSILON, float to = std::numeric_limits<float>::infinity()) const;
     AxisAlignedBox * boundingBox() const;
     
   private:

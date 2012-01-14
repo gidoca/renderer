@@ -68,8 +68,8 @@ Intersectable * getScene(void)
   IntersectableInstance * largeBoxInstance = new IntersectableInstance(transform, QSharedPointer<Intersectable>(largeBox));
   objects.push_back(QSharedPointer<Intersectable>(largeBoxInstance));
 
-  const double s = .6;
-  const double t = 1 - s;
+  const float s = .6;
+  const float t = 1 - s;
   Sphere * smallSphere = new Sphere(QVector3D(t * 185 + s * 219 + 50, s * 548, t * 169 + s * 232), 60, QSharedPointer<Material>(new PhongMaterial(kd, Spectrum(), 32)));
 //  objects.push_back(QSharedPointer<Intersectable>(smallSphere));
 

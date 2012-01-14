@@ -7,26 +7,26 @@
 #include <QtGui/QVector3D>
 #include "axisalignedbox.h"
 
-HitRecord Triangle::intersect(Ray ray, double from, double to) const
+HitRecord Triangle::intersect(Ray ray, float from, float to) const
 {
   if(QVector3D::dotProduct(ray.getDirection(), QVector3D::crossProduct(p1 - p2, p1 - p3)) > 0) return HitRecord();
   
   /*QVector3D edge1 = p1 - p2;
   QVector3D edge2 = p1 - p3;
   QVector3D pvec = QVector3D::crossProduct(ray.getDirection().toVector3D(), edge2);
-  double det = QVector3D::dotProduct(pvec, edge1);
+  float det = QVector3D::dotProduct(pvec, edge1);
   if(det < EPSILON) return HitRecord();
   
   QVector3D tvec = ray.getOrigin().toVector3DAffine() - p1;
-  double u = QVector3D::dotProduct(pvec, tvec);
+  float u = QVector3D::dotProduct(pvec, tvec);
   if(u < 0 || u > det) return HitRecord();
   
   QVector3D qvec = QVector3D::crossProduct(tvec, edge1);
-  double v = QVector3D::dotProduct(ray.getDirection().toVector3D(), qvec);
+  float v = QVector3D::dotProduct(ray.getDirection().toVector3D(), qvec);
   if(v < 0 || u + v > det) return HitRecord();
   
-  double t = QVector3D::dotProduct(edge2, qvec);
-  double inv_det = 1 / det;
+  float t = QVector3D::dotProduct(edge2, qvec);
+  float inv_det = 1 / det;
   t *= inv_det;
   u *= inv_det;
   v *= inv_det;
@@ -38,7 +38,7 @@ HitRecord Triangle::intersect(Ray ray, double from, double to) const
   intersectionMatrix.setColumn(2, ray.getDirection());
   QVector4D result = intersectionMatrix.inverted().map(p1 - ray.getOrigin());
   
-  double beta = result.x(), gamma = result.y(), alpha = 1 - beta - gamma;
+  float beta = result.x(), gamma = result.y(), alpha = 1 - beta - gamma;
 
   if(from < result.z() && result.z() < to &&
     0 < alpha && alpha < 1 &&

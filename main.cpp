@@ -10,6 +10,9 @@
 
 #include "scene1.h"
 #include "perpixelrenderer.h"
+#include "unidipathtracingintegrator.h"
+#include "film.h"
+#include "tonemapper.h"
 
 int main(int argc, char **argv) {
   QSize resolution(512, 512);
@@ -21,9 +24,12 @@ int main(int argc, char **argv) {
   const std::list<QSharedPointer<Light> > light = getLight();
   const Camera camera = getCamera(resolution);
   
-	PerPixelRenderer renderer(resolution);
-	QImage image = renderer.render(*object, camera, light);
+	Renderer * renderer = new PerPixelRenderer(resolution, new UniDiPathTracingIntegrator());
+  Tonemapper tonemapper(resolution);
+	Film film = renderer->render(*object, camera, light);
+  QImage image = tonemapper.tonemap(film);
   
+  delete renderer;
   delete object;
   if(!image.save("/tmp/tst.png")) std::cout << "Failed to save file.\n";
   QLabel l;

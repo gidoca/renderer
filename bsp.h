@@ -33,7 +33,7 @@ class BSPLeafNode : public BSPNode
     BSPLeafNode(IntersectableList * objects, AxisAlignedBox * boundingBox);
     virtual ~BSPLeafNode();
     
-    HitRecord intersect(Ray ray, double from, double to) const;
+    HitRecord intersect(Ray ray, float from, float to) const;
   private:
     IntersectableList * objects;
 };
@@ -41,12 +41,12 @@ class BSPLeafNode : public BSPNode
 class BSPInternalNode : public BSPNode
 {
   public:
-    BSPInternalNode(double planePosition, short axis, BSPNode * lowerNode, BSPNode * upperNode, AxisAlignedBox * boundingBox);
+    BSPInternalNode(float planePosition, short axis, BSPNode * lowerNode, BSPNode * upperNode, AxisAlignedBox * boundingBox);
     virtual ~BSPInternalNode();
     
-    HitRecord intersect(Ray ray, double from, double to) const;
+    HitRecord intersect(Ray ray, float from, float to) const;
   protected:
-    double planePosition;
+    float planePosition;
     short axis;
     BSPNode * lowerNode, * upperNode;
 };

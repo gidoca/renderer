@@ -24,13 +24,13 @@ Intersectable* BVHNode::create(IntersectableList* list, int maxDepth)
   QVector3D diff = bb->getMax() - bb->getMin();
   int splitAxis = (diff.x() > diff.y() && diff.x() > diff.z() ? 0 : (diff.y() > diff.z() ? 1 : 2));
   QVector3D splitPlanes = bb->getMin() + diff / 2;
-  double splitPlane = get(splitPlanes, splitAxis);
+  float splitPlane = get(splitPlanes, splitAxis);
   
   std::list< QSharedPointer<Intersectable> > left, right;
   for(std::list< QSharedPointer<Intersectable> >::const_iterator i = intersectables.begin(); i != intersectables.end(); i++)
   {
     AxisAlignedBox * curbb = (*i)->boundingBox();
-    double min, max;
+    float min, max;
     min = get(curbb->getMin(), splitAxis);
     max = get(curbb->getMax(), splitAxis);
     if(min < splitPlane) left.push_back(*i);
@@ -47,7 +47,7 @@ AxisAlignedBox* BVHNode::boundingBox() const
   return new AxisAlignedBox(*bb);
 }
 
-HitRecord BVHNode::intersect(Ray ray, double from, double to) const
+HitRecord BVHNode::intersect(Ray ray, float from, float to) const
 {
   if(!bb->intersect(ray, from, to).intersects()) return HitRecord();
   HitRecord lhit = left->intersect(ray, from, to);

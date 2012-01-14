@@ -12,8 +12,8 @@ IntersectionParameter CSGIntersection::getCSGIntersection(Ray ray) const
 
   IntersectionParameter result;
 
-  std::list<double>::iterator leftIterator = leftIntersection.intersections.begin();
-  std::list<double>::iterator rightIterator = rightIntersection.intersections.begin();
+  std::list<float>::iterator leftIterator = leftIntersection.intersections.begin();
+  std::list<float>::iterator rightIterator = rightIntersection.intersections.begin();
 
   while(leftIterator != leftIntersection.intersections.end() && rightIterator != rightIntersection.intersections.end())
   {

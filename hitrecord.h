@@ -14,11 +14,11 @@ class HitRecord
 
   public:
     HitRecord();
-    HitRecord(double rayParameter, Ray ray, QSharedPointer<Material> material, QVector3D surfaceNormal);
+    HitRecord(float rayParameter, Ray ray, QSharedPointer<Material> material, QVector3D surfaceNormal);
     
     void transform(QMatrix4x4 matrix);
     
-    double getRayParameter() const;
+    float getRayParameter() const;
     QVector3D getIntersectingPoint() const;
     const Material & getMaterial() const;
     QVector3D getSurfaceNormal() const;
@@ -27,19 +27,19 @@ class HitRecord
     
   private:
     QSharedPointer<Material> material;
-    double rayParameter;
+    float rayParameter;
     QVector3D intersectingPoint;
     QVector3D surfaceNormal;
     Ray ray;
     
 };
 
-inline HitRecord::HitRecord() : material(DarkMatter::getInstance()), rayParameter(std::numeric_limits< double >::infinity())
+inline HitRecord::HitRecord() : material(DarkMatter::getInstance()), rayParameter(std::numeric_limits< float >::infinity())
 {
 }
 
 
-inline HitRecord::HitRecord(double rayParameter, Ray ray, QSharedPointer < Material > material, QVector3D surfaceNormal)
+inline HitRecord::HitRecord(float rayParameter, Ray ray, QSharedPointer < Material > material, QVector3D surfaceNormal)
   : material(material), rayParameter(rayParameter), intersectingPoint(ray.evaluate(rayParameter)), surfaceNormal(surfaceNormal), ray(ray)
 {
 }
@@ -51,7 +51,7 @@ inline void HitRecord::transform(QMatrix4x4 matrix)
   surfaceNormal = QMatrix4x4(matrix.normalMatrix()).map(surfaceNormal);
 }
 
-inline double HitRecord::getRayParameter() const
+inline float HitRecord::getRayParameter() const
 {
   return rayParameter;
 }
@@ -78,7 +78,7 @@ inline Ray HitRecord::getRay() const
 
 inline bool HitRecord::intersects() const
 {
-  return rayParameter < std::numeric_limits< double >::infinity();
+  return rayParameter < std::numeric_limits< float >::infinity();
 }
 
 #endif // HITRECORD_H

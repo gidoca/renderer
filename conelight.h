@@ -9,16 +9,16 @@
 class ConeLight : public Light
 {
 public:
-    ConeLight(QVector3D location, QVector3D direction, double openingAngle, Spectrum intensity) : location(location), direction(direction), openingAngle(openingAngle), intensity(intensity)
+    ConeLight(QVector3D location, QVector3D direction, float openingAngle, Spectrum intensity) : location(location), direction(direction), openingAngle(openingAngle), intensity(intensity)
     {
     }
 
     Spectrum getIntensity(HitRecord &hit, QVector3D &direction, const Intersectable &scene, const Sample &sample) const;
-    Ray getRandomRay(const Sample &sample, double &pdf) const;
+    Ray getRandomRay(const Sample &sample, float &pdf) const;
 
 private:
     QVector3D location, direction;
-    double openingAngle;
+    float openingAngle;
     Spectrum intensity;
 };
 

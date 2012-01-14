@@ -15,7 +15,7 @@ class Ray
     QVector3D getOrigin() const;
     QVector3D getDirection() const;
     
-    QVector3D evaluate(double u) const;
+    QVector3D evaluate(float u) const;
     
     Ray transform(QMatrix4x4 matrix);
 
@@ -56,7 +56,7 @@ inline void Ray::init(QVector4D origin, QVector4D direction)
   this->direction = direction.toVector3D();
 }
 
-inline QVector3D Ray::evaluate(double u) const
+inline QVector3D Ray::evaluate(float u) const
 {
   return origin + u * direction;
 }
