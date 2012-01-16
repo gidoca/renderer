@@ -3,25 +3,20 @@
 
 #include <cmath>
 
-#include "camera.h"
-#include "pointlight.h"
-#include "directionallight.h"
-#include "sphere.h"
-#include "plane.h"
-#include "intersectablelist.h"
-#include "mirrormaterial.h"
-#include "axisalignedbox.h"
-#include "bsp.h"
-#include "phongmaterial.h"
-#include "arealight.h"
-#include "environmentmap.h"
+#include "../camera.h"
+#include "../sphere.h"
+#include "../plane.h"
+#include "../intersectablelist.h"
+#include "../phongmaterial.h"
+#include "../pointlight.h"
+#include "../mirrormaterial.h"
 
 Camera getCamera(QSize resolution)
 {
   // Make camera and film
   QVector3D eye(0.f,0.f,2.f);
   QVector3D lookAt(0.f,0.f,0.f);
-  QVector3D up(0.f,-1.f,0.f);
+  QVector3D up(0.f,1.f,0.f);
   float fov = M_PI / 3;
   return Camera(eye, lookAt, up, fov, resolution);
 }
@@ -29,17 +24,19 @@ Camera getCamera(QSize resolution)
 Intersectable * getScene(void)
 {
   QVector3D center(0.f,0.f,0.f);
-  float radius = 0.6f;
-  Spectrum kd(8, 8, 8);
-  QSharedPointer<Material> material(QSharedPointer<Material>(new PhongMaterial(Spectrum(14, 14, 14), kd, 32)));
-//   Sphere * sphere = new Sphere(center, radius, QSharedPointer<Material>(new PhongMaterial(kd, kd, 32)));
-  Sphere * sphere = new Sphere(center, radius, material);
-  //AxisAlignedBox * box = new AxisAlignedBox(QVector3D(-.2, -.2, -.2), QVector3D(.2, .2, .2), material);
-//  AxisAlignedBox * box = sphere->boundingBox();
+  float radius = 0.2f;
+  Spectrum kd(0.8f, 0.f, 0.f);
+  Sphere * sphere = new Sphere(center, radius, QSharedPointer<Material>(new PhongMaterial(kd, kd, 32)));
+//   Sphere * sphere = new Sphere(center, radius, QSharedPointer<Material>(new TransparentMaterial(1.33)));
   std::list< QSharedPointer<Intersectable> > objects;
   objects.push_back(QSharedPointer<Intersectable>(sphere));
 
-  /*QVector4D normal(0.f, 1.f, 0.f, 1.f);
+  center = QVector3D(0.4f,0.f,-0.3f);
+  radius = 0.3f;
+  Sphere * msphere = new Sphere(center, radius, QSharedPointer<Material>(new MirrorMaterial(0.85)));
+  objects.push_back(QSharedPointer<Intersectable>(msphere));
+
+  QVector4D normal(0.f, 1.f, 0.f, 1.f);
   kd = Spectrum(0.f, 0.8f, 0.8f);
   Plane * plane = new Plane(normal, QSharedPointer<Material>(new PhongMaterial(kd, kd, 32)));
   objects.push_back(QSharedPointer<Intersectable>(plane));
@@ -62,18 +59,15 @@ Intersectable * getScene(void)
   normal = QVector4D(0.f, -1.f, 0.f, 1.f);
   kd = Spectrum(0.8f, 0.8f, 0.8f);
   plane = new Plane(normal, QSharedPointer<Material>(new PhongMaterial(kd, kd, 32)));
-  objects.push_back(QSharedPointer<Intersectable>(plane));*/
+  objects.push_back(QSharedPointer<Intersectable>(plane));
 
-//  return BSPNode::buildTree(new IntersectableList(objects));
   return new IntersectableList(objects);
 }
 
-std::list<QSharedPointer<Light> > getLight(void)
+std::vector<QSharedPointer<Light> > getLight(void)
 {
-  std::list<QSharedPointer<Light> > lights;
-//  lights.push_back(QSharedPointer<Light>(new PointLight(QVector3D(0, 0.8, 0.8), Spectrum(1, 1, 1))));
-  //lights.push_back(QSharedPointer<Light>(new PointLight(QVector3D(0.3, 0.6, 0.8), Spectrum(1, 1, 1))));
-//  lights.push_back(QSharedPointer<Light>(new AreaLight(QVector3D(0.3, 0.6, 0.8), QVector3D(1, 0, 0), QVector3D(0, 0, 1), Spectrum(4, 4, 4))));
-  lights.push_back(QSharedPointer<Light>(new EnvironmentMap("environmentmaps/campus_probe.hdr", .5)));
+  std::vector<QSharedPointer<Light> > lights;
+  lights.push_back(QSharedPointer<Light>(new PointLight(QVector3D(0, 0.8, 0.8), Spectrum(1, 1, 1))));
+  lights.push_back(QSharedPointer<Light>(new PointLight(QVector3D(0, 0.6, 0.8), Spectrum(1, 1, 1))));
   return lights;
 }

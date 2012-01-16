@@ -1,22 +1,20 @@
 #include <QtGui/QVector3D>
 #include <QtCore/QSize>
 
-#include <list>
+#include <vector>
 #include <cmath>
 
-#include "camera.h"
-#include "arealight.h"
-#include "conelight.h"
-#include "sphere.h"
-#include "plane.h"
-#include "axisalignedbox.h"
-#include "intersectablelist.h"
-#include "intersectableinstance.h"
-#include "objreader.h"
-#include "transparentmaterial.h"
-#include "phongmaterial.h"
-#include "participatingmaterial.h"
-#include "bsp.h"
+#include "../camera.h"
+#include "../arealight.h"
+#include "../conelight.h"
+#include "../sphere.h"
+#include "../plane.h"
+#include "../axisalignedbox.h"
+#include "../intersectablelist.h"
+#include "../intersectableinstance.h"
+#include "../objreader.h"
+#include "../phongmaterial.h"
+#include "../participatingmaterial.h"
 
 Camera getCamera(QSize resolution)
 {
@@ -80,9 +78,9 @@ Intersectable * getScene(void)
   return new IntersectableList(objects);
 }
 
-std::list<QSharedPointer<Light> > getLight(void)
+std::vector<QSharedPointer<Light> > getLight(void)
 {
-  std::list<QSharedPointer<Light> > lights;
+  std::vector<QSharedPointer<Light> > lights;
   lights.push_back(QSharedPointer<Light>(new AreaLight(QVector3D(-150, 100, -135), QVector3D(400, 0, 0), QVector3D(0, 0, 400), 4 * Spectrum(1, 1, 1))));
   lights.push_back(QSharedPointer<Light>(new ConeLight(QVector3D(50, 0, 200), QVector3D(0, -1, 6), M_PI / 8, 900000 * Spectrum(1, 1, 1))));
   lights.push_back(QSharedPointer<Light>(new ConeLight(QVector3D(150, 0, 200), QVector3D(0, -1, 6), M_PI / 8, 900000 * Spectrum(1, 1, 1))));

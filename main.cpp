@@ -9,7 +9,7 @@
 #include <vector>
 #include <iostream>
 
-#include "scene1.h"
+#include "scenes/tmscene.h"
 #include "perpixelrenderer.h"
 #include "unidipathtracingintegrator.h"
 #include "film.h"

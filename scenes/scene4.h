@@ -1,23 +1,22 @@
-#include "objreader.h"
-#include "directionallight.h"
-#include "camera.h"
-#include "diffusematerial.h"
-#include "transparentmaterial.h"
-#include "plane.h"
-#include "intersectableinstance.h"
-#include "sphere.h"
-#include "bsp.h"
+#include "../objreader.h"
+#include "../pointlight.h"
+#include "../camera.h"
+#include "../phongmaterial.h"
+#include "../plane.h"
+#include "../intersectableinstance.h"
+#include "../sphere.h"
+#include "../intersectablelist.h"
 
-#include <list>
+#include <vector>
 #include <QtCore/QSize>
 #include <QtCore/QSharedPointer>
 
 Intersectable * getScene(void)
 {
-  QSharedPointer<Material> material(new DiffuseMaterial(Spectrum(0, 0, 1), Spectrum(1, 1, 1), 64));
-  QSharedPointer<Material> transparentMaterial(new TransparentMaterial(.8));
+  QSharedPointer<Material> material(new PhongMaterial(Spectrum(0, 0, .3), Spectrum(1, 1, 1), 64));
+  QSharedPointer<Material> material2(new PhongMaterial(Spectrum(.3, .1, 0), Spectrum(1, 1, 1), 64));
 
-  BSPNode * obj = ObjReader::getMesh("objfiles/teapot.obj", transparentMaterial);
+  Intersectable * obj = ObjReader::getMesh("objfiles/teapot.obj", material);
   
   std::list<QSharedPointer<Intersectable> > scene;
   QMatrix4x4 t;
@@ -37,9 +36,9 @@ Camera getCamera(QSize resolution)
   return Camera(QVector3D(0, 1, -5), QVector3D(0, 0.5, 0), QVector3D(0, 1, 0), 1, resolution);
 }
 
-std::list<QSharedPointer<Light> > getLight(void)
+std::vector<QSharedPointer<Light> > getLight(void)
 {
-  std::list<QSharedPointer<Light> > lights;
-  lights.push_back(QSharedPointer<Light>(new DirectionalLight(QVector3D(4, -1, -2), Spectrum(1, 1, 1))));
+  std::vector<QSharedPointer<Light> > lights;
+  lights.push_back(QSharedPointer<Light>(new PointLight(-QVector3D(4, -1, -2), 100 * Spectrum(1, 1, 1))));
   return lights;
 }

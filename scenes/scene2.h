@@ -1,22 +1,19 @@
 #include <QtGui/QVector3D>
 #include <QtCore/QSize>
 
-#include <list>
+#include <vector>
 #include <cmath>
 
-#include "camera.h"
-#include "pointlight.h"
-#include "directionallight.h"
-#include "arealight.h"
-#include "sphere.h"
-#include "plane.h"
-#include "axisalignedbox.h"
-#include "intersectablelist.h"
-#include "intersectableinstance.h"
-#include "objreader.h"
-#include "transparentmaterial.h"
-#include "phongmaterial.h"
-#include "bsp.h"
+#include "../camera.h"
+#include "../pointlight.h"
+#include "../arealight.h"
+#include "../sphere.h"
+#include "../plane.h"
+#include "../axisalignedbox.h"
+#include "../intersectablelist.h"
+#include "../intersectableinstance.h"
+#include "../objreader.h"
+#include "../phongmaterial.h"
 
 Camera getCamera(QSize resolution)
 {
@@ -81,9 +78,9 @@ Intersectable * getScene(void)
   return new IntersectableList(objects);
 }
 
-std::list<QSharedPointer<Light> > getLight(void)
+std::vector<QSharedPointer<Light> > getLight(void)
 {
-  std::list<QSharedPointer<Light> > lights;
+  std::vector<QSharedPointer<Light> > lights;
   lights.push_back(QSharedPointer<Light>(new AreaLight(.7 * QVector3D(-0.25, 0.9, -0.25), QVector3D(.5, 0, 0), QVector3D(0, 0, .5), 4 * Spectrum(4, 4, 4))));
 //  lights.push_back(QSharedPointer<Light>(new PointLight(QVector3D(0, 0.8, 0.8), Spectrum(.7, .7, .7))));
 //  lights.push_back(QSharedPointer<Light>(new PointLight(QVector3D(-0.8, 0.2, 1), Spectrum(.5, .5, .5))));
