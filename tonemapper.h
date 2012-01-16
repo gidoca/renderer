@@ -17,6 +17,7 @@ public:
   
 protected:
   virtual QRgb map(const Film & film, int row, int column);
+  int clamp(float x);
   
 private:
   QImage image;

@@ -6,6 +6,7 @@
 #include <QtGui/QApplication>
 
 #include <list>
+#include <vector>
 #include <iostream>
 
 #include "scene1.h"
@@ -21,7 +22,7 @@ int main(int argc, char **argv) {
 
  
   const Intersectable * object = getScene();
-  const std::list<QSharedPointer<Light> > light = getLight();
+  const std::vector<QSharedPointer<Light> > light = getLight();
   const Camera camera = getCamera(resolution);
   
 	Renderer * renderer = new PerPixelRenderer(resolution, new UniDiPathTracingIntegrator());

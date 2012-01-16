@@ -23,7 +23,7 @@ PerPixelRenderer::~PerPixelRenderer()
   delete integrator;
 }
 
-Film PerPixelRenderer::render(const Intersectable& scene, const Camera& camera, std::list< QSharedPointer< Light > > lights)
+Film PerPixelRenderer::render(const Intersectable& scene, const Camera& camera, std::vector< QSharedPointer< Light > > lights)
 {
   QTime time;
   time.start();
@@ -42,7 +42,7 @@ Film PerPixelRenderer::render(const Intersectable& scene, const Camera& camera, 
       if(j == 70 && i == 120)
         std::cout << "";
 #endif
-      JitteredSampler multiSampler(1, 1);
+      JitteredSampler multiSampler(2, 2);
       std::list<Sample> samples = multiSampler.getSamples();
       QPointF point = QPoint(j, i);
       for(std::list<Sample>::iterator it = samples.begin(); it != samples.end(); it++)

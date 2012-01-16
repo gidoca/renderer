@@ -5,13 +5,9 @@
 #include "light.h"
 #include "sampler.h"
 
-Spectrum Integrator::integrate(const Ray &ray, const Intersectable &scene, const std::list< QSharedPointer<Light> > light) const
+Spectrum Integrator::integrate(const Ray &ray, const Intersectable &scene, const std::vector< QSharedPointer<Light> > light) const
 {
-  Spectrum result;
-  for(std::list<QSharedPointer<Light> >::const_iterator lights = light.begin(); lights != light.end(); lights++)
-  {
-    result += integrate(ray, scene, **lights, 0);
-  }
-  return result;
+  int lightIndex = qrand() % light.size();
+  return integrate(ray, scene, *light[lightIndex], 0) * light.size();
 }
 

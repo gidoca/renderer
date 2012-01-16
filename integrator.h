@@ -3,7 +3,7 @@
 
 #include "spectrum.h"
 
-#include <list>
+#include <vector>
 #include <QtCore/QSharedPointer>
 
 #define MAX_DEPTH 4
@@ -16,7 +16,7 @@ class Sampler;
 class Integrator
 {
 public:
-  Spectrum integrate(const Ray & ray, const Intersectable & scene, std::list< QSharedPointer<Light> > light) const;
+  Spectrum integrate(const Ray & ray, const Intersectable & scene, std::vector< QSharedPointer<Light> > light) const;
 
 protected:
   virtual Spectrum integrate(const Ray &ray, const Intersectable &scene, const Light & light, int recursionDepth) const = 0;

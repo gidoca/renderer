@@ -13,7 +13,7 @@ public:
     {
     }
 
-    Spectrum getIntensity(HitRecord &hit, QVector3D &direction, const Intersectable &scene, const Sample &sample) const;
+    Spectrum getIntensity(const QVector3D &at, QVector3D &direction, const Intersectable &scene, const Sample &sample) const;
     Ray getRandomRay(const Sample &sample, float &pdf) const;
 
 private:
