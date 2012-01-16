@@ -4,7 +4,6 @@
 #include <QImage>
 
 class Film;
-class Spectrum;
 
 class Tonemapper
 {
@@ -14,10 +13,10 @@ public:
     
   }
   
-  QImage tonemap(const Film & film);
+  virtual QImage tonemap(const Film & film);
   
 protected:
-  QRgb map(const Spectrum & s);
+  virtual QRgb map(const Film & film, int row, int column);
   
 private:
   QImage image;
