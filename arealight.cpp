@@ -37,10 +37,10 @@ Spectrum AreaLight::getIntensity(const QVector3D & at, QVector3D &direction, con
   }
 }
 
-Ray AreaLight::getRandomRay(const Sample &sample, float &pdf) const
+Ray AreaLight::getRandomRay(const Sample &sample1, const Sample &sample2, float &pdf) const
 {
-  QVector3D location = getLocation(sample.getSample());
-  QVector3D direction = sample.getCosineWeightedDirection(normal, pdf);
+  QVector3D location = getLocation(sample1.getSample());
+  QVector3D direction = sample2.getCosineWeightedDirection(normal, pdf);
   return Ray(location, direction);
 }
 

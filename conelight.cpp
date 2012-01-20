@@ -27,7 +27,7 @@ Spectrum ConeLight::getIntensity(const QVector3D & at, QVector3D &direction, con
   }
 }
 
-Ray ConeLight::getRandomRay(const Sample &sample, float &pdf) const
+Ray ConeLight::getRandomRay(const Sample &sample, const Sample&, float &pdf) const
 {
   return Ray(location, sample.getCosineWeightedDirection(direction, pdf, openingAngle));
 }

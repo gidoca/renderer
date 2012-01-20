@@ -14,7 +14,7 @@ public:
     }
 
     Spectrum getIntensity(const QVector3D &at, QVector3D &direction, const Intersectable &scene, const Sample &sample) const;
-    Ray getRandomRay(const Sample &sample, float &pdf) const;
+    Ray getRandomRay(const Sample &sample, const Sample&, float &pdf) const;
 
 private:
     QVector3D location, direction;
