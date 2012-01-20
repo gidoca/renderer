@@ -1,27 +1,3 @@
-project(renderingproject)
-cmake_minimum_required(VERSION 2.6)
-find_package(Qt4 REQUIRED)
 
-include_directories(${QT_INCLUDES} ${CMAKE_CURRENT_BINARY_DIR})
+add_subdirectory(src)
 
-include(${QT_USE_FILE})
-
-set(renderingproject_SRCS main.cpp camera.cpp plane.cpp sphere.cpp
-  triangle.cpp intersectableinstance.cpp
-  darkmatter.cpp diffusematerial.cpp phongmaterial.cpp
-  conelight.cpp intersectablelist.cpp binarymaterial.cpp
-  pointlight.cpp objreader.cpp mirrormaterial.cpp
-  axisalignedbox.cpp integrator.cpp
-  sampler.cpp jitteredsampler.cpp arealight.cpp
-  simpleintegrator.cpp unidipathtracingintegrator.cpp bidipathtracingintegrator.cpp
-  quad.cpp csgobject.cpp csgintersection.cpp bvh.cpp
-  renderer.cpp perpixelrenderer.cpp metropolisrenderer.cpp tonemapper.cpp)
-qt4_automoc(${renderingproject_SRCS})
-add_executable(renderingproject ${renderingproject_SRCS})
-#add_executable(stst stst.cpp sampler.cpp jitteredsampler.cpp)
-target_link_libraries(renderingproject ${QT_LIBRARIES})
-#target_link_libraries(stst ${QT_LIBRARIES})
-
-set(CMAKE_CXX_FLAGS "-Wall -fopenmp -DNDEBUG -march=native")
-#set(CMAKE_CXX_FLAGS "-Wall -pg")
-#set(CMAKE_CXX_FLAGS "-Wall -g")
