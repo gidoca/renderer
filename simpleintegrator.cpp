@@ -4,6 +4,7 @@
 #include "intersectable.h"
 #include "jitteredsampler.h"
 #include "light.h"
+#include "renderer.h"
 
 Spectrum SimpleIntegrator::integrate(const Ray & ray, const Intersectable & scene, const Light & light, int depth) const
 {

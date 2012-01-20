@@ -6,6 +6,7 @@
 #include "ray.h"
 #include "hitrecord.h"
 #include "intersectable.h"
+#include "renderer.h"
 
 #include <list>
 #include <cassert>
@@ -22,8 +23,8 @@ Spectrum BiDiPathTracingIntegrator::integrate(const Ray &ray, const Intersectabl
   QVector3D initialLightDirection;
   Spectrum lightIntensity = light.getIntensity(initialLightHit.getIntersectingPoint(), initialLightDirection, scene, lightSample);
 
-  Path lightPath = createPath(primaryLightRay, scene, lightIntensity / directionPdf);
-  Path eyePath = createPath(ray, scene);
+  Path lightPath = Renderer::createPath(primaryLightRay, scene, lightIntensity / directionPdf);
+  Path eyePath = Renderer::createPath(ray, scene);
 
   std::list<Spectrum>::iterator lightAlphaIt = lightPath.alphaValues.begin();
   std::list<HitRecord>::iterator lightHitIt = lightPath.hitRecords.begin();

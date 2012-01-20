@@ -6,8 +6,6 @@
 #include "integrator.h"
 #include "spectrum.h"
 
-const float dt = 20;
-
 class Path;
 
 class PathTracingIntegrator : public Integrator

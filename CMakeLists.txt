@@ -8,14 +8,14 @@ include(${QT_USE_FILE})
 
 set(renderingproject_SRCS main.cpp camera.cpp plane.cpp sphere.cpp
   triangle.cpp intersectableinstance.cpp
-  darkmatter.cpp diffusematerial.cpp phongmaterial.cpp participatingmaterial.cpp
+  darkmatter.cpp diffusematerial.cpp phongmaterial.cpp
   conelight.cpp intersectablelist.cpp binarymaterial.cpp
   pointlight.cpp objreader.cpp mirrormaterial.cpp
   axisalignedbox.cpp integrator.cpp
   sampler.cpp jitteredsampler.cpp arealight.cpp
-  hdrloader.cpp simpleintegrator.cpp pathtracingintegrator.cpp unidipathtracingintegrator.cpp bidipathtracingintegrator.cpp
+  simpleintegrator.cpp unidipathtracingintegrator.cpp bidipathtracingintegrator.cpp
   quad.cpp csgobject.cpp csgintersection.cpp bvh.cpp
-  perpixelrenderer.cpp tonemapper.cpp)
+  renderer.cpp perpixelrenderer.cpp metropolisrenderer.cpp tonemapper.cpp)
 qt4_automoc(${renderingproject_SRCS})
 add_executable(renderingproject ${renderingproject_SRCS})
 #add_executable(stst stst.cpp sampler.cpp jitteredsampler.cpp)

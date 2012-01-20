@@ -4,6 +4,7 @@
 #include "path.h"
 #include "light.h"
 #include "hitrecord.h"
+#include "renderer.h"
 
 #include <cmath>
 #include <cassert>
@@ -12,7 +13,7 @@ Spectrum UniDiPathTracingIntegrator::integrate(const Ray& ray, const Intersectab
 {
   JitteredSampler sampler(1, 1);
   Spectrum color;
-  Path path = createPath(ray, scene);
+  Path path = Renderer::createPath(ray, scene);
 
   std::list<Spectrum>::iterator alphaIt = path.alphaValues.begin();
   std::list<HitRecord>::iterator hitIt = path.hitRecords.begin();

@@ -1,17 +1,12 @@
-#include "pathtracingintegrator.h"
+#include "renderer.h"
 
 #include "hitrecord.h"
-#include "jitteredsampler.h"
 #include "intersectable.h"
-#include "light.h"
-#include "path.h"
+#include "jitteredsampler.h"
 
-#include <list>
-#include <iostream>
-#include <cmath>
 #include <cassert>
 
-Path PathTracingIntegrator::createPath(const Ray& primaryRay, const Intersectable &scene, Spectrum alpha) const
+Path Renderer::createPath(const Ray& primaryRay, const Intersectable &scene, Spectrum alpha)
 {
   Path result;
   HitRecord hit = scene.intersect(primaryRay);
