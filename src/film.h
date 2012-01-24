@@ -34,6 +34,11 @@ public:
   {
     return size.height();
   }
+
+  inline QSize getSize() const
+  {
+    return size;
+  }
   
 private:
   QSharedPointer<Spectrum> data;

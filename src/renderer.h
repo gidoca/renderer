@@ -26,16 +26,4 @@ public:
   static Path createPath(const Ray &primaryRay, const Intersectable &scene, Sample pathSamples[], Spectrum initialAlpha = Spectrum(1, 1, 1));
 };
 
-class PathSample
-{
-public:
-  void largeStep();
-  void smallStep();
-
-  Sample lightSample1[MAX_DEPTH], lightSample2[MAX_DEPTH];
-  Sample cameraSample;
-  Sample lightPathSamples[MAX_DEPTH];
-  Sample cameraPathSamples[MAX_DEPTH];
-};
-
 #endif // RENDERER_H

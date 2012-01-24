@@ -16,6 +16,20 @@ public:
   
 private:
   Film film;
+
+  Path pathFromSample(PathSample sample, const Intersectable & scene, const Camera & camera);
+};
+
+class PathSample
+{
+public:
+  void largeStep();
+  void smallStep();
+
+  Sample lightSample1[MAX_DEPTH], lightSample2[MAX_DEPTH];
+  Sample cameraSample;
+  Sample lightPathSamples[MAX_DEPTH];
+  Sample cameraPathSamples[MAX_DEPTH];
 };
 
 #endif // METROPOLISRENDERER_H

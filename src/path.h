@@ -3,8 +3,8 @@
 
 #include <list>
 
-class Spectrum;
-class HitRecord;
+#include "hitrecord.h"
+#include "spectrum.h"
 
 class Path
 {
