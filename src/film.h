@@ -4,30 +4,25 @@
 #include <cstdlib>
 
 #include <QSize>
+#include <QSharedPointer>
 
 #include "spectrum.h"
 
 class Film
 {
 public:
-  Film(QSize size): size(size)
+  Film(QSize size): data(new Spectrum[size.width() * size.height()]), size(size)
   {
-    data = (Spectrum *) calloc(size.width() * size.height(), sizeof(Spectrum));
-  }
-  
-  ~Film()
-  {
-    free(data);
   }
   
   const inline Spectrum * operator[](int i) const
   {
-    return data + i * size.width();
+    return data.data() + i * size.width();
   }
   
   inline Spectrum * operator[](int i)
   {
-    return data + i * size.width();
+    return data.data() + i * size.width();
   }
   
   inline int width()
@@ -41,7 +36,7 @@ public:
   }
   
 private:
-  Spectrum * data;
+  QSharedPointer<Spectrum> data;
   QSize size;
 };
 
