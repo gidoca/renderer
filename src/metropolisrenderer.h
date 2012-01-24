@@ -17,7 +17,7 @@ public:
 private:
   Film film;
 
-  Path pathFromSample(PathSample sample, const Intersectable & scene, const Camera & camera);
+  Path cameraPathFromSample(PathSample sample, const Intersectable & scene, const Camera & camera);
 };
 
 class PathSample

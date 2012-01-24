@@ -11,7 +11,7 @@ Film MetropolisRenderer::render(const Intersectable& scene, const Camera& camera
   return film;
 }
 
-Path MetropolisRenderer::pathFromSample(PathSample sample, const Intersectable & scene, const Camera& camera)
+Path MetropolisRenderer::cameraPathFromSample(PathSample sample, const Intersectable & scene, const Camera& camera)
 {
   QPointF pixel = sample.cameraSample.getSample();
   pixel.rx() *= film.getSize().width();
