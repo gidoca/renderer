@@ -10,6 +10,7 @@ class Sample
 {
 public:
   Sample(QPointF sample) : sample(sample) {}
+  Sample() {}
 
   QPointF getSample() const;
   QVector3D getCosineWeightedDirection(QVector3D w, float & pdf) const;

@@ -3,7 +3,6 @@
 
 #include "renderer.h"
 #include "film.h"
-#include "sampler.h"
 
 class MetropolisRenderer : public Renderer
 {
@@ -17,18 +16,6 @@ public:
   
 private:
   Film film;
-};
-
-class MetropolisSample
-{
-public:
-  void largeStep();
-  void smallStep();
-  
-  Sample lightSample1[MAX_DEPTH], lightSample2[MAX_DEPTH];
-  Sample cameraSample;
-  Sample lightPathSamples[MAX_DEPTH];
-  Sample cameraPathSamples[MAX_DEPTH];
 };
 
 #endif // METROPOLISRENDERER_H
