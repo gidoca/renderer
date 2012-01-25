@@ -1,15 +1,11 @@
 #ifndef INTEGRATOR_H
 #define INTEGRATOR_H
 
+#include "global.h"
 #include "spectrum.h"
 
 #include <vector>
 #include <QtCore/QSharedPointer>
-
-class Ray;
-class Intersectable;
-class Light;
-class Sampler;
 
 class Integrator
 {

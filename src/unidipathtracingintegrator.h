@@ -1,6 +1,7 @@
 #ifndef UNIDIPATHTRACINGINTEGRATOR_H
 #define UNIDIPATHTRACINGINTEGRATOR_H
 
+#include "global.h"
 #include "pathtracingintegrator.h"
 
 class UniDiPathTracingIntegrator: public PathTracingIntegrator

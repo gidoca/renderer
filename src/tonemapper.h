@@ -3,7 +3,7 @@
 
 #include <QImage>
 
-class Film;
+#include "global.h"
 
 class Tonemapper
 {

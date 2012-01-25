@@ -1,6 +1,8 @@
 #ifndef RAY_H
 #define RAY_H
 
+#include "global.h"
+
 #include <QtGui/QVector3D>
 #include <QtGui/QMatrix4x4>
 

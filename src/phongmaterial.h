@@ -1,6 +1,7 @@
 #ifndef PHONGMATERIAL_H
 #define PHONGMATERIAL_H
 
+#include "global.h"
 #include "diffusematerial.h"
 #include "intersectable.h"
 

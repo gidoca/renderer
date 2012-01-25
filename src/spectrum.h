@@ -3,6 +3,8 @@
 
 #include <QtGui/QVector3D>
 
+#include "global.h"
+
 class Spectrum : public QVector3D
 {
 public:

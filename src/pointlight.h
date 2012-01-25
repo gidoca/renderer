@@ -1,6 +1,7 @@
 #ifndef POINTLIGHT_H
 #define POINTLIGHT_H
 
+#include "global.h"
 #include "light.h"
 #include "spectrum.h"
 

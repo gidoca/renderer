@@ -6,6 +6,7 @@
 #include <QSize>
 #include <QSharedPointer>
 
+#include "global.h"
 #include "spectrum.h"
 
 class Film

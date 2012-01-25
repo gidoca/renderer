@@ -1,6 +1,7 @@
 #ifndef QUAD_H
 #define QUAD_H
 
+#include "global.h"
 #include "intersectable.h"
 #include "triangle.h"
 #include "axisalignedbox.h"

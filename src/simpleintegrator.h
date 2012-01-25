@@ -1,6 +1,7 @@
 #ifndef SIMPLEINTEGRATOR_H
 #define SIMPLEINTEGRATOR_H
 
+#include "global.h"
 #include "integrator.h"
 
 class SimpleIntegrator : public Integrator

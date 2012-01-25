@@ -1,13 +1,12 @@
 #ifndef PERPIXELRENDERER_H
 #define PERPIXELRENDERER_H
 
+#include "global.h"
 #include "renderer.h"
 
 #include <QSize>
 
 #include <vector>
-
-class Integrator;
 
 class PerPixelRenderer: public Renderer
 {

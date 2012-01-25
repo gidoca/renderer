@@ -1,6 +1,7 @@
 #ifndef METROPOLISRENDERER_H
 #define METROPOLISRENDERER_H
 
+#include "global.h"
 #include "renderer.h"
 #include "film.h"
 
@@ -17,10 +18,10 @@ public:
 private:
   Film film;
 
-  Path cameraPathFromSample(PathSample sample, const Intersectable & scene, const Camera & camera);
+  Path cameraPathFromSample(MetropolisSample sample, const Intersectable & scene, const Camera & camera);
 };
 
-class PathSample
+class MetropolisSample
 {
 public:
   void largeStep();

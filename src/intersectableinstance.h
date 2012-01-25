@@ -1,6 +1,7 @@
 #ifndef INTERSECTABLEINSTANCE_H
 #define INTERSECTABLEINSTANCE_H
 
+#include "global.h"
 #include "intersectable.h"
 
 #include <QtGui/QMatrix4x4>

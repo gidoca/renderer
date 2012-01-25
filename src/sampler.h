@@ -6,6 +6,8 @@
 #include <QtCore/QPointF>
 #include <QtGui/QVector3D>
 
+#include "global.h"
+
 class Sample
 {
 public:

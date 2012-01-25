@@ -1,6 +1,7 @@
 #ifndef PLANE_H
 #define PLANE_H
 
+#include "global.h"
 #include "intersectable.h"
 #include "material.h"
 

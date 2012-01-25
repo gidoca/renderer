@@ -11,7 +11,7 @@ Film MetropolisRenderer::render(const Intersectable& scene, const Camera& camera
   return film;
 }
 
-Path MetropolisRenderer::cameraPathFromSample(PathSample sample, const Intersectable & scene, const Camera& camera)
+Path MetropolisRenderer::cameraPathFromSample(MetropolisSample sample, const Intersectable & scene, const Camera& camera)
 {
   QPointF pixel = sample.cameraSample.getSample();
   pixel.rx() *= film.getSize().width();
@@ -19,7 +19,7 @@ Path MetropolisRenderer::cameraPathFromSample(PathSample sample, const Intersect
   return createPath(camera.getRay(pixel), scene, sample.cameraPathSamples);
 }
 
-void PathSample::largeStep()
+void MetropolisSample::largeStep()
 {
   JitteredSampler sampler(1, 1);
   cameraSample = sampler.getSamples().front();
@@ -49,7 +49,7 @@ void mutate(qreal &s)
   assert(0 <= s && s <= 1);
 }
 
-void PathSample::smallStep()
+void MetropolisSample::smallStep()
 {
   mutate(cameraSample.getSample().rx());
   mutate(cameraSample.getSample().ry());

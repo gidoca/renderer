@@ -3,10 +3,9 @@
 
 #define ROUSSIAN_ROULETTE
 
+#include "global.h"
 #include "integrator.h"
 #include "spectrum.h"
-
-class Path;
 
 class PathTracingIntegrator : public Integrator
 {

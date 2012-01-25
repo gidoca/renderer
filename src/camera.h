@@ -1,6 +1,7 @@
 #ifndef CAMERA_H
 #define CAMERA_H
 
+#include "global.h"
 #include "ray.h"
 
 #include <QtGui/QVector3D>

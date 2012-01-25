@@ -1,6 +1,7 @@
 #ifndef HITRECORD_H
 #define HITRECORD_H
 
+#include "global.h"
 #include "ray.h"
 #include "darkmatter.h"
 

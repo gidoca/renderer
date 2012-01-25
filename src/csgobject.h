@@ -1,6 +1,7 @@
 #ifndef CSGOBJECT_H
 #define CSGOBJECT_H
 
+#include "global.h"
 #include "intersectable.h"
 
 class IntersectionParameter

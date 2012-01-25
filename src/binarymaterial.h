@@ -1,8 +1,8 @@
 #ifndef BINARYMATERIAL_H
 #define BINARYMATERIAL_H
 
+#include "global.h"
 #include "diffusematerial.h"
-
 
 class BinaryMaterial:public DiffuseMaterial
 {

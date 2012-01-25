@@ -1,6 +1,7 @@
 #ifndef AXISALIGNEDBOX_H
 #define AXISALIGNEDBOX_H
 
+#include "global.h"
 #include "csgobject.h"
 
 #include <limits>

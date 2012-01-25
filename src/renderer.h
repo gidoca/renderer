@@ -4,18 +4,13 @@
 #include <vector>
 #include <QSharedPointer>
 
+#include "global.h"
 #include "film.h"
 #include "path.h"
 #include "spectrum.h"
 #include "sampler.h"
 
 #define MAX_DEPTH 4
-
-class Intersectable;
-class Light;
-class Camera;
-class Ray;
-class PathSample;
 
 class Renderer
 {

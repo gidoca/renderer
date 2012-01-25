@@ -3,6 +3,7 @@
 
 #define EPSILON 0.0001
 
+#include "global.h"
 #include "ray.h"
 #include "hitrecord.h"
 

@@ -3,6 +3,7 @@
 
 #include <list>
 
+#include "global.h"
 #include "hitrecord.h"
 #include "spectrum.h"
 

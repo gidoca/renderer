@@ -1,10 +1,8 @@
 #ifndef BVH_H
 #define BVH_H
 
+#include "global.h"
 #include "intersectable.h"
-
-class IntersectableList;
-
 
 class BVHNode : public Intersectable
 {

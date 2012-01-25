@@ -1,11 +1,8 @@
 #ifndef MATERIAL_H
 #define MATERIAL_H
 
+#include "global.h"
 #include "spectrum.h"
-
-class HitRecord;
-class Light;
-class Intersectable;
 
 class Material
 {

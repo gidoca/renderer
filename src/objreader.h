@@ -3,8 +3,7 @@
 
 #include <QtCore/QSharedPointer>
 
-class Intersectable;
-class Material;
+#include "global.h"
 
 class ObjReader
 {

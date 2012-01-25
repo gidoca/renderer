@@ -1,6 +1,7 @@
 #ifndef JITTEREDSAMPLER_H
 #define JITTEREDSAMPLER_H
 
+#include "global.h"
 #include "sampler.h"
 
 #include <QtCore/QPointF>

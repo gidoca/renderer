@@ -1,6 +1,7 @@
 #ifndef BIDIPATHTRACINGINTEGRATOR_H
 #define BIDIPATHTRACINGINTEGRATOR_H
 
+#include "global.h"
 #include "pathtracingintegrator.h"
 
 class BiDiPathTracingIntegrator : public PathTracingIntegrator

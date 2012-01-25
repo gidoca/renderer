@@ -1,6 +1,7 @@
 #ifndef AGGREGATEINTERSECTABLE_H
 #define AGGREGATEINTERSECTABLE_H
 
+#include "global.h"
 #include "intersectable.h"
 #include "axisalignedbox.h"
 

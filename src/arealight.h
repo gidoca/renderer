@@ -1,6 +1,7 @@
 #ifndef AREALIGHT_H
 #define AREALIGHT_H
 
+#include "global.h"
 #include "light.h"
 #include "spectrum.h"
 #include "jitteredsampler.h"

@@ -1,12 +1,9 @@
 #ifndef LIGHT_H
 #define LIGHT_H
 
-class HitRecord;
-class Sample;
-class Ray;
-class Intersectable;
-class Spectrum;
-class QVector3D;
+#include <QVector3D>
+
+#include "global.h"
 
 class Light
 {

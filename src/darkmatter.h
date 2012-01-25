@@ -1,6 +1,7 @@
 #ifndef DARKMATTER_H
 #define DARKMATTER_H
 
+#include "global.h"
 #include "diffusematerial.h"
 
 #include <QtCore/QSharedPointer>

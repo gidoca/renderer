@@ -1,8 +1,8 @@
 #ifndef MIRRORMATERIAL_H
 #define MIRRORMATERIAL_H
 
+#include "global.h"
 #include "material.h"
-
 
 class MirrorMaterial : public Material
 {

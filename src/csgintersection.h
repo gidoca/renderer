@@ -3,6 +3,7 @@
 
 #include <QtCore/QSharedPointer>
 
+#include "global.h"
 #include "csgobject.h"
 
 class CSGIntersection : public CSGObject

@@ -1,6 +1,7 @@
 #ifndef SPHERE_H
 #define SPHERE_H
 
+#include "global.h"
 #include "ray.h"
 #include "csgobject.h"
 #include "diffusematerial.h"

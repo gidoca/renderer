@@ -1,6 +1,7 @@
 #ifndef CONELIGHT_H
 #define CONELIGHT_H
 
+#include "global.h"
 #include "light.h"
 #include "spectrum.h"
 

@@ -1,6 +1,7 @@
 #ifndef TRIANGLE_H
 #define TRIANGLE_H
 
+#include "global.h"
 #include "plane.h"
 #include "hitrecord.h"
 
