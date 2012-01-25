@@ -31,6 +31,8 @@ public:
   Sample cameraSample;
   Sample lightPathSamples[MAX_DEPTH];
   Sample cameraPathSamples[MAX_DEPTH];
+
+  int lightIndex[MAX_DEPTH];
 };
 
 #endif // METROPOLISRENDERER_H

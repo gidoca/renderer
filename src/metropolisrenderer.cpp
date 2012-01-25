@@ -30,7 +30,9 @@ void MetropolisSample::largeStep()
     cameraPathSamples[i] = sampler.getSamples().front();
     lightSample1[i] = sampler.getSamples().front();
     lightSample2[i] = sampler.getSamples().front();
+    lightIndex[i] = qrand();
   }
+
 }
 
 void mutate(qreal &s)
