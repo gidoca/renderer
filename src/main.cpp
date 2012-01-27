@@ -36,7 +36,6 @@ int main(int argc, char **argv) {
   const std::vector<QSharedPointer<Light> > light = getLight();
   const Camera camera = getCamera(resolution);
   
-  Tonemapper tonemapper(resolution);
   Film film(resolution);
   QFuture< void > future = QtConcurrent::run(render, resolution, film, object, &camera, light);
   std::cout << "Foo\n";
