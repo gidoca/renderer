@@ -41,7 +41,7 @@ int main(int argc, char **argv) {
   QFuture< void > future = QtConcurrent::run(render, resolution, film, object, &camera, light);
   std::cout << "Foo\n";
   
-  Win l(film);
+  Win l(film, future);
   l.show();
   
   return app.exec();
