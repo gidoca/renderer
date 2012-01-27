@@ -13,7 +13,7 @@ public:
     
   }
   
-  Film render(const Intersectable & scene, const Camera & camera, std::vector<QSharedPointer<Light> > lights);
+  void render(const Intersectable & scene, const Camera & camera, std::vector<QSharedPointer<Light> > lights, Film & film);
   
 private:
   Film film;

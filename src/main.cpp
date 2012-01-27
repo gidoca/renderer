@@ -1,4 +1,4 @@
-#include <QtCore/QSize>
+#include <QtCore>
 #include <QtGui/QImage>
 #include <QtCore/QSharedPointer>
 #include <QtCore/QTime>
@@ -14,6 +14,17 @@
 #include "unidipathtracingintegrator.h"
 #include "film.h"
 #include "tonemapper.h"
+#include "win.h"
+
+void render(QSize resolution, Film & film, const Intersectable * object, const Camera * camera, std::vector<QSharedPointer<Light> > light)
+{
+  Renderer * renderer = new PerPixelRenderer(resolution, new UniDiPathTracingIntegrator());
+  
+  renderer->render(*object, *camera, light, film);
+  delete renderer;
+}
+
+
 
 int main(int argc, char **argv) {
   QSize resolution(512, 512);
@@ -25,16 +36,14 @@ int main(int argc, char **argv) {
   const std::vector<QSharedPointer<Light> > light = getLight();
   const Camera camera = getCamera(resolution);
   
-	Renderer * renderer = new PerPixelRenderer(resolution, new UniDiPathTracingIntegrator());
   Tonemapper tonemapper(resolution);
-	Film film = renderer->render(*object, camera, light);
-  QImage image = tonemapper.tonemap(film);
+  Film film(resolution);
+  QFuture< void > future = QtConcurrent::run(render, resolution, film, object, &camera, light);
+  std::cout << "Foo\n";
   
-  delete renderer;
-  delete object;
-  if(!image.save("/tmp/tst.png")) std::cout << "Failed to save file.\n";
-  QLabel l;
-  l.setPixmap(QPixmap::fromImage(image));
+  Win l(film);
   l.show();
+  
   return app.exec();
 }
+

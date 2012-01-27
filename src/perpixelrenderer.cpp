@@ -23,13 +23,11 @@ PerPixelRenderer::~PerPixelRenderer()
   delete integrator;
 }
 
-Film PerPixelRenderer::render(const Intersectable& scene, const Camera& camera, std::vector< QSharedPointer< Light > > lights)
+void PerPixelRenderer::render(const Intersectable& scene, const Camera& camera, std::vector< QSharedPointer< Light > > lights, Film & film)
 {
   QTime time;
   time.start();
   
-  Film film(resolution);
-	
   #pragma omp parallel for schedule(dynamic)
   for(int i = 0; i < film.height(); i++)
   {
@@ -56,8 +54,6 @@ Film PerPixelRenderer::render(const Intersectable& scene, const Camera& camera, 
 
   std::cout << "100% complete, time elapsed: " << time.elapsed() / 1000 << "s\n";
   std::cout.flush();
-	
-	return film;
 }
 
 

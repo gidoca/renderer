@@ -6,9 +6,8 @@
 #include <cmath>
 #include <cassert>
 
-Film MetropolisRenderer::render(const Intersectable& scene, const Camera& camera, std::vector< QSharedPointer< Light > > lights)
+void MetropolisRenderer::render(const Intersectable& scene, const Camera& camera, std::vector< QSharedPointer< Light > > lights, Film & film)
 {
-  return film;
 }
 
 Path MetropolisRenderer::cameraPathFromSample(MetropolisSample sample, const Intersectable & scene, const Camera& camera)
