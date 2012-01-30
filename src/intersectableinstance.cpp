@@ -13,7 +13,7 @@ AxisAlignedBox * IntersectableInstance::boundingBox() const
 {
   AxisAlignedBox * untransformed = intersectable->boundingBox();
   AxisAlignedBox * result = new AxisAlignedBox();
-  QVector3D min = untransformed->getMin(), max = untransformed->getMax();
+  QVector3D min = transform.map(untransformed->getMin()), max = transform.map(untransformed->getMax());
   result->includePoint(QVector3D(min.x(), min.y(), min.z()));
   result->includePoint(QVector3D(min.x(), min.y(), max.z()));
   result->includePoint(QVector3D(min.x(), max.y(), min.z()));
