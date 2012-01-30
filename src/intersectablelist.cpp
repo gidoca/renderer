@@ -14,9 +14,9 @@ HitRecord IntersectableList::intersect(Ray ray, float from, float to) const
 
   HitRecord hit;
 
-  for(std::list< QSharedPointer<Intersectable> >::const_iterator i = components.begin(); i != components.end(); i++)
+  for(std::list< Intersectable* >::const_iterator i = components.begin(); i != components.end(); i++)
   {
-    Intersectable & component = **i;
+    const Intersectable & component = **i;
     HitRecord currentHit = component.intersect(ray, from, (to < hit.getRayParameter() ? to : hit.getRayParameter()));
     if(currentHit.intersects())
     {
@@ -30,7 +30,7 @@ AxisAlignedBox * IntersectableList::boundingBox() const
 {
   QVector3D min(std::numeric_limits< float >::infinity(), std::numeric_limits< float >::infinity(), std::numeric_limits< float >::infinity());
   QVector3D max = -min;
-  for(std::list<QSharedPointer<Intersectable> >::const_iterator i = components.begin(); i != components.end(); i++)
+  for(std::list<Intersectable*>::const_iterator i = components.begin(); i != components.end(); i++)
   {
     AxisAlignedBox * boundingBox = (*i)->boundingBox();
     QVector3D currentMin = boundingBox->getMin();
@@ -47,7 +47,7 @@ AxisAlignedBox * IntersectableList::boundingBox() const
 }
 
 
-std::list< QSharedPointer< Intersectable >, std::allocator< QSharedPointer< Intersectable > > > IntersectableList::getComponents() const
+std::list< Intersectable* > IntersectableList::getComponents() const
 {
   return components;
 }

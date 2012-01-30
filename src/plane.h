@@ -5,15 +5,14 @@
 #include "intersectable.h"
 #include "material.h"
 
-#include <QtGui/QVector4D>
-#include <QtGui/QVector3D>
-#include <QtCore/QSharedPointer>
+#include <QVector4D>
+#include <QVector3D>
 
 class Plane : public Intersectable
 {
 
   public:
-    Plane(QVector4D planeVector, QSharedPointer<Material> material) : planeVector(planeVector), material(material)
+    Plane(QVector4D planeVector, Material* material) : planeVector(planeVector), material(material)
     {
 
     }
@@ -24,7 +23,7 @@ class Plane : public Intersectable
     
   private:
     QVector4D planeVector;
-    QSharedPointer<Material> material;
+    Material* material;
 };
 
 #endif // PLANE_H

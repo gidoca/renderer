@@ -7,7 +7,6 @@
 #include <limits>
 
 #include <QtGui/QVector3D>
-#include <QtCore/QSharedPointer>
 
 class AxisAlignedBox : public CSGObject
 {
@@ -22,7 +21,7 @@ public:
   }
 
 
-  AxisAlignedBox(QVector3D min, QVector3D max, QSharedPointer<Material> material = DarkMatter::getInstance()): material(material), min(min), max(max)
+  AxisAlignedBox(QVector3D min, QVector3D max, Material* material = DarkMatter::getInstance()): material(material), min(min), max(max)
   {
 
   }
@@ -37,7 +36,7 @@ public:
   void includePoint(QVector3D point);
   
 private:
-  QSharedPointer<Material> material;
+  Material* material;
   QVector3D min, max;
     
 };

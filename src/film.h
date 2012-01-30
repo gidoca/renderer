@@ -4,7 +4,6 @@
 #include <cstdlib>
 
 #include <QSize>
-#include <QSharedPointer>
 
 #include "global.h"
 #include "spectrum.h"
@@ -18,12 +17,12 @@ public:
   
   const inline Spectrum * operator[](int i) const
   {
-    return data.data() + i * size.width();
+    return data + i * size.width();
   }
   
   inline Spectrum * operator[](int i)
   {
-    return data.data() + i * size.width();
+    return data + i * size.width();
   }
   
   inline int width()
@@ -42,7 +41,7 @@ public:
   }
   
 private:
-  QSharedPointer<Spectrum> data;
+  Spectrum* data;
   QSize size;
 };
 

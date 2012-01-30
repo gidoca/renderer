@@ -6,7 +6,7 @@
 #include <cmath>
 #include <cassert>
 
-void MetropolisRenderer::render(const Intersectable& scene, const Camera& camera, std::vector< QSharedPointer< Light > > lights, Film & film)
+void MetropolisRenderer::render(const Intersectable& scene, const Camera& camera, boost::ptr_vector< Light > lights, Film & film)
 {
 }
 

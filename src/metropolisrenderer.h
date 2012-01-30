@@ -5,6 +5,8 @@
 #include "renderer.h"
 #include "film.h"
 
+#include <boost/ptr_container/ptr_vector.hpp>
+
 class MetropolisRenderer : public Renderer
 {
 public:
@@ -13,7 +15,7 @@ public:
     
   }
   
-  void render(const Intersectable & scene, const Camera & camera, std::vector<QSharedPointer<Light> > lights, Film & film);
+  void render(const Intersectable & scene, const Camera & camera, boost::ptr_vector<Light> lights, Film & film);
   
 private:
   Film film;

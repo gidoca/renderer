@@ -23,7 +23,7 @@ IntersectionParameter CSGIntersection::getCSGIntersection ( Ray ray ) const
             if ( leftInside && rightInside )
             {
                 result.intersections.push_back ( *leftIterator );
-                if ( result.material.isNull() )
+                if ( result.material == 0 )
                 {
                     result.material = leftIntersection.material;
                     result.normal = leftIntersection.normal;
@@ -37,7 +37,7 @@ IntersectionParameter CSGIntersection::getCSGIntersection ( Ray ray ) const
             if ( leftInside && rightInside )
             {
                 result.intersections.push_back ( *rightIterator );
-                if ( result.material.isNull() )
+                if ( result.material == 0 )
                 {
                     result.material = rightIntersection.material;
                     result.normal = rightIntersection.normal;

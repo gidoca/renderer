@@ -5,8 +5,7 @@
 #include "ray.h"
 #include "darkmatter.h"
 
-#include <QtGui/QVector3D>
-#include <QtCore/QSharedPointer>
+#include <QVector3D>
 
 #include <limits>
 
@@ -15,7 +14,7 @@ class HitRecord
 
   public:
     HitRecord();
-    HitRecord(float rayParameter, Ray ray, QSharedPointer<Material> material, QVector3D surfaceNormal);
+    HitRecord(float rayParameter, Ray ray, Material* material, QVector3D surfaceNormal);
     
     void transform(QMatrix4x4 matrix);
     
@@ -27,7 +26,7 @@ class HitRecord
     bool intersects() const;
     
   private:
-    QSharedPointer<Material> material;
+    Material* material;
     float rayParameter;
     QVector3D intersectingPoint;
     QVector3D surfaceNormal;
@@ -40,7 +39,7 @@ inline HitRecord::HitRecord() : material(DarkMatter::getInstance()), rayParamete
 }
 
 
-inline HitRecord::HitRecord(float rayParameter, Ray ray, QSharedPointer < Material > material, QVector3D surfaceNormal)
+inline HitRecord::HitRecord(float rayParameter, Ray ray, Material * material, QVector3D surfaceNormal)
   : material(material), rayParameter(rayParameter), intersectingPoint(ray.evaluate(rayParameter)), surfaceNormal(surfaceNormal), ray(ray)
 {
 }

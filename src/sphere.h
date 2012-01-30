@@ -6,12 +6,12 @@
 #include "csgobject.h"
 #include "diffusematerial.h"
 
-#include <QtGui/QVector3D>
+#include <QVector3D>
 
 class Sphere : public CSGObject
 {
   public:
-    Sphere(QVector3D center, float radius, QSharedPointer<Material> material) : material(material), center(center), radius(radius)
+    Sphere(QVector3D center, float radius, Material* material) : material(material), center(center), radius(radius)
     {
 
     }
@@ -20,7 +20,7 @@ class Sphere : public CSGObject
     AxisAlignedBox * boundingBox() const;
     
   private:
-    QSharedPointer<Material> material;
+    Material* material;
     QVector3D center;
     float radius;
 };

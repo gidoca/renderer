@@ -23,7 +23,7 @@ PerPixelRenderer::~PerPixelRenderer()
   delete integrator;
 }
 
-void PerPixelRenderer::render(const Intersectable& scene, const Camera& camera, std::vector< QSharedPointer< Light > > lights, Film & film)
+void PerPixelRenderer::render(const Intersectable& scene, const Camera& camera, std::vector< Light* > lights, Film & film)
 {
   QTime time;
   time.start();

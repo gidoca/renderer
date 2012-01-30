@@ -1,14 +1,12 @@
 #ifndef __ObjReader_h__
 #define __ObjReader_h__
 
-#include <QtCore/QSharedPointer>
-
 #include "global.h"
 
 class ObjReader
 {
   public:
-    static Intersectable* getMesh(const char* fileName, QSharedPointer< Material > material);
+    static Intersectable* getMesh(const char* fileName, Material * material);
     
   private:
     static void readObj(const char* fileName, int &nVertices, float **vertices, float **normals, float **texcoords, int &nIndices, int **indices);

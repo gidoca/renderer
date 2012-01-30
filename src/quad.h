@@ -9,7 +9,7 @@
 class Quad : public Intersectable
 {
 public:
-  Quad(QVector3D p1, QVector3D p2, QVector3D p3, QVector3D p4, QSharedPointer<Material> mat) : t1(p1, p2, p4, mat), t2(p4, p2, p3, mat)
+  Quad(QVector3D p1, QVector3D p2, QVector3D p3, QVector3D p4, Material* mat) : t1(p1, p2, p4, mat), t2(p4, p2, p3, mat)
   {
     bBox.includePoint(p1);
     bBox.includePoint(p2);

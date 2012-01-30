@@ -6,13 +6,12 @@
 #include "axisalignedbox.h"
 
 #include <list>
-#include <QtCore/QSharedPointer>
 
 class IntersectableList : public Intersectable
 {
 
   public:
-    IntersectableList(std::list<QSharedPointer<Intersectable> > components) : components(components), bBox(boundingBox())
+    IntersectableList(std::list<Intersectable*> components) : components(components), bBox(boundingBox())
     {
 
     }
@@ -23,10 +22,10 @@ class IntersectableList : public Intersectable
     HitRecord intersect(Ray ray, float from, float to) const;
     AxisAlignedBox* boundingBox() const;
     
-    std::list< QSharedPointer<Intersectable> > getComponents() const;
+    std::list< Intersectable* > getComponents() const;
 
   private:
-    std::list<QSharedPointer<Intersectable> > components;
+    std::list<Intersectable* > components;
     const AxisAlignedBox* bBox;
   
 };

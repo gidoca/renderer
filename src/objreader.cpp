@@ -3,12 +3,12 @@
 #include "bvh.h"
 #include "intersectablelist.h"
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
+#include <cstdlib>
+#include <cstdio>
+#include <cmath>
 #include <list>
 
-Intersectable * ObjReader::getMesh(const char * fileName, QSharedPointer<Material> material)
+Intersectable * ObjReader::getMesh(const char * fileName, Material * material)
 {
   int nVertices;
   float *vertices;
@@ -16,7 +16,7 @@ Intersectable * ObjReader::getMesh(const char * fileName, QSharedPointer<Materia
   float *texcoords;
   int nIndices;
   int *indices;
-  std::list<QSharedPointer<Intersectable> > triangles;
+  std::list<Intersectable*> triangles;
   readObj(fileName, nVertices, &vertices, &normals, &texcoords, nIndices, &indices);
   if(vertices == NULL)
   {
@@ -40,7 +40,7 @@ Intersectable * ObjReader::getMesh(const char * fileName, QSharedPointer<Materia
       QVector3D n3(normals[3 * indices[i + 2]], normals[3 * indices[i + 2] + 1], normals[3 * indices[i + 2] + 2]);
       triangle = new Triangle(v1, v2, v3, n1, n2, n3, material);
     }
-    triangles.push_back(QSharedPointer<Intersectable>(triangle));
+    triangles.push_back(triangle);
   }
 //  return BSPNode::buildTree(new IntersectableList(triangles));
 //   return new IntersectableList(triangles);

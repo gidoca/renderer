@@ -4,21 +4,19 @@
 #include "global.h"
 #include "diffusematerial.h"
 
-#include <QtCore/QSharedPointer>
-
 class DarkMatter : public DiffuseMaterial
 {
 public:
     Spectrum shade(HitRecord&, QVector3D direction) const;
 
-    static QSharedPointer<DarkMatter> getInstance();
+    static DarkMatter* getInstance();
 
 private:
     DarkMatter();
-    static QSharedPointer<DarkMatter> instance;
+    static DarkMatter* instance;
 };
 
-inline QSharedPointer<DarkMatter> DarkMatter::getInstance()
+inline DarkMatter* DarkMatter::getInstance()
 {
   return instance;
 }

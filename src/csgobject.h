@@ -7,9 +7,13 @@
 class IntersectionParameter
 {
   public:
+    IntersectionParameter()
+    {
+      material = 0;
+    }
     std::list<float> intersections;
     QVector3D normal;
-    QSharedPointer<Material> material;
+    Material* material;
 };
 
 class CSGObject : public Intersectable

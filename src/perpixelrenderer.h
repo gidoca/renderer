@@ -14,7 +14,7 @@ public:
 	PerPixelRenderer(QSize size, Integrator * integrator);
   virtual ~PerPixelRenderer();
 	
-	void render(const Intersectable & scene, const Camera & camera, std::vector<QSharedPointer<Light> > lights, Film & film);
+	void render(const Intersectable & scene, const Camera & camera, std::vector<Light*> lights, Film & film);
 	
 private:
   Integrator * integrator;

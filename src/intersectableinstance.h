@@ -5,13 +5,12 @@
 #include "intersectable.h"
 
 #include <QtGui/QMatrix4x4>
-#include <QtCore/QSharedPointer>
 
 class IntersectableInstance : public Intersectable
 {
 
 public:
-  IntersectableInstance(QMatrix4x4 transform, QSharedPointer<Intersectable> intersectable) : transform(transform), inverseTransform(transform.inverted()), intersectable(intersectable)
+  IntersectableInstance(QMatrix4x4 transform, Intersectable* intersectable) : transform(transform), inverseTransform(transform.inverted()), intersectable(intersectable)
   {
 
   }
@@ -23,7 +22,7 @@ private:
   QMatrix4x4 transform;
   QMatrix4x4 inverseTransform;
   
-  QSharedPointer<Intersectable> intersectable;
+  Intersectable* intersectable;
 };
 
 #endif // INTERSECTABLEINSTANCE_H

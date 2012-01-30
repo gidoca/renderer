@@ -1,9 +1,5 @@
 #include <QtCore>
-#include <QtGui/QImage>
-#include <QtCore/QSharedPointer>
-#include <QtCore/QTime>
-#include <QtGui/QLabel>
-#include <QtGui/QApplication>
+#include <QApplication>
 
 #include <list>
 #include <vector>
@@ -16,7 +12,7 @@
 #include "tonemapper.h"
 #include "win.h"
 
-void render(QSize resolution, Film & film, const Intersectable * object, const Camera * camera, std::vector<QSharedPointer<Light> > light)
+void render(QSize resolution, Film & film, const Intersectable * object, const Camera * camera, std::vector<Light*> light)
 {
   Renderer * renderer = new PerPixelRenderer(resolution, new UniDiPathTracingIntegrator());
   
@@ -33,7 +29,7 @@ int main(int argc, char **argv) {
 
  
   const Intersectable * object = getScene();
-  const std::vector<QSharedPointer<Light> > light = getLight();
+  const std::vector<Light*> light = getLight();
   const Camera camera = getCamera(resolution);
   
   Film film(resolution);
