@@ -1,4 +1,5 @@
 #include "win.h"
+#include "win.moc"
 
 #include <QImage>
 

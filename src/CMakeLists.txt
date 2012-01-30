@@ -1,13 +1,14 @@
 project(renderingproject)
-cmake_minimum_required(VERSION 2.8.6)
+cmake_minimum_required(VERSION 2.8.0)
 find_package(Qt4 REQUIRED)
 
 include_directories(${QT_INCLUDES} ${CMAKE_CURRENT_BINARY_DIR})
 
 include(${QT_USE_FILE})
 
-set(CMAKE_AUTOMOC TRUE)
+#set(CMAKE_AUTOMOC TRUE)
 
+set(renderingsproject_HEADERS win.h)
 set(renderingproject_SRCS main.cpp camera.cpp plane.cpp sphere.cpp
   triangle.cpp intersectableinstance.cpp
   darkmatter.cpp diffusematerial.cpp phongmaterial.cpp
@@ -19,6 +20,7 @@ set(renderingproject_SRCS main.cpp camera.cpp plane.cpp sphere.cpp
   quad.cpp csgobject.cpp csgintersection.cpp bvh.cpp
   renderer.cpp perpixelrenderer.cpp metropolisrenderer.cpp tonemapper.cpp
   win.cpp)
+#qt4_wrap_cpp(renderingproject_HEADERS_MOC ${renderingproject_HEADERS})
 qt4_automoc(${renderingproject_SRCS})
 add_executable(renderingproject ${renderingproject_SRCS})
 #add_executable(stst stst.cpp sampler.cpp jitteredsampler.cpp)
