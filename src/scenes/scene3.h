@@ -26,48 +26,48 @@ Intersectable * getScene(void)
   QVector3D center(0.f,0.f,0.f);
   float radius = 0.2f;
   Spectrum kd(0.8f, 0.f, 0.f);
-  Sphere * sphere = new Sphere(center, radius, QSharedPointer<Material>(new PhongMaterial(kd, kd, 32)));
+  Sphere * sphere = new Sphere(center, radius, new PhongMaterial(kd, kd, 32));
 //   Sphere * sphere = new Sphere(center, radius, QSharedPointer<Material>(new TransparentMaterial(1.33)));
-  std::list< QSharedPointer<Intersectable> > objects;
-  objects.push_back(QSharedPointer<Intersectable>(sphere));
+  std::list< Intersectable* > objects;
+  objects.push_back(sphere);
 
   center = QVector3D(0.4f,0.f,-0.3f);
   radius = 0.3f;
-  Sphere * msphere = new Sphere(center, radius, QSharedPointer<Material>(new MirrorMaterial(0.85)));
-  objects.push_back(QSharedPointer<Intersectable>(msphere));
+  Sphere * msphere = new Sphere(center, radius, new MirrorMaterial(0.85));
+  objects.push_back(msphere);
 
   QVector4D normal(0.f, 1.f, 0.f, 1.f);
   kd = Spectrum(0.f, 0.8f, 0.8f);
-  Plane * plane = new Plane(normal, QSharedPointer<Material>(new PhongMaterial(kd, kd, 32)));
-  objects.push_back(QSharedPointer<Intersectable>(plane));
+  Plane * plane = new Plane(normal, new PhongMaterial(kd, kd, 32));
+  objects.push_back(plane);
 
   normal = QVector4D(0.f, 0.f, 1.f, 1.f);
   kd = Spectrum(0.3f, 0.8f, 0.8f);
-  plane = new Plane(normal, QSharedPointer<Material>(new PhongMaterial(kd, kd, 32)));
-  objects.push_back(QSharedPointer<Intersectable>(plane));
+  plane = new Plane(normal, new PhongMaterial(kd, kd, 32));
+  objects.push_back(plane);
 
   normal = QVector4D(-1.f, 0.f, 0.f, 1.f);
   kd = Spectrum(1.f, 0.8f, 0.8f);
-  plane = new Plane(normal, QSharedPointer<Material>(new PhongMaterial(kd, kd, 32)));
-  objects.push_back(QSharedPointer<Intersectable>(plane));
+  plane = new Plane(normal, new PhongMaterial(kd, kd, 32));
+  objects.push_back(plane);
 
   normal = QVector4D(1.f, 0.f, 0.f, 1.f);
   kd = Spectrum(0.f, 0.8f, 0.f);
-  plane = new Plane(normal, QSharedPointer<Material>(new PhongMaterial(kd, kd, 32)));
-  objects.push_back(QSharedPointer<Intersectable>(plane));
+  plane = new Plane(normal, new PhongMaterial(kd, kd, 32));
+  objects.push_back(plane);
 
   normal = QVector4D(0.f, -1.f, 0.f, 1.f);
   kd = Spectrum(0.8f, 0.8f, 0.8f);
-  plane = new Plane(normal, QSharedPointer<Material>(new PhongMaterial(kd, kd, 32)));
-  objects.push_back(QSharedPointer<Intersectable>(plane));
+  plane = new Plane(normal, new PhongMaterial(kd, kd, 32));
+  objects.push_back(plane);
 
   return new IntersectableList(objects);
 }
 
-std::vector<QSharedPointer<Light> > getLight(void)
+std::vector<Light* > getLight(void)
 {
-  std::vector<QSharedPointer<Light> > lights;
-  lights.push_back(QSharedPointer<Light>(new PointLight(QVector3D(0, 0.8, 0.8), Spectrum(1, 1, 1))));
-  lights.push_back(QSharedPointer<Light>(new PointLight(QVector3D(0, 0.6, 0.8), Spectrum(1, 1, 1))));
+  std::vector<Light* > lights;
+  lights.push_back(new PointLight(QVector3D(0, 0.8, 0.8), Spectrum(1, 1, 1)));
+  lights.push_back(new PointLight(QVector3D(0, 0.6, 0.8), Spectrum(1, 1, 1)));
   return lights;
 }

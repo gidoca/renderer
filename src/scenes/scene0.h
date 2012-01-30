@@ -3,7 +3,7 @@
 #include "../pointlight.h"
 #include "../phongmaterial.h"
 
-#include <QtCore/QSize>
+#include <QSize>
 
 #include <cmath>
 
@@ -19,12 +19,11 @@ Camera getCamera(QSize resolution)
 
 Intersectable * getScene(void)
 {
-  return new Sphere(QVector3D(), 1, QSharedPointer<Material>(new PhongMaterial(Spectrum(1, 0, 0), Spectrum(1.4, 0, 0), 32)));
+  return new Sphere(QVector3D(), 1, new PhongMaterial(Spectrum(1, 0, 0), Spectrum(1.4, 0, 0), 32));
 }
 
-std::vector<QSharedPointer<Light> > getLight(void)
+std::vector<Light* > getLight(void)
 {
-  std::vector<QSharedPointer<Light> > lights;
-  lights.push_back(QSharedPointer<Light>(new PointLight(QVector3D(2, 2, 2), Spectrum(4, 4, 4))));
+  std::vector<Light* > lights = {new PointLight(QVector3D(2, 2, 2), Spectrum(4, 4, 4))};
   return lights;
 }

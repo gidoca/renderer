@@ -40,7 +40,7 @@ void PerPixelRenderer::render(const Intersectable& scene, const Camera& camera, 
       if(j == 70 && i == 120)
         std::cout << "";
 #endif
-      JitteredSampler multiSampler(2, 2);
+      JitteredSampler multiSampler(1, 1);
       std::list<Sample> samples = multiSampler.getSamples();
       QPointF point = QPoint(j, i);
       for(std::list<Sample>::iterator it = samples.begin(); it != samples.end(); it++)
