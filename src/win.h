@@ -4,6 +4,7 @@
 #include <QLabel>
 #include <QTimer>
 #include <QFuture>
+#include <QAction>
 
 #include "film.h"
 #include "tonemapper.h"
@@ -20,10 +21,17 @@ public:
     connect(&timer, SIGNAL(timeout()), this, SLOT(update()));
     timer.setInterval(100);
     timer.start();
+
+    setContextMenuPolicy(Qt::ActionsContextMenu);
+
+    QAction *saveAct = new QAction("Save image as...", this);
+    connect(saveAct, SIGNAL(triggered()), this, SLOT(saveImage()));
+    insertAction(0, saveAct);
   }
   
 private slots:
   void update();
+  void saveImage();
   
 private:
   QTimer timer;
