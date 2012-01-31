@@ -27,6 +27,8 @@ public:
     QAction *saveAct = new QAction("Save image as...", this);
     connect(saveAct, SIGNAL(triggered()), this, SLOT(saveImage()));
     insertAction(0, saveAct);
+
+    setWindowTitle("Rendering...");
   }
   
 private slots:

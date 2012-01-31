@@ -10,7 +10,11 @@ void Win::update()
     QImage image = tonemapper.tonemap(film);
     setPixmap(QPixmap::fromImage(image));
     repaint();
-    if(future.isFinished()) timer.stop();
+    if(future.isFinished())
+    {
+      timer.stop();
+      setWindowTitle("Rendering complete.");
+    }
 }
 
 void Win::saveImage()
