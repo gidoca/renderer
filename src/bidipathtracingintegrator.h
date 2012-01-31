@@ -7,7 +7,7 @@
 class BiDiPathTracingIntegrator : public PathTracingIntegrator
 {
 public:
-  Spectrum integrate(const Ray &ray, const Intersectable &scene, const Light &light, int recursionDepth) const;
+  Spectrum integrate(const Ray &ray, const Intersectable &scene, const Light &light, int recursionDepth, gsl_rng *rng) const;
 };
 
 #endif // BIDIPATHTRACINGINTEGRATOR_H

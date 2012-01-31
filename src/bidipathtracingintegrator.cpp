@@ -12,18 +12,18 @@
 #include <cassert>
 #include <cmath>
 
-Spectrum BiDiPathTracingIntegrator::integrate(const Ray &ray, const Intersectable &scene, const Light &light, int recursionDepth) const
+Spectrum BiDiPathTracingIntegrator::integrate(const Ray &ray, const Intersectable &scene, const Light &light, int recursionDepth, gsl_rng *rng) const
 {
   Spectrum color;
-  JitteredSampler sampler(1, 1);
+  JitteredSampler sampler(1, 1, rng);
   float directionPdf;
   Ray primaryLightRay = light.getRandomRay(sampler.getSamples().front(), sampler.getSamples().front(), directionPdf);
   HitRecord initialLightHit = scene.intersect(primaryLightRay);
   QVector3D initialLightDirection;
   Spectrum lightIntensity = light.getIntensity(initialLightHit.getIntersectingPoint(), initialLightDirection, scene, sampler.getSamples().front());
 
-  Path lightPath = Renderer::createPath(primaryLightRay, scene, lightIntensity / directionPdf);
-  Path eyePath = Renderer::createPath(ray, scene);
+  Path lightPath = Renderer::createPath(primaryLightRay, scene, rng, lightIntensity / directionPdf);
+  Path eyePath = Renderer::createPath(ray, scene, rng);
 
   std::list<Spectrum>::iterator lightAlphaIt = lightPath.alphaValues.begin();
   std::list<HitRecord>::iterator lightHitIt = lightPath.hitRecords.begin();

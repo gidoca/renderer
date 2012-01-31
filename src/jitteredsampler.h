@@ -9,7 +9,7 @@
 class JitteredSampler : public Sampler
 {
 public:
-  JitteredSampler(int width, int height) : width(width), height(height) {}
+  JitteredSampler(int width, int height, gsl_rng *rng) : Sampler(rng), width(width), height(height) {}
 
 
   std::list<Sample> getSamples();

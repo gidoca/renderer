@@ -87,5 +87,5 @@ QVector3D Sample::getUniformSphereDirection() const
 
 float Sampler::getRandom()
 {
-  return (float) qrand() / RAND_MAX;
+  return gsl_rng_uniform(rng);
 }

@@ -6,6 +6,8 @@
 #include <QtCore/QPointF>
 #include <QtGui/QVector3D>
 
+#include <gsl/gsl_rng.h>
+
 #include "global.h"
 
 class Sample
@@ -26,10 +28,15 @@ private:
 class Sampler
 {
 public:
-    virtual std::list<Sample> getSamples() = 0;
+  Sampler(gsl_rng *rng) : rng(rng)
+  {
+  }
+  virtual std::list<Sample> getSamples() = 0;
 
 protected:
-    static float getRandom();
+  float getRandom();
+    
+  gsl_rng * rng;
 };
 
 inline QPointF Sample::getSample() const

@@ -4,21 +4,23 @@
 #include "intersectable.h"
 #include "jitteredsampler.h"
 
+#include <gsl/gsl_rng.h>
+
 #include <cmath>
 #include <cassert>
 
-Path Renderer::createPath(const Ray &primaryRay, const Intersectable &scene, Spectrum initialAlpha)
+Path Renderer::createPath(const Ray &primaryRay, const Intersectable &scene, gsl_rng *rng, Spectrum initialAlpha)
 {
-    JitteredSampler sampler(1, 1);
+    JitteredSampler sampler(1, 1, rng);
     Sample samples[MAX_DEPTH];
     for(int i = 0; i < MAX_DEPTH; i++)
     {
       samples[i] = sampler.getSamples().front();
     }
-    return createPath(primaryRay, scene, samples, initialAlpha);
+    return createPath(primaryRay, scene, rng, samples, initialAlpha);
 }
 
-Path Renderer::createPath(const Ray& primaryRay, const Intersectable &scene, Sample pathSamples[], Spectrum alpha)
+Path Renderer::createPath(const Ray& primaryRay, const Intersectable &scene, gsl_rng *rng, Sample pathSamples[], Spectrum alpha)
 {
   Path result;
   HitRecord hit = scene.intersect(primaryRay);

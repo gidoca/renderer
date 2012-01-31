@@ -5,7 +5,7 @@
 #include <vector>
 #include <iostream>
 
-#include "scenes/cornellscene.h"
+#include "scenes/scene1.h"
 #include "perpixelrenderer.h"
 #include "unidipathtracingintegrator.h"
 #include "film.h"

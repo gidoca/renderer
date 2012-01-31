@@ -6,9 +6,9 @@
 #include "light.h"
 #include "renderer.h"
 
-Spectrum SimpleIntegrator::integrate(const Ray & ray, const Intersectable & scene, const Light & light, int depth) const
+Spectrum SimpleIntegrator::integrate(const Ray & ray, const Intersectable & scene, const Light & light, int depth, gsl_rng *rng) const
 {
-  JitteredSampler sampler(2, 2);
+  JitteredSampler sampler(2, 2, rng);
   if(depth > MAX_DEPTH) return Spectrum();
 
   HitRecord hit = scene.intersect(ray);
@@ -19,7 +19,7 @@ Spectrum SimpleIntegrator::integrate(const Ray & ray, const Intersectable & scen
     surfaceNormal.normalize();
     QVector3D newDirection = oldRayDirection - 2 * QVector3D::dotProduct(oldRayDirection, surfaceNormal) * surfaceNormal;
     Ray mirrorRay(hit.getIntersectingPoint(), newDirection);
-    return integrate(mirrorRay, scene, light, depth + 1);
+    return integrate(mirrorRay, scene, light, depth + 1, rng);
   }
   else
   {
