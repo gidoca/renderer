@@ -17,10 +17,9 @@ set(renderingproject_SRCS main.cpp camera.cpp plane.cpp sphere.cpp
   sampler.cpp jitteredsampler.cpp arealight.cpp
   simpleintegrator.cpp unidipathtracingintegrator.cpp bidipathtracingintegrator.cpp
   quad.cpp csgobject.cpp csgintersection.cpp bvh.cpp
-  renderer.cpp perpixelrenderer.cpp #metropolisrenderer.cpp
+  renderer.cpp perpixelrenderer.cpp metropolisrenderer.cpp
   tonemapper.cpp
   win.cpp)
-#qt4_wrap_cpp(renderingproject_HEADERS_MOC ${renderingproject_HEADERS})
 qt4_automoc(${renderingproject_SRCS})
 add_executable(renderingproject ${renderingproject_SRCS})
 #add_executable(stst stst.cpp sampler.cpp jitteredsampler.cpp)

@@ -5,6 +5,8 @@
 #include "renderer.h"
 #include "film.h"
 
+#include <gsl/gsl_rng.h>
+
 #include <vector>
 
 class MetropolisRenderer : public Renderer
@@ -26,8 +28,8 @@ private:
 class MetropolisSample
 {
 public:
-  void largeStep();
-  void smallStep();
+  void largeStep(gsl_rng *rng);
+  void smallStep(gsl_rng *rng);
 
   Sample lightSample1[MAX_DEPTH], lightSample2[MAX_DEPTH];
   Sample cameraSample;

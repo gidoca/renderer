@@ -52,6 +52,7 @@ void PerPixelRenderer::render(const Intersectable& scene, const Camera& camera, 
         scanline[j] += integrator->integrate(ray, scene, lights, rng) / samples.size();
       }
     }
+    gsl_rng_free(rng);
   }
 
   std::cout << "100% complete, time elapsed: " << time.elapsed() / 1000 << "s\n";

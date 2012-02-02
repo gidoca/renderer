@@ -2,6 +2,7 @@
 
 #include "jitteredsampler.h"
 #include "camera.h"
+#include "path.h"
 
 #include <cmath>
 #include <cassert>
@@ -13,14 +14,18 @@ void MetropolisRenderer::render(const Intersectable& scene, const Camera& camera
 Path MetropolisRenderer::cameraPathFromSample(MetropolisSample sample, const Intersectable & scene, const Camera& camera)
 {
   QPointF pixel = sample.cameraSample.getSample();
+  gsl_rng *rng = gsl_rng_alloc(gsl_rng_taus);
+  gsl_rng_set(rng, 1);
   pixel.rx() *= film.getSize().width();
   pixel.ry() *= film.getSize().height();
-  return createPath(camera.getRay(pixel), scene, sample.cameraPathSamples);
+  Path result = createPath(camera.getRay(pixel), scene, rng, sample.cameraPathSamples);
+  gsl_rng_free(rng);
+  return result;
 }
 
-void MetropolisSample::largeStep()
+void MetropolisSample::largeStep(gsl_rng *rng)
 {
-  JitteredSampler sampler(1, 1);
+  JitteredSampler sampler(1, 1, rng);
   cameraSample = sampler.getSamples().front();
 
   for(int i = 0; i < MAX_DEPTH; i++)
@@ -34,9 +39,9 @@ void MetropolisSample::largeStep()
 
 }
 
-void mutate(qreal &s)
+void mutate(qreal &s, gsl_rng *rng)
 {
-  JitteredSampler sampler(1, 1);
+  JitteredSampler sampler(1, 1, rng);
   Sample sample = sampler.getSamples().front();
   static const float a = 1. / 1024., b = 1. / 64.;
   static const float logRatio = -log(b / a);
@@ -50,19 +55,19 @@ void mutate(qreal &s)
   assert(0 <= s && s <= 1);
 }
 
-void MetropolisSample::smallStep()
+void MetropolisSample::smallStep(gsl_rng *rng)
 {
-  mutate(cameraSample.getSample().rx());
-  mutate(cameraSample.getSample().ry());
+  mutate(cameraSample.getSample().rx(), rng);
+  mutate(cameraSample.getSample().ry(), rng);
   for(int i = 0; i < MAX_DEPTH; i++)
   {
-      mutate(lightPathSamples[i].getSample().rx());
-      mutate(lightPathSamples[i].getSample().ry());
-      mutate(cameraPathSamples[i].getSample().rx());
-      mutate(cameraPathSamples[i].getSample().ry());
-      mutate(lightSample1[i].getSample().rx());
-      mutate(lightSample1[i].getSample().ry());
-      mutate(lightSample2[i].getSample().rx());
-      mutate(lightSample2[i].getSample().ry());
+      mutate(lightPathSamples[i].getSample().rx(), rng);
+      mutate(lightPathSamples[i].getSample().ry(), rng);
+      mutate(cameraPathSamples[i].getSample().rx(), rng);
+      mutate(cameraPathSamples[i].getSample().ry(), rng);
+      mutate(lightSample1[i].getSample().rx(), rng);
+      mutate(lightSample1[i].getSample().ry(), rng);
+      mutate(lightSample2[i].getSample().rx(), rng);
+      mutate(lightSample2[i].getSample().ry(), rng);
   }
 }
