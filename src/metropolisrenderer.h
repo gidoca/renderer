@@ -28,6 +28,7 @@ private:
 class MetropolisSample
 {
 public:
+  MetropolisSample(int numLights) : numLights(numLights) {}
   void largeStep(gsl_rng *rng);
   void smallStep(gsl_rng *rng);
 
@@ -36,7 +37,9 @@ public:
   Sample lightPathSamples[MAX_DEPTH];
   Sample cameraPathSamples[MAX_DEPTH];
 
-  int lightIndex[MAX_DEPTH];
+  unsigned long int lightIndex[MAX_DEPTH];
+
+  const int numLights;
 };
 
 #endif // METROPOLISRENDERER_H

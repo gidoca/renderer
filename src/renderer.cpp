@@ -17,10 +17,10 @@ Path Renderer::createPath(const Ray &primaryRay, const Intersectable &scene, gsl
     {
       samples[i] = sampler.getSamples().front();
     }
-    return createPath(primaryRay, scene, rng, samples, initialAlpha);
+    return createPath(primaryRay, scene, samples, initialAlpha);
 }
 
-Path Renderer::createPath(const Ray& primaryRay, const Intersectable &scene, gsl_rng *rng, Sample pathSamples[], Spectrum alpha)
+Path Renderer::createPath(const Ray& primaryRay, const Intersectable &scene, Sample pathSamples[], Spectrum alpha)
 {
   Path result;
   HitRecord hit = scene.intersect(primaryRay);
