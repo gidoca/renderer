@@ -3,12 +3,44 @@
 #include "jitteredsampler.h"
 #include "camera.h"
 #include "path.h"
+#include "unidipathtracingintegrator.h"
 
 #include <cmath>
 #include <cassert>
+#include <algorithm>
+#include <iostream>
 
 void MetropolisRenderer::render(const Intersectable& scene, const Camera& camera, std::vector< Light* > lights, Film & film)
 {
+  gsl_rng *rng = gsl_rng_alloc(gsl_rng_taus);
+  gsl_rng_set(rng, 2);
+
+  MetropolisSample sample(lights.size());
+  sample.largeStep(rng);
+  Path path = cameraPathFromSample(sample, scene, camera);
+  UniDiPathTracingIntegrator integrator;
+  Spectrum value = integrator.integrate(path, scene, *lights[sample.lightIndex[0]], sample.lightSample1);
+
+  const int numSamples = 10000000;
+  const float largeStepProb = 0.1f;
+  for(int i = 0; i < numSamples; i++)
+  {
+    MetropolisSample newSample = sample.mutated(rng, largeStepProb);
+    Spectrum newValue = integrator.integrate(path, scene, *lights[sample.lightIndex[0]], sample.lightSample1);
+    float accept = std::min(1., newValue.length() / value.length());
+    int x = (int)(sample.cameraSample.getSample().x() * film.width());
+    int y = (int)(sample.cameraSample.getSample().y() * film.height());
+    film[y][x] += (1 - accept) * value / (value.length() * numSamples) * film.getSize().width() * film.getSize().height();
+    x = (int)(newSample.cameraSample.getSample().x() * film.width());
+    y = (int)(newSample.cameraSample.getSample().y() * film.height());
+    film[y][x] += accept * newValue / (newValue.length() * numSamples) * film.getSize().width() * film.getSize().height();
+    if(gsl_rng_uniform(rng) < accept)
+    {
+      sample = newSample;
+      value = newValue;
+      path = cameraPathFromSample(sample, scene, camera);
+    }
+  }
 }
 
 Path MetropolisRenderer::cameraPathFromSample(MetropolisSample sample, const Intersectable & scene, const Camera& camera)
@@ -67,4 +99,19 @@ void MetropolisSample::smallStep(gsl_rng *rng)
       mutate(lightSample2[i].getSample().rx(), rng);
       mutate(lightSample2[i].getSample().ry(), rng);
   }
+}
+
+MetropolisSample MetropolisSample::mutated(gsl_rng *rng, float largeStepProb)
+{
+  MetropolisSample result = *this;
+  float s = gsl_rng_uniform(rng);
+  if(s < largeStepProb)
+  {
+    result.largeStep(rng);
+  }
+  else
+  {
+    result.smallStep(rng);
+  }
+  return result;
 }

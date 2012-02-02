@@ -14,7 +14,7 @@ class PhongMaterial : public DiffuseMaterial
     }
 
 
-    Spectrum shade(HitRecord& hit, QVector3D direction) const;
+    Spectrum shade(const HitRecord& hit, QVector3D direction) const;
 
   private:
     const Spectrum color, specularColor;

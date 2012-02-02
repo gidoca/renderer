@@ -13,7 +13,7 @@ class BinaryMaterial:public DiffuseMaterial
 
     }
 
-    Spectrum shade (HitRecord&, QVector3D) const;
+    Spectrum shade (const HitRecord&, QVector3D) const;
     
   private:
     Spectrum color;

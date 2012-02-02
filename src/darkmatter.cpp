@@ -5,7 +5,7 @@ DarkMatter::DarkMatter()
 
 }
 
-Spectrum DarkMatter::shade(HitRecord&, QVector3D) const
+Spectrum DarkMatter::shade(const HitRecord&, QVector3D) const
 {
   return Spectrum(0, 0, 0);
 }

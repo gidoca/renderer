@@ -13,7 +13,7 @@ public:
 
   }
 
-  Spectrum shade(HitRecord& hit, QVector3D direction) const;
+  Spectrum shade(const HitRecord& hit, QVector3D direction) const;
   bool isMirror() const;
   bool isParticipating() const;
   

@@ -7,7 +7,8 @@
 class UniDiPathTracingIntegrator: public PathTracingIntegrator
 {
 public:
-    virtual Spectrum integrate(const Ray& ray, const Intersectable& scene, const Light& light, int recursionDepth, gsl_rng *rng) const;
+  Spectrum integrate(const Ray& ray, const Intersectable& scene, const Light& light, int recursionDepth, gsl_rng *rng) const;
+  Spectrum integrate(const Path& path, const Intersectable& scene, const Light& light, const Sample lightSample[]) const;
 };
 
 #endif // UNIDIPATHTRACINGINTEGRATOR_H

@@ -4,7 +4,7 @@
 #include "intersectable.h"
 #include "light.h"
 
-Spectrum MirrorMaterial::shade(HitRecord& , QVector3D direction) const
+Spectrum MirrorMaterial::shade(const HitRecord& , QVector3D) const
 {
   return Spectrum();
 }
