@@ -13,7 +13,7 @@ set(renderingproject_SRCS main.cpp camera.cpp plane.cpp sphere.cpp
   darkmatter.cpp diffusematerial.cpp phongmaterial.cpp
   conelight.cpp intersectablelist.cpp binarymaterial.cpp
   pointlight.cpp objreader.cpp mirrormaterial.cpp
-  axisalignedbox.cpp integrator.cpp
+  axisalignedbox.cpp
   sampler.cpp jitteredsampler.cpp arealight.cpp
   simpleintegrator.cpp unidipathtracingintegrator.cpp bidipathtracingintegrator.cpp
   quad.cpp csgobject.cpp csgintersection.cpp bvh.cpp

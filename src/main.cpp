@@ -5,18 +5,18 @@
 #include <vector>
 #include <iostream>
 
-#include "scenes/scene1.h"
-//#include "perpixelrenderer.h"
-//#include "unidipathtracingintegrator.h"
-#include "metropolisrenderer.h"
+#include "scenes/scene2.h"
+#include "perpixelrenderer.h"
+#include "unidipathtracingintegrator.h"
+//#include "metropolisrenderer.h"
 #include "film.h"
 #include "tonemapper.h"
 #include "win.h"
 
 void render(QSize resolution, Film & film, const Intersectable * object, const Camera * camera, std::vector<Light*> light)
 {
-  //Renderer * renderer = new PerPixelRenderer(resolution, new UniDiPathTracingIntegrator());
-  Renderer * renderer = new MetropolisRenderer(resolution);
+  Renderer * renderer = new PerPixelRenderer(resolution, new UniDiPathTracingIntegrator());
+  //Renderer * renderer = new MetropolisRenderer(resolution);
   
   renderer->render(*object, *camera, light, film);
   delete renderer;

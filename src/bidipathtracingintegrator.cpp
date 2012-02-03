@@ -12,15 +12,16 @@
 #include <cassert>
 #include <cmath>
 
-Spectrum BiDiPathTracingIntegrator::integrate(const Ray &ray, const Intersectable &scene, const Light &light, int recursionDepth, gsl_rng *rng) const
+Spectrum BiDiPathTracingIntegrator::integrate(const Ray &ray, const Intersectable &scene, std::vector<Light*> light, int recursionDepth, gsl_rng *rng) const
 {
   Spectrum color;
   JitteredSampler sampler(1, 1, rng);
   float directionPdf;
-  Ray primaryLightRay = light.getRandomRay(sampler.getSamples().front(), sampler.getSamples().front(), directionPdf);
+  int lightIndex = gsl_rng_uniform_int(rng, light.size());
+  Ray primaryLightRay = light[lightIndex]->getRandomRay(sampler.getSamples().front(), sampler.getSamples().front(), directionPdf);
   HitRecord initialLightHit = scene.intersect(primaryLightRay);
   QVector3D initialLightDirection;
-  Spectrum lightIntensity = light.getIntensity(initialLightHit.getIntersectingPoint(), initialLightDirection, scene, sampler.getSamples().front());
+  Spectrum lightIntensity = light[lightIndex]->getIntensity(initialLightHit.getIntersectingPoint(), initialLightDirection, scene, sampler.getSamples().front());
 
   Path lightPath = Renderer::createPath(primaryLightRay, scene, rng, lightIntensity / directionPdf);
   Path eyePath = Renderer::createPath(ray, scene, rng);
@@ -63,7 +64,7 @@ Spectrum BiDiPathTracingIntegrator::integrate(const Ray &ray, const Intersectabl
   while(eyeAlphaIt != eyePath.alphaValues.end() && eyeHitIt != eyePath.hitRecords.end())
   {
     QVector3D lightDirection;
-    lightIntensity = light.getIntensity(eyeHitIt->getIntersectingPoint(), lightDirection, scene, sampler.getSamples().front());
+    lightIntensity = light[lightIndex]->getIntensity(eyeHitIt->getIntersectingPoint(), lightDirection, scene, sampler.getSamples().front());
 
     float inCos = QVector3D::dotProduct(-lightDirection.normalized(), eyeHitIt->getSurfaceNormal().normalized());
     Spectrum brdf;

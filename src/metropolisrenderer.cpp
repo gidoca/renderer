@@ -19,14 +19,14 @@ void MetropolisRenderer::render(const Intersectable& scene, const Camera& camera
   sample.largeStep(rng);
   Path path = cameraPathFromSample(sample, scene, camera);
   UniDiPathTracingIntegrator integrator;
-  Spectrum value = integrator.integrate(path, scene, *lights[sample.lightIndex[0]], sample.lightSample1);
+  Spectrum value = integrator.integrate(path, scene, lights, sample.lightSample1, sample.lightIndex);
 
   const int numSamples = 10000000;
   const float largeStepProb = 0.1f;
   for(int i = 0; i < numSamples; i++)
   {
     MetropolisSample newSample = sample.mutated(rng, largeStepProb);
-    Spectrum newValue = integrator.integrate(path, scene, *lights[sample.lightIndex[0]], sample.lightSample1);
+    Spectrum newValue = integrator.integrate(path, scene, lights, sample.lightSample1, sample.lightIndex);
     float accept = std::min(1., newValue.length() / value.length());
     int x = (int)(sample.cameraSample.getSample().x() * film.width());
     int y = (int)(sample.cameraSample.getSample().y() * film.height());

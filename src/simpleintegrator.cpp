@@ -6,7 +6,9 @@
 #include "light.h"
 #include "renderer.h"
 
-Spectrum SimpleIntegrator::integrate(const Ray & ray, const Intersectable & scene, const Light & light, int depth, gsl_rng *rng) const
+#include <gsl/gsl_rng.h>
+
+Spectrum SimpleIntegrator::integrate(const Ray & ray, const Intersectable & scene, std::vector<Light*> light, int depth, gsl_rng *rng) const
 {
   JitteredSampler sampler(2, 2, rng);
   if(depth > MAX_DEPTH) return Spectrum();
@@ -30,7 +32,8 @@ Spectrum SimpleIntegrator::integrate(const Ray & ray, const Intersectable & scen
     std::list<Sample> samples = sampler.getSamples();
     for(std::list<Sample>::iterator i = samples.begin(); i != samples.end(); i++)
     {
-      Spectrum lightIntensity = light.getIntensity(hit.getIntersectingPoint(), direction, scene, *i);
+      int lightIndex = gsl_rng_uniform_int(rng, light.size());
+      Spectrum lightIntensity = light[lightIndex]->getIntensity(hit.getIntersectingPoint(), direction, scene, *i);
       Spectrum shade = hit.getMaterial().shade(hit, direction);
       result += shade * lightIntensity;
     }

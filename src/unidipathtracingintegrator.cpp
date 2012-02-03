@@ -9,19 +9,21 @@
 #include <cmath>
 #include <cassert>
 
-Spectrum UniDiPathTracingIntegrator::integrate(const Ray& ray, const Intersectable& scene, const Light& light, int, gsl_rng *rng) const
+Spectrum UniDiPathTracingIntegrator::integrate(const Ray& ray, const Intersectable& scene, std::vector<Light*> light, int, gsl_rng *rng) const
 {
   JitteredSampler sampler(1, 1, rng);
   Path path = Renderer::createPath(ray, scene, rng);
   Sample lightSamples[MAX_DEPTH];
+  long unsigned int lightIndex[MAX_DEPTH];
   for(int i = 0; i < MAX_DEPTH; i++)
   {
     lightSamples[i] = sampler.getSamples().front();
+    lightIndex[i] = gsl_rng_uniform_int(rng, light.size());
   }
-  return integrate(path, scene, light, lightSamples);
+  return integrate(path, scene, light, lightSamples, lightIndex);
 }
 
-Spectrum UniDiPathTracingIntegrator::integrate(const Path &path, const Intersectable &scene, const Light &light, const Sample lightSamples[]) const
+Spectrum UniDiPathTracingIntegrator::integrate(const Path &path, const Intersectable &scene, std::vector<Light*> light, const Sample lightSamples[], long unsigned int lightIndex[]) const
 {
   Spectrum color;
 
@@ -33,7 +35,8 @@ Spectrum UniDiPathTracingIntegrator::integrate(const Path &path, const Intersect
   while(alphaIt != path.alphaValues.end() && hitIt != path.hitRecords.end())
   {
     QVector3D direction;
-    Spectrum lightIntensity = light.getIntensity(hitIt->getIntersectingPoint(), direction, scene, lightSamples[i]);
+
+    Spectrum lightIntensity = light[lightIndex[i]]->getIntensity(hitIt->getIntersectingPoint(), direction, scene, lightSamples[i]);
     float inCos;
     if(hitIt->getMaterial().isParticipating())
     {
