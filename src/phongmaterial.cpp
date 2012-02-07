@@ -6,7 +6,7 @@
 #include <algorithm>
 #include <cassert>
 
-Spectrum PhongMaterial::shade(const HitRecord& hit, QVector3D direction) const
+Spectrum PhongMaterial::shade(const HitRecord&, QVector3D) const
 {
 //   QVector3D normal = hit.getSurfaceNormal();
 //   float coefficient = std::max(QVector3D::dotProduct(-direction.normalized(), hit.getSurfaceNormal().normalized()), 0.0);

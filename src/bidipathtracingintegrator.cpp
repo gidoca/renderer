@@ -12,7 +12,7 @@
 #include <cassert>
 #include <cmath>
 
-Spectrum BiDiPathTracingIntegrator::integrate(const Ray &ray, const Intersectable &scene, std::vector<Light*> light, int recursionDepth, gsl_rng *rng) const
+Spectrum BiDiPathTracingIntegrator::integrate(const Ray &ray, const Intersectable &scene, std::vector<Light*> light, int, gsl_rng *rng) const
 {
   Spectrum color;
   JitteredSampler sampler(1, 1, rng);

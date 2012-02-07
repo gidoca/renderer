@@ -6,7 +6,7 @@
 
 #include <cmath>
 
-Spectrum ConeLight::getIntensity(const QVector3D & at, QVector3D &direction, const Intersectable &scene, const Sample & sample) const
+Spectrum ConeLight::getIntensity(const QVector3D & at, QVector3D &direction, const Intersectable &scene, const Sample &) const
 {
   direction = at - location;
   HitRecord shadowHit = scene.intersect(Ray(at, -direction.normalized()), EPSILON, direction.length());
