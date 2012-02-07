@@ -15,7 +15,7 @@ public:
   {
     return integrate(ray, scene, light, 0, rng);
   }
-  virtual Spectrum integrate(const Ray & ray, const Intersectable & scene, std::vector< Light* > light, int recursionDepth, gsl_rng *rng) const;
+  virtual Spectrum integrate(const Ray & ray, const Intersectable & scene, std::vector< Light* > light, int recursionDepth, gsl_rng *rng) const = 0;
 
 };
 
