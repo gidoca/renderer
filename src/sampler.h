@@ -16,7 +16,8 @@ public:
   Sample(QPointF sample) : sample(sample) {}
   Sample() {}
 
-  QPointF getSample() const;
+  const QPointF& getSample() const;
+  QPointF& getSample();
   QVector3D getCosineWeightedDirection(QVector3D w, float & pdf) const;
   QVector3D getCosineWeightedDirection(QVector3D w, float &pdf, float openingAngle) const;
   QVector3D getUniformSphereDirection() const;
@@ -39,7 +40,12 @@ protected:
   gsl_rng * rng;
 };
 
-inline QPointF Sample::getSample() const
+inline QPointF& Sample::getSample()
+{
+  return sample;
+}
+
+inline const QPointF& Sample::getSample() const
 {
   return sample;
 }

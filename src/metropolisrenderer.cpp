@@ -35,6 +35,7 @@ void MetropolisRenderer::render(const Intersectable& scene, const Camera& camera
     MetropolisSample newSample = sample.mutated(rng, largeStepProb);
     path = cameraPathFromSample(sample, scene, camera);
     Spectrum newValue = integrator.integrate(path, scene, lights, newSample.lightSample1, newSample.lightIndex);
+    assert(!isnan(newValue.x()) && !isnan(newValue.y()) && !isnan(newValue.z()));
     float accept = min(1., newValue.length() / value.length());
     if(value.length() > 0)
     {
