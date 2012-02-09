@@ -10,8 +10,15 @@
 #include <algorithm>
 #include <iostream>
 
+#include <QTime>
+
+using namespace std;
+
 void MetropolisRenderer::render(const Intersectable& scene, const Camera& camera, std::vector< Light* > lights, Film & film)
 {
+  QTime time;
+  time.start();
+
   gsl_rng *rng = gsl_rng_alloc(gsl_rng_taus);
   gsl_rng_set(rng, 2);
 
@@ -21,26 +28,35 @@ void MetropolisRenderer::render(const Intersectable& scene, const Camera& camera
   UniDiPathTracingIntegrator integrator;
   Spectrum value = integrator.integrate(path, scene, lights, sample.lightSample1, sample.lightIndex);
 
-  const int numSamples = 10000000;
+  const int numSamples = 1000000;
   const float largeStepProb = 0.1f;
   for(int i = 0; i < numSamples; i++)
   {
     MetropolisSample newSample = sample.mutated(rng, largeStepProb);
-    Spectrum newValue = integrator.integrate(path, scene, lights, sample.lightSample1, sample.lightIndex);
-    float accept = std::min(1., newValue.length() / value.length());
-    int x = (int)(sample.cameraSample.getSample().x() * film.width());
-    int y = (int)(sample.cameraSample.getSample().y() * film.height());
-    film[y][x] += (1 - accept) * value / (value.length() * numSamples) * film.getSize().width() * film.getSize().height();
-    x = (int)(newSample.cameraSample.getSample().x() * film.width());
-    y = (int)(newSample.cameraSample.getSample().y() * film.height());
-    film[y][x] += accept * newValue / (newValue.length() * numSamples) * film.getSize().width() * film.getSize().height();
+    path = cameraPathFromSample(sample, scene, camera);
+    Spectrum newValue = integrator.integrate(path, scene, lights, newSample.lightSample1, newSample.lightIndex);
+    float accept = min(1., newValue.length() / value.length());
+    if(value.length() > 0)
+    {
+      int x = (int)(sample.cameraSample.getSample().x() * film.width());
+      int y = (int)(sample.cameraSample.getSample().y() * film.height());
+      film[y][x] += (1 - accept) * value / (value.length() * numSamples) * film.getSize().width() * film.getSize().height();
+    }
+    if(newValue.length() > 0)
+    {
+      int x = (int)(newSample.cameraSample.getSample().x() * film.width());
+      int y = (int)(newSample.cameraSample.getSample().y() * film.height());
+      film[y][x] += accept * newValue / (newValue.length() * numSamples) * film.getSize().width() * film.getSize().height();
+    }
     if(gsl_rng_uniform(rng) < accept)
     {
       sample = newSample;
       value = newValue;
-      path = cameraPathFromSample(sample, scene, camera);
     }
   }
+
+  std::cout << "Rendering complete, " << time.elapsed() / 1000 << "s elapsed\n";
+  std::cout.flush();
 }
 
 Path MetropolisRenderer::cameraPathFromSample(MetropolisSample sample, const Intersectable & scene, const Camera& camera)
@@ -80,7 +96,9 @@ void mutate(qreal &s, gsl_rng *rng)
     delta *= -1;
   }
 
-  s = fmod(s + delta, 1);
+  s = s + delta;
+  if(s < 0) s += 1;
+  if(s > 1) s -= 1;
   assert(0 <= s && s <= 1);
 }
 
