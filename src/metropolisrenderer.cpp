@@ -28,8 +28,22 @@ void MetropolisRenderer::render(const Intersectable& scene, const Camera& camera
   UniDiPathTracingIntegrator integrator;
   Spectrum value = integrator.integrate(path, scene, lights, sample.lightSample1, sample.lightIndex);
 
-  const int numSamples = 100000;
+  const int numInitialSamples = 1000;
   const float largeStepProb = 0.1f;
+
+  float sumI = 0;
+  for(int i = 0; i < numInitialSamples; i++)
+  {
+    MetropolisSample sample(lights.size());
+    sample.largeStep(rng);
+    path = cameraPathFromSample(sample, scene, camera);
+    Spectrum l = integrator.integrate(path, scene, lights, sample.lightSample1, sample.lightIndex);
+    sumI += l.length();
+  }
+  sumI /= numInitialSamples;
+  const int numPixelSamples = 4;
+  const int numSamples = numPixelSamples * film.getSize().width() * film.getSize().height();
+
   for(int i = 0; i < numSamples; i++)
   {
     MetropolisSample newSample = sample.mutated(rng, largeStepProb);
@@ -43,13 +57,13 @@ void MetropolisRenderer::render(const Intersectable& scene, const Camera& camera
     {
       int x = (int)(sample.cameraSample.getSample().x() * film.width());
       int y = (int)(sample.cameraSample.getSample().y() * film.height());
-      film[y][x] += (1 - accept) * value / (value.length() * numSamples) * film.getSize().width() * film.getSize().height();
+      film[y][x] += (1 - accept) * value / value.length() * sumI / numPixelSamples;
     }
     if(newValue.length() > 0)
     {
       int x = (int)(newSample.cameraSample.getSample().x() * film.width());
       int y = (int)(newSample.cameraSample.getSample().y() * film.height());
-      film[y][x] += accept * newValue / (newValue.length() * numSamples) * film.getSize().width() * film.getSize().height();
+      film[y][x] += accept * newValue / newValue.length() * sumI / numPixelSamples;
     }
     if(gsl_rng_uniform(rng) < accept)
     {
