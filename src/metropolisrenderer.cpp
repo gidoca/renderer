@@ -41,7 +41,7 @@ void MetropolisRenderer::render(const Intersectable& scene, const Camera& camera
     sumI += l.length();
   }
   sumI /= numInitialSamples;
-  const int numPixelSamples = 4;
+  const int numPixelSamples = 16;
   const int numSamples = numPixelSamples * film.getSize().width() * film.getSize().height();
 
   for(int i = 0; i < numSamples; i++)
