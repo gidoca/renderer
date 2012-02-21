@@ -32,16 +32,31 @@ void MetropolisRenderer::render(const Intersectable& scene, const Camera& camera
   const float largeStepProb = 0.1f;
 
   float sumI = 0;
+  vector<float> bootstrapI;
+  vector<MetropolisSample> bootstrapSamples;
   for(int i = 0; i < numInitialSamples; i++)
   {
-    MetropolisSample sample(lights.size());
     sample.largeStep(rng);
     path = cameraPathFromSample(sample, scene, camera);
     Spectrum l = integrator.integrate(path, scene, lights, sample.lightSample1, sample.lightIndex);
     sumI += l.length();
+    bootstrapI.push_back(l.length());
+    bootstrapSamples.push_back(sample);
   }
-  sumI /= numInitialSamples;
-  const int numPixelSamples = 16;
+  const float b = sumI / numInitialSamples;
+
+  /*const float contribOffset = gsl_rng_uniform(rng) * sumI;
+  sumI = 0;
+  for(int i = 0; i < numInitialSamples; i++)
+  {
+    //sample.largeStep(rng);
+    sample = bootstrapSamples[i];
+    sumI += bootstrapI[i];
+    if(sumI > contribOffset) break;
+  }*/
+  sample.largeStep(rng);
+
+  const int numPixelSamples = 9;
   const int numSamples = numPixelSamples * film.getSize().width() * film.getSize().height();
 
   for(int i = 0; i < numSamples; i++)
@@ -57,13 +72,13 @@ void MetropolisRenderer::render(const Intersectable& scene, const Camera& camera
     {
       int x = (int)(sample.cameraSample.getSample().x() * film.width());
       int y = (int)(sample.cameraSample.getSample().y() * film.height());
-      film[y][x] += (1 - accept) * value / value.length() * sumI / numPixelSamples;
+      film[y][x] += (1 - accept) * value / value.length() * b / numPixelSamples;
     }
     if(newValue.length() > 0)
     {
       int x = (int)(newSample.cameraSample.getSample().x() * film.width());
       int y = (int)(newSample.cameraSample.getSample().y() * film.height());
-      film[y][x] += accept * newValue / newValue.length() * sumI / numPixelSamples;
+      film[y][x] += accept * newValue / newValue.length() * b / numPixelSamples;
     }
     if(gsl_rng_uniform(rng) < accept)
     {

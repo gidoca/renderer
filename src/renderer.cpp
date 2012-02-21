@@ -11,7 +11,7 @@
 #include <cassert>
 #include <algorithm>
 
-#define RUSSIAN_ROULETTE
+//#define RUSSIAN_ROULETTE
 
 Path Renderer::createPath(const Ray &primaryRay, const Intersectable &scene, gsl_rng *rng, Spectrum initialAlpha)
 {
