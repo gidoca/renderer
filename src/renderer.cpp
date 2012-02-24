@@ -59,7 +59,7 @@ Path Renderer::createPath(const Ray& primaryRay, const Intersectable &scene, Sam
       assert(cos >= 0);
       assert(pdf >= 0);
       assert(brdf.x() >= 0 && brdf.y() >= 0 && brdf.z() >= 0);
-      alpha *= brdf * cos / pdf  / russianRoulettePdf;
+      alpha *= brdf * cos / pdf / russianRoulettePdf;
     }
     hit = scene.intersect(Ray(hit.getIntersectingPoint(), outDirection));
   }

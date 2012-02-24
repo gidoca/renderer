@@ -5,6 +5,8 @@
 
 #include <QSize>
 
+#include <ImfRgba.h>
+
 #include "global.h"
 #include "spectrum.h"
 
@@ -39,6 +41,8 @@ public:
   {
     return size;
   }
+
+  Imf::Rgba* toExrRgba() const;
   
 private:
   Spectrum* data;

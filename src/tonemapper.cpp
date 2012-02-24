@@ -3,6 +3,8 @@
 #include "spectrum.h"
 #include "film.h"
 
+#include <cmath>
+
 inline int Tonemapper::clamp(float x)
 {
   return x <= 0 ? 0 : (x >= 255 ? 255 : x);
@@ -23,7 +25,7 @@ QImage Tonemapper::tonemap(const Film& film)
 
 QRgb Tonemapper::map(const Film & film, int row, int column)
 {
-  Spectrum irradiance = 255 * film[row][column];
-  return qRgb(clamp(irradiance.x()), clamp(irradiance.y()), clamp(irradiance.z()));
+  Spectrum irradiance = film[row][column];
+  return qRgb(clamp(255 * pow(irradiance.x(), 1./2.3)), clamp(255 * pow(irradiance.y(), 1./2.3)), clamp(255 * pow(irradiance.z(), 1./2.3)));
 }
 

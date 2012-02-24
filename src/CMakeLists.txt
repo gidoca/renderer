@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8.0)
 find_package(Qt4 REQUIRED)
 
-include_directories(${QT_INCLUDES} ${GSL_INCLUDE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
+include_directories(${QT_INCLUDES} ${GSL_INCLUDE_DIR} ${OPENEXR_INCLUDE_PATHS} ${CMAKE_CURRENT_BINARY_DIR})
 
 include(${QT_USE_FILE})
 
@@ -18,12 +18,12 @@ set(renderingproject_SRCS main.cpp camera.cpp plane.cpp sphere.cpp
   simpleintegrator.cpp unidipathtracingintegrator.cpp bidipathtracingintegrator.cpp
   quad.cpp csgobject.cpp csgintersection.cpp bvh.cpp
   renderer.cpp perpixelrenderer.cpp metropolisrenderer.cpp
-  tonemapper.cpp
+  tonemapper.cpp film.cpp
   win.cpp)
 qt4_automoc(${renderingproject_SRCS})
 add_executable(renderingproject ${renderingproject_SRCS})
 #add_executable(stst stst.cpp sampler.cpp jitteredsampler.cpp)
-target_link_libraries(renderingproject ${QT_LIBRARIES} ${GSL_LIBRARIES})
+target_link_libraries(renderingproject ${QT_LIBRARIES} ${GSL_LIBRARIES} ${OPENEXR_LIBRARIES})
 #target_link_libraries(stst ${QT_LIBRARIES})
 
 set(COMMON_CXX_FLAGS "-Wextra -Wall -pedantic -std=c++0x ")

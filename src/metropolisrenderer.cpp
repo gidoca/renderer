@@ -45,18 +45,18 @@ void MetropolisRenderer::render(const Intersectable& scene, const Camera& camera
   }
   const float b = sumI / numInitialSamples;
 
-  /*const float contribOffset = gsl_rng_uniform(rng) * sumI;
+  const float contribOffset = gsl_rng_uniform(rng) * sumI;
   sumI = 0;
   for(int i = 0; i < numInitialSamples; i++)
   {
-    //sample.largeStep(rng);
-    sample = bootstrapSamples[i];
+    sample.largeStep(rng);
+//    sample = bootstrapSamples[i];
     sumI += bootstrapI[i];
     if(sumI > contribOffset) break;
-  }*/
-  sample.largeStep(rng);
+  }
+//  sample.largeStep(rng);
 
-  const int numPixelSamples = 9;
+  const int numPixelSamples = 16;
   const int numSamples = numPixelSamples * film.getSize().width() * film.getSize().height();
 
   for(int i = 0; i < numSamples; i++)

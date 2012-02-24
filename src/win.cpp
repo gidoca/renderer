@@ -5,6 +5,8 @@
 #include <QFileDialog>
 #include <QImageWriter>
 
+#include <ImfRgbaFile.h>
+
 void Win::update()
 {
     QImage image = tonemapper.tonemap(film);
@@ -35,4 +37,16 @@ void Win::saveImage()
   if(file.isNull()) return;
   QImage image = tonemapper.tonemap(film);
   image.save(file);
+}
+
+void Win::saveExr()
+{
+  QString formatString = "OpenEXR (*.exr)";
+
+  QString filename = QFileDialog::getSaveFileName(this, "Save image as",  QString(), formatString);
+  if(filename.isNull()) return;
+  Imf::Rgba *rgba = film.toExrRgba();
+  Imf::RgbaOutputFile file(filename.toUtf8(), film.getSize().width(), film.getSize().height(), Imf::WRITE_RGBA);
+  file.setFrameBuffer(rgba, 1, film.getSize().width());
+  file.writePixels(film.getSize().height());
 }

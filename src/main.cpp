@@ -5,7 +5,7 @@
 #include <vector>
 #include <iostream>
 
-#include "scenes/scene1.h"
+#include "scenes/cornellscene.h"
 #include "perpixelrenderer.h"
 #include "unidipathtracingintegrator.h"
 #include "metropolisrenderer.h"
@@ -25,7 +25,7 @@ void render(QSize resolution, Film & film, const Intersectable * object, const C
 
 
 int main(int argc, char **argv) {
-  QSize resolution(512, 512);
+  QSize resolution(250, 250);
 
   QApplication app(argc, argv);
 

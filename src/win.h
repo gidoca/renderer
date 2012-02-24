@@ -28,12 +28,17 @@ public:
     connect(saveAct, SIGNAL(triggered()), this, SLOT(saveImage()));
     insertAction(0, saveAct);
 
+    saveAct = new QAction("Save image as EXR...", this);
+    connect(saveAct, SIGNAL(triggered()), this, SLOT(saveExr()));
+    insertAction(0, saveAct);
+
     setWindowTitle("Rendering...");
   }
   
 private slots:
   void update();
   void saveImage();
+  void saveExr();
   
 private:
   QTimer timer;

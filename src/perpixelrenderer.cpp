@@ -8,6 +8,8 @@
 #include "integrator.h"
 
 #include <iostream>
+#include <cassert>
+#include <cmath>
 
 #include <QTime>
 #include <QRgb>
@@ -47,9 +49,11 @@ void PerPixelRenderer::render(const Intersectable& scene, const Camera& camera, 
       QPointF point = QPoint(j, i);
       for(std::list<Sample>::iterator it = samples.begin(); it != samples.end(); it++)
       {
-        QPointF samplePoint = point + it->getSample() - QPointF(0.5, 0.5);
+        QPointF samplePoint = point + it->getSample()/* - QPointF(0.5, 0.5)*/;
         Ray ray = camera.getRay(samplePoint);
-        scanline[j] += integrator->integrate(ray, scene, lights, rng) / samples.size();
+        Spectrum s = integrator->integrate(ray, scene, lights, rng) / samples.size();
+        assert(!isnan(s.x()) && !isnan(s.y()) && !isnan(s.z()));
+        scanline[j] += s;
       }
     }
     gsl_rng_free(rng);
