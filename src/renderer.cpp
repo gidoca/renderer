@@ -39,6 +39,7 @@ Path Renderer::createPath(const Ray& primaryRay, const Intersectable &scene, Sam
   {
     if(!hit.intersects()) return result;
 
+    assert(!isnan(alpha.x()) && !isnan(alpha.y()) && !isnan(alpha.z()));
     result.alphaValues.push_back(alpha);
     result.hitRecords.push_back(hit);
 
@@ -56,9 +57,10 @@ Path Renderer::createPath(const Ray& primaryRay, const Intersectable &scene, Sam
       outDirection = pathSamples[i].getCosineWeightedDirection(hit.getSurfaceNormal(), pdf);
       Spectrum brdf = hit.getMaterial().shade(hit, -outDirection);
       float cos = QVector3D::dotProduct(outDirection.normalized(), hit.getSurfaceNormal().normalized());
-      assert(cos >= 0);
-      assert(pdf >= 0);
+      assert(cos >= 0 && !isnan(pdf));
+      assert(pdf >= 0 && !isnan(pdf));
       assert(brdf.x() >= 0 && brdf.y() >= 0 && brdf.z() >= 0);
+      assert(!isnan(brdf.x()) && !isnan(brdf.y()) && !isnan(brdf.z()));
       alpha *= brdf * cos / pdf / russianRoulettePdf;
     }
     hit = scene.intersect(Ray(hit.getIntersectingPoint(), outDirection));

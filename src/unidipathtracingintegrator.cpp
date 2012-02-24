@@ -51,6 +51,8 @@ Spectrum UniDiPathTracingIntegrator::integrate(const Path &path, const Intersect
     {
       assert(!isnan(lightIntensity.x()) && !isnan(lightIntensity.y()) && !isnan(lightIntensity.z()));
       brdf = hitIt->getMaterial().shade(*hitIt, direction);
+      assert(!isnan(brdf.x()) && !isnan(brdf.y()) && !isnan(brdf.z()));
+      assert(!isnan(alphaIt->x()) && !isnan(alphaIt->y()) && !isnan(alphaIt->z()));
       assert(brdf.x() >= 0 && brdf.y() >= 0 && brdf.z() >= 0);
       color += *alphaIt * brdf * lightIntensity * inCos;
     }

@@ -33,10 +33,10 @@ void Win::saveImage()
 
   QString formatString = "Image File (" + formats.join(" ").toLower() + ")";
 
-  QString file = QFileDialog::getSaveFileName(this, "Save image as",  QString(), formatString);
-  if(file.isNull()) return;
+  QString filename = QFileDialog::getSaveFileName(this, "Save image as",  QString(), formatString);
+  if(filename.isNull()) return;
   QImage image = tonemapper.tonemap(film);
-  image.save(file);
+  image.save(filename);
 }
 
 void Win::saveExr()

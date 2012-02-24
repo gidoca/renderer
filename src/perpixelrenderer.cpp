@@ -41,10 +41,11 @@ void PerPixelRenderer::render(const Intersectable& scene, const Camera& camera, 
     for(int j = 0; j < film.width(); j++)
     {
 #ifndef NDEBUG
-      if(j == 70 && i == 120)
+      //Black pixel
+      if(j == 84 && i == 13)
         std::cout << "";
 #endif
-      JitteredSampler multiSampler(4, 4, rng);
+      JitteredSampler multiSampler(32, 32, rng);
       std::list<Sample> samples = multiSampler.getSamples();
       QPointF point = QPoint(j, i);
       for(std::list<Sample>::iterator it = samples.begin(); it != samples.end(); it++)
@@ -53,6 +54,7 @@ void PerPixelRenderer::render(const Intersectable& scene, const Camera& camera, 
         Ray ray = camera.getRay(samplePoint);
         Spectrum s = integrator->integrate(ray, scene, lights, rng) / samples.size();
         assert(!isnan(s.x()) && !isnan(s.y()) && !isnan(s.z()));
+        assert(s.x() >= 0 && s.y() >= 0 && s.z() >= 0);
         scanline[j] += s;
       }
     }

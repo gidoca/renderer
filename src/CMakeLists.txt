@@ -28,6 +28,6 @@ target_link_libraries(renderingproject ${QT_LIBRARIES} ${GSL_LIBRARIES} ${OPENEX
 
 set(COMMON_CXX_FLAGS "-Wextra -Wall -pedantic -std=c++0x ")
 
-set(CMAKE_CXX_FLAGS "${COMMON_CXX_FLAGS} -fopenmp -DNDEBUG -march=native")
+#set(CMAKE_CXX_FLAGS "${COMMON_CXX_FLAGS} -fopenmp -DNDEBUG -march=native")
 #set(CMAKE_CXX_FLAGS "${COMMON_CXX_FLAGS} -pg")
-#set(CMAKE_CXX_FLAGS "${COMMON_CXX_FLAGS} -g")
+set(CMAKE_CXX_FLAGS "${COMMON_CXX_FLAGS} -g")
