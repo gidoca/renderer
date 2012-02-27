@@ -55,6 +55,7 @@ Path Renderer::createPath(const Ray& primaryRay, const Intersectable &scene, Sam
     else
     {
       outDirection = pathSamples[i].getCosineWeightedDirection(hit.getSurfaceNormal(), pdf);
+      if(pdf == 0) return result;
       Spectrum brdf = hit.getMaterial().shade(hit, -outDirection);
       float cos = QVector3D::dotProduct(outDirection.normalized(), hit.getSurfaceNormal().normalized());
       assert(cos >= 0 && !isnan(pdf));
