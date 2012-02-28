@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8.0)
 find_package(Qt4 REQUIRED)
 
-include_directories(${QT_INCLUDES} ${GSL_INCLUDE_DIR} ${OPENEXR_INCLUDE_PATHS} ${CMAKE_CURRENT_BINARY_DIR})
+include_directories(${QT_INCLUDES} ${GSL_INCLUDE_DIR} ${OPENEXR_INCLUDE_PATHS} ${TCLAP_INCLUDEDIR} ${CMAKE_CURRENT_BINARY_DIR})
 
 include(${QT_USE_FILE})
 
@@ -28,6 +28,6 @@ target_link_libraries(renderingproject ${QT_LIBRARIES} ${GSL_LIBRARIES} ${OPENEX
 
 set(COMMON_CXX_FLAGS "-Wextra -Wall -pedantic -std=c++0x ")
 
-#set(CMAKE_CXX_FLAGS "${COMMON_CXX_FLAGS} -fopenmp -DNDEBUG -march=native")
+set(CMAKE_CXX_FLAGS "${COMMON_CXX_FLAGS} -fopenmp -DNDEBUG -march=native")
 #set(CMAKE_CXX_FLAGS "${COMMON_CXX_FLAGS} -pg")
-set(CMAKE_CXX_FLAGS "${COMMON_CXX_FLAGS} -g")
+#set(CMAKE_CXX_FLAGS "${COMMON_CXX_FLAGS} -g")
