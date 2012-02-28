@@ -16,6 +16,8 @@
 
 #include <gsl/gsl_rng.h>
 
+using namespace boost::program_options;
+
 PerPixelRenderer::PerPixelRenderer(Integrator * integrator): integrator(integrator)
 {
 
@@ -26,7 +28,7 @@ PerPixelRenderer::~PerPixelRenderer()
   delete integrator;
 }
 
-void PerPixelRenderer::render(const Intersectable& scene, const Camera& camera, std::vector< Light* > lights, Film & film)
+void PerPixelRenderer::render(const Intersectable& scene, const Camera& camera, std::vector< Light* > lights, Film & film, boost::program_options::variables_map vm)
 {
   QTime time;
   time.start();
@@ -45,7 +47,7 @@ void PerPixelRenderer::render(const Intersectable& scene, const Camera& camera, 
       if(j == 84 && i == 13)
         std::cout << "";
 #endif
-      JitteredSampler multiSampler(32, 32, rng);
+      JitteredSampler multiSampler(vm["ppr-x-samples"].as<int>(), vm["ppr-y-samples"].as<int>(), rng);
       std::list<Sample> samples = multiSampler.getSamples();
       QPointF point = QPoint(j, i);
       for(std::list<Sample>::iterator it = samples.begin(); it != samples.end(); it++)
@@ -65,4 +67,11 @@ void PerPixelRenderer::render(const Intersectable& scene, const Camera& camera, 
   std::cout.flush();
 }
 
-
+options_description PerPixelRenderer::options() const
+{
+  options_description opts("Per-pixel renderer");
+  opts.add_options()
+      ("ppr-x-samples", value<int>()->default_value(4), "Number of samples per pixel in x direction")
+      ("ppr-y-samples", value<int>()->default_value(4), "Number of samples per pixel in y direction");
+  return opts;
+}

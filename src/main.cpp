@@ -18,9 +18,19 @@
 using namespace std;
 using namespace boost::program_options;
 
-void render(Renderer * renderer, Film & film, const Intersectable * object, const Camera * camera, vector<Light*> light)
+class Scene
+{
+public:
+  Scene(Camera camera): camera(camera) {}
+
+  const Intersectable * object;
+  Camera camera;
+  vector<Light*> light;
+};
+
+void render(Renderer * renderer, Film & film, Scene scene, variables_map vm)
 {  
-  renderer->render(*object, *camera, light, film);
+  renderer->render(*scene.object, scene.camera, scene.light, film, vm);
   delete renderer;
 }
 
@@ -31,29 +41,35 @@ int main(int argc, char **argv) {
   Renderer * perPixelRenderer = new PerPixelRenderer(new UniDiPathTracingIntegrator());
 
   QApplication app(argc, argv);
+  options_description command_line_options;
+
   options_description generic("Generic options");
   generic.add_options()
       ("help,h", "display the help")
-      ("renderer,r", value<string>()->default_value("perpixelrenderer"), "The rendering algorithm to be used (either perpixelrenderer or metropolisrenderer)")
+      ("renderer,r", value<string>()->default_value("perpixelrenderer"), "The rendering algorithm to be used (either pathtracing or metropolis)")
       ("width,x", value<int>()->default_value(250), "The width of the output image")
       ("height,y", value<int>()->default_value(250), "The height of the output image");
 
+  command_line_options.add(generic);
+  command_line_options.add(metropolisRenderer->options());
+  command_line_options.add(perPixelRenderer->options());
+
   variables_map vm;
-  store(parse_command_line(argc, argv, generic), vm);
+  store(parse_command_line(argc, argv, command_line_options), vm);
   notify(vm);
 
   if(vm.count("help"))
   {
-    cout << generic << endl;
+    cout << command_line_options << endl;
     return 0;
   }
 
   Renderer * renderer;
-  if(vm["renderer"].as<string>() == "perpixelrenderer")
+  if(vm["renderer"].as<string>() == "pathtracing")
   {
     renderer = perPixelRenderer;
   }
-  else if(vm["renderer"].as<string>() == "metropolisrenderer")
+  else if(vm["renderer"].as<string>() == "metropolis")
   {
     renderer = metropolisRenderer;
   }
@@ -70,7 +86,10 @@ int main(int argc, char **argv) {
   const Camera camera = getCamera(resolution);
   
   Film film(resolution);
-  QFuture< void > future = QtConcurrent::run(render, renderer, film, object, &camera, light);
+  Scene scene(camera);
+  scene.object = object;
+  scene.light = light;
+  QFuture< void > future = QtConcurrent::run(render, renderer, film, scene, vm);
   
   Win l(film, future);
   l.show();

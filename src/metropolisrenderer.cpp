@@ -13,8 +13,9 @@
 #include <QTime>
 
 using namespace std;
+using namespace boost::program_options;
 
-void MetropolisRenderer::render(const Intersectable& scene, const Camera& camera, std::vector< Light* > lights, Film & film)
+void MetropolisRenderer::render(const Intersectable& scene, const Camera& camera, std::vector< Light* > lights, Film & film, boost::program_options::variables_map vm)
 {
   QTime time;
   time.start();
@@ -56,7 +57,7 @@ void MetropolisRenderer::render(const Intersectable& scene, const Camera& camera
   }
 //  sample.largeStep(rng);
 
-  int numPixelSamples = 16;
+  int numPixelSamples = vm["met-mutations"].as<int>();
   const int numSamples = numPixelSamples * film.getSize().width() * film.getSize().height();
 
   for(int i = 0; i < numSamples; i++)
@@ -98,6 +99,14 @@ Path MetropolisRenderer::cameraPathFromSample(MetropolisSample sample, const Int
   pixel.ry() *= camera.getResolution().height();
   Path result = createPath(camera.getRay(pixel), scene, sample.cameraPathSamples);
   return result;
+}
+
+options_description MetropolisRenderer::options() const
+{
+  options_description opts("Metropolis renderer");
+  opts.add_options()
+      ("met-mutations", value<int>()->default_value(16), "Average number of path mutations per pixel");
+  return opts;
 }
 
 void MetropolisSample::largeStep(gsl_rng *rng)
