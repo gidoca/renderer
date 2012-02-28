@@ -56,7 +56,7 @@ void MetropolisRenderer::render(const Intersectable& scene, const Camera& camera
   }
 //  sample.largeStep(rng);
 
-  const int numPixelSamples = 1024;
+  int numPixelSamples = 16;
   const int numSamples = numPixelSamples * film.getSize().width() * film.getSize().height();
 
   for(int i = 0; i < numSamples; i++)
@@ -94,8 +94,8 @@ void MetropolisRenderer::render(const Intersectable& scene, const Camera& camera
 Path MetropolisRenderer::cameraPathFromSample(MetropolisSample sample, const Intersectable & scene, const Camera& camera)
 {
   QPointF pixel = sample.cameraSample.getSample();
-  pixel.rx() *= film.getSize().width();
-  pixel.ry() *= film.getSize().height();
+  pixel.rx() *= camera.getResolution().width();
+  pixel.ry() *= camera.getResolution().height();
   Path result = createPath(camera.getRay(pixel), scene, sample.cameraPathSamples);
   return result;
 }

@@ -16,6 +16,14 @@ public:
   Film(QSize size): data(new Spectrum[size.width() * size.height()]), size(size)
   {
   }
+
+  Film(): data(0) {}
+
+  inline void setSize(QSize size)
+  {
+    data = new Spectrum[size.width() * size.height()];
+    this->size = size;
+  }
   
   const inline Spectrum * operator[](int i) const
   {

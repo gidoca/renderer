@@ -13,6 +13,8 @@
 
 //#define RUSSIAN_ROULETTE
 
+using namespace std;
+
 Path Renderer::createPath(const Ray &primaryRay, const Intersectable &scene, gsl_rng *rng, Spectrum initialAlpha)
 {
     JitteredSampler sampler(1, 1, rng);

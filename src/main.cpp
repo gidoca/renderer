@@ -5,7 +5,7 @@
 #include <vector>
 #include <iostream>
 
-#include <tclap/CmdLine.h>
+#include <boost/program_options.hpp>
 
 #include "scenes/cornellscene.h"
 #include "perpixelrenderer.h"
@@ -16,7 +16,7 @@
 #include "win.h"
 
 using namespace std;
-using namespace TCLAP;
+using namespace boost::program_options;
 
 void render(Renderer * renderer, Film & film, const Intersectable * object, const Camera * camera, vector<Light*> light)
 {  
@@ -27,37 +27,43 @@ void render(Renderer * renderer, Film & film, const Intersectable * object, cons
 
 
 int main(int argc, char **argv) {
-  Renderer * renderer;
+  Renderer * metropolisRenderer = new MetropolisRenderer();
+  Renderer * perPixelRenderer = new PerPixelRenderer(new UniDiPathTracingIntegrator());
 
   QApplication app(argc, argv);
-  CmdLine cmd("A ray tracing renderer", ' ', "0.0");
+  options_description generic("Generic options");
+  generic.add_options()
+      ("help,h", "display the help")
+      ("renderer,r", value<string>()->default_value("perpixelrenderer"), "The rendering algorithm to be used (either perpixelrenderer or metropolisrenderer)")
+      ("width,x", value<int>()->default_value(250), "The width of the output image")
+      ("height,y", value<int>()->default_value(250), "The height of the output image");
 
-  ValueArg<string> rendererArg("r", "renderer", "The renderer to be used", false, "perpixelrenderer", "name");
-  cmd.add(rendererArg);
+  variables_map vm;
+  store(parse_command_line(argc, argv, generic), vm);
+  notify(vm);
 
-  ValueArg<int> widthArg("x", "width", "The width of the output image", false, 250, "width");
-  cmd.add(widthArg);
-
-  ValueArg<int> heightArg("y", "height", "The height of the output image", false, 250, "height");
-  cmd.add(heightArg);
-
-  cmd.parse(argc, argv);
-
-  QSize resolution(widthArg.getValue(), heightArg.getValue());
-
-  if(rendererArg.getValue() == "perpixelrenderer")
+  if(vm.count("help"))
   {
-    renderer = new PerPixelRenderer(resolution, new UniDiPathTracingIntegrator());
+    cout << generic << endl;
+    return 0;
   }
-  else if(rendererArg.getValue() == "metropolisrenderer")
+
+  Renderer * renderer;
+  if(vm["renderer"].as<string>() == "perpixelrenderer")
   {
-    renderer = new MetropolisRenderer(resolution);
+    renderer = perPixelRenderer;
+  }
+  else if(vm["renderer"].as<string>() == "metropolisrenderer")
+  {
+    renderer = metropolisRenderer;
   }
   else
   {
-    cerr << "Unknown renderer: " << rendererArg.getValue() << endl;
+    cerr << "Unknown renderer: " << vm["renderer"].as<string>() << endl;
     return -1;
   }
+
+  QSize resolution(vm["width"].as<int>(), vm["height"].as<int>());
 
   const Intersectable * object = getScene();
   const vector<Light*> light = getLight();

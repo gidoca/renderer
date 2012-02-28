@@ -16,7 +16,7 @@
 
 #include <gsl/gsl_rng.h>
 
-PerPixelRenderer::PerPixelRenderer(QSize resolution, Integrator * integrator): integrator(integrator), resolution(resolution)
+PerPixelRenderer::PerPixelRenderer(Integrator * integrator): integrator(integrator)
 {
 
 }

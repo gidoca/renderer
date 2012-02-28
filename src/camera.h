@@ -13,6 +13,11 @@ class Camera
 {
   public:
     Camera(QVector3D cop, QVector3D look_at, QVector3D up, float fov, QSize resolution);
+
+    inline QSize getResolution() const
+    {
+      return resolution;
+    }
     
     Ray getRay(QPointF point) const;
   private:
