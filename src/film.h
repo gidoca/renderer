@@ -2,6 +2,7 @@
 #define FILM_H
 
 #include <cstdlib>
+#include <string>
 
 #include <QSize>
 
@@ -50,9 +51,12 @@ public:
     return size;
   }
 
+  void saveImg(std::string filename);
+  void saveExr(std::string filename);
+
+private:
   Imf::Rgba* toExrRgba() const;
   
-private:
   Spectrum* data;
   QSize size;
 };
