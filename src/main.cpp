@@ -31,6 +31,8 @@ public:
 void render(Renderer * renderer, Film & film, Scene scene, variables_map vm)
 {  
   renderer->render(*scene.object, scene.camera, scene.light, film, vm);
+  if(vm.count("saveexr")) film.saveExr(vm["saveexr"].as<string>());
+  if(vm.count("saveimg")) film.saveImg(vm["saveimg"].as<string>());
   delete renderer;
 }
 
@@ -46,6 +48,9 @@ int main(int argc, char **argv) {
   options_description generic("Generic options");
   generic.add_options()
       ("help,h", "display the help")
+      ("gui,g", "Display the result in a window")
+      ("saveexr,e", value<string>(), "Write the result to the specified EXR file")
+      ("saveimg,i", value<string>(), "Write the result to the specified LDR image file")
       ("renderer,r", value<string>()->default_value("pathtracing"), "The rendering algorithm to be used (either pathtracing or metropolis)")
       ("width,x", value<int>()->default_value(250), "The width of the output image")
       ("height,y", value<int>()->default_value(250), "The height of the output image");
@@ -91,9 +96,17 @@ int main(int argc, char **argv) {
   scene.light = light;
   QFuture< void > future = QtConcurrent::run(render, renderer, film, scene, vm);
   
-  Win l(film, future);
-  l.show();
+  if(vm.count("gui") || (!vm.count("saveexr") && !vm.count("saveimg")))
+  {
+    Win l(film, future);
+    l.show();
   
-  return app.exec();
+    return app.exec();
+  }
+  else
+  {
+    future.waitForFinished();
+    return 0;
+  }
 }
 
