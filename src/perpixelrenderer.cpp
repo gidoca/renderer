@@ -34,12 +34,22 @@ void PerPixelRenderer::render(const Intersectable& scene, const Camera& camera, 
 
   QTime time;
   time.start();
+
+  int seed;
+  if(vm.count("pt-fixed-seed"))
+  {
+    seed = 1;
+  }
+  else
+  {
+    seed = QTime::currentTime().msec();
+  }
   
   #pragma omp parallel for schedule(dynamic)
   for(int i = 0; i < film.height(); i++)
   {
     gsl_rng *rng = gsl_rng_alloc(gsl_rng_taus);
-    gsl_rng_set(rng, i);
+    gsl_rng_set(rng, film.height() * seed + i);
     std::cout << i * 100 / film.height() << "% complete, ETA: " << time.elapsed() * (film.height() - i) / ((i + 1) * 1000) << "s" << std::endl;
     Spectrum * scanline = film[i];
     for(int j = 0; j < film.width(); j++)
@@ -76,6 +86,7 @@ options_description PerPixelRenderer::options() const
       ("pt-integrator", value<string>()->default_value("unidi"), "The path tracing method (unidi or bidi)")
       ("pt-termination-prob", value<float>()->default_value(0.5f, "0.5"), "The roussian roulette path termination probability (use 0 to disable roussian roulette path termination)")
       ("pt-x-samples", value<int>()->default_value(4), "Number of samples per pixel in x direction")
-      ("pt-y-samples", value<int>()->default_value(4), "Number of samples per pixel in y direction");
+      ("pt-y-samples", value<int>()->default_value(4), "Number of samples per pixel in y direction")
+      ("pt-fixed-seed", "Use a fixed seed for the RNG to make the resulting image deterministic");
   return opts;
 }

@@ -60,12 +60,21 @@ int main(int argc, char **argv) {
   command_line_options.add(perPixelRenderer->options());
 
   variables_map vm;
-  store(parse_command_line(argc, argv, command_line_options), vm);
+  try
+  {
+    store(parse_command_line(argc, argv, command_line_options), vm);
+  }
+  catch(boost::program_options::error e)
+  {
+    std::cerr << e.what() << endl;
+    return -1;
+  }
+
   notify(vm);
 
   if(vm.count("help"))
   {
-    cout << command_line_options << endl;
+    cerr << command_line_options << endl;
     return 0;
   }
 

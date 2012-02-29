@@ -21,6 +21,15 @@ void MetropolisRenderer::render(const Intersectable& scene, const Camera& camera
   time.start();
 
   gsl_rng *rng = gsl_rng_alloc(gsl_rng_taus);
+  int seed;
+  if(vm.count("met-fixed-seed"))
+  {
+    seed = 2;
+  }
+  else
+  {
+    seed = QTime::currentTime().msec();
+  }
   gsl_rng_set(rng, 2);
 
   MetropolisSample sample(lights.size());
@@ -107,7 +116,8 @@ options_description MetropolisRenderer::options() const
   opts.add_options()
       ("met-large-step-prob", value<float>()->default_value(0.1f, "0.1"), "The probability for a mutation to be a large step mutation")
       ("met-bootstrap", value<int>()->default_value(1000), "Number of bootstrapping samples")
-      ("met-mutations", value<int>()->default_value(16), "Average number of path mutations per pixel");
+      ("met-mutations", value<int>()->default_value(16), "Average number of path mutations per pixel")
+      ("met-fixed-seed", "Use a fixed seed for the RNG to make the resulting image deterministic");
   return opts;
 }
 
