@@ -12,7 +12,7 @@
 Spectrum UniDiPathTracingIntegrator::integrate(const Ray& ray, const Intersectable& scene, std::vector<Light*> light, int, gsl_rng *rng) const
 {
   JitteredSampler sampler(1, 1, rng);
-  Path path = Renderer::createPath(ray, scene, rng);
+  Path path = Renderer::createPath(ray, scene, rng, Spectrum(1, 1, 1), terminationProb);
   Sample lightSamples[MAX_DEPTH];
   long unsigned int lightIndex[MAX_DEPTH];
   for(int i = 0; i < MAX_DEPTH; i++)

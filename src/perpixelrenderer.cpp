@@ -4,6 +4,7 @@
 #include "camera.h"
 #include "light.h"
 #include "unidipathtracingintegrator.h"
+#include "bidipathtracingintegrator.h"
 #include "jitteredsampler.h"
 #include "integrator.h"
 
@@ -17,19 +18,20 @@
 #include <gsl/gsl_rng.h>
 
 using namespace boost::program_options;
-
-PerPixelRenderer::PerPixelRenderer(Integrator * integrator): integrator(integrator)
-{
-
-}
-
-PerPixelRenderer::~PerPixelRenderer()
-{
-  delete integrator;
-}
+using namespace std;
 
 void PerPixelRenderer::render(const Intersectable& scene, const Camera& camera, std::vector< Light* > lights, Film & film, boost::program_options::variables_map vm)
 {
+  Integrator * integrator;
+  if(vm["pt-integrator"].as<string>() == "unidi")
+  {
+    integrator = new UniDiPathTracingIntegrator(vm["pt-termination-prob"].as<float>());
+  }
+  else
+  {
+    integrator = new BiDiPathTracingIntegrator();
+  }
+
   QTime time;
   time.start();
   
@@ -47,7 +49,7 @@ void PerPixelRenderer::render(const Intersectable& scene, const Camera& camera, 
       if(j == 84 && i == 13)
         std::cout << "";
 #endif
-      JitteredSampler multiSampler(vm["ppr-x-samples"].as<int>(), vm["ppr-y-samples"].as<int>(), rng);
+      JitteredSampler multiSampler(vm["pt-x-samples"].as<int>(), vm["pt-y-samples"].as<int>(), rng);
       std::list<Sample> samples = multiSampler.getSamples();
       QPointF point = QPoint(j, i);
       for(std::list<Sample>::iterator it = samples.begin(); it != samples.end(); it++)
@@ -69,9 +71,11 @@ void PerPixelRenderer::render(const Intersectable& scene, const Camera& camera, 
 
 options_description PerPixelRenderer::options() const
 {
-  options_description opts("Per-pixel renderer");
+  options_description opts("Path tracer");
   opts.add_options()
-      ("ppr-x-samples", value<int>()->default_value(4), "Number of samples per pixel in x direction")
-      ("ppr-y-samples", value<int>()->default_value(4), "Number of samples per pixel in y direction");
+      ("pt-integrator", value<string>()->default_value("unidi"), "The path tracing method (unidi or bidi)")
+      ("pt-termination-prob", value<float>()->default_value(0.5f, "0.5"), "The roussian roulette path termination probability (use 0 to disable roussian roulette path termination)")
+      ("pt-x-samples", value<int>()->default_value(4), "Number of samples per pixel in x direction")
+      ("pt-y-samples", value<int>()->default_value(4), "Number of samples per pixel in y direction");
   return opts;
 }

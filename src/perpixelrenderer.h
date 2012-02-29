@@ -11,9 +11,6 @@
 class PerPixelRenderer: public Renderer
 {
 public:
-  PerPixelRenderer(Integrator * integrator);
-  virtual ~PerPixelRenderer();
-	
   void render(const Intersectable & scene, const Camera & camera, std::vector<Light*> lights, Film & film, boost::program_options::variables_map vm);
 
   boost::program_options::options_description options() const;

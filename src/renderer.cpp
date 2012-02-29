@@ -11,21 +11,22 @@
 #include <cassert>
 #include <algorithm>
 
-//#define RUSSIAN_ROULETTE
-
 using namespace std;
 
-Path Renderer::createPath(const Ray &primaryRay, const Intersectable &scene, gsl_rng *rng, Spectrum initialAlpha)
+Path Renderer::createPath(const Ray &primaryRay, const Intersectable &scene, gsl_rng *rng, Spectrum initialAlpha, float terminationProb)
 {
     JitteredSampler sampler(1, 1, rng);
     Sample pathSamples[MAX_DEPTH];
-#ifdef RUSSIAN_ROULETTE
-    const float terminationProb = 0.5;
-    const int pathLength = std::max(1, std::min((int)gsl_ran_negative_binomial(rng, terminationProb, 1), (int)MAX_DEPTH));
-#else
-    const float terminationProb = 1;
-    const int pathLength = MAX_DEPTH;
-#endif
+    int pathLength;
+    if(terminationProb > 0)
+    {
+      pathLength = std::max(1, std::min((int)gsl_ran_negative_binomial(rng, terminationProb, 1), (int)MAX_DEPTH));
+    }
+    else
+    {
+      terminationProb = 1;
+      pathLength = MAX_DEPTH;
+    }
     for(int i = 0; i < pathLength; i++)
     {
       pathSamples[i] = sampler.getSamples().front();

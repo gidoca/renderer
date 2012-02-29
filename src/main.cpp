@@ -38,7 +38,7 @@ void render(Renderer * renderer, Film & film, Scene scene, variables_map vm)
 
 int main(int argc, char **argv) {
   Renderer * metropolisRenderer = new MetropolisRenderer();
-  Renderer * perPixelRenderer = new PerPixelRenderer(new UniDiPathTracingIntegrator());
+  Renderer * perPixelRenderer = new PerPixelRenderer();
 
   QApplication app(argc, argv);
   options_description command_line_options;
@@ -46,7 +46,7 @@ int main(int argc, char **argv) {
   options_description generic("Generic options");
   generic.add_options()
       ("help,h", "display the help")
-      ("renderer,r", value<string>()->default_value("perpixelrenderer"), "The rendering algorithm to be used (either pathtracing or metropolis)")
+      ("renderer,r", value<string>()->default_value("pathtracing"), "The rendering algorithm to be used (either pathtracing or metropolis)")
       ("width,x", value<int>()->default_value(250), "The width of the output image")
       ("height,y", value<int>()->default_value(250), "The height of the output image");
 

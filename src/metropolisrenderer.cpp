@@ -29,8 +29,8 @@ void MetropolisRenderer::render(const Intersectable& scene, const Camera& camera
   UniDiPathTracingIntegrator integrator;
   Spectrum value = integrator.integrate(path, scene, lights, sample.lightSample1, sample.lightIndex);
 
-  const int numInitialSamples = 1000;
-  const float largeStepProb = 0.1f;
+  const int numInitialSamples = vm["met-bootstrap"].as<int>();
+  const float largeStepProb = vm["met-large-step-prob"].as<float>();
 
   float sumI = 0;
   vector<float> bootstrapI;
@@ -105,6 +105,8 @@ options_description MetropolisRenderer::options() const
 {
   options_description opts("Metropolis renderer");
   opts.add_options()
+      ("met-large-step-prob", value<float>()->default_value(0.1f, "0.1"), "The probability for a mutation to be a large step mutation")
+      ("met-bootstrap", value<int>()->default_value(1000), "Number of bootstrapping samples")
       ("met-mutations", value<int>()->default_value(16), "Average number of path mutations per pixel");
   return opts;
 }

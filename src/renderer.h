@@ -20,8 +20,8 @@ public:
   
   virtual boost::program_options::options_description options() const;
 
-  static Path createPath(const Ray& primaryRay, const Intersectable& scene, gsl_rng *rng, Spectrum initialAlpha = Spectrum(1, 1, 1));
-  static Path createPath(const Ray &primaryRay, const Intersectable &scene, Sample pathSamples[], Spectrum initialAlpha = Spectrum(1, 1, 1), int pathLength = MAX_DEPTH, float russianRoulettePdf = 1);
+  static Path createPath(const Ray & primaryRay, const Intersectable & scene, gsl_rng *rng, Spectrum initialAlpha = Spectrum(1, 1, 1), float terminationProb = 0.f);
+  static Path createPath(const Ray & primaryRay, const Intersectable & scene, Sample pathSamples[], Spectrum initialAlpha = Spectrum(1, 1, 1), int pathLength = MAX_DEPTH, float russianRoulettePdf = 1);
 };
 
 #endif // RENDERER_H
