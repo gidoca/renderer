@@ -6,6 +6,8 @@
 #include <iostream>
 
 #include <boost/program_options.hpp>
+#include <boost/mpl/list.hpp>
+#include <boost/mpl/for_each.hpp>
 
 #include "scenes/cornellscene.h"
 #include "perpixelrenderer.h"
@@ -28,6 +30,19 @@ public:
   vector<const Light*> light;
 };
 
+struct option_adder
+{
+  options_description * desc;
+  option_adder(options_description * desc): desc(desc) {}
+
+  template< typename R > void operator()(R)
+  {
+    desc->add(R::options());
+  }
+};
+
+typedef boost::mpl::list<MetropolisRenderer, PerPixelRenderer> renderers;
+
 void render(Renderer * renderer, Film & film, const Scene scene, variables_map vm)
 {  
   renderer->render(*scene.object, scene.camera, scene.light, film, vm);
@@ -37,26 +52,24 @@ void render(Renderer * renderer, Film & film, const Scene scene, variables_map v
 }
 
 int main(int argc, char **argv) {
-  Renderer * metropolisRenderer = new MetropolisRenderer();
-  Renderer * perPixelRenderer = new PerPixelRenderer();
-
   QApplication app(argc, argv);
   options_description command_line_options;
 
   options_description generic("Generic options");
   generic.add_options()
       ("help,h", "display the help")
-      ("verbose,v", "Be verbose about progress, etc. ")
-      ("gui,g", "Display the result in a window")
-      ("save-exr,e", value<string>(), "Write the result to the specified EXR file")
-      ("save-img,i", value<string>(), "Write the result to the specified LDR image file")
-      ("renderer,r", value<string>()->default_value("pathtracing"), "The rendering algorithm to be used (either pathtracing or metropolis)")
-      ("width,x", value<int>()->default_value(250), "The width of the output image")
-      ("height,y", value<int>()->default_value(250), "The height of the output image");
+      ("verbose,v", "be verbose about progress, etc. ")
+      ("gui,g", "display the result in a window")
+      ("save-exr,e", value<string>(), "write the result to the specified EXR file")
+      ("save-img,i", value<string>(), "write the result to the specified LDR image file")
+      ("renderer,r", value<string>()->default_value("pathtracing"), "the rendering algorithm to be used (either pathtracing or metropolis)")
+      ("width,x", value<int>()->default_value(250), "the width of the output image")
+      ("height,y", value<int>()->default_value(250), "the height of the output image");
 
   command_line_options.add(generic);
-  command_line_options.add(metropolisRenderer->options());
-  command_line_options.add(perPixelRenderer->options());
+
+  //Yay, metaprogramming - because we can!
+  boost::mpl::for_each<renderers>(option_adder(&command_line_options));
 
   variables_map vm;
   try
@@ -80,11 +93,11 @@ int main(int argc, char **argv) {
   Renderer * renderer;
   if(vm["renderer"].as<string>() == "pathtracing")
   {
-    renderer = perPixelRenderer;
+    renderer = new PerPixelRenderer();
   }
   else if(vm["renderer"].as<string>() == "metropolis")
   {
-    renderer = metropolisRenderer;
+    renderer = new MetropolisRenderer();
   }
   else
   {

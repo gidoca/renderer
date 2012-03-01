@@ -113,14 +113,14 @@ Path MetropolisRenderer::cameraPathFromSample(MetropolisSample sample, const Int
   return result;
 }
 
-options_description MetropolisRenderer::options() const
+options_description MetropolisRenderer::options()
 {
-  options_description opts("Metropolis renderer");
+  options_description opts("Metropolis renderer options");
   opts.add_options()
-      ("met-large-step-prob", value<float>()->default_value(0.1f, "0.1"), "The probability for a mutation to be a large step mutation")
-      ("met-bootstrap", value<int>()->default_value(1000), "Number of bootstrapping samples")
-      ("met-mutations", value<int>()->default_value(16), "Average number of path mutations per pixel")
-      ("met-fixed-seed", "Use a fixed seed for the RNG to make the resulting image deterministic");
+      ("met-large-step-prob", value<float>()->default_value(0.1f, "0.1"), "the probability for a mutation to be a large step mutation")
+      ("met-bootstrap", value<int>()->default_value(1000), "number of bootstrapping samples")
+      ("met-mutations", value<int>()->default_value(16), "average number of path mutations per pixel")
+      ("met-fixed-seed", "use a fixed seed for the RNG to make the resulting image deterministic");
   return opts;
 }
 

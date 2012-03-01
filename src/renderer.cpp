@@ -72,7 +72,7 @@ Path Renderer::createPath(const Ray& primaryRay, const Intersectable &scene, Sam
   return result;
 }
 
-boost::program_options::options_description Renderer::options() const
+boost::program_options::options_description Renderer::options()
 {
   return boost::program_options::options_description("Renderer");
 }

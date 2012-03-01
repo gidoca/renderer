@@ -84,14 +84,14 @@ void PerPixelRenderer::render(const Intersectable& scene, const Camera& camera, 
   }
 }
 
-options_description PerPixelRenderer::options() const
+options_description PerPixelRenderer::options()
 {
-  options_description opts("Path tracer");
+  options_description opts("Path tracer options");
   opts.add_options()
-      ("pt-integrator", value<string>()->default_value("unidi"), "The path tracing method (unidi or bidi)")
-      ("pt-termination-prob", value<float>()->default_value(0.5f, "0.5"), "The roussian roulette path termination probability (use 0 to disable roussian roulette path termination)")
-      ("pt-x-samples", value<int>()->default_value(4), "Number of samples per pixel in x direction")
-      ("pt-y-samples", value<int>()->default_value(4), "Number of samples per pixel in y direction")
-      ("pt-fixed-seed", "Use a fixed seed for the RNG to make the resulting image deterministic");
+      ("pt-integrator", value<string>()->default_value("unidi"), "the path tracing method (unidi or bidi)")
+      ("pt-termination-prob", value<float>()->default_value(0.5f, "0.5"), "the roussian roulette path termination probability (use 0 to disable roussian roulette path termination)")
+      ("pt-x-samples", value<int>()->default_value(4), "number of samples per pixel in x direction")
+      ("pt-y-samples", value<int>()->default_value(4), "number of samples per pixel in y direction")
+      ("pt-fixed-seed", "use a fixed seed for the RNG to make the resulting image deterministic");
   return opts;
 }

@@ -14,7 +14,7 @@ class MetropolisRenderer : public Renderer
 public:
   void render(const Intersectable & scene, const Camera & camera, const std::vector<const Light*> lights, Film & film, const boost::program_options::variables_map vm);
 
-  boost::program_options::options_description options() const;
+  static boost::program_options::options_description options();
   
 private:
   Path cameraPathFromSample(MetropolisSample sample, const Intersectable & scene, const Camera & camera);
