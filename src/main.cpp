@@ -14,21 +14,12 @@
 #include "unidipathtracingintegrator.h"
 #include "metropolisrenderer.h"
 #include "film.h"
+#include "scene.h"
 #include "tonemapper.h"
 #include "win.h"
 
 using namespace std;
 using namespace boost::program_options;
-
-class Scene
-{
-public:
-  Scene(Camera camera): camera(camera) {}
-
-  const Intersectable * object;
-  Camera camera;
-  vector<const Light*> light;
-};
 
 struct option_adder
 {
@@ -43,9 +34,9 @@ struct option_adder
 
 typedef boost::mpl::list<MetropolisRenderer, PerPixelRenderer> renderers;
 
-void render(Renderer * renderer, Film & film, const Scene scene, variables_map vm)
+void render(Renderer * renderer, Film film, Scene scene, variables_map vm)
 {  
-  renderer->render(*scene.object, scene.camera, scene.light, film, vm);
+  renderer->render(scene, film, vm);
   if(vm.count("save-exr")) film.saveExr(vm["save-exr"].as<string>());
   if(vm.count("save-img")) film.saveImg(vm["save-img"].as<string>());
   delete renderer;

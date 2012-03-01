@@ -36,6 +36,7 @@ class Ray;
 class Renderer;
 class Sample;
 class Sampler;
+class Scene;
 class SimpleIntegrator;
 class Spectrum;
 class Sphere;

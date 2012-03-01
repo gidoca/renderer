@@ -15,7 +15,7 @@
 using namespace std;
 using namespace boost::program_options;
 
-void MetropolisRenderer::render(const Intersectable& scene, const Camera& camera, const std::vector<const Light* > lights, Film & film, const boost::program_options::variables_map vm)
+void MetropolisRenderer::render(const Scene & scene, Film & film, const boost::program_options::variables_map vm)
 {
   QTime time;
   time.start();
@@ -32,11 +32,11 @@ void MetropolisRenderer::render(const Intersectable& scene, const Camera& camera
   }
   gsl_rng_set(rng, seed);
 
-  MetropolisSample sample(lights.size());
+  MetropolisSample sample(scene.light.size());
   sample.largeStep(rng);
-  Path path = cameraPathFromSample(sample, scene, camera);
+  Path path = cameraPathFromSample(sample, *scene.object, scene.camera);
   UniDiPathTracingIntegrator integrator;
-  Spectrum value = integrator.integrate(path, scene, lights, sample.lightSample1, sample.lightIndex);
+  Spectrum value = integrator.integrate(path, *scene.object, scene.light, sample.lightSample1, sample.lightIndex);
 
   const int numInitialSamples = vm["met-bootstrap"].as<int>();
   const float largeStepProb = vm["met-large-step-prob"].as<float>();
@@ -47,8 +47,8 @@ void MetropolisRenderer::render(const Intersectable& scene, const Camera& camera
   for(int i = 0; i < numInitialSamples; i++)
   {
     sample.largeStep(rng);
-    path = cameraPathFromSample(sample, scene, camera);
-    Spectrum l = integrator.integrate(path, scene, lights, sample.lightSample1, sample.lightIndex);
+    path = cameraPathFromSample(sample, *scene.object, scene.camera);
+    Spectrum l = integrator.integrate(path, *scene.object, scene.light, sample.lightSample1, sample.lightIndex);
     sumI += l.length();
     bootstrapI.push_back(l.length());
     bootstrapSamples.push_back(sample);
@@ -72,8 +72,8 @@ void MetropolisRenderer::render(const Intersectable& scene, const Camera& camera
   for(int i = 0; i < numSamples; i++)
   {
     MetropolisSample newSample = sample.mutated(rng, largeStepProb);
-    path = cameraPathFromSample(newSample, scene, camera);
-    Spectrum newValue = integrator.integrate(path, scene, lights, newSample.lightSample1, newSample.lightIndex);
+    path = cameraPathFromSample(newSample, *scene.object, scene.camera);
+    Spectrum newValue = integrator.integrate(path, *scene.object, scene.light, newSample.lightSample1, newSample.lightIndex);
     assert(!isnan(newValue.x()) && !isnan(newValue.y()) && !isnan(newValue.z()));
     float accept = min(1., newValue.length() / value.length());
     assert(!isnan(accept));

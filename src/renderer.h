@@ -6,6 +6,7 @@
 #include <boost/program_options.hpp>
 
 #include "global.h"
+#include "scene.h"
 #include "film.h"
 #include "path.h"
 #include "spectrum.h"
@@ -16,7 +17,7 @@
 class Renderer
 {
 public:
-  virtual void render(const Intersectable & scene, const Camera & camera, const std::vector<const Light*> lights, Film & film, const boost::program_options::variables_map vm) = 0;
+  virtual void render(const Scene & scene, Film & film, const boost::program_options::variables_map vm) = 0;
   
   static boost::program_options::options_description options();
 

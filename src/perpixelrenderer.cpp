@@ -19,7 +19,7 @@
 using namespace boost::program_options;
 using namespace std;
 
-void PerPixelRenderer::render(const Intersectable& scene, const Camera& camera, const std::vector<const Light* > lights, Film & film, const boost::program_options::variables_map vm)
+void PerPixelRenderer::render(const Scene & scene, Film & film, const boost::program_options::variables_map vm)
 {
   Integrator * integrator;
   if(vm["pt-integrator"].as<string>() == "unidi")
@@ -67,8 +67,8 @@ void PerPixelRenderer::render(const Intersectable& scene, const Camera& camera, 
       for(std::list<Sample>::iterator it = samples.begin(); it != samples.end(); it++)
       {
         QPointF samplePoint = point + it->getSample()/* - QPointF(0.5, 0.5)*/;
-        Ray ray = camera.getRay(samplePoint);
-        Spectrum s = integrator->integrate(ray, scene, lights, rng) / samples.size();
+        Ray ray = scene.camera.getRay(samplePoint);
+        Spectrum s = integrator->integrate(ray, *scene.object, scene.light, rng) / samples.size();
         assert(!isnan(s.x()) && !isnan(s.y()) && !isnan(s.z()));
         assert(s.x() >= 0 && s.y() >= 0 && s.z() >= 0);
         scanline[j] += s;
