@@ -11,12 +11,12 @@
 class Integrator
 {
 public:
-  inline Spectrum integrate(const Ray & ray, const Intersectable & scene, std::vector< Light* > light, gsl_rng *rng) const
+  inline Spectrum integrate(const Ray & ray, const Intersectable & scene, const std::vector<const Light* > light, gsl_rng *rng) const
   {
     return integrate(ray, scene, light, 0, rng);
   }
 protected:
-  virtual Spectrum integrate(const Ray & ray, const Intersectable & scene, std::vector< Light* > light, int recursionDepth, gsl_rng *rng) const = 0;
+  virtual Spectrum integrate(const Ray & ray, const Intersectable & scene, const std::vector< const Light* > light, int recursionDepth, gsl_rng *rng) const = 0;
 
 };
 

@@ -25,10 +25,10 @@ public:
 
   const Intersectable * object;
   Camera camera;
-  vector<Light*> light;
+  vector<const Light*> light;
 };
 
-void render(Renderer * renderer, Film & film, Scene scene, variables_map vm)
+void render(Renderer * renderer, Film & film, const Scene scene, variables_map vm)
 {  
   renderer->render(*scene.object, scene.camera, scene.light, film, vm);
   if(vm.count("save-exr")) film.saveExr(vm["save-exr"].as<string>());
@@ -95,7 +95,7 @@ int main(int argc, char **argv) {
   QSize resolution(vm["width"].as<int>(), vm["height"].as<int>());
 
   const Intersectable * object = getScene();
-  const vector<Light*> light = getLight();
+  const vector<const Light*> light = getLight();
   const Camera camera = getCamera(resolution);
   
   Film film(resolution);

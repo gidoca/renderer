@@ -19,7 +19,7 @@
 using namespace boost::program_options;
 using namespace std;
 
-void PerPixelRenderer::render(const Intersectable& scene, const Camera& camera, std::vector< Light* > lights, Film & film, const boost::program_options::variables_map vm)
+void PerPixelRenderer::render(const Intersectable& scene, const Camera& camera, const std::vector<const Light* > lights, Film & film, const boost::program_options::variables_map vm)
 {
   Integrator * integrator;
   if(vm["pt-integrator"].as<string>() == "unidi")

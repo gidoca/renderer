@@ -9,7 +9,7 @@
 #include <cmath>
 #include <cassert>
 
-Spectrum UniDiPathTracingIntegrator::integrate(const Ray& ray, const Intersectable& scene, std::vector<Light*> light, int, gsl_rng *rng) const
+Spectrum UniDiPathTracingIntegrator::integrate(const Ray& ray, const Intersectable& scene, const std::vector<const Light*> light, int, gsl_rng *rng) const
 {
   JitteredSampler sampler(1, 1, rng);
   Path path = Renderer::createPath(ray, scene, rng, Spectrum(1, 1, 1), terminationProb);
@@ -23,7 +23,7 @@ Spectrum UniDiPathTracingIntegrator::integrate(const Ray& ray, const Intersectab
   return integrate(path, scene, light, lightSamples, lightIndex);
 }
 
-Spectrum UniDiPathTracingIntegrator::integrate(const Path &path, const Intersectable &scene, std::vector<Light*> light, const Sample lightSamples[], long unsigned int lightIndex[]) const
+Spectrum UniDiPathTracingIntegrator::integrate(const Path &path, const Intersectable &scene, const std::vector<const Light*> light, const Sample lightSamples[], long unsigned int lightIndex[]) const
 {
   Spectrum color;
 

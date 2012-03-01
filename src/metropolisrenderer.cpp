@@ -15,7 +15,7 @@
 using namespace std;
 using namespace boost::program_options;
 
-void MetropolisRenderer::render(const Intersectable& scene, const Camera& camera, std::vector< Light* > lights, Film & film, const boost::program_options::variables_map vm)
+void MetropolisRenderer::render(const Intersectable& scene, const Camera& camera, const std::vector<const Light* > lights, Film & film, const boost::program_options::variables_map vm)
 {
   QTime time;
   time.start();

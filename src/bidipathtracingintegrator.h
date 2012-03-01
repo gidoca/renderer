@@ -4,10 +4,10 @@
 #include "global.h"
 #include "pathtracingintegrator.h"
 
-class BiDiPathTracingIntegrator : public PathTracingIntegrator
+class BiDiPathTracingIntegrator : public Integrator
 {
 public:
-  Spectrum integrate(const Ray &ray, const Intersectable &scene, std::vector<Light*> light, int recursionDepth, gsl_rng *rng) const;
+  Spectrum integrate(const Ray &ray, const Intersectable &scene, const std::vector<const Light*> light, int recursionDepth, gsl_rng *rng) const;
 };
 
 #endif // BIDIPATHTRACINGINTEGRATOR_H

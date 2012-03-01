@@ -16,7 +16,7 @@
 class Renderer
 {
 public:
-  virtual void render(const Intersectable & scene, const Camera & camera, std::vector<Light*> lights, Film & film, const boost::program_options::variables_map vm) = 0;
+  virtual void render(const Intersectable & scene, const Camera & camera, const std::vector<const Light*> lights, Film & film, const boost::program_options::variables_map vm) = 0;
   
   virtual boost::program_options::options_description options() const;
 
