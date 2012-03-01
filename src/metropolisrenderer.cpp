@@ -15,7 +15,7 @@
 using namespace std;
 using namespace boost::program_options;
 
-void MetropolisRenderer::render(const Intersectable& scene, const Camera& camera, std::vector< Light* > lights, Film & film, boost::program_options::variables_map vm)
+void MetropolisRenderer::render(const Intersectable& scene, const Camera& camera, std::vector< Light* > lights, Film & film, const boost::program_options::variables_map vm)
 {
   QTime time;
   time.start();
@@ -24,13 +24,13 @@ void MetropolisRenderer::render(const Intersectable& scene, const Camera& camera
   int seed;
   if(vm.count("met-fixed-seed"))
   {
-    seed = 2;
+    seed = 0;
   }
   else
   {
     seed = QTime::currentTime().msec();
   }
-  gsl_rng_set(rng, 2);
+  gsl_rng_set(rng, seed);
 
   MetropolisSample sample(lights.size());
   sample.largeStep(rng);
@@ -97,8 +97,11 @@ void MetropolisRenderer::render(const Intersectable& scene, const Camera& camera
     }
   }
 
-  std::cout << "Rendering complete, " << time.elapsed() / 1000 << "s elapsed\n";
-  std::cout.flush();
+  if(vm.count("verbose"))
+  {
+    std::cout << "Rendering complete, " << time.elapsed() / 1000 << "s elapsed\n";
+    std::cout.flush();
+  }
 }
 
 Path MetropolisRenderer::cameraPathFromSample(MetropolisSample sample, const Intersectable & scene, const Camera& camera)

@@ -13,14 +13,13 @@
 #include <cmath>
 
 #include <QTime>
-#include <QRgb>
 
 #include <gsl/gsl_rng.h>
 
 using namespace boost::program_options;
 using namespace std;
 
-void PerPixelRenderer::render(const Intersectable& scene, const Camera& camera, std::vector< Light* > lights, Film & film, boost::program_options::variables_map vm)
+void PerPixelRenderer::render(const Intersectable& scene, const Camera& camera, std::vector< Light* > lights, Film & film, const boost::program_options::variables_map vm)
 {
   Integrator * integrator;
   if(vm["pt-integrator"].as<string>() == "unidi")
@@ -38,7 +37,7 @@ void PerPixelRenderer::render(const Intersectable& scene, const Camera& camera, 
   int seed;
   if(vm.count("pt-fixed-seed"))
   {
-    seed = 1;
+    seed = 0;
   }
   else
   {
@@ -50,7 +49,10 @@ void PerPixelRenderer::render(const Intersectable& scene, const Camera& camera, 
   {
     gsl_rng *rng = gsl_rng_alloc(gsl_rng_taus);
     gsl_rng_set(rng, film.height() * seed + i);
-    std::cout << i * 100 / film.height() << "% complete, ETA: " << time.elapsed() * (film.height() - i) / ((i + 1) * 1000) << "s" << std::endl;
+    if(vm.count("verbose"))
+    {
+      std::cout << i * 100 / film.height() << "% complete, ETA: " << time.elapsed() * (film.height() - i) / ((i + 1) * 1000) << "s" << std::endl;
+    }
     Spectrum * scanline = film[i];
     for(int j = 0; j < film.width(); j++)
     {
@@ -75,8 +77,11 @@ void PerPixelRenderer::render(const Intersectable& scene, const Camera& camera, 
     gsl_rng_free(rng);
   }
 
-  std::cout << "100% complete, time elapsed: " << time.elapsed() / 1000 << "s\n";
-  std::cout.flush();
+  if(vm.count("verbose"))
+  {
+    std::cout << "100% complete, time elapsed: " << time.elapsed() / 1000 << "s\n";
+    std::cout.flush();
+  }
 }
 
 options_description PerPixelRenderer::options() const

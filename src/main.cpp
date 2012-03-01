@@ -31,12 +31,10 @@ public:
 void render(Renderer * renderer, Film & film, Scene scene, variables_map vm)
 {  
   renderer->render(*scene.object, scene.camera, scene.light, film, vm);
-  if(vm.count("saveexr")) film.saveExr(vm["saveexr"].as<string>());
-  if(vm.count("saveimg")) film.saveImg(vm["saveimg"].as<string>());
+  if(vm.count("save-exr")) film.saveExr(vm["save-exr"].as<string>());
+  if(vm.count("save-img")) film.saveImg(vm["save-img"].as<string>());
   delete renderer;
 }
-
-
 
 int main(int argc, char **argv) {
   Renderer * metropolisRenderer = new MetropolisRenderer();
@@ -48,9 +46,10 @@ int main(int argc, char **argv) {
   options_description generic("Generic options");
   generic.add_options()
       ("help,h", "display the help")
+      ("verbose,v", "Be verbose about progress, etc. ")
       ("gui,g", "Display the result in a window")
-      ("saveexr,e", value<string>(), "Write the result to the specified EXR file")
-      ("saveimg,i", value<string>(), "Write the result to the specified LDR image file")
+      ("save-exr,e", value<string>(), "Write the result to the specified EXR file")
+      ("save-img,i", value<string>(), "Write the result to the specified LDR image file")
       ("renderer,r", value<string>()->default_value("pathtracing"), "The rendering algorithm to be used (either pathtracing or metropolis)")
       ("width,x", value<int>()->default_value(250), "The width of the output image")
       ("height,y", value<int>()->default_value(250), "The height of the output image");
@@ -105,7 +104,7 @@ int main(int argc, char **argv) {
   scene.light = light;
   QFuture< void > future = QtConcurrent::run(render, renderer, film, scene, vm);
   
-  if(vm.count("gui") || (!vm.count("saveexr") && !vm.count("saveimg")))
+  if(vm.count("gui") || (!vm.count("save-exr") && !vm.count("save-img")))
   {
     Win l(film, future);
     l.show();
