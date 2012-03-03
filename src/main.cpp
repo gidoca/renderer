@@ -46,18 +46,21 @@ int main(int argc, char **argv) {
   QApplication app(argc, argv);
   options_description command_line_options;
 
-  options_description generic("Generic options");
-  generic.add_options()
+  options_description general("General options");
+  general.add_options()
       ("help,h", "display the help")
       ("verbose,v", "be verbose about progress, etc. ")
       ("gui,g", "display the result in a window")
       ("save-exr,e", value<string>(), "write the result to the specified EXR file")
-      ("save-img,i", value<string>(), "write the result to the specified LDR image file")
+      ("save-img,i", value<string>(), "write the result to the specified LDR image file");
+  command_line_options.add(general); 
+	
+  options_description image("Image options");
+	image.add_options()
       ("renderer,r", value<string>()->default_value("pathtracing"), "the rendering algorithm to be used (either pathtracing or metropolis)")
       ("width,x", value<int>()->default_value(250), "the width of the output image")
       ("height,y", value<int>()->default_value(250), "the height of the output image");
-
-  command_line_options.add(generic);
+  command_line_options.add(image);
 
   //Yay, metaprogramming - because we can!
   boost::mpl::for_each<renderers>(option_adder(&command_line_options));
