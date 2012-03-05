@@ -33,7 +33,7 @@ struct option_adder
   }
 };
 
-typedef boost::mpl::list<MetropolisRenderer, PerPixelRenderer> renderers;
+typedef boost::mpl::list<MetropolisRenderer, PerPixelRenderer, EnergyRedistributionRenderer> renderers;
 
 void render(Renderer * renderer, Film film, Scene scene, variables_map vm)
 {  

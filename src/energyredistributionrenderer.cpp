@@ -10,13 +10,15 @@
 
 #include <algorithm>
 
+using namespace boost::program_options;
+
 void EnergyRedistributionRenderer::render(const Scene &scene, Film &film, boost::program_options::variables_map vm)
 {
   gsl_rng *rng = gsl_rng_alloc(gsl_rng_taus);
   int seed = getSeed(vm);
   gsl_rng_set(rng, seed);
 
-  float ed = computeEd(scene, rng, 5);
+  float ed = computeEd(scene, rng, vm["erpt-mutations"].as<int>());
 
   QSize size = film.getSize();
 
@@ -25,7 +27,7 @@ void EnergyRedistributionRenderer::render(const Scene &scene, Film &film, boost:
     for(int j = 0; j < size.width(); j++)
     {
       QPointF pixelCoord(j, i);
-      JitteredSampler multiSampler(4, 4, rng);
+      JitteredSampler multiSampler(2, 2, rng);
       std::list<Sample> samples = multiSampler.getSamples();
       for(std::list<Sample>::iterator it = samples.begin(); it != samples.end(); it++)
       {
@@ -34,7 +36,7 @@ void EnergyRedistributionRenderer::render(const Scene &scene, Film &film, boost:
         point.ry() /= size.height();
         MetropolisSample initialSample(scene.light.size());
         initialSample.initAtPixel(point, rng);
-        equalDispositionFlow(film, initialSample, *scene.object, scene.light, scene.camera, rng, ed);
+        equalDispositionFlow(film, initialSample, *scene.object, scene.light, scene.camera, rng, ed, vm);
       }
     }
   }
@@ -42,13 +44,13 @@ void EnergyRedistributionRenderer::render(const Scene &scene, Film &film, boost:
   gsl_rng_free(rng);
 }
 
-void EnergyRedistributionRenderer::equalDispositionFlow(Film &film, MetropolisSample initialSample, const Intersectable &scene, std::vector<const Light *>light, const Camera & camera, gsl_rng *rng, float ed)
+void EnergyRedistributionRenderer::equalDispositionFlow(Film &film, MetropolisSample initialSample, const Intersectable &scene, std::vector<const Light *>light, const Camera & camera, gsl_rng *rng, float ed, variables_map vm)
 {
   UniDiPathTracingIntegrator integrator(0.1);
   Path initialPath = initialSample.cameraPathFromSample(scene, camera);
   Spectrum initialContrib = integrator.integrate(initialPath, scene, light, initialSample.lightSample1, initialSample.lightIndex);
   Spectrum depVal = initialContrib / initialContrib.length() * ed / 4;
-  const int numMutations = 3;
+  const int numMutations = vm["erpt-mutations"].as<int>();
   int numChains = (int)(gsl_rng_uniform(rng) + initialContrib.length() / (numMutations * ed));
 
   MetropolisSample y(light.size());
@@ -91,4 +93,12 @@ float EnergyRedistributionRenderer::computeEd(const Scene &scene, gsl_rng *rng, 
     }
   }
   return ed.length() / (size.height() * size.width() * pathsPerPixel);
+}
+
+boost::program_options::options_description EnergyRedistributionRenderer::options()
+{
+	options_description options("Energy Redistribution Renderer options");
+	options.add_options()
+	  ("erpt-mutations", value<int>()->default_value(4), "Number of mutations");
+	return options;
 }
