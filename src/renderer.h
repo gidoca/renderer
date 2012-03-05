@@ -23,6 +23,9 @@ public:
 
   static Path createPath(const Ray & primaryRay, const Intersectable & scene, gsl_rng *rng, Spectrum initialAlpha = Spectrum(1, 1, 1), float terminationProb = 0.f);
   static Path createPath(const Ray & primaryRay, const Intersectable & scene, Sample pathSamples[], Spectrum initialAlpha = Spectrum(1, 1, 1), int pathLength = MAX_DEPTH, float russianRoulettePdf = 1);
+
+protected:
+  int getSeed(boost::program_options::variables_map vm);
 };
 
 #endif // RENDERER_H

@@ -4,6 +4,7 @@
 #include "camera.h"
 #include "path.h"
 #include "unidipathtracingintegrator.h"
+#include "metropolissample.h"
 
 #include <cmath>
 #include <cassert>
@@ -21,20 +22,12 @@ void MetropolisRenderer::render(const Scene & scene, Film & film, const boost::p
   time.start();
 
   gsl_rng *rng = gsl_rng_alloc(gsl_rng_taus);
-  int seed;
-  if(vm.count("met-fixed-seed"))
-  {
-    seed = 0;
-  }
-  else
-  {
-    seed = QTime::currentTime().msec();
-  }
+  int seed = getSeed(vm);
   gsl_rng_set(rng, seed);
 
   MetropolisSample sample(scene.light.size());
   sample.largeStep(rng);
-  Path path = cameraPathFromSample(sample, *scene.object, scene.camera);
+  Path path = sample.cameraPathFromSample(*scene.object, scene.camera);
   UniDiPathTracingIntegrator integrator;
   Spectrum value = integrator.integrate(path, *scene.object, scene.light, sample.lightSample1, sample.lightIndex);
 
@@ -47,7 +40,7 @@ void MetropolisRenderer::render(const Scene & scene, Film & film, const boost::p
   for(int i = 0; i < numInitialSamples; i++)
   {
     sample.largeStep(rng);
-    path = cameraPathFromSample(sample, *scene.object, scene.camera);
+    path = sample.cameraPathFromSample(*scene.object, scene.camera);
     Spectrum l = integrator.integrate(path, *scene.object, scene.light, sample.lightSample1, sample.lightIndex);
     sumI += l.length();
     bootstrapI.push_back(l.length());
@@ -61,7 +54,7 @@ void MetropolisRenderer::render(const Scene & scene, Film & film, const boost::p
   {
     sample.largeStep(rng);
     sample = bootstrapSamples[i];
-//    sumI += bootstrapI[i];
+    sumI += bootstrapI[i];
     if(sumI > contribOffset) break;
   }
 //  sample.largeStep(rng);
@@ -72,7 +65,7 @@ void MetropolisRenderer::render(const Scene & scene, Film & film, const boost::p
   for(int i = 0; i < numSamples; i++)
   {
     MetropolisSample newSample = sample.mutated(rng, largeStepProb);
-    path = cameraPathFromSample(newSample, *scene.object, scene.camera);
+    path = newSample.cameraPathFromSample(*scene.object, scene.camera);
     Spectrum newValue = integrator.integrate(path, *scene.object, scene.light, newSample.lightSample1, newSample.lightIndex);
     assert(!isnan(newValue.x()) && !isnan(newValue.y()) && !isnan(newValue.z()));
     float accept = min(1., newValue.length() / value.length());
@@ -104,15 +97,6 @@ void MetropolisRenderer::render(const Scene & scene, Film & film, const boost::p
   }
 }
 
-Path MetropolisRenderer::cameraPathFromSample(MetropolisSample sample, const Intersectable & scene, const Camera& camera)
-{
-  QPointF pixel = sample.cameraSample.getSample();
-  pixel.rx() *= camera.getResolution().width();
-  pixel.ry() *= camera.getResolution().height();
-  Path result = createPath(camera.getRay(pixel), scene, sample.cameraPathSamples);
-  return result;
-}
-
 options_description MetropolisRenderer::options()
 {
   options_description opts("Metropolis renderer options");
@@ -124,68 +108,3 @@ options_description MetropolisRenderer::options()
   return opts;
 }
 
-void MetropolisSample::largeStep(gsl_rng *rng)
-{
-  JitteredSampler sampler(1, 1, rng);
-  cameraSample = sampler.getSamples().front();
-
-  for(int i = 0; i < MAX_DEPTH; i++)
-  {
-    lightPathSamples[i] = sampler.getSamples().front();
-    cameraPathSamples[i] = sampler.getSamples().front();
-    lightSample1[i] = sampler.getSamples().front();
-    lightSample2[i] = sampler.getSamples().front();
-    lightIndex[i] = gsl_rng_uniform_int(rng, numLights);
-  }
-
-}
-
-void mutate(qreal &s, gsl_rng *rng)
-{
-  JitteredSampler sampler(1, 1, rng);
-  Sample sample = sampler.getSamples().front();
-  static const float a = 1. / 1024., b = 1. / 64.;
-  static const float logRatio = -log(b / a);
-  float delta = b * exp(logRatio * sample.getSample().x());
-  if(sample.getSample().y() < 0.5)
-  {
-    delta *= -1;
-  }
-
-  s = s + delta;
-  if(s < 0) s += 1;
-  if(s > 1) s -= 1;
-  assert(0 <= s && s <= 1);
-}
-
-void MetropolisSample::smallStep(gsl_rng *rng)
-{
-  mutate(cameraSample.getSample().rx(), rng);
-  mutate(cameraSample.getSample().ry(), rng);
-  for(int i = 0; i < MAX_DEPTH; i++)
-  {
-      mutate(lightPathSamples[i].getSample().rx(), rng);
-      mutate(lightPathSamples[i].getSample().ry(), rng);
-      mutate(cameraPathSamples[i].getSample().rx(), rng);
-      mutate(cameraPathSamples[i].getSample().ry(), rng);
-      mutate(lightSample1[i].getSample().rx(), rng);
-      mutate(lightSample1[i].getSample().ry(), rng);
-      mutate(lightSample2[i].getSample().rx(), rng);
-      mutate(lightSample2[i].getSample().ry(), rng);
-  }
-}
-
-MetropolisSample MetropolisSample::mutated(gsl_rng *rng, float largeStepProb)
-{
-  MetropolisSample result = *this;
-  float s = gsl_rng_uniform(rng);
-  if(s < largeStepProb)
-  {
-    result.largeStep(rng);
-  }
-  else
-  {
-    result.smallStep(rng);
-  }
-  return result;
-}

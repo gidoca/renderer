@@ -11,6 +11,8 @@
 #include <cassert>
 #include <algorithm>
 
+#include <QTime>
+
 using namespace std;
 
 Path Renderer::createPath(const Ray &primaryRay, const Intersectable &scene, gsl_rng *rng, Spectrum initialAlpha, float terminationProb)
@@ -75,4 +77,16 @@ Path Renderer::createPath(const Ray& primaryRay, const Intersectable &scene, Sam
 boost::program_options::options_description Renderer::options()
 {
   return boost::program_options::options_description("Renderer");
+}
+
+int Renderer::getSeed(boost::program_options::variables_map vm)
+{
+  if(vm.count("pt-fixed-seed"))
+  {
+    return 0;
+  }
+  else
+  {
+    return QTime::currentTime().msec() + 1000 * QTime::currentTime().second();
+  }
 }

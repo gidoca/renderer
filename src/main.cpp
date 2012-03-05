@@ -13,6 +13,7 @@
 #include "perpixelrenderer.h"
 #include "unidipathtracingintegrator.h"
 #include "metropolisrenderer.h"
+#include "energyredistributionrenderer.h"
 #include "film.h"
 #include "scene.h"
 #include "tonemapper.h"
@@ -53,7 +54,7 @@ int main(int argc, char **argv) {
       ("gui,g", "display the result in a window")
       ("save-exr,e", value<string>(), "write the result to the specified EXR file")
       ("save-img,i", value<string>(), "write the result to the specified LDR image file")
-      ("renderer,r", value<string>()->default_value("pathtracing"), "the rendering algorithm to be used (either pathtracing or metropolis)")
+      ("renderer,r", value<string>()->default_value("pathtracing"), "the rendering algorithm to be used (either pathtracing, energyredist or metropolis)")
       ("width,x", value<int>()->default_value(250), "the width of the output image")
       ("height,y", value<int>()->default_value(250), "the height of the output image");
 
@@ -89,6 +90,10 @@ int main(int argc, char **argv) {
   else if(vm["renderer"].as<string>() == "metropolis")
   {
     renderer = new MetropolisRenderer();
+  }
+  else if(vm["renderer"].as<string>() == "energyredist")
+  {
+    renderer = new EnergyRedistributionRenderer();
   }
   else
   {

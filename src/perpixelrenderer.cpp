@@ -34,15 +34,7 @@ void PerPixelRenderer::render(const Scene & scene, Film & film, const boost::pro
   QTime time;
   time.start();
 
-  int seed;
-  if(vm.count("pt-fixed-seed"))
-  {
-    seed = 0;
-  }
-  else
-  {
-    seed = QTime::currentTime().msec();
-  }
+  int seed = getSeed(vm);
   
   #pragma omp parallel for schedule(dynamic)
   for(int i = 0; i < film.height(); i++)
@@ -68,10 +60,10 @@ void PerPixelRenderer::render(const Scene & scene, Film & film, const boost::pro
       {
         QPointF samplePoint = point + it->getSample()/* - QPointF(0.5, 0.5)*/;
         Ray ray = scene.camera.getRay(samplePoint);
-        Spectrum s = integrator->integrate(ray, *scene.object, scene.light, rng) / samples.size();
+        Spectrum s = integrator->integrate(ray, *scene.object, scene.light, rng);
         assert(!isnan(s.x()) && !isnan(s.y()) && !isnan(s.z()));
         assert(s.x() >= 0 && s.y() >= 0 && s.z() >= 0);
-        scanline[j] += s;
+        scanline[j] += s / samples.size();
       }
     }
     gsl_rng_free(rng);
