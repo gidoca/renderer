@@ -18,9 +18,6 @@ using namespace boost::program_options;
 
 void MetropolisRenderer::render(const Scene & scene, Film & film, const boost::program_options::variables_map vm)
 {
-  QTime time;
-  time.start();
-
   gsl_rng *rng = gsl_rng_alloc(gsl_rng_taus);
   int seed = getSeed(vm);
   gsl_rng_set(rng, seed);
@@ -88,12 +85,6 @@ void MetropolisRenderer::render(const Scene & scene, Film & film, const boost::p
       sample = newSample;
       value = newValue;
     }
-  }
-
-  if(vm.count("verbose"))
-  {
-    std::cout << "Rendering complete, " << time.elapsed() / 1000 << "s elapsed\n";
-    std::cout.flush();
   }
 }
 

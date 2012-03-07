@@ -18,7 +18,7 @@ void EnergyRedistributionRenderer::render(const Scene &scene, Film &film, boost:
 
   gsl_rng *rng = gsl_rng_alloc(gsl_rng_taus);
   gsl_rng_set(rng, seed);
-  const float ed = computeEd(scene, rng, vm["erpt-mutations"].as<int>() * vm["erpt-x-samples"].as<int>() * vm["erpt-y-samples"].as<int>());
+  const float ed = computeEd(scene, rng, vm["erpt-mutations"].as<int>());
   gsl_rng_free(rng);
 
   QSize size = film.getSize();

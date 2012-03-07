@@ -1,5 +1,6 @@
 #include <QtCore>
 #include <QApplication>
+#include <QTime>
 
 #include <list>
 #include <vector>
@@ -52,10 +53,17 @@ typedef boost::mpl::list<MetropolisRenderer, PerPixelRenderer, EnergyRedistribut
 
 void render(Renderer * renderer, Film film, Scene scene, variables_map vm)
 {  
+  QTime time;
+  time.start();
   renderer->render(scene, film, vm);
   if(vm.count("save-exr")) film.saveExr(vm["save-exr"].as<string>());
   if(vm.count("save-img")) film.saveImg(vm["save-img"].as<string>());
   delete renderer;
+  if(vm.count("verbose"))
+  {
+    std::cout << "Rendering complete, " << time.elapsed() / 1000 << "s elapsed\n";
+    std::cout.flush();
+  }
 }
 
 int main(int argc, char **argv) {

@@ -68,12 +68,6 @@ void PerPixelRenderer::render(const Scene & scene, Film & film, const boost::pro
     }
     gsl_rng_free(rng);
   }
-
-  if(vm.count("verbose"))
-  {
-    std::cout << "100% complete, time elapsed: " << time.elapsed() / 1000 << "s\n";
-    std::cout.flush();
-  }
 }
 
 options_description PerPixelRenderer::options()
