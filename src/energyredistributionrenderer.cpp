@@ -18,16 +18,17 @@ void EnergyRedistributionRenderer::render(const Scene &scene, Film &film, boost:
   int seed = getSeed(vm);
   gsl_rng_set(rng, seed);
 
-  float ed = computeEd(scene, rng, vm["erpt-mutations"].as<int>());
+  float ed = computeEd(scene, rng, vm["erpt-mutations"].as<int>() * vm["erpt-x-samples"].as<int>() * vm["erpt-y-samples"].as<int>());
 
   QSize size = film.getSize();
 
+  #pragma omp parallel for schedule(dynamic)
   for(int i = 0; i < size.height(); i++)
   {
     for(int j = 0; j < size.width(); j++)
     {
       QPointF pixelCoord(j, i);
-      JitteredSampler multiSampler(2, 2, rng);
+      JitteredSampler multiSampler(vm["erpt-x-samples"].as<int>(), vm["erpt-y-samples"].as<int>(), rng);
       std::list<Sample> samples = multiSampler.getSamples();
       for(std::list<Sample>::iterator it = samples.begin(); it != samples.end(); it++)
       {
@@ -49,9 +50,9 @@ void EnergyRedistributionRenderer::equalDispositionFlow(Film &film, MetropolisSa
   UniDiPathTracingIntegrator integrator(0.1);
   Path initialPath = initialSample.cameraPathFromSample(scene, camera);
   Spectrum initialContrib = integrator.integrate(initialPath, scene, light, initialSample.lightSample1, initialSample.lightIndex);
-  Spectrum depVal = initialContrib / initialContrib.length() * ed / 4;
   const int numMutations = vm["erpt-mutations"].as<int>();
   int numChains = (int)(gsl_rng_uniform(rng) + initialContrib.length() / (numMutations * ed));
+  Spectrum depVal = initialContrib / initialContrib.length() * ed / numChains;
 
   MetropolisSample y(light.size());
 
@@ -73,6 +74,7 @@ void EnergyRedistributionRenderer::equalDispositionFlow(Film &film, MetropolisSa
       }
       int pixelX = (int)(y.cameraSample.getSample().x() * film.width());
       int pixelY = (int)(y.cameraSample.getSample().y() * film.height());
+      #pragma omp critical
       film[pixelY][pixelX] += depVal;
     }
   }
@@ -99,6 +101,8 @@ boost::program_options::options_description EnergyRedistributionRenderer::option
 {
 	options_description options("Energy Redistribution Renderer options");
 	options.add_options()
-	  ("erpt-mutations", value<int>()->default_value(4), "Number of mutations");
-	return options;
+    ("erpt-mutations", value<int>()->default_value(100), "number of mutations")
+    ("erpt-x-samples", value<int>()->default_value(2), "number of samples per pixel in x direction")
+    ("erpt-y-samples", value<int>()->default_value(2), "number of samples per pixel in y direction");
+  return options;
 }

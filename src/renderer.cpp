@@ -22,7 +22,7 @@ Path Renderer::createPath(const Ray &primaryRay, const Intersectable &scene, gsl
     int pathLength;
     if(terminationProb > 0)
     {
-      pathLength = std::max(1, std::min((int)gsl_ran_negative_binomial(rng, terminationProb, 1), (int)MAX_DEPTH));
+      pathLength = max(1, min<int>(gsl_ran_negative_binomial(rng, terminationProb, 1), MAX_DEPTH));
     }
     else
     {
