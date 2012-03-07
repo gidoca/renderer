@@ -87,3 +87,5 @@ options_description PerPixelRenderer::options()
       ("pt-fixed-seed", "use a fixed seed for the RNG to make the resulting image deterministic");
   return opts;
 }
+
+const std::string PerPixelRenderer::name = "pathtracing";

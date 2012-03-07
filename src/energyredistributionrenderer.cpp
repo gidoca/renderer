@@ -14,17 +14,20 @@ using namespace boost::program_options;
 
 void EnergyRedistributionRenderer::render(const Scene &scene, Film &film, boost::program_options::variables_map vm)
 {
-  gsl_rng *rng = gsl_rng_alloc(gsl_rng_taus);
-  int seed = getSeed(vm);
-  gsl_rng_set(rng, seed);
+  const int seed = getSeed(vm);
 
-  float ed = computeEd(scene, rng, vm["erpt-mutations"].as<int>() * vm["erpt-x-samples"].as<int>() * vm["erpt-y-samples"].as<int>());
+  gsl_rng *rng = gsl_rng_alloc(gsl_rng_taus);
+  gsl_rng_set(rng, seed);
+  const float ed = computeEd(scene, rng, vm["erpt-mutations"].as<int>() * vm["erpt-x-samples"].as<int>() * vm["erpt-y-samples"].as<int>());
+  gsl_rng_free(rng);
 
   QSize size = film.getSize();
 
   #pragma omp parallel for schedule(dynamic)
   for(int i = 0; i < size.height(); i++)
   {
+    gsl_rng *rng = gsl_rng_alloc(gsl_rng_taus);
+    gsl_rng_set(rng, size.height() * seed + i);
     for(int j = 0; j < size.width(); j++)
     {
       QPointF pixelCoord(j, i);
@@ -40,9 +43,9 @@ void EnergyRedistributionRenderer::render(const Scene &scene, Film &film, boost:
         equalDispositionFlow(film, initialSample, *scene.object, scene.light, scene.camera, rng, ed, vm);
       }
     }
+    gsl_rng_free(rng);
   }
 
-  gsl_rng_free(rng);
 }
 
 void EnergyRedistributionRenderer::equalDispositionFlow(Film &film, MetropolisSample initialSample, const Intersectable &scene, std::vector<const Light *>light, const Camera & camera, gsl_rng *rng, float ed, variables_map vm)
@@ -106,3 +109,5 @@ boost::program_options::options_description EnergyRedistributionRenderer::option
     ("erpt-y-samples", value<int>()->default_value(2), "number of samples per pixel in y direction");
   return options;
 }
+
+const std::string EnergyRedistributionRenderer::name = "energyredist";

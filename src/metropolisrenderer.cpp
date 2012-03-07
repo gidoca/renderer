@@ -108,3 +108,4 @@ options_description MetropolisRenderer::options()
   return opts;
 }
 
+const std::string MetropolisRenderer::name = "metropolis";

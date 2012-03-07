@@ -8,6 +8,7 @@
 #include <gsl/gsl_rng.h>
 
 #include <vector>
+#include <string>
 
 class MetropolisRenderer : public Renderer
 {
@@ -16,6 +17,7 @@ public:
 
   static boost::program_options::options_description options();
   
+  static const std::string name;
 };
 
 #endif // METROPOLISRENDERER_H

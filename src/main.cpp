@@ -33,6 +33,21 @@ struct option_adder
   }
 };
 
+struct initializer
+{
+  Renderer **renderer;
+  variables_map vm;
+  initializer(Renderer **renderer, variables_map vm) : renderer(renderer), vm(vm) {}
+
+  template< typename R > void operator()(R)
+  {
+    if(vm["renderer"].as<string>() == R::name)
+    {
+      *renderer = new R();
+    }
+  }
+};
+
 typedef boost::mpl::list<MetropolisRenderer, PerPixelRenderer, EnergyRedistributionRenderer> renderers;
 
 void render(Renderer * renderer, Film film, Scene scene, variables_map vm)
@@ -85,20 +100,9 @@ int main(int argc, char **argv) {
     return 0;
   }
 
-  Renderer * renderer;
-  if(vm["renderer"].as<string>() == "pathtracing")
-  {
-    renderer = new PerPixelRenderer();
-  }
-  else if(vm["renderer"].as<string>() == "metropolis")
-  {
-    renderer = new MetropolisRenderer();
-  }
-  else if(vm["renderer"].as<string>() == "energyredist")
-  {
-    renderer = new EnergyRedistributionRenderer();
-  }
-  else
+  Renderer * renderer = 0;
+  boost::mpl::for_each<renderers>(initializer(&renderer, vm));
+  if(renderer == 0)
   {
     cerr << "Unknown renderer: " << vm["renderer"].as<string>() << endl;
     return -1;
