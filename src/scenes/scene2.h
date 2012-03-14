@@ -78,9 +78,9 @@ Intersectable * getScene(void)
   return new IntersectableList(objects);
 }
 
-std::vector<Light* > getLight(void)
+std::vector<const Light* > getLight(void)
 {
-  std::vector<Light* > lights;
+  std::vector<const Light* > lights;
   lights.push_back(new AreaLight(.7 * QVector3D(-0.25, 0.9, -0.25), QVector3D(.5, 0, 0), QVector3D(0, 0, .5), 4 * Spectrum(4, 4, 4)));
 //  lights.push_back(QSharedPointer<Light>(new PointLight(QVector3D(0, 0.8, 0.8), Spectrum(.7, .7, .7))));
 //  lights.push_back(QSharedPointer<Light>(new PointLight(QVector3D(-0.8, 0.2, 1), Spectrum(.5, .5, .5))));

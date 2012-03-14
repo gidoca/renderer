@@ -33,9 +33,9 @@ Camera getCamera(QSize resolution)
   return Camera(QVector3D(0, 1, 5), QVector3D(0, 0.5, 0), QVector3D(0, 1, 0), 1, resolution);
 }
 
-std::vector<Light* > getLight(void)
+std::vector<const Light* > getLight(void)
 {
-  std::vector<Light* > lights;
+  std::vector<const Light* > lights;
 //  lights.push_back(QSharedPointer<Light>(new DirectionalLight(QVector3D(4, -1, -2), Spectrum(1, 1, 1))));
   lights.push_back(new AreaLight(QVector3D(-2, 6, -5), QVector3D(0, -8, 0), QVector3D(8, 0, 0), Spectrum(3, 3, 3)));
   return lights;

@@ -29,13 +29,14 @@ Intersectable * getScene(void)
   QVector3D center(0.f,0.f,0.f);
   float radius = 0.2f;
   Spectrum kd(0.4f, 0.4f, 0.4f);
-//  QSharedPointer<Material> material(new MirrorMaterial(0.7));
+//  Material* material(new MirrorMaterial(0.7));
   Material* material(new PhongMaterial(kd, kd, 32));
   Sphere * sphere = new Sphere(center, radius, material);
-  //AxisAlignedBox * box = new AxisAlignedBox(QVector3D(-.2, -.2, -.2), QVector3D(.2, .2, .2), material);
+//  AxisAlignedBox * box = new AxisAlignedBox(QVector3D(-.2, -.2, -.2), QVector3D(.2, .2, .2), material);
 //  AxisAlignedBox * box = sphere->boundingBox();
   std::list< Intersectable* > objects;
   objects.push_back(sphere);
+//  objects.push_back(box);
 
   QVector4D normal(0.f, 1.f, 0.f, 1.f);
   kd = Spectrum(0.f, 0.4f, 0.4f);

@@ -7,6 +7,7 @@
 
 #include <QSize>
 #include <QPointF>
+#include <QTime>
 
 #include <algorithm>
 
@@ -23,9 +24,16 @@ void EnergyRedistributionRenderer::render(const Scene &scene, Film &film, boost:
 
   QSize size = film.getSize();
 
+  QTime time;
+  time.start();
+
   #pragma omp parallel for schedule(dynamic)
   for(int i = 0; i < size.height(); i++)
   {
+    if(vm.count("verbose"))
+    {
+      std::cout << i * 100 / film.height() << "% complete, ETA: " << time.elapsed() * (film.height() - i) / ((i + 1) * 1000) << "s" << std::endl;
+    }
     gsl_rng *rng = gsl_rng_alloc(gsl_rng_taus);
     gsl_rng_set(rng, size.height() * seed + i);
     for(int j = 0; j < size.width(); j++)
@@ -57,11 +65,9 @@ void EnergyRedistributionRenderer::equalDispositionFlow(Film &film, MetropolisSa
   int numChains = (int)(gsl_rng_uniform(rng) + initialContrib.length() / (numMutations * ed));
   Spectrum depVal = initialContrib / initialContrib.length() * ed / numChains;
 
-  MetropolisSample y(light.size());
-
   for(int i = 0; i < numChains; i++)
   {
-    y = initialSample;
+    MetropolisSample y = initialSample;
     for(int j = 0; j < numMutations; j++)
     {
       MetropolisSample z = y;

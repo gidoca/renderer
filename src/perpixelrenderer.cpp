@@ -58,7 +58,7 @@ void PerPixelRenderer::render(const Scene & scene, Film & film, const boost::pro
       QPointF point = QPoint(j, i);
       for(std::list<Sample>::iterator it = samples.begin(); it != samples.end(); it++)
       {
-        QPointF samplePoint = point + it->getSample()/* - QPointF(0.5, 0.5)*/;
+        QPointF samplePoint = point + it->getSample();
         Ray ray = scene.camera.getRay(samplePoint);
         Spectrum s = integrator->integrate(ray, *scene.object, scene.light, rng);
         assert(!isnan(s.x()) && !isnan(s.y()) && !isnan(s.z()));
