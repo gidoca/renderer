@@ -4,10 +4,11 @@
 #include "global.h"
 #include "diffusematerial.h"
 
-class DarkMatter : public DiffuseMaterial
+class DarkMatter : public Material
 {
 public:
     Spectrum shade(const HitRecord&, QVector3D direction) const;
+    virtual bool isMirror() const;
 
     static DarkMatter* getInstance();
 

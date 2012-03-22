@@ -13,8 +13,3 @@ bool MirrorMaterial::isMirror() const
 {
   return true;
 }
-
-bool MirrorMaterial::isParticipating() const
-{
-  return false;
-}

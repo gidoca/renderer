@@ -11,7 +11,7 @@ set(renderingsproject_HEADERS win.h)
 set(renderingproject_SRCS main.cpp camera.cpp plane.cpp sphere.cpp
   triangle.cpp intersectableinstance.cpp
   darkmatter.cpp diffusematerial.cpp phongmaterial.cpp
-  conelight.cpp intersectablelist.cpp binarymaterial.cpp
+  conelight.cpp intersectablelist.cpp
   pointlight.cpp objreader.cpp mirrormaterial.cpp
   axisalignedbox.cpp
   sampler.cpp jitteredsampler.cpp arealight.cpp

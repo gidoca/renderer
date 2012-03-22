@@ -1,11 +1,13 @@
 #include "diffusematerial.h"
 
+#include <cmath>
+
 bool DiffuseMaterial::isMirror() const
 {
   return false;
 }
 
-bool DiffuseMaterial::isParticipating() const
+Spectrum DiffuseMaterial::shade(const HitRecord&, QVector3D) const
 {
-  return false;
+  return color / M_PI;
 }
