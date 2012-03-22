@@ -26,8 +26,7 @@ add_executable(renderingproject ${renderingproject_SRCS})
 target_link_libraries(renderingproject ${QT_LIBRARIES} ${GSL_LIBRARIES} ${OPENEXR_LIBRARIES} ${Boost_LIBRARIES})
 #target_link_libraries(stst ${QT_LIBRARIES})
 
-set(COMMON_CXX_FLAGS "-Wextra -Wall -pedantic -std=c++0x ")
+set(COMMON_CXX_FLAGS "-Wextra -Wall -pedantic -std=c++0x -fopenmp ")
 
-set(CMAKE_CXX_FLAGS "${COMMON_CXX_FLAGS} -fopenmp -DNDEBUG -march=native -O3")
-#set(CMAKE_CXX_FLAGS "${COMMON_CXX_FLAGS} -pg")
-#set(CMAKE_CXX_FLAGS "${COMMON_CXX_FLAGS} -g")
+set(CMAKE_CXX_FLAGS_RELEASE "${COMMON_CXX_FLAGS} -fopenmp -DNDEBUG -march=native -O3")
+set(CMAKE_CXX_FLAGS_DEBUG "${COMMON_CXX_FLAGS} -g")
