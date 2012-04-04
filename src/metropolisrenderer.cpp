@@ -72,12 +72,16 @@ void MetropolisRenderer::render(const Scene & scene, Film & film, const boost::p
     {
       int x = (int)(sample.cameraSample.getSample().x() * film.width());
       int y = (int)(sample.cameraSample.getSample().y() * film.height());
+      assert(0 <= x && x < film.width());
+      assert(0 <= y && y < film.height());
       film[y][x] += (1 - accept) * value / value.length() * b / numPixelSamples;
     }
     if(newValue.length() > 0)
     {
       int x = (int)(newSample.cameraSample.getSample().x() * film.width());
       int y = (int)(newSample.cameraSample.getSample().y() * film.height());
+      assert(0 <= x && x < film.width());
+      assert(0 <= y && y < film.height());
       film[y][x] += accept * newValue / newValue.length() * b / numPixelSamples;
     }
     if(gsl_rng_uniform(rng) < accept)

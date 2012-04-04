@@ -38,14 +38,7 @@ Spectrum UniDiPathTracingIntegrator::integrate(const Path &path, const Intersect
 
     Spectrum lightIntensity = light[lightIndex[i]]->getIntensity(hitIt->getIntersectingPoint(), direction, scene, lightSamples[i]);
     float inCos;
-    if(hitIt->getMaterial().isParticipating())
-    {
-      inCos = 1;
-    }
-    else
-    {
-      inCos = QVector3D::dotProduct(-direction.normalized(), hitIt->getSurfaceNormal().normalized());
-    }
+    inCos = QVector3D::dotProduct(-direction.normalized(), hitIt->getSurfaceNormal().normalized());
     Spectrum brdf;
     if(inCos > 0)
     {
