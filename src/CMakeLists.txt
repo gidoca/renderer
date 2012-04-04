@@ -19,7 +19,8 @@ set(renderingproject_SRCS main.cpp camera.cpp plane.cpp sphere.cpp
   quad.cpp csgobject.cpp csgintersection.cpp bvh.cpp
   renderer.cpp perpixelrenderer.cpp metropolisrenderer.cpp
   tonemapper.cpp film.cpp
-  win.cpp energyredistributionrenderer.cpp metropolissample.cpp)
+  win.cpp energyredistributionrenderer.cpp metropolissample.cpp
+  )
 qt4_automoc(${renderingproject_SRCS})
 add_executable(renderingproject ${renderingproject_SRCS})
 #add_executable(stst stst.cpp sampler.cpp jitteredsampler.cpp)

@@ -60,8 +60,9 @@ Intersectable * getScene(void)
   objects.push_back(smallBoxInstance);
 
   kd = Spectrum(.5, .2, .2);
-  AxisAlignedBox * largeBox = new AxisAlignedBox(QVector3D(-82.5, -165, -82.5), QVector3D(82.5, 165, 82.5), new PhongMaterial(kd, Spectrum(), 32));
-//  Sphere * largeBox = new Sphere(QVector3D(), 80, QSharedPointer<Material>(new MirrorMaterial(1)));
+//  AxisAlignedBox * largeBox = new AxisAlignedBox(QVector3D(-82.5, -165, -82.5), QVector3D(82.5, 165, 82.5), new PhongMaterial(kd, Spectrum(), 32));
+  Sphere * largeBox = new Sphere(QVector3D(), 120, new MirrorMaterial(1));
+//  Quad * largeBox = new Quad(QVector3D(82.5, -165, -82.5), QVector3D(82.5, -165, 82.5), QVector3D(82.5, 165, 82.5), QVector3D(82.5, 165, -82.5), new MirrorMaterial(1));
   transform.setToIdentity();
   transform.translate(368, 166, 351);
   transform.rotate(-1.27 * 180 / M_PI, 0, 1, 0);

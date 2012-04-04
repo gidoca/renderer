@@ -10,7 +10,7 @@
 #include <boost/mpl/list.hpp>
 #include <boost/mpl/for_each.hpp>
 
-#include "scenes/sscene.h"
+#include "scenes/cornellscene.h"
 #include "perpixelrenderer.h"
 #include "unidipathtracingintegrator.h"
 #include "metropolisrenderer.h"
