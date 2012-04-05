@@ -35,7 +35,7 @@ public:
     setWindowTitle("Rendering...");
   }
   
-private slots:
+private Q_SLOTS:
   void update();
   void saveImage();
   void saveExr();

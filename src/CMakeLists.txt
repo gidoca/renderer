@@ -6,6 +6,7 @@ include_directories(${QT_INCLUDES} ${GSL_INCLUDE_DIR} ${OPENEXR_INCLUDE_PATHS} $
 include(${QT_USE_FILE})
 
 #set(CMAKE_AUTOMOC TRUE)
+ADD_DEFINITIONS(-DQT_NO_KEYWORDS)
 
 set(renderingproject_HEADERS win.h)
 set(renderingproject_SRCS main.cpp camera.cpp plane.cpp sphere.cpp
@@ -19,14 +20,16 @@ set(renderingproject_SRCS main.cpp camera.cpp plane.cpp sphere.cpp
   quad.cpp csgobject.cpp csgintersection.cpp bvh.cpp
   renderer.cpp perpixelrenderer.cpp metropolisrenderer.cpp
   tonemapper.cpp film.cpp
-  win.cpp energyredistributionrenderer.cpp metropolissample.cpp)
+  win.cpp energyredistributionrenderer.cpp metropolissample.cpp
+  sceneast.cpp sceneparser.cpp
+  )
 qt4_automoc(${renderingproject_SRCS})
 add_executable(renderingproject ${renderingproject_SRCS})
 #add_executable(stst stst.cpp sampler.cpp jitteredsampler.cpp)
 target_link_libraries(renderingproject ${QT_LIBRARIES} ${GSL_LIBRARIES} ${OPENEXR_LIBRARIES} ${Boost_LIBRARIES})
 #target_link_libraries(stst ${QT_LIBRARIES})
 
-set(COMMON_CXX_FLAGS "-Wextra -Wall -pedantic -std=c++0x -fopenmp ")
+set(COMMON_CXX_FLAGS "-Wextra -Wall ")
 
 set(CMAKE_CXX_FLAGS_RELEASE "${COMMON_CXX_FLAGS} -fopenmp -DNDEBUG -march=native -O3")
 set(CMAKE_CXX_FLAGS_DEBUG "${COMMON_CXX_FLAGS} -g")

@@ -1,7 +1,7 @@
 #ifndef INTERSECTABLE_H
 #define INTERSECTABLE_H
 
-#define EPSILON 0.0001
+#define EPSILON 0.001
 
 #include "global.h"
 #include "ray.h"
