@@ -44,8 +44,11 @@ class Tonemapper;
 class Triangle;
 class UniDiPathTracingIntegrator;
 
-struct lst;
-struct sphere;
-struct vctor;
+struct ast_list;
+struct ast_sphere;
+struct ast_box;
+struct ast_quad;
+struct ast_vector;
+struct ast_diffuse_material;
 
 #endif // GLOBAL_H

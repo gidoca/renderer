@@ -120,7 +120,11 @@ int main(int argc, char **argv) {
   QSize resolution(vm["width"].as<int>(), vm["height"].as<int>());
 
   SceneGrammar parser;
-  parser.parse("list{sphere([185 83.5 169] 120) sphere([368 166 351] 150)}");
+  if(!parser.parse("list{ sphere([185 83.5 169] 120 diffuse([1 0 0])) quad([338 136 351] [338 196 351] [398 196 351] [398 136 351] diffuse([1 0 1])) }"))
+  {
+    cerr << "Failed to parse scene\n";
+    return -1;
+  }
 
   const Intersectable * object = buildScene(parser.getAst());
   const vector<const Light*> light = getLight();

@@ -17,25 +17,32 @@
 
 namespace qi = boost::spirit::qi;
 
-struct SceneGrammar : qi::grammar<std::string::iterator, node(), boost::spirit::ascii::space_type>
+struct SceneGrammar : qi::grammar<std::string::iterator, ast_intersectable(), boost::spirit::ascii::space_type>
 {
 public:
   SceneGrammar();
 
   bool parse(std::string in);
 
-  node getAst()
+  ast_intersectable getAst()
   {
     return ast;
   }
 
 private:
-  qi::rule<std::string::iterator, lst(), boost::spirit::ascii::space_type> list;
-  qi::rule<std::string::iterator, sphere(), boost::spirit::ascii::space_type> sp;
-  qi::rule<std::string::iterator, node(), boost::spirit::ascii::space_type> nd;
-  qi::rule<std::string::iterator, vctor(), boost::spirit::ascii::space_type> vect;
+  qi::rule<std::string::iterator, ast_list(), boost::spirit::ascii::space_type> list_rule;
+  qi::rule<std::string::iterator, ast_sphere(), boost::spirit::ascii::space_type> sphere_rule;
+  qi::rule<std::string::iterator, ast_box(), boost::spirit::ascii::space_type> box_rule;
+  qi::rule<std::string::iterator, ast_quad(), boost::spirit::ascii::space_type> quad_rule;
+  qi::rule<std::string::iterator, ast_intersectable(), boost::spirit::ascii::space_type> intersectable_rule;
 
-  node ast;
+  qi::rule<std::string::iterator, ast_vector(), boost::spirit::ascii::space_type> vector_rule;
+
+  qi::rule<std::string::iterator, ast_diffuse_material(), boost::spirit::ascii::space_type> diffuse_material_rule;
+  qi::rule<std::string::iterator, ast_mirror_material(), boost::spirit::ascii::space_type> mirror_material_rule;
+  qi::rule<std::string::iterator, ast_material(), boost::spirit::ascii::space_type> material_rule;
+
+  ast_intersectable ast;
 };
 
 #endif // SCENEPARSER_H
