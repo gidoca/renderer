@@ -7,7 +7,7 @@ include(${QT_USE_FILE})
 
 #set(CMAKE_AUTOMOC TRUE)
 
-set(renderingsproject_HEADERS win.h)
+set(renderingproject_HEADERS win.h)
 set(renderingproject_SRCS main.cpp camera.cpp plane.cpp sphere.cpp
   triangle.cpp intersectableinstance.cpp
   darkmatter.cpp diffusematerial.cpp phongmaterial.cpp
@@ -30,3 +30,4 @@ set(COMMON_CXX_FLAGS "-Wextra -Wall -pedantic -std=c++0x -fopenmp ")
 
 set(CMAKE_CXX_FLAGS_RELEASE "${COMMON_CXX_FLAGS} -fopenmp -DNDEBUG -march=native -O3")
 set(CMAKE_CXX_FLAGS_DEBUG "${COMMON_CXX_FLAGS} -g")
+
