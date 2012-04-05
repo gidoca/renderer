@@ -4,6 +4,8 @@
 
 #include <boost/foreach.hpp>
 
+using namespace std;
+
 struct printer;
 struct node_printer;
 
@@ -41,19 +43,18 @@ void printer::operator()(lst const& l) const
   }
 }
 
-int main(void)
+SceneGrammar::SceneGrammar() : SceneGrammar::base_type(nd)
 {
-  SceneGrammar s;
-  bool r = s.parse("list {list{} list { list {sphere([1 2 3] 4) } } }");
-  if(r)
-  {
-    printer p;
-    p(s.getAst());
-  }
-  else
-  {
-    std::cout << "Failed to parse string\n";
-  }
-  return 0;
+  nd %= list | sp;
+  list %= boost::spirit::lit("list") >> boost::spirit::lit("{") >> *nd >> boost::spirit::lit("}");
+  sp %= boost::spirit::lit("sphere") >> "(" >> vect >> boost::spirit::tag::float_() >> ")";
+  vect %= boost::spirit::lit("[") >> boost::spirit::tag::float_() >> boost::spirit::tag::float_() >> boost::spirit::tag::float_() >> "]";
 }
 
+bool SceneGrammar::parse(string in)
+{
+  std::string::iterator begin = in.begin();
+  std::string::iterator end = in.end();
+  bool r = qi::phrase_parse(begin, end, *this, ast, boost::spirit::ascii::space);
+  return r && begin == end;
+}

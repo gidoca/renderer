@@ -44,4 +44,8 @@ class Tonemapper;
 class Triangle;
 class UniDiPathTracingIntegrator;
 
+struct lst;
+struct sphere;
+struct vctor;
+
 #endif // GLOBAL_H

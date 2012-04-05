@@ -19,6 +19,7 @@
 #include "scene.h"
 #include "tonemapper.h"
 #include "win.h"
+#include "sceneparser.h"
 
 using namespace std;
 using namespace boost::program_options;
@@ -118,7 +119,10 @@ int main(int argc, char **argv) {
 
   QSize resolution(vm["width"].as<int>(), vm["height"].as<int>());
 
-  const Intersectable * object = getScene();
+  SceneGrammar parser;
+  parser.parse("list{sphere([185 83.5 169] 120) sphere([368 166 351] 150)}");
+
+  const Intersectable * object = buildScene(parser.getAst());
   const vector<const Light*> light = getLight();
   const Camera camera = getCamera(resolution);
   
