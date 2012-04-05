@@ -55,6 +55,11 @@ bool SceneGrammar::parse(string in)
 {
   std::string::iterator begin = in.begin();
   std::string::iterator end = in.end();
+  //Argument order changed
+#if ((BOOST_VERSION / 100) % 1000) >= 41
+  bool r = qi::phrase_parse(begin, end, *this, boost::spirit::ascii::space, ast);
+#else
   bool r = qi::phrase_parse(begin, end, *this, ast, boost::spirit::ascii::space);
+#endif
   return r && begin == end;
 }
