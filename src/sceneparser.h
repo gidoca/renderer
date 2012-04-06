@@ -37,7 +37,8 @@ private:
   qi::rule<std::string::iterator, ast_instance(), boost::spirit::ascii::space_type> instance_rule;
   qi::rule<std::string::iterator, ast_intersectable(), boost::spirit::ascii::space_type> intersectable_rule;
 
-  qi::rule<std::string::iterator, ast_vector3_literal(), boost::spirit::ascii::space_type> vector_literal_rule;
+  qi::rule<std::string::iterator, ast_vector3_literal(), boost::spirit::ascii::space_type> vector3_literal_rule;
+  qi::rule<std::string::iterator, ast_vector4_literal(), boost::spirit::ascii::space_type> vector4_literal_rule;
   qi::rule<std::string::iterator, ast_matrix_literal(), boost::spirit::ascii::space_type> matrix_literal_rule;
   qi::rule<std::string::iterator, ast_matrix_mul(), boost::spirit::ascii::space_type> matrix_mul_rule;
   qi::rule<std::string::iterator, ast_matrix(), boost::spirit::ascii::space_type> matrix_rule;

@@ -26,6 +26,7 @@ struct matrix_evaluator : boost::static_visitor<QMatrix4x4>
         matrix.setRow(0, literal.v1.asQVector());
         matrix.setRow(1, literal.v2.asQVector());
         matrix.setRow(2, literal.v3.asQVector());
+        matrix.setRow(3, literal.v4.asQVector());
         return matrix;
     }
 
@@ -58,6 +59,11 @@ QVector3D ast_vector3_literal::asQVector() const
 Spectrum ast_vector3_literal::asSpectrum() const
 {
   return Spectrum(x, y, z);
+}
+
+QVector4D ast_vector4_literal::asQVector() const
+{
+  return QVector4D(x, y, z, w);
 }
 
 struct scene_builder : boost::static_visitor<Intersectable*>

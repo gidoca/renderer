@@ -9,6 +9,7 @@
 #include <vector>
 
 #include <QVector3D>
+#include <QVector4D>
 
 struct ast_vector3_literal
 {
@@ -16,6 +17,13 @@ struct ast_vector3_literal
 
   QVector3D asQVector() const;
   Spectrum asSpectrum() const;
+};
+
+struct ast_vector4_literal
+{
+  float x, y, z, w;
+
+  QVector4D asQVector() const;
 };
 
 struct ast_diffuse_material
@@ -40,7 +48,7 @@ typedef boost::variant<
 
 struct ast_matrix_literal
 {
-  ast_vector3_literal v1, v2, v3;
+  ast_vector4_literal v1, v2, v3, v4;
 };
 
 struct ast_matrix_mul
@@ -128,10 +136,19 @@ BOOST_FUSION_ADAPT_STRUCT(
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
+    ast_vector4_literal,
+    (float, x)
+    (float, y)
+    (float, z)
+    (float, w)
+)
+
+BOOST_FUSION_ADAPT_STRUCT(
     ast_matrix_literal,
-    (ast_vector3_literal, v1)
-    (ast_vector3_literal, v2)
-    (ast_vector3_literal, v3)
+    (ast_vector4_literal, v1)
+    (ast_vector4_literal, v2)
+    (ast_vector4_literal, v3)
+    (ast_vector4_literal, v4)
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
