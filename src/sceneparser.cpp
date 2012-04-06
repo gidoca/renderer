@@ -6,52 +6,21 @@
 
 using namespace std;
 
-/*struct printer;
-struct node_printer;
-
-struct printer
-{
-  void operator()(ast_list const& l) const;
-};
-
-struct node_printer : boost::static_visitor<>
-{
-  void operator()(const ast_sphere& s) const
-  {
-    std::cout << s.radius;
-    this->operator()(s.center);
-  }
-
-  void operator()(const ast_vector& v) const
-  {
-    std::cout << "[" << v.x << " " << v.y << " " << v.z << "]";
-  }
-
-  void operator()(const ast_list& l) const
-  {
-    std::cout << '{';
-    printer()(l);
-    std::cout << '}';
-  }
-};
-
-void printer::operator()(ast_list const& l) const
-{
-  BOOST_FOREACH( ast_intersectable n, l.children )
-  {
-    boost::apply_visitor(node_printer(), n);
-  }
-}*/
-
 SceneGrammar::SceneGrammar() : SceneGrammar::base_type(intersectable_rule)
 {
-  intersectable_rule %= list_rule | sphere_rule | box_rule | quad_rule;
+  intersectable_rule %= list_rule | sphere_rule | box_rule | quad_rule | instance_rule;
   list_rule %= boost::spirit::lit("list") >> boost::spirit::lit("{") >> *intersectable_rule >> boost::spirit::lit("}");
-  sphere_rule %= boost::spirit::lit("sphere") >> "(" >> vector_rule >> boost::spirit::tag::float_() >> material_rule >> ")";
-  box_rule %= boost::spirit::lit("box") >> "(" >> vector_rule >> vector_rule >> material_rule >> ")";
-  quad_rule %= boost::spirit::lit("quad") >> "(" >> vector_rule >> vector_rule >> vector_rule >> vector_rule >> material_rule >> ")";
-  vector_rule %= boost::spirit::lit("[") >> boost::spirit::tag::float_() >> boost::spirit::tag::float_() >> boost::spirit::tag::float_() >> "]";
-  diffuse_material_rule %= boost::spirit::lit("diffuse") >> "(" >> vector_rule >> ")";
+  sphere_rule %= boost::spirit::lit("sphere") >> "(" >> vector_literal_rule >> "," >> boost::spirit::tag::float_() >> "," >> material_rule >> ")";
+  box_rule %= boost::spirit::lit("box") >> "(" >> vector_literal_rule >> "," >> vector_literal_rule >> "," >> material_rule >> ")";
+  quad_rule %= boost::spirit::lit("quad") >> "(" >> vector_literal_rule >> "," >> vector_literal_rule >> "," >> vector_literal_rule >> "," >> vector_literal_rule >> "," >> material_rule >> ")";
+  instance_rule %= boost::spirit::lit("instance") >> "(" >> matrix_rule >> "," >> intersectable_rule >> ")";
+
+  vector_literal_rule %= boost::spirit::lit("[") >> boost::spirit::tag::float_() >> boost::spirit::tag::float_() >> boost::spirit::tag::float_() >> "]";
+  matrix_literal_rule %= boost::spirit::lit("[") >> vector_literal_rule >> vector_literal_rule >> vector_literal_rule >> "]";
+  matrix_mul_rule %= matrix_literal_rule >> "*" >> matrix_rule;
+  matrix_rule %= matrix_mul_rule | matrix_literal_rule;
+
+  diffuse_material_rule %= boost::spirit::lit("diffuse") >> "(" >> vector_literal_rule >> ")";
   mirror_material_rule %= boost::spirit::lit("mirror") >> "(" >> boost::spirit::tag::float_() >> ")";
   material_rule %= diffuse_material_rule | mirror_material_rule;
 }

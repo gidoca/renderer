@@ -34,9 +34,13 @@ private:
   qi::rule<std::string::iterator, ast_sphere(), boost::spirit::ascii::space_type> sphere_rule;
   qi::rule<std::string::iterator, ast_box(), boost::spirit::ascii::space_type> box_rule;
   qi::rule<std::string::iterator, ast_quad(), boost::spirit::ascii::space_type> quad_rule;
+  qi::rule<std::string::iterator, ast_instance(), boost::spirit::ascii::space_type> instance_rule;
   qi::rule<std::string::iterator, ast_intersectable(), boost::spirit::ascii::space_type> intersectable_rule;
 
-  qi::rule<std::string::iterator, ast_vector(), boost::spirit::ascii::space_type> vector_rule;
+  qi::rule<std::string::iterator, ast_vector3_literal(), boost::spirit::ascii::space_type> vector_literal_rule;
+  qi::rule<std::string::iterator, ast_matrix_literal(), boost::spirit::ascii::space_type> matrix_literal_rule;
+  qi::rule<std::string::iterator, ast_matrix_mul(), boost::spirit::ascii::space_type> matrix_mul_rule;
+  qi::rule<std::string::iterator, ast_matrix(), boost::spirit::ascii::space_type> matrix_rule;
 
   qi::rule<std::string::iterator, ast_diffuse_material(), boost::spirit::ascii::space_type> diffuse_material_rule;
   qi::rule<std::string::iterator, ast_mirror_material(), boost::spirit::ascii::space_type> mirror_material_rule;

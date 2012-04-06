@@ -3,9 +3,10 @@
 #include "sphere.h"
 #include "axisalignedbox.h"
 #include "quad.h"
+#include "intersectableinstance.h"
+#include "intersectablelist.h"
 #include "diffusematerial.h"
 #include "mirrormaterial.h"
-#include "intersectablelist.h"
 #include "spectrum.h"
 
 #include <boost/foreach.hpp>
@@ -13,7 +14,28 @@
 
 #include <list>
 
+#include <QMatrix4x4>
+
 using namespace std;
+
+struct matrix_evaluator : boost::static_visitor<QMatrix4x4>
+{
+    QMatrix4x4 operator()(ast_matrix_literal literal) const
+    {
+        QMatrix4x4 matrix;
+        matrix.setRow(0, literal.v1.asQVector());
+        matrix.setRow(1, literal.v2.asQVector());
+        matrix.setRow(2, literal.v3.asQVector());
+        return matrix;
+    }
+
+    QMatrix4x4 operator()(ast_matrix_mul matrix_mul) const;
+};
+
+QMatrix4x4 matrix_evaluator::operator()(ast_matrix_mul matrix_mul) const
+{
+    return boost::apply_visitor(matrix_evaluator(), matrix_mul.left) * boost::apply_visitor(matrix_evaluator(), matrix_mul.right);
+}
 
 struct material_builder : boost::static_visitor<Material*>
 {
@@ -28,12 +50,12 @@ struct material_builder : boost::static_visitor<Material*>
   }
 };
 
-QVector3D ast_vector::asQVector() const
+QVector3D ast_vector3_literal::asQVector() const
 {
   return QVector3D(x, y, z);
 }
 
-Spectrum ast_vector::asSpectrum() const
+Spectrum ast_vector3_literal::asSpectrum() const
 {
   return Spectrum(x, y, z);
 }
@@ -56,6 +78,7 @@ struct scene_builder : boost::static_visitor<Intersectable*>
   }
 
   Intersectable* operator()(const ast_list& l) const;
+  Intersectable* operator()(const ast_instance& i) const;
 };
 
 Intersectable* scene_builder::operator()(ast_list const& l) const
@@ -68,6 +91,11 @@ Intersectable* scene_builder::operator()(ast_list const& l) const
   }
 
   return new IntersectableList(intersectables);
+}
+
+Intersectable* scene_builder::operator()(const ast_instance& i) const
+{
+    return new IntersectableInstance(boost::apply_visitor(matrix_evaluator(), i.transform), boost::apply_visitor(scene_builder(), i.intersectable));
 }
 
 Intersectable* buildScene(ast_intersectable n)

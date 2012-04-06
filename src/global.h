@@ -37,6 +37,7 @@ class Renderer;
 class Sample;
 class Sampler;
 class Scene;
+class SceneGrammar;
 class SimpleIntegrator;
 class Spectrum;
 class Sphere;
@@ -48,7 +49,10 @@ struct ast_list;
 struct ast_sphere;
 struct ast_box;
 struct ast_quad;
-struct ast_vector;
+struct ast_instance;
+struct ast_vector3_literal;
 struct ast_diffuse_material;
+struct ast_matrix_literal;
+struct ast_matrix_mul;
 
 #endif // GLOBAL_H
