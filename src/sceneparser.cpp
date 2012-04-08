@@ -19,7 +19,8 @@ SceneGrammar::SceneGrammar() : SceneGrammar::base_type(intersectable_rule)
   vector4_literal_rule %= boost::spirit::lit("[") >> boost::spirit::tag::float_() >> boost::spirit::tag::float_() >> boost::spirit::tag::float_() >> boost::spirit::tag::float_() >> "]";
   matrix_literal_rule %= boost::spirit::lit("[") >> vector4_literal_rule >> vector4_literal_rule >> vector4_literal_rule >> vector4_literal_rule >> "]";
   matrix_mul_rule %= matrix_literal_rule >> "*" >> matrix_rule;
-  matrix_rule %= matrix_mul_rule | matrix_literal_rule;
+  matrix_translate_rule %= boost::spirit::lit("translate") >> "(" >> vector3_literal_rule >> ")";
+  matrix_rule %= matrix_mul_rule | matrix_literal_rule | matrix_translate_rule;
 
   diffuse_material_rule %= boost::spirit::lit("diffuse") >> "(" >> vector3_literal_rule >> ")";
   mirror_material_rule %= boost::spirit::lit("mirror") >> "(" >> boost::spirit::tag::float_() >> ")";

@@ -31,6 +31,13 @@ struct matrix_evaluator : boost::static_visitor<QMatrix4x4>
     }
 
     QMatrix4x4 operator()(ast_matrix_mul matrix_mul) const;
+
+    QMatrix4x4 operator()(ast_matrix_translate matrix_translate) const
+    {
+      QMatrix4x4 matrix;
+      matrix.translate(matrix_translate.translation_vector.asQVector());
+      return matrix;
+    }
 };
 
 QMatrix4x4 matrix_evaluator::operator()(ast_matrix_mul matrix_mul) const

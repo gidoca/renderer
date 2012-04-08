@@ -43,12 +43,18 @@ typedef boost::variant<
 
 typedef boost::variant<
     ast_matrix_literal,
-    boost::recursive_wrapper<ast_matrix_mul>
+    boost::recursive_wrapper<ast_matrix_mul>,
+    ast_matrix_translate
     > ast_matrix;
 
 struct ast_matrix_literal
 {
   ast_vector4_literal v1, v2, v3, v4;
+};
+
+struct ast_matrix_translate
+{
+  ast_vector3_literal translation_vector;
 };
 
 struct ast_matrix_mul
@@ -155,6 +161,11 @@ BOOST_FUSION_ADAPT_STRUCT(
     ast_matrix_mul,
     (ast_matrix, left)
     (ast_matrix, right)
+)
+
+BOOST_FUSION_ADAPT_STRUCT(
+    ast_matrix_translate,
+    (ast_vector3_literal, translation_vector)
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
