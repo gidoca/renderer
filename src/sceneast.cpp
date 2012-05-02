@@ -30,19 +30,30 @@ struct matrix_evaluator : boost::static_visitor<QMatrix4x4>
         return matrix;
     }
 
-    QMatrix4x4 operator()(ast_matrix_mul matrix_mul) const;
-
     QMatrix4x4 operator()(ast_matrix_translate matrix_translate) const
     {
       QMatrix4x4 matrix;
       matrix.translate(matrix_translate.translation_vector.asQVector());
       return matrix;
     }
+
+    QMatrix4x4 operator()(ast_matrix_rotate matrix_rot) const
+    {
+      QMatrix4x4 matrix;
+      matrix.rotate(matrix_rot.angle, matrix_rot.axis.asQVector());
+      return matrix;
+    }
 };
 
-QMatrix4x4 matrix_evaluator::operator()(ast_matrix_mul matrix_mul) const
+QMatrix4x4 ast_matrix::asQMatrix4x4() const
 {
-    return boost::apply_visitor(matrix_evaluator(), matrix_mul.left) * boost::apply_visitor(matrix_evaluator(), matrix_mul.right);
+    QMatrix4x4 first = boost::apply_visitor(matrix_evaluator(), this->first);
+    BOOST_FOREACH(ast_basic_matrix mat, this->mult)
+    {
+        first *= boost::apply_visitor(matrix_evaluator(), mat);
+    }
+
+    return first;
 }
 
 struct material_builder : boost::static_visitor<Material*>
@@ -108,7 +119,7 @@ Intersectable* scene_builder::operator()(ast_list const& l) const
 
 Intersectable* scene_builder::operator()(const ast_instance& i) const
 {
-    return new IntersectableInstance(boost::apply_visitor(matrix_evaluator(), i.transform), boost::apply_visitor(scene_builder(), i.intersectable));
+    return new IntersectableInstance(i.transform.asQMatrix4x4(), boost::apply_visitor(scene_builder(), i.intersectable));
 }
 
 Intersectable* buildScene(ast_intersectable n)

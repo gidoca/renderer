@@ -55,5 +55,6 @@ struct ast_diffuse_material;
 struct ast_matrix_literal;
 struct ast_matrix_mul;
 struct ast_matrix_translate;
+struct ast_matrix_rotate;
 
 #endif // GLOBAL_H

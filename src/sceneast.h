@@ -10,6 +10,7 @@
 
 #include <QVector3D>
 #include <QVector4D>
+#include <QMatrix4x4>
 
 struct ast_vector3_literal
 {
@@ -41,12 +42,6 @@ typedef boost::variant<
     ast_mirror_material
     > ast_material;
 
-typedef boost::variant<
-    ast_matrix_literal,
-    boost::recursive_wrapper<ast_matrix_mul>,
-    ast_matrix_translate
-    > ast_matrix;
-
 struct ast_matrix_literal
 {
   ast_vector4_literal v1, v2, v3, v4;
@@ -57,9 +52,24 @@ struct ast_matrix_translate
   ast_vector3_literal translation_vector;
 };
 
-struct ast_matrix_mul
+struct ast_matrix_rotate
 {
-  ast_matrix left, right;
+  float angle;
+  ast_vector3_literal axis;
+};
+
+typedef boost::variant<
+    ast_matrix_literal,
+    ast_matrix_translate,
+    ast_matrix_rotate
+    > ast_basic_matrix;
+
+struct ast_matrix
+{
+    ast_basic_matrix first;
+    std::vector<ast_basic_matrix> mult;
+
+    QMatrix4x4 asQMatrix4x4() const;
 };
 
 typedef boost::variant<
@@ -158,14 +168,20 @@ BOOST_FUSION_ADAPT_STRUCT(
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    ast_matrix_mul,
-    (ast_matrix, left)
-    (ast_matrix, right)
+    ast_matrix,
+    (ast_basic_matrix, first)
+    (std::vector<ast_basic_matrix>, mult)
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
     ast_matrix_translate,
     (ast_vector3_literal, translation_vector)
+)
+
+BOOST_FUSION_ADAPT_STRUCT(
+    ast_matrix_rotate,
+    (float, angle)
+    (ast_vector3_literal, axis)
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
