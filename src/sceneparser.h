@@ -9,6 +9,8 @@
 #include <boost/spirit/include/phoenix_operator.hpp>
 #include <boost/spirit/include/phoenix_fusion.hpp>
 #include <boost/spirit/include/phoenix_stl.hpp>
+#include <boost/spirit/include/phoenix_object.hpp>
+#include <boost/spirit/include/support_istream_iterator.hpp>
 
 #include <vector>
 #include <string>
@@ -22,7 +24,7 @@ struct SceneGrammar : qi::grammar<std::string::iterator, ast_intersectable(), bo
 public:
   SceneGrammar();
 
-  bool parse(std::string in);
+  bool parse(std::string filename);
 
   ast_intersectable getAst()
   {
