@@ -11,7 +11,7 @@
 #include <algorithm>
 #include <iostream>
 
-#include <QTime>
+#include <omp.h>
 
 using namespace std;
 using namespace boost::program_options;
@@ -56,39 +56,54 @@ void MetropolisRenderer::render(const Scene & scene, Film & film, const boost::p
   }
 //  sample.largeStep(rng);
 
-  int numPixelSamples = vm["met-mutations"].as<int>();
-  const int numSamples = numPixelSamples * film.getSize().width() * film.getSize().height();
+  const int numPixelSamples = vm["met-mutations"].as<int>();
+#ifdef NDEBUG
+  const int numThreads = omp_get_max_threads();
+#else
+  const int numThreads = 1;
+#endif
+  const int numSamples = numPixelSamples * film.getSize().width() * film.getSize().height() / numThreads;
 
-  for(int i = 0; i < numSamples; i++)
+#pragma omp parallel for
+  for(int t = 0; t < numThreads; t++)
   {
-    MetropolisSample newSample = sample.mutated(rng, largeStepProb);
-    path = newSample.cameraPathFromSample(*scene.object, scene.camera);
-    Spectrum newValue = integrator.integrate(path, *scene.object, scene.light, newSample.lightSample1, newSample.lightIndex);
-    assert(!isnan(newValue.x()) && !isnan(newValue.y()) && !isnan(newValue.z()));
-    float accept = min(1., newValue.length() / value.length());
-    assert(!isnan(accept));
-    
-    if(value.length() > 0)
-    {
-      int x = (int)(sample.cameraSample.getSample().x() * film.width());
-      int y = (int)(sample.cameraSample.getSample().y() * film.height());
-      assert(0 <= x && x < film.width());
-      assert(0 <= y && y < film.height());
-      film[y][x] += (1 - accept) * value / value.length() * b / numPixelSamples;
-    }
-    if(newValue.length() > 0)
-    {
-      int x = (int)(newSample.cameraSample.getSample().x() * film.width());
-      int y = (int)(newSample.cameraSample.getSample().y() * film.height());
-      assert(0 <= x && x < film.width());
-      assert(0 <= y && y < film.height());
-      film[y][x] += accept * newValue / newValue.length() * b / numPixelSamples;
-    }
-    if(gsl_rng_uniform(rng) < accept)
-    {
-      sample = newSample;
-      value = newValue;
-    }
+      MetropolisSample currentSample = sample;
+      Spectrum currentValue = value;
+      Path currentPath = path;
+
+      for(int i = 0; i < numSamples; i++)
+      {
+          MetropolisSample newSample = currentSample.mutated(rng, largeStepProb);
+          currentPath = newSample.cameraPathFromSample(*scene.object, scene.camera);
+          Spectrum newValue = integrator.integrate(currentPath, *scene.object, scene.light, newSample.lightSample1, newSample.lightIndex);
+          assert(!isnan(newValue.x()) && !isnan(newValue.y()) && !isnan(newValue.z()));
+          float accept = min(1., newValue.length() / currentValue.length());
+          assert(!isnan(accept));
+
+          if(currentValue.length() > 0)
+          {
+              int x = (int)(currentSample.cameraSample.getSample().x() * film.width());
+              int y = (int)(currentSample.cameraSample.getSample().y() * film.height());
+              assert(0 <= x && x < film.width());
+              assert(0 <= y && y < film.height());
+#pragma omp critical
+              film[y][x] += (1 - accept) * currentValue / currentValue.length() * b / numPixelSamples;
+          }
+          if(newValue.length() > 0)
+          {
+              int x = (int)(newSample.cameraSample.getSample().x() * film.width());
+              int y = (int)(newSample.cameraSample.getSample().y() * film.height());
+              assert(0 <= x && x < film.width());
+              assert(0 <= y && y < film.height());
+#pragma omp critical
+              film[y][x] += accept * newValue / newValue.length() * b / numPixelSamples;
+          }
+          if(gsl_rng_uniform(rng) < accept)
+          {
+              currentSample = newSample;
+              currentValue = newValue;
+          }
+      }
   }
 }
 
