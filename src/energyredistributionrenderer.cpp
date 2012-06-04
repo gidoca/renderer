@@ -62,8 +62,10 @@ void EnergyRedistributionRenderer::equalDispositionFlow(Film &film, MetropolisSa
   Path initialPath = initialSample.cameraPathFromSample(scene, camera);
   Spectrum initialContrib = integrator.integrate(initialPath, scene, light, initialSample.lightSample1, initialSample.lightIndex);
   const int numMutations = vm["erpt-mutations"].as<int>();
+  //TODO check (seems to always be 0 or 1)
   int numChains = (int)(gsl_rng_uniform(rng) + initialContrib.length() / (numMutations * ed));
   Spectrum depVal = initialContrib / initialContrib.length() * ed / numChains;
+  assert(depVal.x() > 0 && depVal.y() > 0 && depVal.z() > 0);
 
   for(int i = 0; i < numChains; i++)
   {
@@ -77,6 +79,7 @@ void EnergyRedistributionRenderer::equalDispositionFlow(Film &film, MetropolisSa
       Path zPath = z.cameraPathFromSample(scene, camera);
       float zLum = integrator.integrate(zPath, scene, light, z.lightSample1, z.lightIndex).length();
       float q = std::min<float>(1, zLum / yLum);
+      assert(q >= 0);
       if(q > gsl_rng_uniform(rng))
       {
         y = z;
@@ -108,8 +111,8 @@ float EnergyRedistributionRenderer::computeEd(const Scene &scene, gsl_rng *rng, 
 
 boost::program_options::options_description EnergyRedistributionRenderer::options()
 {
-	options_description options("Energy Redistribution Renderer options");
-	options.add_options()
+  options_description options("Energy Redistribution Renderer options");
+  options.add_options()
     ("erpt-mutations", value<int>()->default_value(100), "number of mutations")
     ("erpt-x-samples", value<int>()->default_value(2), "number of samples per pixel in x direction")
     ("erpt-y-samples", value<int>()->default_value(2), "number of samples per pixel in y direction");

@@ -83,7 +83,7 @@ int main(int argc, char **argv) {
   options_description image("Image options");
 	image.add_options()
       ("renderer,r", value<string>()->default_value("pathtracing"), "the rendering algorithm to be used (either pathtracing or metropolis)")
-      ("scene,s", value<string>(), "the scene description file")
+      ("scene,s", value<string>(), "the scene description file (mandatory)")
       ("width,x", value<int>()->default_value(250), "the width of the output image")
       ("height,y", value<int>()->default_value(250), "the height of the output image");
   command_line_options.add(image);
@@ -121,6 +121,11 @@ int main(int argc, char **argv) {
   QSize resolution(vm["width"].as<int>(), vm["height"].as<int>());
 
   SceneGrammar parser;
+  if(!vm.count("scene"))
+  {
+    cerr << "Please specify the scene description file by using the -s option\n";
+    return -1;
+  }
   if(!parser.parse(vm["scene"].as<string>()))
   {
     cerr << "Failed to parse scene\n";
