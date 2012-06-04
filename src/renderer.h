@@ -2,8 +2,11 @@
 #define RENDERER_H
 
 #include <vector>
+#include <string>
 
 #include <boost/program_options.hpp>
+#include <boost/mpl/list.hpp>
+#include <boost/mpl/for_each.hpp>
 
 #include "global.h"
 #include "scene.h"
@@ -13,6 +16,8 @@
 #include "sampler.h"
 
 #define MAX_DEPTH 4
+
+typedef boost::mpl::list<MetropolisRenderer, PerPixelRenderer, EnergyRedistributionRenderer> renderers;
 
 class Renderer
 {
@@ -27,5 +32,7 @@ public:
 protected:
   int getSeed(boost::program_options::variables_map vm);
 };
+
+Renderer *getRendererByName(std::string name);
 
 #endif // RENDERER_H

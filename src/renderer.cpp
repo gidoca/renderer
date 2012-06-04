@@ -4,6 +4,10 @@
 #include "intersectable.h"
 #include "jitteredsampler.h"
 
+#include "energyredistributionrenderer.h"
+#include "perpixelrenderer.h"
+#include "metropolisrenderer.h"
+
 #include <gsl/gsl_rng.h>
 #include <gsl/gsl_randist.h>
 
@@ -14,6 +18,28 @@
 #include <QTime>
 
 using namespace std;
+
+struct initializer
+{
+  Renderer **renderer;
+  std::string name;
+  initializer(Renderer **renderer, std::string name) : renderer(renderer), name(name) {}
+
+  template< typename R > void operator()(R)
+  {
+    if(name == R::name)
+    {
+      *renderer = new R();
+    }
+  }
+};
+
+Renderer *getRendererByName(string name)
+{
+  Renderer * renderer = 0;
+  boost::mpl::for_each<renderers>(initializer(&renderer, name));
+  return renderer;
+}
 
 Path Renderer::createPath(const Ray &primaryRay, const Intersectable &scene, gsl_rng *rng, Spectrum initialAlpha, float terminationProb)
 {

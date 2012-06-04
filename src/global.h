@@ -12,6 +12,7 @@ class CSGIntersection;
 class CSGObject;
 class DarkMatter;
 class DiffuseMaterial;
+class EnergyRedistributionRenderer;
 class Film;
 class HitRecord;
 class Integrator;
