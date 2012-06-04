@@ -87,7 +87,7 @@ void EnergyRedistributionRenderer::equalDispositionFlow(Film &film, MetropolisSa
       int pixelX = (int)(y.cameraSample.getSample().x() * film.width());
       int pixelY = (int)(y.cameraSample.getSample().y() * film.height());
       #pragma omp critical
-      film[pixelY][pixelX] += depVal;
+      film[pixelY][pixelX] += depVal / (vm["erpt-x-samples"].as<int>() * vm["erpt-y-samples"].as<int>());
     }
   }
 }
