@@ -18,6 +18,8 @@ using namespace boost::program_options;
 
 void MetropolisRenderer::render(const Scene & scene, Film & film, const boost::program_options::variables_map vm)
 {
+  const int num_films = 100;
+  Film films[num_films];
   gsl_rng *rng = gsl_rng_alloc(gsl_rng_taus);
   int seed = getSeed(vm);
   gsl_rng_set(rng, seed);
@@ -64,6 +66,9 @@ void MetropolisRenderer::render(const Scene & scene, Film & film, const boost::p
 #endif
   const int numSamples = numPixelSamples * film.getSize().width() * film.getSize().height() / numThreads;
 
+  for(int n = 0; n < num_films; n++)
+  {
+    films[n] = Film(film.getSize());
 #pragma omp parallel for
   for(int t = 0; t < numThreads; t++)
   {
@@ -87,7 +92,7 @@ void MetropolisRenderer::render(const Scene & scene, Film & film, const boost::p
               assert(0 <= x && x < film.width());
               assert(0 <= y && y < film.height());
 #pragma omp critical
-              film[y][x] += (1 - accept) * currentValue / currentValue.length() * b / numPixelSamples;
+              films[n][y][x] += (1 - accept) * currentValue / currentValue.length() * b / numPixelSamples;
           }
           if(newValue.length() > 0)
           {
@@ -96,7 +101,7 @@ void MetropolisRenderer::render(const Scene & scene, Film & film, const boost::p
               assert(0 <= x && x < film.width());
               assert(0 <= y && y < film.height());
 #pragma omp critical
-              film[y][x] += accept * newValue / newValue.length() * b / numPixelSamples;
+              films[n][y][x] += accept * newValue / newValue.length() * b / numPixelSamples;
           }
           if(gsl_rng_uniform(rng) < accept)
           {
@@ -105,6 +110,26 @@ void MetropolisRenderer::render(const Scene & scene, Film & film, const boost::p
           }
       }
   }
+  }
+
+  for(int i = 0; i < film.height(); i++)
+  {
+    for(int j = 0; j < film.width(); j++)
+    {
+//      Spectrum diff = films[0][i][j] - films[1][i][j];
+//      Spectrum variance = diff * diff / 4;
+//      film[i][j] = variance;
+//      film[i][j] = films[0][i][j];
+        Spectrum estimated_mean, estimated_squared_mean;
+        for(int k = 0; k < num_films; k++)
+        {
+            estimated_mean += films[k][i][j] / (num_films - 1);
+            estimated_squared_mean += films[k][i][j] * films[k][i][j] / (num_films - 1);
+        }
+        film[i][j] = estimated_squared_mean - estimated_mean * estimated_mean;
+    }
+  }
+
 }
 
 options_description MetropolisRenderer::options()
