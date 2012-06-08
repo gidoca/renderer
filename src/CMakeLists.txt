@@ -26,7 +26,7 @@ set(renderingproject_SRCS main.cpp camera.cpp plane.cpp sphere.cpp
 qt4_automoc(${renderingproject_SRCS})
 add_executable(renderingproject ${renderingproject_SRCS})
 #add_executable(stst stst.cpp sampler.cpp jitteredsampler.cpp)
-target_link_libraries(renderingproject ${QT_LIBRARIES} ${GSL_LIBRARIES} ${OPENEXR_LIBRARIES} ${Boost_LIBRARIES})
+target_link_libraries(renderingproject ${QT_LIBRARIES} ${GSL_LIBRARIES} ${OPENEXR_LIBRARIES} ${Boost_LIBRARIES} ${OpenCV_LIBS})
 #target_link_libraries(stst ${QT_LIBRARIES})
 
 set(COMMON_CXX_FLAGS "-Wextra -Wall -Wno-unused-parameter")
