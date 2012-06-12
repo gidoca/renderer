@@ -5,6 +5,10 @@
 #include <QFileDialog>
 #include <QImageWriter>
 
+#include <opencv2/highgui/highgui.hpp>
+
+using namespace cv;
+
 void Win::update()
 {
     QImage image = tonemapper.tonemap(film);
@@ -33,7 +37,10 @@ void Win::saveImage()
 
   QString filename = QFileDialog::getSaveFileName(this, "Save image as",  QString(), formatString);
   if(filename.isNull()) return;
-  film.saveImg(filename.toStdString());
+
+  Tonemapper tonemapper(QSize(film.size().width, film.size().height));
+  QImage image = tonemapper.tonemap(film);
+  image.save(filename);
 }
 
 void Win::saveExr()
@@ -42,5 +49,5 @@ void Win::saveExr()
 
   QString filename = QFileDialog::getSaveFileName(this, "Save image as",  QString(), formatString);
   if(filename.isNull()) return;
-  film.saveExr(filename.toStdString());
+  imwrite(filename.toStdString(), film);
 }

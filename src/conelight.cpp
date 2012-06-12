@@ -6,19 +6,21 @@
 
 #include <cmath>
 
-Spectrum ConeLight::getIntensity(const QVector3D & at, QVector3D &direction, const Intersectable &scene, const Sample &) const
+using namespace cv;
+
+Vec3f ConeLight::getIntensity(const QVector3D & at, QVector3D &direction, const Intersectable &scene, const Sample &) const
 {
   direction = at - location;
   HitRecord shadowHit = scene.intersect(Ray(at, -direction.normalized()), EPSILON, direction.length());
-  Spectrum part = Spectrum(1, 1, 1);
+  cv::Vec3f part = cv::Vec3f(1, 1, 1);
   float rayAngle = QVector3D::dotProduct(direction.normalized(), this->direction.normalized());
   if(0 <= acos(rayAngle) && acos(rayAngle) <= openingAngle && !shadowHit.intersects())
   {
-    return intensity * part / direction.lengthSquared();
+    return intensity.mul(part) * (1 / direction.lengthSquared());
   }
   else
   {
-    return Spectrum();
+    return Vec3f();
   }
 }
 

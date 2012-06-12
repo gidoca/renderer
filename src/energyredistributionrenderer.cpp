@@ -10,10 +10,12 @@
 #include <QTime>
 
 #include <algorithm>
+#include <iostream>
 
 using namespace boost::program_options;
+using namespace cv;
 
-void EnergyRedistributionRenderer::render(const Scene &scene, Film &film, boost::program_options::variables_map vm)
+void EnergyRedistributionRenderer::render(const Scene &scene, Mat &film, boost::program_options::variables_map vm)
 {
   const int seed = getSeed(vm);
 
@@ -22,21 +24,21 @@ void EnergyRedistributionRenderer::render(const Scene &scene, Film &film, boost:
   const float ed = computeEd(scene, rng, vm["erpt-mutations"].as<int>());
   gsl_rng_free(rng);
 
-  QSize size = film.getSize();
+  Size size = film.size();
 
   QTime time;
   time.start();
 
   #pragma omp parallel for schedule(dynamic)
-  for(int i = 0; i < size.height(); i++)
+  for(int i = 0; i < size.height; i++)
   {
     if(vm.count("verbose"))
     {
-      std::cout << i * 100 / film.height() << "% complete, ETA: " << time.elapsed() * (film.height() - i) / ((i + 1) * 1000) << "s" << std::endl;
+        std::cout << i * 100 / size.height << "% complete, ETA: " << time.elapsed() * (size.height - i) / ((i + 1) * 1000) << "s" << std::endl;
     }
     gsl_rng *rng = gsl_rng_alloc(gsl_rng_taus);
-    gsl_rng_set(rng, size.height() * seed + i);
-    for(int j = 0; j < size.width(); j++)
+    gsl_rng_set(rng, size.height * seed + i);
+    for(int j = 0; j < size.width; j++)
     {
       QPointF pixelCoord(j, i);
       JitteredSampler multiSampler(vm["erpt-x-samples"].as<int>(), vm["erpt-y-samples"].as<int>(), rng);
@@ -44,8 +46,8 @@ void EnergyRedistributionRenderer::render(const Scene &scene, Film &film, boost:
       for(std::list<Sample>::iterator it = samples.begin(); it != samples.end(); it++)
       {
         QPointF point = pixelCoord + it->getSample();
-        point.rx() /= size.width();
-        point.ry() /= size.height();
+        point.rx() /= size.width;
+        point.ry() /= size.height;
         MetropolisSample initialSample(scene.light.size());
         initialSample.initAtPixel(point, rng);
         equalDispositionFlow(film, initialSample, *scene.object, scene.light, scene.camera, rng, ed, vm);
@@ -56,16 +58,16 @@ void EnergyRedistributionRenderer::render(const Scene &scene, Film &film, boost:
 
 }
 
-void EnergyRedistributionRenderer::equalDispositionFlow(Film &film, MetropolisSample initialSample, const Intersectable &scene, std::vector<const Light *>light, const Camera & camera, gsl_rng *rng, float ed, variables_map vm)
+void EnergyRedistributionRenderer::equalDispositionFlow(Mat &film, MetropolisSample initialSample, const Intersectable &scene, std::vector<const Light *>light, const Camera & camera, gsl_rng *rng, float ed, variables_map vm)
 {
   UniDiPathTracingIntegrator integrator(0.1);
   Path initialPath = initialSample.cameraPathFromSample(scene, camera);
-  Spectrum initialContrib = integrator.integrate(initialPath, scene, light, initialSample.lightSample1, initialSample.lightIndex);
+  Vec3f initialContrib = integrator.integrate(initialPath, scene, light, initialSample.lightSample1, initialSample.lightIndex);
   const int numMutations = vm["erpt-mutations"].as<int>();
   //TODO check (seems to always be 0 or 1)
-  int numChains = (int)(gsl_rng_uniform(rng) + initialContrib.length() / (numMutations * ed));
-  Spectrum depVal = initialContrib / initialContrib.length() * ed / numChains;
-  assert(depVal.x() > 0 && depVal.y() > 0 && depVal.z() > 0);
+  int numChains = 3;//(int)(gsl_rng_uniform(rng) + norm(initialContrib) / (numMutations * ed));
+  Vec3f depVal = initialContrib * (1 / norm(initialContrib) * ed / numChains);
+  assert(norm(depVal) > 0);
 
   for(int i = 0; i < numChains; i++)
   {
@@ -75,26 +77,26 @@ void EnergyRedistributionRenderer::equalDispositionFlow(Film &film, MetropolisSa
       MetropolisSample z = y;
       z.smallStep(rng);
       Path yPath = y.cameraPathFromSample(scene, camera);
-      float yLum = integrator.integrate(yPath, scene, light, y.lightSample1, y.lightIndex).length();
+      float yLum = norm(integrator.integrate(yPath, scene, light, y.lightSample1, y.lightIndex));
       Path zPath = z.cameraPathFromSample(scene, camera);
-      float zLum = integrator.integrate(zPath, scene, light, z.lightSample1, z.lightIndex).length();
+      float zLum = norm(integrator.integrate(zPath, scene, light, z.lightSample1, z.lightIndex));
       float q = std::min<float>(1, zLum / yLum);
       assert(q >= 0);
       if(q > gsl_rng_uniform(rng))
       {
         y = z;
       }
-      int pixelX = (int)(y.cameraSample.getSample().x() * film.width());
-      int pixelY = (int)(y.cameraSample.getSample().y() * film.height());
+      int pixelX = (int)(y.cameraSample.getSample().x() * film.size().width);
+      int pixelY = (int)(y.cameraSample.getSample().y() * film.size().height);
       #pragma omp critical
-      film[pixelY][pixelX] += depVal / (vm["erpt-x-samples"].as<int>() * vm["erpt-y-samples"].as<int>());
+      film.at<Vec3f>(pixelY, pixelX) += depVal * (1 / (vm["erpt-x-samples"].as<int>() * vm["erpt-y-samples"].as<int>()));
     }
   }
 }
 
 float EnergyRedistributionRenderer::computeEd(const Scene &scene, gsl_rng *rng, int pathsPerPixel)
 {
-  Spectrum ed;
+  Vec3f ed;
   QSize size = scene.camera.getResolution();
   const UniDiPathTracingIntegrator integrator(0.1f);
   for(int i = 0; i < size.height(); i++)
@@ -106,7 +108,7 @@ float EnergyRedistributionRenderer::computeEd(const Scene &scene, gsl_rng *rng, 
       ed += integrator.integrate(ray, *scene.object, scene.light, 4, rng);
     }
   }
-  return ed.length() / (size.height() * size.width() * pathsPerPixel);
+  return norm(ed) / (size.height() * size.width() * pathsPerPixel);
 }
 
 boost::program_options::options_description EnergyRedistributionRenderer::options()

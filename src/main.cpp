@@ -8,12 +8,14 @@
 
 #include <boost/program_options.hpp>
 
+#include <opencv2/core/core.hpp>
+#include <opencv2/highgui/highgui.hpp>
+
 #include "scenes/cornellscene.h"
 #include "perpixelrenderer.h"
 #include "unidipathtracingintegrator.h"
 #include "metropolisrenderer.h"
 #include "energyredistributionrenderer.h"
-#include "film.h"
 #include "scene.h"
 #include "tonemapper.h"
 #include "win.h"
@@ -33,13 +35,13 @@ struct option_adder
   }
 };
 
-void render(Renderer * renderer, Film film, Scene scene, variables_map vm)
+void render(Renderer * renderer, cv::Mat film, Scene scene, variables_map vm)
 {  
   QTime time;
   time.start();
   renderer->render(scene, film, vm);
-  if(vm.count("save-exr")) film.saveExr(vm["save-exr"].as<string>());
-  if(vm.count("save-img")) film.saveImg(vm["save-img"].as<string>());
+  if(vm.count("save-exr")) imwrite(vm["save-exr"].as<string>(), film);
+//  if(vm.count("save-img")) film.saveImg(vm["save-img"].as<string>());
   delete renderer;
   if(vm.count("verbose"))
   {
@@ -116,7 +118,7 @@ int main(int argc, char **argv) {
   const vector<const Light*> light = getLight();
   const Camera camera = getCamera(resolution);
   
-  Film film(resolution);
+  cv::Mat film(resolution.height(), resolution.width(), CV_64FC3);
   Scene scene(camera);
   scene.object = object;
   scene.light = light;
@@ -134,5 +136,7 @@ int main(int argc, char **argv) {
     future.waitForFinished();
     return 0;
   }
+
+
 }
 

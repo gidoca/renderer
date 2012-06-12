@@ -8,28 +8,28 @@
 #include <cmath>
 #include <iostream>
 
-AreaLight::AreaLight(QVector3D origin, QVector3D uDirection, QVector3D vDirection, Spectrum intensity) : origin(origin), uDirection(uDirection), vDirection(vDirection), intensity(intensity), normal(QVector3D::crossProduct(uDirection, vDirection))
+AreaLight::AreaLight(QVector3D origin, QVector3D uDirection, QVector3D vDirection, cv::Vec3f intensity) : origin(origin), uDirection(uDirection), vDirection(vDirection), intensity(intensity), normal(QVector3D::crossProduct(uDirection, vDirection))
 {
 }
 
-Spectrum AreaLight::getIntensity(const QVector3D & at, QVector3D &direction, const Intersectable &scene, const Sample &sample) const
+cv::Vec3f AreaLight::getIntensity(const QVector3D & at, QVector3D &direction, const Intersectable &scene, const Sample &sample) const
 {
   QPointF p = sample.getSample();
   QVector3D lightLocation = getLocation(p);
   direction = at - lightLocation;
   HitRecord shadowHit = scene.intersect(Ray(at, -direction.normalized()), EPSILON, direction.length());
-  Spectrum part = Spectrum(1, 1, 1);
+  cv::Vec3f part = cv::Vec3f(1, 1, 1);
 
   if(shadowHit.intersects())
   {
-    return Spectrum();
+    return cv::Vec3f();
   }
   else
   {
     float c = QVector3D::dotProduct(direction.normalized(), normal.normalized()) / direction.lengthSquared() * normal.length();
     assert(!isnan(c));
     if(c < 0) c = 0;
-    return c * intensity * part;
+    return c * intensity.mul(part);
   }
 }
 

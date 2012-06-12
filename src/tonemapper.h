@@ -3,6 +3,8 @@
 
 #include <QImage>
 
+#include <opencv2/core/core.hpp>
+
 #include "global.h"
 
 class Tonemapper
@@ -13,10 +15,10 @@ public:
     
   }
   
-  virtual QImage tonemap(const Film & film);
+  virtual QImage tonemap(const cv::Mat & film);
   
 protected:
-  virtual QRgb map(const Film & film, int row, int column);
+  virtual QRgb map(const cv::Mat & film, int row, int column);
   int clamp(float x);
   
 private:

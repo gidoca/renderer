@@ -6,16 +6,16 @@
 
 #include <cmath>
 
-Spectrum PointLight::getIntensity (const QVector3D& at, QVector3D& direction, const Intersectable& scene, const Sample&) const
+cv::Vec3f PointLight::getIntensity (const QVector3D& at, QVector3D& direction, const Intersectable& scene, const Sample&) const
 {
   direction = getDirection(at);
   if(isOccluded(at, scene))
   {
-    return Spectrum();
+    return cv::Vec3f();
   }
   else
   {
-    return intensity / direction.lengthSquared();
+    return intensity * (1 / direction.lengthSquared());
   }
 }
 

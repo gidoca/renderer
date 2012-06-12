@@ -1,16 +1,17 @@
 #include "tonemapper.h"
 
-#include "spectrum.h"
-#include "film.h"
-
 #include <cmath>
+
+#include <opencv2/core/core.hpp>
+
+using namespace cv;
 
 inline int Tonemapper::clamp(float x)
 {
   return x <= 0 ? 0 : (x >= 255 ? 255 : x);
 }
 
-QImage Tonemapper::tonemap(const Film& film)
+QImage Tonemapper::tonemap(const cv::Mat &film)
 {
   for(int i = 0; i < image.height(); i++)
   {
@@ -23,9 +24,9 @@ QImage Tonemapper::tonemap(const Film& film)
   return image;
 }
 
-QRgb Tonemapper::map(const Film & film, int row, int column)
+QRgb Tonemapper::map(const cv::Mat &film, int row, int column)
 {
-  Spectrum irradiance = film[row][column];
-  return qRgb(clamp(255 * pow(irradiance.x(), 1./2.3)), clamp(255 * pow(irradiance.y(), 1./2.3)), clamp(255 * pow(irradiance.z(), 1./2.3)));
+  Vec3f irradiance = film.at<Vec3f>(row, column);
+  return qRgb(clamp(255 * pow(irradiance[0], 1./2.3)), clamp(255 * pow(irradiance[1], 1./2.3)), clamp(255 * pow(irradiance[2], 1./2.3)));
 }
 

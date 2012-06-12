@@ -36,6 +36,7 @@ Intersectable* BVHNode::create(IntersectableList* list, int maxDepth)
     if(splitPlane < max) right.push_back(*i);
     delete curbb;
   }
+  //TODO delete all those intermediate list
   BVHNode* node = new BVHNode(create(new IntersectableList(left), maxDepth - 1), create(new IntersectableList(right), maxDepth - 1), bb);
   return node;
 }

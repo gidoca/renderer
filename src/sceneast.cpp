@@ -74,9 +74,9 @@ QVector3D ast_vector3_literal::asQVector() const
   return QVector3D(x, y, z);
 }
 
-Spectrum ast_vector3_literal::asSpectrum() const
+cv::Vec3f ast_vector3_literal::asSpectrum() const
 {
-  return Spectrum(x, y, z);
+  return cv::Vec3f(x, y, z);
 }
 
 QVector4D ast_vector4_literal::asQVector() const

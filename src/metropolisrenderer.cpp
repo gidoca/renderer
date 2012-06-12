@@ -15,11 +15,12 @@
 
 using namespace std;
 using namespace boost::program_options;
+using namespace cv;
 
-void MetropolisRenderer::render(const Scene & scene, Film & film, const boost::program_options::variables_map vm)
+void MetropolisRenderer::render(const Scene & scene, Mat & film, const boost::program_options::variables_map vm)
 {
-  const int num_films = 100;
-  Film films[num_films];
+  const int num_films = 2;
+  Mat films[num_films];
   gsl_rng *rng = gsl_rng_alloc(gsl_rng_taus);
   int seed = getSeed(vm);
   gsl_rng_set(rng, seed);
@@ -28,7 +29,7 @@ void MetropolisRenderer::render(const Scene & scene, Film & film, const boost::p
   sample.largeStep(rng);
   Path path = sample.cameraPathFromSample(*scene.object, scene.camera);
   UniDiPathTracingIntegrator integrator;
-  Spectrum value = integrator.integrate(path, *scene.object, scene.light, sample.lightSample1, sample.lightIndex);
+  Vec3f value = integrator.integrate(path, *scene.object, scene.light, sample.lightSample1, sample.lightIndex);
 
   const int numInitialSamples = vm["met-bootstrap"].as<int>();
   const float largeStepProb = vm["met-large-step-prob"].as<float>();
@@ -40,9 +41,9 @@ void MetropolisRenderer::render(const Scene & scene, Film & film, const boost::p
   {
     sample.largeStep(rng);
     path = sample.cameraPathFromSample(*scene.object, scene.camera);
-    Spectrum l = integrator.integrate(path, *scene.object, scene.light, sample.lightSample1, sample.lightIndex);
-    sumI += l.length();
-    bootstrapI.push_back(l.length());
+    Vec3f l = integrator.integrate(path, *scene.object, scene.light, sample.lightSample1, sample.lightIndex);
+    sumI += norm(l);
+    bootstrapI.push_back(norm(l));
     bootstrapSamples.push_back(sample);
   }
   const float b = sumI / numInitialSamples;
@@ -64,44 +65,44 @@ void MetropolisRenderer::render(const Scene & scene, Film & film, const boost::p
 #else
   const int numThreads = 1;
 #endif
-  const int numSamples = numPixelSamples * film.getSize().width() * film.getSize().height() / numThreads;
+  const int numSamples = numPixelSamples * film.size().width * film.size().height / numThreads;
 
   for(int n = 0; n < num_films; n++)
   {
-    films[n] = Film(film.getSize());
+    films[n].create(film.size(), film.type());
 #pragma omp parallel for
   for(int t = 0; t < numThreads; t++)
   {
       MetropolisSample currentSample = sample;
-      Spectrum currentValue = value;
+      Vec3f currentValue = value;
       Path currentPath = path;
 
       for(int i = 0; i < numSamples; i++)
       {
           MetropolisSample newSample = currentSample.mutated(rng, largeStepProb);
           currentPath = newSample.cameraPathFromSample(*scene.object, scene.camera);
-          Spectrum newValue = integrator.integrate(currentPath, *scene.object, scene.light, newSample.lightSample1, newSample.lightIndex);
-          assert(!isnan(newValue.x()) && !isnan(newValue.y()) && !isnan(newValue.z()));
-          float accept = min(1., newValue.length() / currentValue.length());
+          Vec3f newValue = integrator.integrate(currentPath, *scene.object, scene.light, newSample.lightSample1, newSample.lightIndex);
+//          assert(!isnan(newValue.x()) && !isnan(newValue.y()) && !isnan(newValue.z()));
+          float accept = min(1., norm(newValue) / norm(currentValue));
           assert(!isnan(accept));
 
-          if(currentValue.length() > 0)
+          if(norm(currentValue) > 0)
           {
-              int x = (int)(currentSample.cameraSample.getSample().x() * film.width());
-              int y = (int)(currentSample.cameraSample.getSample().y() * film.height());
-              assert(0 <= x && x < film.width());
-              assert(0 <= y && y < film.height());
+              int x = (int)(currentSample.cameraSample.getSample().x() * film.size().width);
+              int y = (int)(currentSample.cameraSample.getSample().y() * film.size().height);
+              assert(0 <= x && x < film.size().width);
+              assert(0 <= y && y < film.size().height);
 #pragma omp critical
-              films[n][y][x] += (1 - accept) * currentValue / currentValue.length() * b / numPixelSamples;
+              films[n].at<Vec3f>(y, x) += (1 - accept) * currentValue * (1 / norm(currentValue) * b / numPixelSamples);
           }
-          if(newValue.length() > 0)
+          if(norm(newValue) > 0)
           {
-              int x = (int)(newSample.cameraSample.getSample().x() * film.width());
-              int y = (int)(newSample.cameraSample.getSample().y() * film.height());
-              assert(0 <= x && x < film.width());
-              assert(0 <= y && y < film.height());
+              int x = (int)(newSample.cameraSample.getSample().x() * film.size().width);
+              int y = (int)(newSample.cameraSample.getSample().y() * film.size().height);
+              assert(0 <= x && x < film.size().width);
+              assert(0 <= y && y < film.size().height);
 #pragma omp critical
-              films[n][y][x] += accept * newValue / newValue.length() * b / numPixelSamples;
+              films[n].at<Vec3f>(y, x) += accept * newValue * (1 / norm(newValue) * b / numPixelSamples);
           }
           if(gsl_rng_uniform(rng) < accept)
           {
@@ -110,26 +111,26 @@ void MetropolisRenderer::render(const Scene & scene, Film & film, const boost::p
           }
       }
   }
+  std::cout << n << std::endl;
   }
 
-  for(int i = 0; i < film.height(); i++)
+  for(int i = 0; i < film.size().height; i++)
   {
-    for(int j = 0; j < film.width(); j++)
+    for(int j = 0; j < film.size().width; j++)
     {
 //      Spectrum diff = films[0][i][j] - films[1][i][j];
 //      Spectrum variance = diff * diff / 4;
 //      film[i][j] = variance;
 //      film[i][j] = films[0][i][j];
-        Spectrum estimated_mean, estimated_squared_mean;
+        Vec3f sum, sum_of_square;
         for(int k = 0; k < num_films; k++)
         {
-            estimated_mean += films[k][i][j] / (num_films - 1);
-            estimated_squared_mean += films[k][i][j] * films[k][i][j] / (num_films - 1);
+          sum += films[k].at<Vec3f>(i, j);
+          sum_of_square += films[k].at<Vec3f>(i, j).mul(films[k].at<Vec3f>(i, j));
         }
-        film[i][j] = estimated_squared_mean - estimated_mean * estimated_mean;
+        film.at<Vec3f>(i, j) = (sum_of_square - sum.mul(sum) * (1 / num_films)) * (1 / (num_films - 1));
     }
   }
-
 }
 
 options_description MetropolisRenderer::options()

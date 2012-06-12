@@ -6,6 +6,8 @@
 #include <vector>
 #include <list>
 
+#include <opencv2/core/core.hpp>
+
 #include "../camera.h"
 #include "../pointlight.h"
 #include "../conelight.h"
@@ -29,7 +31,7 @@ Camera getCamera(QSize resolution)
   return Camera(eye, lookAt, up, fov, resolution);
 }
 
-Intersectable * getScene(void)
+/*Intersectable * getScene(void)
 {
   std::list<Intersectable*> objects;
 
@@ -76,7 +78,7 @@ Intersectable * getScene(void)
 
 //  return BSPNode::buildTree(new IntersectableList(objects));
   return new IntersectableList(objects);
-}
+}*/
 
 std::vector<const Light*> getLight(void)
 {
@@ -84,7 +86,7 @@ std::vector<const Light*> getLight(void)
 //  lights.push_back((new AreaLight(QVector3D(213, 548, 227), QVector3D(13, 0, 0), QVector3D(0, 0, 10.5), 5000 * Spectrum(1, 0.85, 0.43))));
 //   lights.push_back(QSharedPointer<Light>(new AreaLight(QVector3D(213, 548, 227), QVector3D(130, 0, 0), QVector3D(0, 0, 105), 250 * Spectrum(1, 0.85, 0.43))));
 //   lights.push_back(QSharedPointer<Light>(new AreaLight(QVector3D(368, 166, 351), QVector3D(10, 0, 0), QVector3D(0, 0, 7), 1000 * Spectrum(1, 0.85, 0.43))));
-   lights.push_back(new PointLight(QVector3D(278, 478, 279.5), Spectrum(412300, 341100, 298600)));
+   lights.push_back(new PointLight(QVector3D(278, 478, 279.5), cv::Vec3f(412300, 341100, 298600)));
 //   lights.push_back(QSharedPointer<Light>(new ConeLight(QVector3D(213, 548, 227), QVector3D(0, -1, 0), M_PI / 32, 10000 * Spectrum(200, 200, 200))));
   return lights;
 }

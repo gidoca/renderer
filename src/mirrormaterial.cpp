@@ -4,9 +4,9 @@
 #include "intersectable.h"
 #include "light.h"
 
-Spectrum MirrorMaterial::shade(const HitRecord& , QVector3D) const
+cv::Vec3f MirrorMaterial::shade(const HitRecord& , QVector3D) const
 {
-  return Spectrum();
+  return cv::Vec3f();
 }
 
 bool MirrorMaterial::isMirror() const

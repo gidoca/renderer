@@ -8,10 +8,12 @@
 
 #include <gsl/gsl_rng.h>
 
-Spectrum SimpleIntegrator::integrate(const Ray & ray, const Intersectable & scene, std::vector<Light*> light, int depth, gsl_rng *rng) const
+using namespace cv;
+
+Vec3f SimpleIntegrator::integrate(const Ray & ray, const Intersectable & scene, std::vector<Light*> light, int depth, gsl_rng *rng) const
 {
   JitteredSampler sampler(2, 2, rng);
-  if(depth > MAX_DEPTH) return Spectrum();
+  if(depth > MAX_DEPTH) return Vec3f();
 
   HitRecord hit = scene.intersect(ray);
   if(hit.getMaterial().isMirror())
@@ -27,23 +29,23 @@ Spectrum SimpleIntegrator::integrate(const Ray & ray, const Intersectable & scen
   {
     if(hit.intersects())
     {
-    Spectrum result;
+    Vec3f result;
     QVector3D direction;
     std::list<Sample> samples = sampler.getSamples();
     for(std::list<Sample>::iterator i = samples.begin(); i != samples.end(); i++)
     {
       int lightIndex = gsl_rng_uniform_int(rng, light.size());
-      Spectrum lightIntensity = light[lightIndex]->getIntensity(hit.getIntersectingPoint(), direction, scene, *i);
-      Spectrum shade = hit.getMaterial().shade(hit, direction);
-      result += shade * lightIntensity;
+      Vec3f lightIntensity = light[lightIndex]->getIntensity(hit.getIntersectingPoint(), direction, scene, *i);
+      Vec3f shade = hit.getMaterial().shade(hit, direction);
+      result += shade.mul(lightIntensity);
     }
-    return result / samples.size();
+    return result * (1.f / samples.size());
   }
     else
     {
 //      QVector3D dir = ray.getDirection();
 //      return light.getIntensity(hit, dir, scene, QPointF());
-      return Spectrum();
+      return Vec3f();
     }
   }
 }

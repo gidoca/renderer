@@ -18,8 +18,9 @@
 
 using namespace boost::program_options;
 using namespace std;
+using namespace cv;
 
-void PerPixelRenderer::render(const Scene & scene, Film & film, const boost::program_options::variables_map vm)
+void PerPixelRenderer::render(const Scene & scene, cv::Mat & film, const boost::program_options::variables_map vm)
 {
   Integrator * integrator;
   if(vm["pt-integrator"].as<string>() == "unidi")
@@ -37,16 +38,16 @@ void PerPixelRenderer::render(const Scene & scene, Film & film, const boost::pro
   int seed = getSeed(vm);
   
   #pragma omp parallel for schedule(dynamic)
-  for(int i = 0; i < film.height(); i++)
+  for(int i = 0; i < film.size().height; i++)
   {
     gsl_rng *rng = gsl_rng_alloc(gsl_rng_taus);
-    gsl_rng_set(rng, film.height() * seed + i);
+    gsl_rng_set(rng, film.size().height * seed + i);
     if(vm.count("verbose"))
     {
-      std::cout << i * 100 / film.height() << "% complete, ETA: " << time.elapsed() * (film.height() - i) / ((i + 1) * 1000) << "s" << std::endl;
+      std::cout << i * 100 / film.size().height << "% complete, ETA: " << time.elapsed() * (film.size().height - i) / ((i + 1) * 1000) << "s" << std::endl;
     }
-    Spectrum * scanline = film[i];
-    for(int j = 0; j < film.width(); j++)
+    Vec3f * scanline = film.ptr<Vec3f>(i);
+    for(int j = 0; j < film.size().width; j++)
     {
 #ifndef NDEBUG
       //Black pixel
@@ -60,10 +61,10 @@ void PerPixelRenderer::render(const Scene & scene, Film & film, const boost::pro
       {
         QPointF samplePoint = point + it->getSample();
         Ray ray = scene.camera.getRay(samplePoint);
-        Spectrum s = integrator->integrate(ray, *scene.object, scene.light, rng);
-        assert(!isnan(s.x()) && !isnan(s.y()) && !isnan(s.z()));
-        assert(s.x() >= 0 && s.y() >= 0 && s.z() >= 0);
-        scanline[j] += s / samples.size();
+        Vec3f s = integrator->integrate(ray, *scene.object, scene.light, rng);
+        assert(!isnan(s[0]) && !isnan(s[1]) && !isnan(s[2]));
+        assert(s[0] >= 0 && s[1] >= 0 && s[2] >= 0);
+        scanline[j] += s * (1.f / samples.size());
       }
     }
     gsl_rng_free(rng);

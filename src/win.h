@@ -1,13 +1,14 @@
 #ifndef WIN_H
 #define WIN_H
 
+#include "tonemapper.h"
+
 #include <QLabel>
 #include <QTimer>
 #include <QFuture>
 #include <QAction>
 
-#include "film.h"
-#include "tonemapper.h"
+#include <opencv2/core/core.hpp>
 
 class Win: public QLabel
 {
@@ -15,9 +16,10 @@ class Win: public QLabel
   Q_OBJECT
   
 public:
-  Win(Film film, QFuture< void > future): film(film), tonemapper(film.getSize()), future(future)
+  Win(cv::Mat film, QFuture< void > future): tonemapper(QSize(film.size().width, film.size().height)), film(film), future(future)
   {
-    setPixmap(QPixmap(film.getSize()));
+    cv::Size size = film.size();
+    setPixmap(QPixmap(QSize(size.width, size.height)));
     connect(&timer, SIGNAL(timeout()), this, SLOT(update()));
     timer.setInterval(100);
     timer.start();
@@ -41,9 +43,9 @@ private Q_SLOTS:
   void saveExr();
   
 private:
-  QTimer timer;
-  Film film;
   Tonemapper tonemapper;
+  QTimer timer;
+  cv::Mat film;
   QFuture<void> future;
 };
 

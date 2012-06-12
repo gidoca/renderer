@@ -17,6 +17,8 @@
 
 #include <QTime>
 
+#include <opencv2/core/core.hpp>
+
 using namespace std;
 
 struct initializer
@@ -41,7 +43,7 @@ Renderer *getRendererByName(string name)
   return renderer;
 }
 
-Path Renderer::createPath(const Ray &primaryRay, const Intersectable &scene, gsl_rng *rng, Spectrum initialAlpha, float terminationProb)
+Path Renderer::createPath(const Ray &primaryRay, const Intersectable &scene, gsl_rng *rng, cv::Vec3f initialAlpha, float terminationProb)
 {
     JitteredSampler sampler(1, 1, rng);
     Sample pathSamples[MAX_DEPTH];
@@ -62,7 +64,7 @@ Path Renderer::createPath(const Ray &primaryRay, const Intersectable &scene, gsl
     return createPath(primaryRay, scene, pathSamples, initialAlpha, pathLength, terminationProb);
 }
 
-Path Renderer::createPath(const Ray& primaryRay, const Intersectable &scene, Sample pathSamples[], Spectrum alpha, int pathLength, float russianRoulettePdf)
+Path Renderer::createPath(const Ray& primaryRay, const Intersectable &scene, Sample pathSamples[], cv::Vec3f alpha, int pathLength, float russianRoulettePdf)
 {
   Path result;
   HitRecord hit = scene.intersect(primaryRay);
@@ -70,7 +72,7 @@ Path Renderer::createPath(const Ray& primaryRay, const Intersectable &scene, Sam
   {
     if(!hit.intersects()) return result;
 
-    assert(!isnan(alpha.x()) && !isnan(alpha.y()) && !isnan(alpha.z()));
+//    assert(!isnan(alpha.x()) && !isnan(alpha.y()) && !isnan(alpha.z()));
     result.alphaValues.push_back(alpha);
     result.hitRecords.push_back(hit);
 
@@ -87,13 +89,13 @@ Path Renderer::createPath(const Ray& primaryRay, const Intersectable &scene, Sam
     {
       outDirection = pathSamples[i].getCosineWeightedDirection(hit.getSurfaceNormal(), pdf);
       if(pdf == 0) return result;
-      Spectrum brdf = hit.getMaterial().shade(hit, -outDirection);
+      cv::Vec3f brdf = hit.getMaterial().shade(hit, -outDirection);
       float cos = QVector3D::dotProduct(outDirection.normalized(), hit.getSurfaceNormal().normalized());
       assert(cos >= 0 && !isnan(pdf));
       assert(pdf >= 0 && !isnan(pdf));
-      assert(brdf.x() >= 0 && brdf.y() >= 0 && brdf.z() >= 0);
-      assert(!isnan(brdf.x()) && !isnan(brdf.y()) && !isnan(brdf.z()));
-      alpha *= brdf * cos / pdf / russianRoulettePdf;
+//      assert(brdf.x() >= 0 && brdf.y() >= 0 && brdf.z() >= 0);
+//      assert(!isnan(brdf.x()) && !isnan(brdf.y()) && !isnan(brdf.z()));
+      alpha = alpha.mul(brdf) * (cos / pdf / russianRoulettePdf);
     }
     hit = scene.intersect(Ray(hit.getIntersectingPoint(), outDirection));
   }

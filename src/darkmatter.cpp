@@ -5,9 +5,9 @@ DarkMatter::DarkMatter()
 
 }
 
-Spectrum DarkMatter::shade(const HitRecord&, QVector3D) const
+cv::Vec3f DarkMatter::shade(const HitRecord&, QVector3D) const
 {
-  return Spectrum(0, 0, 0);
+  return cv::Vec3f(0, 0, 0);
 }
 
 bool DarkMatter::isMirror() const

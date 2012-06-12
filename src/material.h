@@ -2,12 +2,15 @@
 #define MATERIAL_H
 
 #include "global.h"
-#include "spectrum.h"
+
+#include <QVector3D>
+
+#include <opencv2/core/core.hpp>
 
 class Material
 {
   public:
-    virtual Spectrum shade(const HitRecord & hit, QVector3D direction) const = 0;
+    virtual cv::Vec3f shade(const HitRecord & hit, QVector3D direction) const = 0;
     virtual bool isMirror() const = 0;
 };
 

@@ -20,7 +20,8 @@ set(renderingproject_SRCS main.cpp camera.cpp plane.cpp sphere.cpp
   simpleintegrator.cpp unidipathtracingintegrator.cpp bidipathtracingintegrator.cpp
   quad.cpp csgobject.cpp csgintersection.cpp bvh.cpp
   renderer.cpp perpixelrenderer.cpp metropolisrenderer.cpp
-  tonemapper.cpp film.cpp
+  #film.cpp
+  tonemapper.cpp
   win.cpp energyredistributionrenderer.cpp metropolissample.cpp
   )
 qt4_automoc(${renderingproject_SRCS})

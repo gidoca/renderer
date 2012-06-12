@@ -7,7 +7,7 @@ bool DiffuseMaterial::isMirror() const
   return false;
 }
 
-Spectrum DiffuseMaterial::shade(const HitRecord&, QVector3D) const
+cv::Vec3f DiffuseMaterial::shade(const HitRecord&, QVector3D) const
 {
-  return color / M_PI;
+  return color * (1 / M_PI);
 }

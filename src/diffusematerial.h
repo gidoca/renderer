@@ -7,11 +7,11 @@
 class DiffuseMaterial : public Material
 {
 public:
-    DiffuseMaterial(Spectrum color) : color(color) {}
+    DiffuseMaterial(cv::Vec3f color) : color(color) {}
     bool isMirror() const;
-    Spectrum shade(const HitRecord& hit, QVector3D direction) const;
+    cv::Vec3f shade(const HitRecord& hit, QVector3D direction) const;
 protected:
-    const Spectrum color;
+    const cv::Vec3f color;
 };
 
 #endif // DIFFUSEMATERIAL_H

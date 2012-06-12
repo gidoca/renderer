@@ -5,12 +5,13 @@
 
 #include "global.h"
 #include "hitrecord.h"
-#include "spectrum.h"
+
+#include <opencv2/core/core.hpp>
 
 class Path
 {
 public:
-  std::list<Spectrum> alphaValues;
+  std::list<cv::Vec3f> alphaValues;
   std::list<HitRecord> hitRecords;
 };
 

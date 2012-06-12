@@ -12,12 +12,14 @@
 #include <QVector4D>
 #include <QMatrix4x4>
 
+#include <opencv2/core/core.hpp>
+
 struct ast_vector3_literal
 {
   float x, y, z;
 
   QVector3D asQVector() const;
-  Spectrum asSpectrum() const;
+  cv::Vec3f asSpectrum() const;
 };
 
 struct ast_vector4_literal

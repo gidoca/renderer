@@ -8,15 +8,15 @@
 class PhongMaterial : public DiffuseMaterial
 {
   public:
-    PhongMaterial(Spectrum color, Spectrum specularColor, float specularCoefficient) : DiffuseMaterial(color), specularColor(specularColor), specularCoefficient(specularCoefficient)
+    PhongMaterial(cv::Vec3f color, cv::Vec3f specularColor, float specularCoefficient) : DiffuseMaterial(color), specularColor(specularColor), specularCoefficient(specularCoefficient)
     {
 
     }
 
-    Spectrum shade(const HitRecord& hit, QVector3D direction) const;
+    cv::Vec3f shade(const HitRecord& hit, QVector3D direction) const;
 
   private:
-    const Spectrum specularColor;
+    const cv::Vec3f specularColor;
     const float specularCoefficient;
 };
 

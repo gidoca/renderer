@@ -13,7 +13,7 @@ public:
 
   }
 
-  Spectrum shade(const HitRecord& hit, QVector3D direction) const;
+  cv::Vec3f shade(const HitRecord& hit, QVector3D direction) const;
   bool isMirror() const;
   
 private:
