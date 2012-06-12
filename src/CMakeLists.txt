@@ -22,6 +22,7 @@ set(renderingproject_SRCS main.cpp camera.cpp plane.cpp sphere.cpp
   renderer.cpp perpixelrenderer.cpp metropolisrenderer.cpp
   #film.cpp
   tonemapper.cpp
+  symmetricfilter.cpp
   win.cpp energyredistributionrenderer.cpp metropolissample.cpp
   )
 qt4_automoc(${renderingproject_SRCS})
