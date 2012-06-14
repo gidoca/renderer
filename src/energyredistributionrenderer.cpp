@@ -65,8 +65,8 @@ void EnergyRedistributionRenderer::equalDispositionFlow(Mat &film, MetropolisSam
   Vec3f initialContrib = integrator.integrate(initialPath, scene, light, initialSample.lightSample1, initialSample.lightIndex);
   const int numMutations = vm["erpt-mutations"].as<int>();
   //TODO check (seems to always be 0 or 1)
-  int numChains = 3;//(int)(gsl_rng_uniform(rng) + norm(initialContrib) / (numMutations * ed));
-  Vec3f depVal = initialContrib * (1 / norm(initialContrib) * ed / numChains);
+  int numChains = (int)(gsl_rng_uniform(rng) + norm(initialContrib) / (numMutations * ed));
+  Vec3f depVal = initialContrib * (ed / norm(initialContrib) / numChains);
   assert(norm(depVal) > 0);
 
   for(int i = 0; i < numChains; i++)
@@ -89,7 +89,7 @@ void EnergyRedistributionRenderer::equalDispositionFlow(Mat &film, MetropolisSam
       int pixelX = (int)(y.cameraSample.getSample().x() * film.size().width);
       int pixelY = (int)(y.cameraSample.getSample().y() * film.size().height);
       #pragma omp critical
-      film.at<Vec3f>(pixelY, pixelX) += depVal * (1 / (vm["erpt-x-samples"].as<int>() * vm["erpt-y-samples"].as<int>()));
+      film.at<Vec3f>(pixelY, pixelX) += depVal * (1.f / (vm["erpt-x-samples"].as<int>() * vm["erpt-y-samples"].as<int>()));
     }
   }
 }
