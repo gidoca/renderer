@@ -26,6 +26,8 @@ public:
 
   }
 
+  virtual ~AxisAlignedBox() {}
+
   AxisAlignedBox * boundingBox() const;
     
   IntersectionParameter getCSGIntersection(Ray ray) const;
