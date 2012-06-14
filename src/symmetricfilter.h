@@ -10,7 +10,7 @@ class SymmetricFilter
 public:
     SymmetricFilter() {}
 
-    cv::Mat filter(const cv::Mat & in, const cv::Mat &guide);
+    cv::Mat filter(const cv::Mat & image, const cv::Mat &guide, const cv::Mat &pixvar);
 };
 
 #endif // SYMMETRICFILTER_H
