@@ -22,7 +22,7 @@ void MetropolisRenderer::render(const Scene & scene, Mat & film, const boost::pr
 {
   const int num_films = 2;
   Mat films[num_films];
-  Mat mean(film.size(), film.type()), variance(film.size(), film.type());
+  Mat sum = Mat::zeros(film.size(), film.type()), sqr_sum = Mat::zeros(film.size(), film.type());
   gsl_rng *rng = gsl_rng_alloc(gsl_rng_taus);
   int seed = getSeed(vm);
   gsl_rng_set(rng, seed);
@@ -73,72 +73,59 @@ void MetropolisRenderer::render(const Scene & scene, Mat & film, const boost::pr
   {
     films[n].create(film.size(), film.type());
 #pragma omp parallel for
-  for(int t = 0; t < numThreads; t++)
-  {
-      MetropolisSample currentSample = sample;
-      Vec3f currentValue = value;
-      Path currentPath = path;
-
-      for(int i = 0; i < numSamples; i++)
-      {
-          MetropolisSample newSample = currentSample.mutated(rng, largeStepProb);
-          currentPath = newSample.cameraPathFromSample(*scene.object, scene.camera);
-          Vec3f newValue = integrator.integrate(currentPath, *scene.object, scene.light, newSample.lightSample1, newSample.lightIndex);
-//          assert(!isnan(newValue.x()) && !isnan(newValue.y()) && !isnan(newValue.z()));
-          float accept = min(1., norm(newValue) / norm(currentValue));
-          assert(!isnan(accept));
-
-          if(norm(currentValue) > 0)
-          {
-              int x = (int)(currentSample.cameraSample.getSample().x() * film.size().width);
-              int y = (int)(currentSample.cameraSample.getSample().y() * film.size().height);
-              assert(0 <= x && x < film.size().width);
-              assert(0 <= y && y < film.size().height);
-#pragma omp critical
-              films[n].at<Vec3f>(y, x) += (1 - accept) * currentValue * (1 / norm(currentValue) * b / numPixelSamples);
-          }
-          if(norm(newValue) > 0)
-          {
-              int x = (int)(newSample.cameraSample.getSample().x() * film.size().width);
-              int y = (int)(newSample.cameraSample.getSample().y() * film.size().height);
-              assert(0 <= x && x < film.size().width);
-              assert(0 <= y && y < film.size().height);
-#pragma omp critical
-              films[n].at<Vec3f>(y, x) += accept * newValue * (1 / norm(newValue) * b / numPixelSamples);
-          }
-          if(gsl_rng_uniform(rng) < accept)
-          {
-              currentSample = newSample;
-              currentValue = newValue;
-          }
-      }
-  }
-  std::cout << n << std::endl;
-  }
-
-  for(int i = 0; i < film.size().height; i++)
-  {
-    for(int j = 0; j < film.size().width; j++)
+    for(int t = 0; t < numThreads; t++)
     {
-//      Spectrum diff = films[0][i][j] - films[1][i][j];
-//      Spectrum variance = diff * diff / 4;
-//      film[i][j] = variance;
-//      film[i][j] = films[0][i][j];
-        Vec3f sum, sum_of_square;
-        for(int k = 0; k < num_films; k++)
+        MetropolisSample currentSample = sample;
+        Vec3f currentValue = value;
+        Path currentPath = path;
+
+        for(int i = 0; i < numSamples; i++)
         {
-          Vec3f v = films[k].at<Vec3f>(i, j);
-          sum += v;
-          sum_of_square += v.mul(v);
+            MetropolisSample newSample = currentSample.mutated(rng, largeStepProb);
+            currentPath = newSample.cameraPathFromSample(*scene.object, scene.camera);
+            Vec3f newValue = integrator.integrate(currentPath, *scene.object, scene.light, newSample.lightSample1, newSample.lightIndex);
+            float accept = min(1., norm(newValue) / norm(currentValue));
+            assert(!isnan(accept));
+
+            if(norm(currentValue) > 0)
+            {
+                int x = (int)(currentSample.cameraSample.getSample().x() * film.size().width);
+                int y = (int)(currentSample.cameraSample.getSample().y() * film.size().height);
+                assert(0 <= x && x < film.size().width);
+                assert(0 <= y && y < film.size().height);
+#pragma omp critical
+                films[n].at<Vec3f>(y, x) += (1 - accept) * currentValue * (1 / norm(currentValue) * b / numPixelSamples);
+            }
+            if(norm(newValue) > 0)
+            {
+                int x = (int)(newSample.cameraSample.getSample().x() * film.size().width);
+                int y = (int)(newSample.cameraSample.getSample().y() * film.size().height);
+                assert(0 <= x && x < film.size().width);
+                assert(0 <= y && y < film.size().height);
+#pragma omp critical
+                films[n].at<Vec3f>(y, x) += accept * newValue * (1 / norm(newValue) * b / numPixelSamples);
+            }
+            if(gsl_rng_uniform(rng) < accept)
+            {
+                currentSample = newSample;
+                currentValue = newValue;
+            }
         }
-        variance.at<Vec3f>(i, j) = (sum_of_square - sum.mul(sum) * (1. / num_films)) * (1. / (num_films - 1));
-        mean.at<Vec3f>(i, j) = sum * (1. / num_films);
     }
   }
 
+  for(int i = 0; i < num_films; i++)
+  {
+    sum += films[i];
+    sqr_sum += films[i].mul(films[i]);
+  }
+  Mat mean = sum * (1. / num_films);
+  Mat variance = (sqr_sum - sum.mul(mean)) / (num_films - 1);
+
   SymmetricFilter f;
-//  f.filter(mean, mean, variance).copyTo(film);
-  mean.copyTo(film);
+
+  f.filter(mean, mean, variance).copyTo(film);
+//  mean.copyTo(film);
 }
 
 options_description MetropolisRenderer::options()

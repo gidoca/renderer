@@ -37,7 +37,7 @@ cv::Mat SymmetricFilter::filter(const cv::Mat &image, const cv::Mat &guide, cons
             source = paddedGuide(Range(padding + dy, padding + dy + guide.size().height), Range(padding + dx, padding + dx + guide.size().width));
             data = paddedImage(Range(padding + dy, padding + dy + guide.size().height), Range(padding + dx, padding + dx + image.size().width));
             diff = source - image;
-            blur(diff.mul(diff), d2, Size(patchSize, patchSize));
+            blur(diff.mul(diff), d2, Size(patchSize, patchSize), Point(-1, -1), BORDER_CONSTANT);
             exp(-max(d2 - 2 * pixvar, 0) / (h2 * pixvar), weights);
 
             area += weights;

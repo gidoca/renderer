@@ -23,6 +23,7 @@ typedef boost::mpl::list<MetropolisRenderer, PerPixelRenderer, EnergyRedistribut
 class Renderer
 {
 public:
+  virtual ~Renderer() {}
   virtual void render(const Scene & scene, cv::Mat & film, const boost::program_options::variables_map vm) = 0;
   
   static boost::program_options::options_description options();

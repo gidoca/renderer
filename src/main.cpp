@@ -21,6 +21,10 @@
 #include "win.h"
 #include "sceneparser.h"
 
+#include <opencv2/highgui/highgui.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
+#include "symmetricfilter.h"
+
 using namespace std;
 using namespace boost::program_options;
 
@@ -118,7 +122,7 @@ int main(int argc, char **argv) {
   const vector<const Light*> light = getLight();
   const Camera camera = getCamera(resolution);
   
-  cv::Mat film(resolution.height(), resolution.width(), CV_64FC3);
+  cv::Mat film(resolution.height(), resolution.width(), CV_32FC3);
   Scene scene(camera);
   scene.object = object;
   scene.light = light;
@@ -140,3 +144,21 @@ int main(int argc, char **argv) {
 
 }
 
+
+/*int main(void)
+{
+    cv::Mat imgorig = cv::imread("ramp.png");
+    cv::Mat guideorig = cv::imread("ramp_guide.png");
+    cv::Mat pix_var = 0.0025 * cv::Mat::ones(imgorig.size(), CV_32FC3);
+
+    cv::Mat img, guide;
+    imgorig.convertTo(img, CV_32FC3, 1./255);
+    guideorig.convertTo(guide, CV_32FC3, 1./255);
+
+    SymmetricFilter f;
+    cv::Mat out = f.filter(img, guide, pix_var);
+
+    cv::imshow("filtered", out);
+    cv::waitKey();
+}
+*/
