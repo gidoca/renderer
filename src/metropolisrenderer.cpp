@@ -5,6 +5,7 @@
 #include "path.h"
 #include "unidipathtracingintegrator.h"
 #include "metropolissample.h"
+#include "symmetricfilter.h"
 
 #include <cmath>
 #include <cassert>
@@ -21,6 +22,7 @@ void MetropolisRenderer::render(const Scene & scene, Mat & film, const boost::pr
 {
   const int num_films = 2;
   Mat films[num_films];
+  Mat mean(film.size(), film.type()), variance(film.size(), film.type());
   gsl_rng *rng = gsl_rng_alloc(gsl_rng_taus);
   int seed = getSeed(vm);
   gsl_rng_set(rng, seed);
@@ -125,12 +127,18 @@ void MetropolisRenderer::render(const Scene & scene, Mat & film, const boost::pr
         Vec3f sum, sum_of_square;
         for(int k = 0; k < num_films; k++)
         {
-          sum += films[k].at<Vec3f>(i, j);
-          sum_of_square += films[k].at<Vec3f>(i, j).mul(films[k].at<Vec3f>(i, j));
+          Vec3f v = films[k].at<Vec3f>(i, j);
+          sum += v;
+          sum_of_square += v.mul(v);
         }
-        film.at<Vec3f>(i, j) = (sum_of_square - sum.mul(sum) * (1 / num_films)) * (1 / (num_films - 1));
+        variance.at<Vec3f>(i, j) = (sum_of_square - sum.mul(sum) * (1. / num_films)) * (1. / (num_films - 1));
+        mean.at<Vec3f>(i, j) = sum * (1. / num_films);
     }
   }
+
+  SymmetricFilter f;
+//  f.filter(mean, mean, variance).copyTo(film);
+  mean.copyTo(film);
 }
 
 options_description MetropolisRenderer::options()
