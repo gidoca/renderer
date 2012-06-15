@@ -4,6 +4,14 @@
 
 using namespace cv;
 
+cv::Mat padArray(const cv::Mat &array, int padding)
+{
+    Mat paddedArray = Mat::zeros(array.size() + Size(2 * padding, 2 * padding), array.type());
+    Mat paddedArraySubheader = paddedArray(Range(padding, padding + array.size().height), Range(padding, padding + array.size().width));
+    array.copyTo(paddedArraySubheader);
+    return paddedArray;
+}
+
 cv::Mat SymmetricFilter::filter(const cv::Mat &image, const cv::Mat &guide, const cv::Mat &pixvar)
 {
     Mat d2, source, diff, weights, data;
@@ -18,13 +26,9 @@ cv::Mat SymmetricFilter::filter(const cv::Mat &image, const cv::Mat &guide, cons
     const float h = 0.4f;
     const float h2 = h * h;
 
-    Mat paddedImage = Mat::zeros(image.size() + Size(2 * padding, 2 * padding), image.type());
-    Mat paddedImageSubheader = paddedImage(Range(padding, padding + image.size().height), Range(padding, padding + image.size().width));
-    image.copyTo(paddedImageSubheader);
+    Mat paddedImage = padArray(image, padding);
 
-    Mat paddedGuide = Mat::zeros(guide.size() + Size(2 * padding, 2 * padding), guide.type());
-    Mat paddedGuideSubheader = paddedGuide(Range(padding, padding + guide.size().height), Range(padding, padding + guide.size().width));
-    guide.copyTo(paddedGuideSubheader);
+    Mat paddedGuide = padArray(guide, padding);
 
     for(int dx = -windowRadius; dx <= windowRadius; dx++)
     {
