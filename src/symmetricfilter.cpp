@@ -20,17 +20,15 @@ cv::Mat SymmetricFilter::filter(const cv::Mat &image, const cv::Mat &guide, cons
 
     Mat paddedImage = Mat::zeros(image.size() + Size(2 * padding, 2 * padding), image.type());
     Mat paddedImageSubheader = paddedImage(Range(padding, padding + image.size().height), Range(padding, padding + image.size().width));
-    assert(paddedImageSubheader.size() == image.size());
     image.copyTo(paddedImageSubheader);
 
     Mat paddedGuide = Mat::zeros(guide.size() + Size(2 * padding, 2 * padding), guide.type());
     Mat paddedGuideSubheader = paddedGuide(Range(padding, padding + guide.size().height), Range(padding, padding + guide.size().width));
-    assert(paddedGuideSubheader.size() == guide.size());
     guide.copyTo(paddedGuideSubheader);
 
-    for(int dx = -windowRadius; dx < windowRadius; dx++)
+    for(int dx = -windowRadius; dx <= windowRadius; dx++)
     {
-        for(int dy = -windowRadius; dy < windowRadius; dy++)
+        for(int dy = -windowRadius; dy <= windowRadius; dy++)
         {
             source = paddedGuide(Range(padding + dy, padding + dy + guide.size().height), Range(padding + dx, padding + dx + guide.size().width));
             data = paddedImage(Range(padding + dy, padding + dy + guide.size().height), Range(padding + dx, padding + dx + image.size().width));
