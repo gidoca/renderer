@@ -1,6 +1,7 @@
 #include "symmetricfilter.h"
 
 #include <opencv2/imgproc/imgproc.hpp>
+#include <opencv2/highgui/highgui.hpp>
 
 using namespace cv;
 
@@ -17,6 +18,7 @@ cv::Mat SymmetricFilter::filter(const cv::Mat &image, const cv::Mat &guide, cons
     Mat d2, source, diff, weights, data;
     Mat area = Mat::zeros(image.size(), image.type());
     Mat acc = Mat::zeros(image.size(), image.type());
+    Mat temp;
 
     const int patchSize = 7;
     const int windowRadius = 10;
@@ -36,9 +38,13 @@ cv::Mat SymmetricFilter::filter(const cv::Mat &image, const cv::Mat &guide, cons
         {
             source = paddedGuide(Range(padding + dy, padding + dy + guide.size().height), Range(padding + dx, padding + dx + guide.size().width));
             data = paddedImage(Range(padding + dy, padding + dy + guide.size().height), Range(padding + dx, padding + dx + image.size().width));
-            diff = source - image;
-            blur(diff.mul(diff), d2, Size(patchSize, patchSize), Point(-1, -1), BORDER_CONSTANT);
-            exp(-max(d2 - 2 * pixvar, 0) / (h2 * pixvar), weights);
+            diff = source - guide;
+            blur(diff.mul(diff), d2, Size(patchSize, patchSize), Point(-1, -1), BORDER_REFLECT);
+//            exp(-max(d2 - 2 * pixvar, 0) / (1e-10f + h2 * pixvar), weights);
+            Mat a = -(d2 - 2 * pixvar) / (h2 * pixvar);
+            exp(a, temp);
+            blur(temp, weights, Size(patchSize, patchSize), Point(-1, -1), BORDER_REFLECT);
+            weights = max(weights, 0.0001);
 
             area += weights;
             acc += weights.mul(data);

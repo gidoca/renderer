@@ -45,7 +45,11 @@ void render(Renderer * renderer, cv::Mat film, Scene scene, variables_map vm)
   QTime time;
   time.start();
   renderer->render(scene, film, vm);
-  if(vm.count("save-exr")) imwrite(vm["save-exr"].as<string>(), film);
+  if(vm.count("save-exr")) {
+      cv::Mat cfilm;
+      cv::cvtColor(film, cfilm, CV_BGR2RGB);
+      imwrite(vm["save-exr"].as<string>(), cfilm);
+  }
 //  if(vm.count("save-img")) film.saveImg(vm["save-img"].as<string>());
   delete renderer;
   if(vm.count("verbose"))
@@ -146,15 +150,20 @@ int main(int argc, char **argv) {
 }
 
 
-/*int main(void)
+/*
+int main(void)
 {
     cv::Mat imgorig = cv::imread("ramp.png");
     cv::Mat guideorig = cv::imread("ramp_guide.png");
-    cv::Mat pix_var = 0.0025 * cv::Mat::ones(imgorig.size(), CV_32FC3);
+    cv::Mat pix_var = 0.0025 * cv::Mat::ones(imgorig.size(), CV_32FC1);
+
+    cv::Mat imggray, guidegray;
+    cv::cvtColor(imgorig, imggray, CV_RGB2GRAY);
+    cv::cvtColor(guideorig, guidegray, CV_RGB2GRAY);
 
     cv::Mat img, guide;
-    imgorig.convertTo(img, CV_32FC3, 1./255);
-    guideorig.convertTo(guide, CV_32FC3, 1./255);
+    imggray.convertTo(img, CV_32FC1, 1./255);
+    guidegray.convertTo(guide, CV_32FC1, 1./255);
 
     SymmetricFilter f;
     cv::Mat out = f.filter(img, guide, pix_var);
