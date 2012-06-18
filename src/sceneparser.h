@@ -35,8 +35,9 @@ private:
   qi::rule<std::string::iterator, std::vector<ast_assignment>(), boost::spirit::ascii::space_type> assignments_rule;
   qi::rule<std::string::iterator, ast_intersectable_assignment(), boost::spirit::ascii::space_type> intersectable_assignment_rule;
   qi::rule<std::string::iterator, ast_camera_assignment(), boost::spirit::ascii::space_type> camera_assignment_rule;
+  qi::rule<std::string::iterator, ast_light_assignment(), boost::spirit::ascii::space_type> light_assignment_rule;
 
-  qi::rule<std::string::iterator, ast_list(), boost::spirit::ascii::space_type> list_rule;
+  qi::rule<std::string::iterator, ast_intersectable_list(), boost::spirit::ascii::space_type> intersectable_list_rule;
   qi::rule<std::string::iterator, ast_sphere(), boost::spirit::ascii::space_type> sphere_rule;
   qi::rule<std::string::iterator, ast_box(), boost::spirit::ascii::space_type> box_rule;
   qi::rule<std::string::iterator, ast_quad(), boost::spirit::ascii::space_type> quad_rule;
@@ -56,6 +57,10 @@ private:
   qi::rule<std::string::iterator, ast_material(), boost::spirit::ascii::space_type> material_rule;
 
   qi::rule<std::string::iterator, ast_camera(), boost::spirit::ascii::space_type> camera_rule;
+
+  qi::rule<std::string::iterator, std::vector<ast_light>(), boost::spirit::ascii::space_type> light_list_rule;
+  qi::rule<std::string::iterator, ast_point_light(), boost::spirit::ascii::space_type> point_light_rule;
+  qi::rule<std::string::iterator, ast_light(), boost::spirit::ascii::space_type> light_rule;
 
   std::vector<ast_assignment> ast;
 };

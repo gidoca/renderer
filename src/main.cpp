@@ -11,7 +11,6 @@
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 
-#include "scenes/cornellscene.h"
 #include "perpixelrenderer.h"
 #include "unidipathtracingintegrator.h"
 #include "metropolisrenderer.h"
@@ -122,7 +121,6 @@ int main(int argc, char **argv) {
   }
 
   Scene scene = buildScene(parser.getAst());
-  scene.light = getLight();
   
   cv::Mat film(scene.camera.getResolution().height(), scene.camera.getResolution().width(), CV_32FC3);
   QFuture< void > future = QtConcurrent::run(render, renderer, film, scene, vm);

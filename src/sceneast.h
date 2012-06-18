@@ -16,6 +16,7 @@
 
 struct ast_vector3_literal
 {
+  ast_vector3_literal() : x(0), y(0), z(0) {}
   float x, y, z;
 
   QVector3D asQVector() const;
@@ -24,6 +25,7 @@ struct ast_vector3_literal
 
 struct ast_vector4_literal
 {
+  ast_vector4_literal() : x(0), y(0), z(0), w(0) {}
   float x, y, z, w;
 
   QVector4D asQVector() const;
@@ -75,14 +77,14 @@ struct ast_matrix
 };
 
 typedef boost::variant<
-    boost::recursive_wrapper<ast_list>,
+    boost::recursive_wrapper<ast_intersectable_list>,
     ast_sphere,
     ast_box,
     ast_quad,
     boost::recursive_wrapper<ast_instance>
     > ast_intersectable;
 
-struct ast_list
+struct ast_intersectable_list
 {
   std::vector<ast_intersectable> children;
 };
@@ -120,6 +122,13 @@ struct ast_camera
     Camera asCamera() const;
 };
 
+struct ast_point_light
+{
+    ast_vector3_literal location, intensity;
+};
+
+typedef boost::variant<ast_point_light> ast_light;
+
 struct ast_intersectable_assignment
 {
     ast_intersectable intersectable;
@@ -130,10 +139,15 @@ struct ast_camera_assignment
     ast_camera camera;
 };
 
-typedef boost::variant<ast_intersectable_assignment, ast_camera_assignment> ast_assignment;
+struct ast_light_assignment
+{
+    std::vector<ast_light> lights;
+};
+
+typedef boost::variant<ast_intersectable_assignment, ast_camera_assignment, ast_light_assignment> ast_assignment;
 
 BOOST_FUSION_ADAPT_STRUCT(
-    ast_list,
+    ast_intersectable_list,
     (std::vector<ast_intersectable>, children)
 )
 
@@ -227,6 +241,12 @@ BOOST_FUSION_ADAPT_STRUCT(
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
+    ast_point_light,
+    (ast_vector3_literal, location)
+    (ast_vector3_literal, intensity)
+)
+
+BOOST_FUSION_ADAPT_STRUCT(
     ast_intersectable_assignment,
     (ast_intersectable, intersectable)
 )
@@ -234,6 +254,11 @@ BOOST_FUSION_ADAPT_STRUCT(
 BOOST_FUSION_ADAPT_STRUCT(
     ast_camera_assignment,
     (ast_camera, camera)
+)
+
+BOOST_FUSION_ADAPT_STRUCT(
+    ast_light_assignment,
+    (std::vector<ast_light>, lights)
 )
 
 Scene buildScene(std::vector<ast_assignment> assignments);

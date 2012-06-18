@@ -15,14 +15,15 @@ SceneGrammar::SceneGrammar() : SceneGrammar::base_type(assignments_rule, "inters
   using boost::phoenix::val;
   using namespace boost::spirit;
 
-  assignments_rule %= *(intersectable_assignment_rule | camera_assignment_rule);
+  assignments_rule %= *(intersectable_assignment_rule | camera_assignment_rule | light_assignment_rule);
   intersectable_assignment_rule %= boost::spirit::lit("intersectable") >> "=" >> intersectable_rule >> ";";
   camera_assignment_rule %= boost::spirit::lit("camera") >> "=" >> camera_rule >> ";";
+  light_assignment_rule %= boost::spirit::lit("lights") >> "=" >> light_list_rule >> ";";
 
-  intersectable_rule %= list_rule | sphere_rule | box_rule | quad_rule | instance_rule;
+  intersectable_rule %= intersectable_list_rule | sphere_rule | box_rule | quad_rule | instance_rule;
   intersectable_rule.name("intersectable");
-  list_rule %= boost::spirit::lit("list") >> boost::spirit::lit("{") >> *intersectable_rule >> boost::spirit::lit("}");
-  list_rule.name("list");
+  intersectable_list_rule %= boost::spirit::lit("intersectables") >> boost::spirit::lit("{") >> *intersectable_rule >> boost::spirit::lit("}");
+  intersectable_list_rule.name("list of intersectables");
   sphere_rule %= boost::spirit::lit("sphere") >> "(" >> vector3_literal_rule >> "," >> boost::spirit::tag::float_() >> "," >> material_rule >> ")";
   sphere_rule.name("sphere");
   box_rule %= boost::spirit::lit("box") >> "(" >> vector3_literal_rule >> "," >> vector3_literal_rule >> "," >> material_rule >> ")";
@@ -55,6 +56,10 @@ SceneGrammar::SceneGrammar() : SceneGrammar::base_type(assignments_rule, "inters
   material_rule.name("material");
 
   camera_rule %= boost::spirit::lit("camera") >> "(" >> vector3_literal_rule >> "," >> vector3_literal_rule >> "," >> vector3_literal_rule >> "," >> boost::spirit::tag::float_() >> "," >> boost::spirit::tag::float_() >> "," >> boost::spirit::tag::float_() >> ")";
+
+  light_list_rule %= boost::spirit::lit("lights") >> "{" >> *light_rule >> "}";
+  point_light_rule %= boost::spirit::lit("pointlight") >> "(" >> vector3_literal_rule >> "," >> vector3_literal_rule >> ")";
+  light_rule %= point_light_rule;
 
   boost::spirit::qi::on_error
   (

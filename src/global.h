@@ -45,16 +45,23 @@ class Tonemapper;
 class Triangle;
 class UniDiPathTracingIntegrator;
 
-struct ast_list;
+struct ast_vector3_literal;
+struct ast_vector4_literal;
+struct ast_diffuse_material;
+struct ast_mirror_material;
+struct ast_matrix_literal;
+struct ast_matrix_translate;
+struct ast_matrix_rotate;
+struct ast_matrix;
+struct ast_intersectable_list;
 struct ast_sphere;
 struct ast_box;
 struct ast_quad;
 struct ast_instance;
-struct ast_vector3_literal;
-struct ast_diffuse_material;
-struct ast_matrix_literal;
-struct ast_matrix_mul;
-struct ast_matrix_translate;
-struct ast_matrix_rotate;
+struct ast_camera;
+struct ast_point_light;
+struct ast_intersectable_assignment;
+struct ast_camera_assignment;
+struct ast_light_assignment;
 
 #endif // GLOBAL_H

@@ -10,6 +10,7 @@
 #include "spectrum.h"
 #include "camera.h"
 #include "scene.h"
+#include "pointlight.h"
 
 #include <boost/foreach.hpp>
 #include <boost/variant/apply_visitor.hpp>
@@ -78,13 +79,17 @@ QVector3D ast_vector3_literal::asQVector() const
 
 cv::Vec3f ast_vector3_literal::asSpectrum() const
 {
-  // OpenCV uses BGR byte order
-  return cv::Vec3f(z, y, x);
+  return cv::Vec3f(x, y, z);
 }
 
 QVector4D ast_vector4_literal::asQVector() const
 {
   return QVector4D(x, y, z, w);
+}
+
+Camera ast_camera::asCamera() const
+{
+    return Camera(eye.asQVector(), look_at.asQVector(), up.asQVector(), fov, QSize(xres, yres));
 }
 
 struct intersectable_builder : boost::static_visitor<Intersectable*>
@@ -104,11 +109,11 @@ struct intersectable_builder : boost::static_visitor<Intersectable*>
     return new Quad(q.p1.asQVector(), q.p2.asQVector(), q.p3.asQVector(), q.p4.asQVector(), boost::apply_visitor(material_builder(), q.material));
   }
 
-  Intersectable* operator()(const ast_list& l) const;
+  Intersectable* operator()(const ast_intersectable_list& l) const;
   Intersectable* operator()(const ast_instance& i) const;
 };
 
-Intersectable* intersectable_builder::operator()(ast_list const& l) const
+Intersectable* intersectable_builder::operator()(ast_intersectable_list const& l) const
 {
   list<Intersectable*> intersectables;
 
@@ -125,10 +130,13 @@ Intersectable* intersectable_builder::operator()(const ast_instance& i) const
     return new IntersectableInstance(i.transform.asQMatrix4x4(), boost::apply_visitor(intersectable_builder(), i.intersectable));
 }
 
-Camera ast_camera::asCamera() const
+struct light_builder : boost::static_visitor<Light*>
 {
-    return Camera(eye.asQVector(), look_at.asQVector(), up.asQVector(), fov, QSize(xres, yres));
-}
+    Light* operator()(ast_point_light point_light) const
+    {
+        return new PointLight(point_light.location.asQVector(), point_light.intensity.asSpectrum());
+    }
+};
 
 struct scene_builder : boost::static_visitor<void>
 {
@@ -142,16 +150,27 @@ struct scene_builder : boost::static_visitor<void>
         intersectable = boost::apply_visitor(intersectable_builder(), intersectable_assignment.intersectable);
     }
 
+    void operator()(ast_light_assignment light_assignment)
+    {
+        lights.clear();
+        BOOST_FOREACH(ast_light light, light_assignment.lights)
+        {
+            lights.push_back(boost::apply_visitor(light_builder(), light));
+        }
+    }
+
     Scene getScene() const
     {
         Scene result(camera);
         result.object = intersectable;
+        result.light = lights;
         return result;
     }
 
 private:
     Camera camera;
     Intersectable *intersectable;
+    std::vector<const Light*> lights;
 };
 
 Scene buildScene(vector<ast_assignment> assignments)
