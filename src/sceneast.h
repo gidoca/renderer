@@ -81,6 +81,8 @@ typedef boost::variant<
     ast_sphere,
     ast_box,
     ast_quad,
+    ast_plane,
+    ast_obj,
     boost::recursive_wrapper<ast_instance>
     > ast_intersectable;
 
@@ -106,6 +108,18 @@ struct ast_quad
 {
   ast_vector3_literal p1, p2, p3, p4;
   ast_material material;
+};
+
+struct ast_plane
+{
+    ast_vector4_literal vector;
+    ast_material material;
+};
+
+struct ast_obj
+{
+    std::vector<char> filename;
+    ast_material material;
 };
 
 struct ast_instance
@@ -182,6 +196,18 @@ BOOST_FUSION_ADAPT_STRUCT(
     (ast_vector3_literal, p2)
     (ast_vector3_literal, p3)
     (ast_vector3_literal, p4)
+    (ast_material, material)
+)
+
+BOOST_FUSION_ADAPT_STRUCT(
+    ast_plane,
+    (ast_vector4_literal, vector)
+    (ast_material, material)
+)
+
+BOOST_FUSION_ADAPT_STRUCT(
+    ast_obj,
+    (std::vector<char>, filename)
     (ast_material, material)
 )
 

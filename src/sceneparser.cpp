@@ -15,12 +15,14 @@ SceneGrammar::SceneGrammar() : SceneGrammar::base_type(assignments_rule, "inters
   using boost::phoenix::val;
   using namespace boost::spirit;
 
+  string_literal_rule %= boost::spirit::lit('"') >> *(boost::spirit::ascii::char_ - '"') >> '"';
+
   assignments_rule %= *(intersectable_assignment_rule | camera_assignment_rule | light_assignment_rule);
   intersectable_assignment_rule %= boost::spirit::lit("intersectable") >> "=" >> intersectable_rule >> ";";
   camera_assignment_rule %= boost::spirit::lit("camera") >> "=" >> camera_rule >> ";";
   light_assignment_rule %= boost::spirit::lit("lights") >> "=" >> light_list_rule >> ";";
 
-  intersectable_rule %= intersectable_list_rule | sphere_rule | box_rule | quad_rule | instance_rule;
+  intersectable_rule %= intersectable_list_rule | sphere_rule | box_rule | quad_rule | plane_rule | obj_rule | instance_rule;
   intersectable_rule.name("intersectable");
   intersectable_list_rule %= boost::spirit::lit("intersectables") >> boost::spirit::lit("{") >> *intersectable_rule >> boost::spirit::lit("}");
   intersectable_list_rule.name("list of intersectables");
@@ -30,6 +32,10 @@ SceneGrammar::SceneGrammar() : SceneGrammar::base_type(assignments_rule, "inters
   box_rule.name("box");
   quad_rule %= boost::spirit::lit("quad") >> "(" >> vector3_literal_rule >> "," >> vector3_literal_rule >> "," >> vector3_literal_rule >> "," >> vector3_literal_rule >> "," >> material_rule >> ")";
   quad_rule.name("quad");
+  plane_rule %= boost::spirit::lit("plane") >> "(" >> vector4_literal_rule >> "," >> material_rule >> ")";
+  plane_rule.name("plane");
+  obj_rule %= boost::spirit::lit("obj") >> "(" >> string_literal_rule >> "," >> material_rule >> ")";
+  obj_rule.name("obj");
   instance_rule %= boost::spirit::lit("instance") >> "(" >> matrix_rule >> "," >> intersectable_rule >> ")";
   instance_rule.name("instance");
 

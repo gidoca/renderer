@@ -3,6 +3,7 @@
 #include "sphere.h"
 #include "axisalignedbox.h"
 #include "quad.h"
+#include "plane.h"
 #include "intersectableinstance.h"
 #include "intersectablelist.h"
 #include "diffusematerial.h"
@@ -13,6 +14,7 @@
 #include "pointlight.h"
 #include "arealight.h"
 #include "conelight.h"
+#include "objreader.h"
 
 #include <boost/foreach.hpp>
 #include <boost/variant/apply_visitor.hpp>
@@ -109,6 +111,16 @@ struct intersectable_builder : boost::static_visitor<Intersectable*>
   Intersectable* operator()(const ast_quad& q) const
   {
     return new Quad(q.p1.asQVector(), q.p2.asQVector(), q.p3.asQVector(), q.p4.asQVector(), boost::apply_visitor(material_builder(), q.material));
+  }
+
+  Intersectable* operator()(const ast_plane& p) const
+  {
+      return new Plane(p.vector.asQVector(), boost::apply_visitor(material_builder(), p.material));
+  }
+
+  Intersectable* operator()(const ast_obj& o) const
+  {
+      return ObjReader::getMesh(std::string(o.filename.begin(), o.filename.end()).c_str(), boost::apply_visitor(material_builder(), o.material));
   }
 
   Intersectable* operator()(const ast_intersectable_list& l) const;
