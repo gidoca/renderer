@@ -112,6 +112,26 @@ struct ast_instance
   ast_intersectable intersectable;
 };
 
+struct ast_camera
+{
+    ast_vector3_literal eye, look_at, up;
+    float fov, xres, yres;
+
+    Camera asCamera() const;
+};
+
+struct ast_intersectable_assignment
+{
+    ast_intersectable intersectable;
+};
+
+struct ast_camera_assignment
+{
+    ast_camera camera;
+};
+
+typedef boost::variant<ast_intersectable_assignment, ast_camera_assignment> ast_assignment;
+
 BOOST_FUSION_ADAPT_STRUCT(
     ast_list,
     (std::vector<ast_intersectable>, children)
@@ -196,6 +216,26 @@ BOOST_FUSION_ADAPT_STRUCT(
     (float, coefficient)
 )
 
-Intersectable* buildScene(ast_intersectable n);
+BOOST_FUSION_ADAPT_STRUCT(
+    ast_camera,
+    (ast_vector3_literal, eye)
+    (ast_vector3_literal, look_at)
+    (ast_vector3_literal, up)
+    (float, fov)
+    (float, xres)
+    (float, yres)
+)
+
+BOOST_FUSION_ADAPT_STRUCT(
+    ast_intersectable_assignment,
+    (ast_intersectable, intersectable)
+)
+
+BOOST_FUSION_ADAPT_STRUCT(
+    ast_camera_assignment,
+    (ast_camera, camera)
+)
+
+Scene buildScene(std::vector<ast_assignment> assignments);
 
 #endif // SCENEAST_H

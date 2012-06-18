@@ -9,11 +9,15 @@
 
 using namespace std;
 
-SceneGrammar::SceneGrammar() : SceneGrammar::base_type(intersectable_rule, "intersectable")
+SceneGrammar::SceneGrammar() : SceneGrammar::base_type(assignments_rule, "intersectable")
 {
   using boost::phoenix::construct;
   using boost::phoenix::val;
   using namespace boost::spirit;
+
+  assignments_rule %= *(intersectable_assignment_rule | camera_assignment_rule);
+  intersectable_assignment_rule %= boost::spirit::lit("intersectable") >> "=" >> intersectable_rule >> ";";
+  camera_assignment_rule %= boost::spirit::lit("camera") >> "=" >> camera_rule >> ";";
 
   intersectable_rule %= list_rule | sphere_rule | box_rule | quad_rule | instance_rule;
   intersectable_rule.name("intersectable");
@@ -49,6 +53,8 @@ SceneGrammar::SceneGrammar() : SceneGrammar::base_type(intersectable_rule, "inte
   mirror_material_rule.name("mirror material");
   material_rule %= diffuse_material_rule | mirror_material_rule;
   material_rule.name("material");
+
+  camera_rule %= boost::spirit::lit("camera") >> "(" >> vector3_literal_rule >> "," >> vector3_literal_rule >> "," >> vector3_literal_rule >> "," >> boost::spirit::tag::float_() >> "," >> boost::spirit::tag::float_() >> "," >> boost::spirit::tag::float_() >> ")";
 
   boost::spirit::qi::on_error
   (

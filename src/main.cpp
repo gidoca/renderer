@@ -121,14 +121,10 @@ int main(int argc, char **argv) {
     return -1;
   }
 
-  const Intersectable * object = buildScene(parser.getAst());
-  const vector<const Light*> light = getLight();
-  const Camera camera = getCamera(resolution);
+  Scene scene = buildScene(parser.getAst());
+  scene.light = getLight();
   
-  cv::Mat film(resolution.height(), resolution.width(), CV_32FC3);
-  Scene scene(camera);
-  scene.object = object;
-  scene.light = light;
+  cv::Mat film(scene.camera.getResolution().height(), scene.camera.getResolution().width(), CV_32FC3);
   QFuture< void > future = QtConcurrent::run(render, renderer, film, scene, vm);
   
   if(vm.count("gui") || (!vm.count("save-exr") && !vm.count("save-img")))

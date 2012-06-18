@@ -19,19 +19,23 @@
 
 namespace qi = boost::spirit::qi;
 
-struct SceneGrammar : qi::grammar<std::string::iterator, ast_intersectable(), boost::spirit::ascii::space_type>
+struct SceneGrammar : qi::grammar<std::string::iterator, std::vector<ast_assignment>(), boost::spirit::ascii::space_type>
 {
 public:
   SceneGrammar();
 
   bool parse(std::string filename);
 
-  ast_intersectable getAst()
+  std::vector<ast_assignment> getAst()
   {
     return ast;
   }
 
 private:
+  qi::rule<std::string::iterator, std::vector<ast_assignment>(), boost::spirit::ascii::space_type> assignments_rule;
+  qi::rule<std::string::iterator, ast_intersectable_assignment(), boost::spirit::ascii::space_type> intersectable_assignment_rule;
+  qi::rule<std::string::iterator, ast_camera_assignment(), boost::spirit::ascii::space_type> camera_assignment_rule;
+
   qi::rule<std::string::iterator, ast_list(), boost::spirit::ascii::space_type> list_rule;
   qi::rule<std::string::iterator, ast_sphere(), boost::spirit::ascii::space_type> sphere_rule;
   qi::rule<std::string::iterator, ast_box(), boost::spirit::ascii::space_type> box_rule;
@@ -51,7 +55,9 @@ private:
   qi::rule<std::string::iterator, ast_mirror_material(), boost::spirit::ascii::space_type> mirror_material_rule;
   qi::rule<std::string::iterator, ast_material(), boost::spirit::ascii::space_type> material_rule;
 
-  ast_intersectable ast;
+  qi::rule<std::string::iterator, ast_camera(), boost::spirit::ascii::space_type> camera_rule;
+
+  std::vector<ast_assignment> ast;
 };
 
 #endif // SCENEPARSER_H
