@@ -127,7 +127,18 @@ struct ast_point_light
     ast_vector3_literal location, intensity;
 };
 
-typedef boost::variant<ast_point_light> ast_light;
+struct ast_area_light
+{
+    ast_vector3_literal location, u_direction, v_direction, intensity;
+};
+
+struct ast_cone_light
+{
+    ast_vector3_literal location, direction, intensity;
+    float angle;
+};
+
+typedef boost::variant<ast_point_light, ast_area_light, ast_cone_light> ast_light;
 
 struct ast_intersectable_assignment
 {
@@ -243,6 +254,22 @@ BOOST_FUSION_ADAPT_STRUCT(
 BOOST_FUSION_ADAPT_STRUCT(
     ast_point_light,
     (ast_vector3_literal, location)
+    (ast_vector3_literal, intensity)
+)
+
+BOOST_FUSION_ADAPT_STRUCT(
+    ast_area_light,
+    (ast_vector3_literal, location)
+    (ast_vector3_literal, u_direction)
+    (ast_vector3_literal, v_direction)
+    (ast_vector3_literal, intensity)
+)
+
+BOOST_FUSION_ADAPT_STRUCT(
+    ast_cone_light,
+    (ast_vector3_literal, location)
+    (ast_vector3_literal, direction)
+    (float, angle)
     (ast_vector3_literal, intensity)
 )
 

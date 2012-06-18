@@ -60,6 +60,8 @@ private:
 
   qi::rule<std::string::iterator, std::vector<ast_light>(), boost::spirit::ascii::space_type> light_list_rule;
   qi::rule<std::string::iterator, ast_point_light(), boost::spirit::ascii::space_type> point_light_rule;
+  qi::rule<std::string::iterator, ast_area_light(), boost::spirit::ascii::space_type> area_light_rule;
+  qi::rule<std::string::iterator, ast_cone_light(), boost::spirit::ascii::space_type> cone_light_rule;
   qi::rule<std::string::iterator, ast_light(), boost::spirit::ascii::space_type> light_rule;
 
   std::vector<ast_assignment> ast;

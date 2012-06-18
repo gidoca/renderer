@@ -11,6 +11,8 @@
 #include "camera.h"
 #include "scene.h"
 #include "pointlight.h"
+#include "arealight.h"
+#include "conelight.h"
 
 #include <boost/foreach.hpp>
 #include <boost/variant/apply_visitor.hpp>
@@ -135,6 +137,16 @@ struct light_builder : boost::static_visitor<Light*>
     Light* operator()(ast_point_light point_light) const
     {
         return new PointLight(point_light.location.asQVector(), point_light.intensity.asSpectrum());
+    }
+
+    Light* operator()(ast_area_light area_light) const
+    {
+        return new AreaLight(area_light.location.asQVector(), area_light.u_direction.asQVector(), area_light.v_direction.asQVector(), area_light.intensity.asSpectrum());
+    }
+
+    Light* operator()(ast_cone_light cone_light) const
+    {
+        return new ConeLight(cone_light.location.asQVector(), cone_light.direction.asQVector(), cone_light.angle, cone_light.intensity.asSpectrum());
     }
 };
 

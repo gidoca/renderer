@@ -59,7 +59,9 @@ SceneGrammar::SceneGrammar() : SceneGrammar::base_type(assignments_rule, "inters
 
   light_list_rule %= boost::spirit::lit("lights") >> "{" >> *light_rule >> "}";
   point_light_rule %= boost::spirit::lit("pointlight") >> "(" >> vector3_literal_rule >> "," >> vector3_literal_rule >> ")";
-  light_rule %= point_light_rule;
+  area_light_rule %= boost::spirit::lit("arealight") >> "(" >> vector3_literal_rule >> "," >> vector3_literal_rule >> "," >> vector3_literal_rule >> "," >> vector3_literal_rule >> ")";
+  cone_light_rule %= boost::spirit::lit("conelight") >> "(" >> vector3_literal_rule >> "," >> vector3_literal_rule >> "," >> boost::spirit::tag::float_() >> "," >> vector3_literal_rule >> ")";
+  light_rule %= point_light_rule | area_light_rule | cone_light_rule;
 
   boost::spirit::qi::on_error
   (
