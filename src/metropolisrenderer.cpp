@@ -18,11 +18,32 @@ using namespace std;
 using namespace boost::program_options;
 using namespace cv;
 
+void addSample(const Sample &cameraSample, float weight, Mat &film, Mat &mean, Mat &m2, Mat &sumweight, Vec3f value)
+{
+    int x = (int)(cameraSample.getSample().x() * film.size().width);
+    int y = (int)(cameraSample.getSample().y() * film.size().height);
+    assert(0 <= x && x < film.size().width);
+    assert(0 <= y && y < film.size().height);
+
+#pragma omp critical
+    film.at<Vec3f>(y, x) += weight * value;
+
+    float oldSumWeight = sumweight.at<float>(y, x);
+    float newSumWeight = weight + oldSumWeight;
+    Vec3f delta = value - mean.at<Vec3f>(y, x);
+    Vec3f R = delta * (weight / newSumWeight);
+    mean.at<Vec3f>(y, x) += R;
+    m2.at<Vec3f>(y, x) += oldSumWeight * delta.mul(R);
+    sumweight.at<float>(y, x) = newSumWeight;
+}
+
 void MetropolisRenderer::render(const Scene & scene, Mat & film, const boost::program_options::variables_map vm)
 {
   const int num_films = 2;
   Mat films[num_films];
   Mat sum = Mat::zeros(film.size(), film.type()), sqr_sum = Mat::zeros(film.size(), film.type());
+  Mat biased_mean = Mat::zeros(film.size(), film.type()), biased_m2 = Mat::zeros(film.size(), film.type());
+  Mat sumweight = Mat::zeros(film.size(), CV_32FC1);
   gsl_rng *rng = gsl_rng_alloc(gsl_rng_taus);
   int seed = getSeed(vm);
   gsl_rng_set(rng, seed);
@@ -89,21 +110,11 @@ void MetropolisRenderer::render(const Scene & scene, Mat & film, const boost::pr
 
             if(norm(currentValue) > 0)
             {
-                int x = (int)(currentSample.cameraSample.getSample().x() * film.size().width);
-                int y = (int)(currentSample.cameraSample.getSample().y() * film.size().height);
-                assert(0 <= x && x < film.size().width);
-                assert(0 <= y && y < film.size().height);
-#pragma omp critical
-                films[n].at<Vec3f>(y, x) += (1 - accept) * currentValue * (1 / norm(currentValue) * b / numPixelSamples);
+                addSample(currentSample.cameraSample, 1 - accept, films[n], biased_mean, biased_m2, sumweight, currentValue * (1 / norm(currentValue) * b / numPixelSamples));
             }
             if(norm(newValue) > 0)
             {
-                int x = (int)(newSample.cameraSample.getSample().x() * film.size().width);
-                int y = (int)(newSample.cameraSample.getSample().y() * film.size().height);
-                assert(0 <= x && x < film.size().width);
-                assert(0 <= y && y < film.size().height);
-#pragma omp critical
-                films[n].at<Vec3f>(y, x) += accept * newValue * (1 / norm(newValue) * b / numPixelSamples);
+                addSample(currentSample.cameraSample, accept, films[n], biased_mean, biased_m2, sumweight, newValue * (1 / norm(newValue) * b / numPixelSamples));
             }
             if(gsl_rng_uniform(rng) < accept)
             {
@@ -114,18 +125,23 @@ void MetropolisRenderer::render(const Scene & scene, Mat & film, const boost::pr
     }
   }
 
+  Mat sumweight3;
+  merge(std::vector<Mat>(3, sumweight), sumweight3);
+  Mat biased_variance = biased_m2 / sumweight3;
+
   for(int i = 0; i < num_films; i++)
   {
     sum += films[i];
     sqr_sum += films[i].mul(films[i]);
   }
-  Mat mean = sum * (1. / num_films);
-  Mat variance = (sqr_sum - sum.mul(mean)) / (num_films - 1);
+  Mat noisy_mean = sum * (1. / num_films);
+  Mat noisy_variance = (sqr_sum - sum.mul(noisy_mean)) / (num_films - 1);
 
   SymmetricFilter f;
 
-  f.filter(mean, mean, variance).copyTo(film);
-//  mean.copyTo(film);
+//  f.filter(noisy_mean, noisy_mean, biased_variance).copyTo(film);
+  noisy_mean.copyTo(film);
+//  biased_variance.copyTo(film);
 }
 
 options_description MetropolisRenderer::options()
