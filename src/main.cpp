@@ -72,9 +72,7 @@ int main(int argc, char **argv) {
   options_description image("Image options");
 	image.add_options()
       ("renderer,r", value<string>()->default_value("pathtracing"), "the rendering algorithm to be used (either pathtracing or metropolis)")
-      ("scene,s", value<string>(), "the scene description file (mandatory)")
-      ("width,x", value<int>()->default_value(250), "the width of the output image")
-      ("height,y", value<int>()->default_value(250), "the height of the output image");
+      ("scene,s", value<string>(), "the scene description file (mandatory)");
   command_line_options.add(image);
 
   //Yay, metaprogramming - because we can!
@@ -105,8 +103,6 @@ int main(int argc, char **argv) {
     cerr << "Unknown renderer: " << vm["renderer"].as<string>() << endl;
     return -1;
   }
-
-  QSize resolution(vm["width"].as<int>(), vm["height"].as<int>());
 
   SceneGrammar parser;
   if(!vm.count("scene"))
