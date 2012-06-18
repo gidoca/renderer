@@ -46,9 +46,7 @@ void render(Renderer * renderer, cv::Mat film, Scene scene, variables_map vm)
   time.start();
   renderer->render(scene, film, vm);
   if(vm.count("save-exr")) {
-      cv::Mat cfilm;
-      cv::cvtColor(film, cfilm, CV_BGR2RGB);
-      imwrite(vm["save-exr"].as<string>(), cfilm);
+      imwrite(vm["save-exr"].as<string>(), film);
   }
 //  if(vm.count("save-img")) film.saveImg(vm["save-img"].as<string>());
   delete renderer;

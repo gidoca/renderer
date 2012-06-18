@@ -76,7 +76,8 @@ QVector3D ast_vector3_literal::asQVector() const
 
 cv::Vec3f ast_vector3_literal::asSpectrum() const
 {
-  return cv::Vec3f(x, y, z);
+  // OpenCV uses BGR byte order
+  return cv::Vec3f(z, y, x);
 }
 
 QVector4D ast_vector4_literal::asQVector() const
