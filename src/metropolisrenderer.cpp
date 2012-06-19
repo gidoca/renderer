@@ -142,7 +142,11 @@ void MetropolisRenderer::render(const Scene & scene, Mat & film, const boost::pr
 
   SymmetricFilter f;
 
-  f.filter(noisy_mean, noisy_mean, noisy_variance).copyTo(film);
+  Mat film1, film2;
+  film1 = f.filter(films[0], films[1], noisy_variance);
+  film2 = f.filter(films[1], films[0], noisy_variance);
+  Mat m = ((film1 + film2) / 2);
+  m.copyTo(film);
   imwrite("/home/gidoca/mean.exr", noisy_mean);
 }
 
