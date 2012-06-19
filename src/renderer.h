@@ -13,7 +13,6 @@
 #include "global.h"
 #include "scene.h"
 #include "path.h"
-#include "spectrum.h"
 #include "sampler.h"
 
 #define MAX_DEPTH 4

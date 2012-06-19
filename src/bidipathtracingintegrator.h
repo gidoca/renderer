@@ -2,7 +2,7 @@
 #define BIDIPATHTRACINGINTEGRATOR_H
 
 #include "global.h"
-#include "pathtracingintegrator.h"
+#include "integrator.h"
 
 class BiDiPathTracingIntegrator : public Integrator
 {

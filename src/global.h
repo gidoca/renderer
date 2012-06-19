@@ -39,7 +39,6 @@ class Sampler;
 class Scene;
 class SceneGrammar;
 class SimpleIntegrator;
-class Spectrum;
 class Sphere;
 class Tonemapper;
 class Triangle;

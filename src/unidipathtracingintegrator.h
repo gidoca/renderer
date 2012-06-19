@@ -2,7 +2,7 @@
 #define UNIDIPATHTRACINGINTEGRATOR_H
 
 #include "global.h"
-#include "pathtracingintegrator.h"
+#include "integrator.h"
 
 #include <opencv2/core/core.hpp>
 
