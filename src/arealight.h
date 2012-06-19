@@ -3,7 +3,6 @@
 
 #include "global.h"
 #include "light.h"
-#include "spectrum.h"
 #include "jitteredsampler.h"
 
 #include <QtGui/QVector3D>

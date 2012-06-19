@@ -8,7 +8,6 @@
 #include "intersectablelist.h"
 #include "diffusematerial.h"
 #include "mirrormaterial.h"
-#include "spectrum.h"
 #include "camera.h"
 #include "scene.h"
 #include "pointlight.h"
