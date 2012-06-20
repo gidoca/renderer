@@ -11,7 +11,7 @@ HitRecord Triangle::intersect(Ray ray, float from, float to) const
 {
 //  if(QVector3D::dotProduct(ray.getDirection(), QVector3D::crossProduct(p1 - p2, p1 - p3)) > 0) return HitRecord();
   
-  QVector3D e1 = p2 - p1;
+  /*QVector3D e1 = p2 - p1;
   QVector3D e2 = p3 - p1;
   QVector3D s1 = QVector3D::crossProduct(ray.getDirection(), e2);
   float divisor = QVector3D::dotProduct(s1, e1);
@@ -29,9 +29,9 @@ HitRecord Triangle::intersect(Ray ray, float from, float to) const
   
   float t = QVector3D::dotProduct(e2, s2);
   if(t < from || t > to) return HitRecord();
-  return HitRecord(t, ray, material, b1 * n1 + b2 * n2 + (1 - b1 - b2) * n3);
+  return HitRecord(t, ray, material, b1 * n1 + b2 * n2 + (1 - b1 - b2) * n3);*/
   
-  /*QMatrix4x4 intersectionMatrix;
+  QMatrix4x4 intersectionMatrix;
   intersectionMatrix.setColumn(0, p1 - p2);
   intersectionMatrix.setColumn(1, p1 - p3);
   intersectionMatrix.setColumn(2, ray.getDirection());
@@ -49,7 +49,7 @@ HitRecord Triangle::intersect(Ray ray, float from, float to) const
   else
   {
     return HitRecord();
-  }*/
+  }
 }
 
 AxisAlignedBox * Triangle::boundingBox() const
