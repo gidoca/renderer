@@ -27,7 +27,7 @@ cv::Mat channelMean(const cv::Mat &in)
         outSingle += splitted[i] / splitted.size();
     }
     Mat out;
-    merge(vector<Mat>(3, outSingle), out);
+    merge(vector<Mat>(in.channels(), outSingle), out);
     return out;
 }
 
@@ -72,7 +72,7 @@ cv::Mat SymmetricFilter::filter(const cv::Mat &image, const cv::Mat &guide, cons
                 break;
             }
 
-            diff = /*channelMean*/(source1 - guide);
+            diff = channelMean(source1 - guide);
             blur(diff.mul(diff), d2, Size(patchSize, patchSize), Point(-1, -1), BORDER_REFLECT);
 //            exp(-max(d2 - 2 * pixvar, 0) / (1e-10f + h2 * pixvar), weights);
             //use min(var1, pixvar)
@@ -82,7 +82,7 @@ cv::Mat SymmetricFilter::filter(const cv::Mat &image, const cv::Mat &guide, cons
             //threshold?
             weights1 = max(weights, 0);
 
-            diff = /*channelMean*/(source2 - guide);
+            diff = channelMean(source2 - guide);
             blur(diff.mul(diff), d2, Size(patchSize, patchSize), Point(-1, -1), BORDER_REFLECT);
 //            exp(-max(d2 - 2 * pixvar, 0) / (1e-10f + h2 * pixvar), weights);
 //            exp(-(d2 - (pixvar + min(var2, pixvar))) / (h2 * (pixvar + var2)), temp);
@@ -115,7 +115,7 @@ cv::Mat SymmetricFilter::filter(const cv::Mat &image, const cv::Mat &guide, cons
                         {
                             w1 = wS;
                             w2 = wS;
-//                        }
+                        }
                     }
                 }
             }
