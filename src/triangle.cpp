@@ -11,29 +11,27 @@ HitRecord Triangle::intersect(Ray ray, float from, float to) const
 {
 //  if(QVector3D::dotProduct(ray.getDirection(), QVector3D::crossProduct(p1 - p2, p1 - p3)) > 0) return HitRecord();
   
-  /*QVector3D edge1 = p2 - p1;
-  QVector3D edge2 = p3 - p1;
-  QVector3D pvec = QVector3D::crossProduct(ray.getDirection(), edge2);
-  float det = QVector3D::dotProduct(pvec, edge1);
-  if(det < EPSILON) return HitRecord();
+  QVector3D e1 = p2 - p1;
+  QVector3D e2 = p3 - p1;
+  QVector3D s1 = QVector3D::crossProduct(ray.getDirection(), e2);
+  float divisor = QVector3D::dotProduct(s1, e1);
+
+  if(divisor == 0) return HitRecord();
+  float invDivisor = 1. / divisor;
   
-  QVector3D tvec = ray.getOrigin() - p1;
-  float u = QVector3D::dotProduct(pvec, tvec);
-  if(u < 0 || u > det) return HitRecord();
+  QVector3D d = ray.getOrigin() - p1;
+  float b1 = QVector3D::dotProduct(d, s1) * invDivisor;
+  if(b1 < 0 || b1 > 1.) return HitRecord();
   
-  QVector3D qvec = QVector3D::crossProduct(tvec, edge1);
-  float v = QVector3D::dotProduct(ray.getDirection(), qvec);
-  if(v < 0 || u + v > det) return HitRecord();
+  QVector3D s2 = QVector3D::crossProduct(d, e1);
+  float b2 = QVector3D::dotProduct(ray.getDirection(), s2) * invDivisor;
+  if(b2 < 0 || b1 + b2 > 1.) return HitRecord();
   
-  float t = QVector3D::dotProduct(edge2, qvec);
+  float t = QVector3D::dotProduct(e2, s2);
   if(t < from || t > to) return HitRecord();
-  float inv_det = 1 / det;
-  t *= inv_det;
-  u *= inv_det;
-  v *= inv_det;
-  return HitRecord(t, ray, material, u * n1 + v * n2 + (1 - u - v) * n3);*/
+  return HitRecord(t, ray, material, b1 * n1 + b2 * n2 + (1 - b1 - b2) * n3);
   
-  QMatrix4x4 intersectionMatrix;
+  /*QMatrix4x4 intersectionMatrix;
   intersectionMatrix.setColumn(0, p1 - p2);
   intersectionMatrix.setColumn(1, p1 - p3);
   intersectionMatrix.setColumn(2, ray.getDirection());
@@ -51,7 +49,7 @@ HitRecord Triangle::intersect(Ray ray, float from, float to) const
   else
   {
     return HitRecord();
-  }
+  }*/
 }
 
 AxisAlignedBox * Triangle::boundingBox() const
