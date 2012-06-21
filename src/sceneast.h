@@ -41,9 +41,15 @@ struct ast_mirror_material
   float coefficient;
 };
 
+struct ast_texture_material
+{
+    std::string filename;
+};
+
 typedef boost::variant<
     ast_diffuse_material,
-    ast_mirror_material
+    ast_mirror_material,
+    ast_texture_material
     > ast_material;
 
 struct ast_matrix_literal
@@ -62,10 +68,16 @@ struct ast_matrix_rotate
   ast_vector3_literal axis;
 };
 
+struct ast_matrix_scale
+{
+  float factor;
+};
+
 typedef boost::variant<
     ast_matrix_literal,
     ast_matrix_translate,
-    ast_matrix_rotate
+    ast_matrix_rotate,
+    ast_matrix_scale
     > ast_basic_matrix;
 
 struct ast_matrix
@@ -258,6 +270,11 @@ BOOST_FUSION_ADAPT_STRUCT(
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
+    ast_matrix_scale,
+    (float, factor)
+)
+
+BOOST_FUSION_ADAPT_STRUCT(
     ast_diffuse_material,
     (ast_vector3_literal, color)
 )
@@ -265,6 +282,11 @@ BOOST_FUSION_ADAPT_STRUCT(
 BOOST_FUSION_ADAPT_STRUCT(
     ast_mirror_material,
     (float, coefficient)
+)
+
+BOOST_FUSION_ADAPT_STRUCT(
+    ast_texture_material,
+    (std::string, filename)
 )
 
 BOOST_FUSION_ADAPT_STRUCT(

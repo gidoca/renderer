@@ -8,6 +8,7 @@
 #include "intersectablelist.h"
 #include "diffusematerial.h"
 #include "mirrormaterial.h"
+#include "texturematerial.h"
 #include "camera.h"
 #include "scene.h"
 #include "pointlight.h"
@@ -49,6 +50,13 @@ struct matrix_evaluator : boost::static_visitor<QMatrix4x4>
       matrix.rotate(matrix_rot.angle, matrix_rot.axis.asQVector());
       return matrix;
     }
+
+    QMatrix4x4 operator()(ast_matrix_scale matrix_scale) const
+    {
+        QMatrix4x4 matrix;
+        matrix.scale(matrix_scale.factor);
+        return matrix;
+    }
 };
 
 QMatrix4x4 ast_matrix::asQMatrix4x4() const
@@ -72,6 +80,13 @@ struct material_builder : boost::static_visitor<Material*>
   Material* operator()(ast_mirror_material material) const
   {
     return new MirrorMaterial(material.coefficient);
+  }
+
+  Material* operator()(ast_texture_material material) const
+  {
+    TextureMaterial* out = new TextureMaterial();
+    out->load(material.filename);
+    return out;
   }
 };
 

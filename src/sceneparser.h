@@ -53,11 +53,13 @@ private:
   qi::rule<std::string::iterator, ast_matrix_literal(), boost::spirit::ascii::space_type> matrix_literal_rule;
   qi::rule<std::string::iterator, ast_matrix_translate(), boost::spirit::ascii::space_type> matrix_translate_rule;
   qi::rule<std::string::iterator, ast_matrix_rotate(), boost::spirit::ascii::space_type> matrix_rotate_rule;
+  qi::rule<std::string::iterator, ast_matrix_scale(), boost::spirit::ascii::space_type> matrix_scale_rule;
   qi::rule<std::string::iterator, ast_basic_matrix(), boost::spirit::ascii::space_type> basic_matrix_rule;
   qi::rule<std::string::iterator, ast_matrix(), boost::spirit::ascii::space_type> matrix_rule;
 
   qi::rule<std::string::iterator, ast_diffuse_material(), boost::spirit::ascii::space_type> diffuse_material_rule;
   qi::rule<std::string::iterator, ast_mirror_material(), boost::spirit::ascii::space_type> mirror_material_rule;
+  qi::rule<std::string::iterator, ast_texture_material(), boost::spirit::ascii::space_type> texture_material_rule;
   qi::rule<std::string::iterator, ast_material(), boost::spirit::ascii::space_type> material_rule;
 
   qi::rule<std::string::iterator, ast_camera(), boost::spirit::ascii::space_type> camera_rule;
