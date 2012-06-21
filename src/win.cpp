@@ -48,6 +48,6 @@ void Win::saveExr()
   QString formatString = "OpenEXR (*.exr)";
 
   QString filename = QFileDialog::getSaveFileName(this, "Save image as",  QString(), formatString);
-  if(filename.isNull()) return;
+  if(filename.isNull() || filename.endsWith(".exr")) return;
   imwrite(filename.toStdString(), film);
 }
