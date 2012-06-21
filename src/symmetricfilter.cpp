@@ -27,9 +27,9 @@ cv::Mat channelMean(const cv::Mat &in)
     {
         outSingle += splitted[i] / splitted.size();
     }
-    Mat out;
-    cvtColor(outSingle, out, CV_GRAY2BGR);
-    imwrite("/tmp/outsingle.exr", outSingle);
+    Mat out(in.size(), in.type());
+    int channelMapping[] = {0, 0, 0, 1, 0, 2};
+    mixChannels(&outSingle, 1, &out, 1, channelMapping, 3);
     return out;
 //    return in;
 }
@@ -41,8 +41,8 @@ cv::Mat computeWeights(const Mat& source, const Mat& target, const Mat& var, con
     blur(diff.mul(diff), d2, Size(patchSize, patchSize), Point(-1, -1), BORDER_REFLECT);
 //            exp(-max(d2 - 2 * pixvar, 0) / (1e-10f + h2 * pixvar), weights);
     //use min(var1, pixvar)
-//            exp(-(d2 - (var + min(shiftedVar, var))) / (h2 * (var + shiftedVar)), temp);
-    exp(-(d2 - (var + shiftedVar)) / (h2 * (var + shiftedVar)), temp);
+    exp(-(d2 - (var + min(shiftedVar, var))) / (h2 * (var + shiftedVar)), temp);
+//    exp(-(d2 - (var + shiftedVar)) / (h2 * (var + shiftedVar)), temp);
     blur(temp, temp2, Size(patchSize, patchSize), Point(-1, -1), BORDER_REFLECT);
     //threshold?
     weights = max(channelMean(temp2), 0);
