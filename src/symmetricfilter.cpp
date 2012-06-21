@@ -34,12 +34,26 @@ cv::Mat channelMean(const cv::Mat &in)
 //    return in;
 }
 
+cv::Mat computeWeights(const Mat& source, const Mat& target, const Mat& var, const Mat& shiftedVar, int patchSize, float h2)
+{
+    Mat weights, temp, temp2, diff, d2;
+    diff = source - target;
+    blur(diff.mul(diff), d2, Size(patchSize, patchSize), Point(-1, -1), BORDER_REFLECT);
+//            exp(-max(d2 - 2 * pixvar, 0) / (1e-10f + h2 * pixvar), weights);
+    //use min(var1, pixvar)
+//            exp(-(d2 - (var + min(shiftedVar, var))) / (h2 * (var + shiftedVar)), temp);
+    exp(-(d2 - (var + shiftedVar)) / (h2 * (var + shiftedVar)), temp);
+    blur(temp, temp2, Size(patchSize, patchSize), Point(-1, -1), BORDER_REFLECT);
+    //threshold?
+    weights = max(channelMean(temp2), 0);
+    return weights;
+}
+
 cv::Mat SymmetricFilter::filter(const cv::Mat &image, const cv::Mat &guide, const cv::Mat &pixvar)
 {
-    Mat d2, source1, source2, source_est_S, diff, weights1, weights2, weights_S, weights, data1, data2, var1, var2, var_S;
+    Mat source1, source2, source_S, weights1, weights2, weights_S, data1, data2, var1, var2, var_S;
     Mat area = Mat::zeros(image.size(), image.type());
     Mat acc = Mat::zeros(image.size(), image.type());
-    Mat temp;
 
     const int patchSize = 7;
     const int windowRadius = 10;
@@ -61,7 +75,7 @@ cv::Mat SymmetricFilter::filter(const cv::Mat &image, const cv::Mat &guide, cons
         {
             source1 = paddedGuide(Range(padding + dy, padding + dy + guide.size().height), Range(padding + dx, padding + dx + guide.size().width));
             source2 = paddedGuide(Range(padding - dy, padding - dy + guide.size().height), Range(padding - dx, padding - dx + guide.size().width));
-            source_est_S = (source1 + source2) / 2.;
+            source_S = (source1 + source2) / 2.;
             data1 = paddedImage(Range(padding + dy, padding + dy + guide.size().height), Range(padding + dx, padding + dx + image.size().width));
             data2 = paddedImage(Range(padding - dy, padding - dy + guide.size().height), Range(padding - dx, padding - dx + image.size().width));
             var1 = paddedVariance(Range(padding + dy, padding + dy + guide.size().height), Range(padding + dx, padding + dx + image.size().width));
@@ -75,31 +89,9 @@ cv::Mat SymmetricFilter::filter(const cv::Mat &image, const cv::Mat &guide, cons
                 break;
             }
 
-            diff = source1 - guide;
-            blur(diff.mul(diff), d2, Size(patchSize, patchSize), Point(-1, -1), BORDER_REFLECT);
-//            exp(-max(d2 - 2 * pixvar, 0) / (1e-10f + h2 * pixvar), weights);
-            //use min(var1, pixvar)
-//            exp(-(d2 - (pixvar + min(var1, pixvar))) / (h2 * (pixvar + var1)), temp);
-            exp(-(d2 - (pixvar + var1)) / (h2 * (pixvar + var1)), weights);
-//            blur(temp, weights, Size(patchSize, patchSize), Point(-1, -1), BORDER_REFLECT);
-            //threshold?
-            weights1 = max(channelMean(weights), 0);
-
-            diff = source2 - guide;
-            blur(diff.mul(diff), d2, Size(patchSize, patchSize), Point(-1, -1), BORDER_REFLECT);
-//            exp(-max(d2 - 2 * pixvar, 0) / (1e-10f + h2 * pixvar), weights);
-//            exp(-(d2 - (pixvar + min(var2, pixvar))) / (h2 * (pixvar + var2)), temp);
-            exp(-(d2 - (pixvar + var2)) / (h2 * (pixvar + var2)), weights);
-//            blur(temp, weights, Size(patchSize, patchSize), Point(-1, -1), BORDER_REFLECT);
-            weights2 = max(channelMean(weights), 0);
-
-            diff = source_est_S - guide;
-            blur(diff.mul(diff), d2, Size(patchSize, patchSize), Point(-1, -1), BORDER_REFLECT);
-//            exp(-max(d2 - 2 * pixvar, 0) / (1e-10f + h2 * pixvar), weights);
-//            exp(-(d2 - (pixvar + min(var_S, pixvar))) / (h2 * (pixvar + var_S)), temp);
-            exp(-(d2 - (pixvar + var_S)) / (h2 * (pixvar + var_S)), weights);
-//            blur(temp, weights, Size(patchSize, patchSize), Point(-1, -1), BORDER_REFLECT);
-            weights_S = max(channelMean(weights), 0);
+            weights1 = computeWeights(source1, guide, pixvar, var1, patchSize, h2);
+            weights2 = computeWeights(source2, guide, pixvar, var2, patchSize, h2);
+            weights_S = computeWeights(source_S, guide, pixvar, var_S, patchSize, h2);
 
             vector<Mat> weights1_split, weights2_split, weights_S_split;
             split(weights1, weights1_split);
