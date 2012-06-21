@@ -7,6 +7,8 @@
 
 #include <QVector3D>
 
+#include <opencv2/core/core.hpp>
+
 #include <limits>
 
 class HitRecord
@@ -15,6 +17,7 @@ class HitRecord
   public:
     HitRecord();
     HitRecord(float rayParameter, Ray ray, Material* material, QVector3D surfaceNormal);
+    HitRecord(float rayParameter, Ray ray, Material * material, QVector3D surfaceNormal, cv::Point2f texcoords);
     
     void transform(QMatrix4x4 matrix);
     
@@ -24,6 +27,7 @@ class HitRecord
     QVector3D getSurfaceNormal() const;
     Ray getRay() const;
     bool intersects() const;
+    cv::Point2f getTexCoords() const;
     
   private:
     Material* material;
@@ -31,7 +35,7 @@ class HitRecord
     QVector3D intersectingPoint;
     QVector3D surfaceNormal;
     Ray ray;
-    
+    cv::Point2f texcoords;
 };
 
 inline HitRecord::HitRecord() : material(DarkMatter::getInstance()), rayParameter(std::numeric_limits< float >::infinity())
@@ -41,6 +45,11 @@ inline HitRecord::HitRecord() : material(DarkMatter::getInstance()), rayParamete
 
 inline HitRecord::HitRecord(float rayParameter, Ray ray, Material * material, QVector3D surfaceNormal)
   : material(material), rayParameter(rayParameter), intersectingPoint(ray.evaluate(rayParameter)), surfaceNormal(surfaceNormal), ray(ray)
+{
+}
+
+inline HitRecord::HitRecord(float rayParameter, Ray ray, Material * material, QVector3D surfaceNormal, cv::Point2f texcoords)
+  : material(material), rayParameter(rayParameter), intersectingPoint(ray.evaluate(rayParameter)), surfaceNormal(surfaceNormal), ray(ray), texcoords(texcoords)
 {
 }
 
@@ -79,6 +88,11 @@ inline Ray HitRecord::getRay() const
 inline bool HitRecord::intersects() const
 {
   return rayParameter < std::numeric_limits< float >::infinity();
+}
+
+inline cv::Point2f HitRecord::getTexCoords() const
+{
+    return texcoords;
 }
 
 #endif // HITRECORD_H

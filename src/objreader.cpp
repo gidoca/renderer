@@ -8,6 +8,8 @@
 #include <cmath>
 #include <list>
 
+#include <opencv2/core/core.hpp>
+
 Intersectable * ObjReader::getMesh(const char * fileName, Material * material)
 {
   int nVertices;
@@ -29,17 +31,28 @@ Intersectable * ObjReader::getMesh(const char * fileName, Material * material)
     QVector3D v1(vertices[3 * indices[i]], vertices[3 * indices[i] + 1], vertices[3 * indices[i] + 2]);
     QVector3D v2(vertices[3 * indices[i + 1]], vertices[3 * indices[i + 1] + 1], vertices[3 * indices[i + 1] + 2]);
     QVector3D v3(vertices[3 * indices[i + 2]], vertices[3 * indices[i + 2] + 1], vertices[3 * indices[i + 2] + 2]);
+    QVector3D n1, n2, n3;
+    cv::Point2f t1, t2, t3;
+
     if(normals == 0)
     {
-      triangle = new Triangle(v1, v2, v3, material);
+        n1 = n2 = n3 = QVector3D::crossProduct(v1 - v2, v1 - v3);
     }
     else
     {
-      QVector3D n1(normals[3 * indices[i]], normals[3 * indices[i] + 1], normals[3 * indices[i] + 2]);
-      QVector3D n2(normals[3 * indices[i + 1]], normals[3 * indices[i + 1] + 1], normals[3 * indices[i + 1] + 2]);
-      QVector3D n3(normals[3 * indices[i + 2]], normals[3 * indices[i + 2] + 1], normals[3 * indices[i + 2] + 2]);
-      triangle = new Triangle(v1, v2, v3, n1, n2, n3, material);
+      n1 = QVector3D(normals[3 * indices[i]], normals[3 * indices[i] + 1], normals[3 * indices[i] + 2]);
+      n2 = QVector3D(normals[3 * indices[i + 1]], normals[3 * indices[i + 1] + 1], normals[3 * indices[i + 1] + 2]);
+      n3 = QVector3D(normals[3 * indices[i + 2]], normals[3 * indices[i + 2] + 1], normals[3 * indices[i + 2] + 2]);
     }
+
+    if(texcoords != 0)
+    {
+        t1 = cv::Point2f(texcoords[2 * indices[i]], texcoords[2 * indices[i] + 1]);
+        t2 = cv::Point2f(texcoords[2 * indices[i + 1]], texcoords[2 * indices[i + 1] + 1]);
+        t3 = cv::Point2f(texcoords[2 * indices[i + 2]], texcoords[2 * indices[i + 2] + 1]);
+    }
+
+    triangle = new Triangle(v1, v2, v3, n1, n2, n3, t1, t2, t3, material);
     triangles.push_back(triangle);
   }
 //  return BSPNode::buildTree(new IntersectableList(triangles));

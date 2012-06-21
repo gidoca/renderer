@@ -44,7 +44,7 @@ HitRecord Triangle::intersect(Ray ray, float from, float to) const
     0 < beta && beta < 1 &&
     0 < gamma && gamma < 1)
   {
-    return HitRecord(result.z(), ray, material, alpha * n1 + beta * n2 + gamma * n3);
+    return HitRecord(result.z(), ray, material, alpha * n1 + beta * n2 + gamma * n3, alpha * t1 + beta * t2 + gamma * t3);
   }
   else
   {
