@@ -5,6 +5,7 @@
 
 #include <algorithm>
 #include <vector>
+#include <iostream>
 
 using namespace cv;
 using namespace std;
@@ -20,15 +21,17 @@ cv::Mat padArray(const cv::Mat &array, int padding)
 cv::Mat channelMean(const cv::Mat &in)
 {
     vector<Mat> splitted;
-    Mat outSingle = Mat::zeros(in.size(), CV_32F);
+    Mat outSingle = Mat::zeros(in.size(), CV_MAKETYPE(in.type(), 1));
     split(in, splitted);
     for(unsigned int i = 0; i < splitted.size(); i++)
     {
         outSingle += splitted[i] / splitted.size();
     }
     Mat out;
-    merge(vector<Mat>(in.channels(), outSingle), out);
+    cvtColor(outSingle, out, CV_GRAY2BGR);
+    imwrite("/tmp/outsingle.exr", outSingle);
     return out;
+//    return in;
 }
 
 cv::Mat SymmetricFilter::filter(const cv::Mat &image, const cv::Mat &guide, const cv::Mat &pixvar)
@@ -72,53 +75,43 @@ cv::Mat SymmetricFilter::filter(const cv::Mat &image, const cv::Mat &guide, cons
                 break;
             }
 
-            diff = channelMean(source1 - guide);
+            diff = source1 - guide;
             blur(diff.mul(diff), d2, Size(patchSize, patchSize), Point(-1, -1), BORDER_REFLECT);
 //            exp(-max(d2 - 2 * pixvar, 0) / (1e-10f + h2 * pixvar), weights);
             //use min(var1, pixvar)
 //            exp(-(d2 - (pixvar + min(var1, pixvar))) / (h2 * (pixvar + var1)), temp);
-            exp(-(d2 - (pixvar + var1)) / (h2 * (pixvar + var1)), temp);
-            blur(temp, weights, Size(patchSize, patchSize), Point(-1, -1), BORDER_REFLECT);
+            exp(-(d2 - (pixvar + var1)) / (h2 * (pixvar + var1)), weights);
+//            blur(temp, weights, Size(patchSize, patchSize), Point(-1, -1), BORDER_REFLECT);
             //threshold?
-            weights1 = max(weights, 0);
+            weights1 = max(channelMean(weights), 0);
 
-            diff = channelMean(source2 - guide);
+            diff = source2 - guide;
             blur(diff.mul(diff), d2, Size(patchSize, patchSize), Point(-1, -1), BORDER_REFLECT);
 //            exp(-max(d2 - 2 * pixvar, 0) / (1e-10f + h2 * pixvar), weights);
 //            exp(-(d2 - (pixvar + min(var2, pixvar))) / (h2 * (pixvar + var2)), temp);
-            exp(-(d2 - (pixvar + var2)) / (h2 * (pixvar + var2)), temp);
-            blur(temp, weights, Size(patchSize, patchSize), Point(-1, -1), BORDER_REFLECT);
-            weights2 = max(weights, 0);
+            exp(-(d2 - (pixvar + var2)) / (h2 * (pixvar + var2)), weights);
+//            blur(temp, weights, Size(patchSize, patchSize), Point(-1, -1), BORDER_REFLECT);
+            weights2 = max(channelMean(weights), 0);
 
-            diff = channelMean(source_est_S - guide);
+            diff = source_est_S - guide;
             blur(diff.mul(diff), d2, Size(patchSize, patchSize), Point(-1, -1), BORDER_REFLECT);
 //            exp(-max(d2 - 2 * pixvar, 0) / (1e-10f + h2 * pixvar), weights);
 //            exp(-(d2 - (pixvar + min(var_S, pixvar))) / (h2 * (pixvar + var_S)), temp);
-            exp(-(d2 - (pixvar + var_S)) / (h2 * (pixvar + var_S)), temp);
-            blur(temp, weights, Size(patchSize, patchSize), Point(-1, -1), BORDER_REFLECT);
-            weights_S = max(weights, 0);
+            exp(-(d2 - (pixvar + var_S)) / (h2 * (pixvar + var_S)), weights);
+//            blur(temp, weights, Size(patchSize, patchSize), Point(-1, -1), BORDER_REFLECT);
+            weights_S = max(channelMean(weights), 0);
 
-            for(int i = 0; i < weights1.size().height; i++)
+            vector<Mat> weights1_split, weights2_split, weights_S_split;
+            split(weights1, weights1_split);
+            split(weights2, weights2_split);
+            split(weights_S, weights_S_split);
+            Mat idx = Mat::zeros(weights1.size(), CV_8UC1);
+            for(unsigned int i = 0; i< weights1_split.size(); i++)
             {
-                for(int j = 0; j < weights1.size().width; j++)
-                {
-                    for(int k = 0; k < 3; k++)
-                    {
-                        float &w1 = weights1.at<Vec3f>(i, j)[k];
-                        float &w2 = weights2.at<Vec3f>(i, j)[k];
-                        float &wS = weights_S.at<Vec3f>(i, j)[k];
-//                        float threshold = 0.05f;
-//                        if(w1 < threshold) w1 = 0;
-//                        if(w2 < threshold) w2 = 0;
-//                        if(wS < threshold) wS = 0;
-                        if(wS > max(w1, w2))
-                        {
-                            w1 = wS;
-                            w2 = wS;
-                        }
-                    }
-                }
+                idx |= weights_S_split[i] > max(weights1_split[i], weights2_split[i]);
             }
+            add(weights_S, 0, weights1, idx);
+            add(weights_S, 0, weights2, idx);
 
             area += weights1 + weights2;
             acc += weights1.mul(data1) + weights2.mul(data2);
