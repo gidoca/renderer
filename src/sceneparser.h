@@ -33,11 +33,11 @@ public:
 
 private:
   qi::rule<std::string::iterator, std::vector<char>() > string_literal_rule;
+  qi::rule<std::string::iterator, std::vector<char>(), boost::spirit::ascii::space_type> identifier_rule;
 
   qi::rule<std::string::iterator, std::vector<ast_assignment>(), boost::spirit::ascii::space_type> assignments_rule;
-  qi::rule<std::string::iterator, ast_intersectable_assignment(), boost::spirit::ascii::space_type> intersectable_assignment_rule;
-  qi::rule<std::string::iterator, ast_camera_assignment(), boost::spirit::ascii::space_type> camera_assignment_rule;
-  qi::rule<std::string::iterator, ast_light_assignment(), boost::spirit::ascii::space_type> light_assignment_rule;
+  qi::rule<std::string::iterator, ast_assignment(), boost::spirit::ascii::space_type> assignment_rule;
+  qi::rule<std::string::iterator, ast_value(), boost::spirit::ascii::space_type> value_rule;
 
   qi::rule<std::string::iterator, ast_intersectable_list(), boost::spirit::ascii::space_type> intersectable_list_rule;
   qi::rule<std::string::iterator, ast_sphere(), boost::spirit::ascii::space_type> sphere_rule;

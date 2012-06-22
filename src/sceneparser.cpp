@@ -16,11 +16,11 @@ SceneGrammar::SceneGrammar() : SceneGrammar::base_type(assignments_rule, "inters
   using namespace boost::spirit;
 
   string_literal_rule %= boost::spirit::lit('"') >> *(boost::spirit::ascii::char_ - '"') >> '"';
+  identifier_rule %= *(boost::spirit::ascii::alnum | '_');
 
-  assignments_rule %= *(intersectable_assignment_rule | camera_assignment_rule | light_assignment_rule);
-  intersectable_assignment_rule %= boost::spirit::lit("intersectable") >> "=" >> intersectable_rule >> ";";
-  camera_assignment_rule %= boost::spirit::lit("camera") >> "=" >> camera_rule >> ";";
-  light_assignment_rule %= boost::spirit::lit("lights") >> "=" >> light_list_rule >> ";";
+  assignments_rule %= *assignment_rule;
+  assignment_rule %= identifier_rule >> "=" >> value_rule >> ";";
+  value_rule %= intersectable_rule | light_list_rule | camera_rule;
 
   intersectable_rule %= intersectable_list_rule | sphere_rule | box_rule | quad_rule | plane_rule | obj_rule | instance_rule;
   intersectable_rule.name("intersectable");
@@ -73,9 +73,9 @@ SceneGrammar::SceneGrammar() : SceneGrammar::base_type(assignments_rule, "inters
   cone_light_rule %= boost::spirit::lit("conelight") >> "(" >> vector3_literal_rule >> "," >> vector3_literal_rule >> "," >> boost::spirit::tag::float_() >> "," >> vector3_literal_rule >> ")";
   light_rule %= point_light_rule | area_light_rule | cone_light_rule;
 
-  boost::spirit::qi::on_error
+  boost::spirit::qi::on_error<boost::spirit::qi::fail>
   (
-      intersectable_rule,
+      assignments_rule,
       cerr << val("Error, expecting ") << _4 << val(" here: \"") << construct<std::string>(_3, _2) << val("\"\n")
   );
 }

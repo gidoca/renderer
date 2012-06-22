@@ -20,6 +20,7 @@
 #include <boost/variant/apply_visitor.hpp>
 
 #include <list>
+#include <map>
 
 #include <QMatrix4x4>
 
@@ -135,7 +136,7 @@ struct intersectable_builder : boost::static_visitor<Intersectable*>
 
   Intersectable* operator()(const ast_obj& o) const
   {
-      return ObjReader::getMesh(std::string(o.filename.begin(), o.filename.end()).c_str(), boost::apply_visitor(material_builder(), o.material));
+      return ObjReader::getMesh(o.filename.c_str(), boost::apply_visitor(material_builder(), o.material));
   }
 
   Intersectable* operator()(const ast_intersectable_list& l) const;
@@ -159,19 +160,19 @@ Intersectable* intersectable_builder::operator()(const ast_instance& i) const
     return new IntersectableInstance(i.transform.asQMatrix4x4(), boost::apply_visitor(intersectable_builder(), i.intersectable));
 }
 
-struct light_builder : boost::static_visitor<Light*>
+struct light_builder : boost::static_visitor<const Light*>
 {
-    Light* operator()(ast_point_light point_light) const
+    const Light* operator()(ast_point_light point_light) const
     {
         return new PointLight(point_light.location.asQVector(), point_light.intensity.asSpectrum());
     }
 
-    Light* operator()(ast_area_light area_light) const
+    const Light* operator()(ast_area_light area_light) const
     {
         return new AreaLight(area_light.location.asQVector(), area_light.u_direction.asQVector(), area_light.v_direction.asQVector(), area_light.intensity.asSpectrum());
     }
 
-    Light* operator()(ast_cone_light cone_light) const
+    const Light* operator()(ast_cone_light cone_light) const
     {
         return new ConeLight(cone_light.location.asQVector(), cone_light.direction.asQVector(), cone_light.angle, cone_light.intensity.asSpectrum());
     }
@@ -179,37 +180,49 @@ struct light_builder : boost::static_visitor<Light*>
 
 struct scene_builder : boost::static_visitor<void>
 {
-    void operator()(ast_camera_assignment camera_assignment)
+    void addAssignment(ast_assignment assignment)
     {
-        camera = camera_assignment.camera.asCamera();
+        current_name = assignment.name;
+        boost::apply_visitor(*this, assignment.value);
     }
 
-    void operator()(ast_intersectable_assignment intersectable_assignment)
+    void operator()(ast_camera camera)
     {
-        intersectable = boost::apply_visitor(intersectable_builder(), intersectable_assignment.intersectable);
+        cameras[current_name] = camera.asCamera();
     }
 
-    void operator()(ast_light_assignment light_assignment)
+    void operator()(ast_intersectable intersectable)
     {
-        lights.clear();
-        BOOST_FOREACH(ast_light light, light_assignment.lights)
+        intersectables[current_name] = boost::apply_visitor(intersectable_b, intersectable);
+    }
+
+    void operator()(std::vector<ast_light> lights)
+    {
+        vector<const Light*> out;
+        BOOST_FOREACH(ast_light light, lights)
         {
-            lights.push_back(boost::apply_visitor(light_builder(), light));
+            out.push_back(boost::apply_visitor(light_b, light));
         }
+        this->lights[current_name] = out;
     }
 
-    Scene getScene() const
+    Scene getScene()
     {
-        Scene result(camera);
-        result.object = intersectable;
-        result.light = lights;
+        Scene result(cameras["camera"]);
+        result.object = intersectables["intersectable"];
+        result.light = lights["lights"];
         return result;
     }
 
+    map<string, Camera> cameras;
+    map<string, Intersectable*> intersectables;
+    map<string, vector<const Light*> > lights;
+
 private:
-    Camera camera;
-    Intersectable *intersectable;
-    std::vector<const Light*> lights;
+    string current_name;
+
+    intersectable_builder intersectable_b;
+    light_builder light_b;
 };
 
 Scene buildScene(vector<ast_assignment> assignments)
@@ -217,7 +230,7 @@ Scene buildScene(vector<ast_assignment> assignments)
   scene_builder builder;
   BOOST_FOREACH(ast_assignment assignment, assignments)
   {
-    boost::apply_visitor(builder, assignment);
+    builder.addAssignment(assignment);
   }
   return builder.getScene();
 }

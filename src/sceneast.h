@@ -130,7 +130,7 @@ struct ast_plane
 
 struct ast_obj
 {
-    std::vector<char> filename;
+    std::string filename;
     ast_material material;
 };
 
@@ -166,22 +166,13 @@ struct ast_cone_light
 
 typedef boost::variant<ast_point_light, ast_area_light, ast_cone_light> ast_light;
 
-struct ast_intersectable_assignment
-{
-    ast_intersectable intersectable;
-};
+typedef boost::variant<std::vector<ast_light>, ast_camera, ast_intersectable> ast_value;
 
-struct ast_camera_assignment
+struct ast_assignment
 {
-    ast_camera camera;
+    std::string name;
+    ast_value value;
 };
-
-struct ast_light_assignment
-{
-    std::vector<ast_light> lights;
-};
-
-typedef boost::variant<ast_intersectable_assignment, ast_camera_assignment, ast_light_assignment> ast_assignment;
 
 BOOST_FUSION_ADAPT_STRUCT(
     ast_intersectable_list,
@@ -219,7 +210,7 @@ BOOST_FUSION_ADAPT_STRUCT(
 
 BOOST_FUSION_ADAPT_STRUCT(
     ast_obj,
-    (std::vector<char>, filename)
+    (std::string, filename)
     (ast_material, material)
 )
 
@@ -322,18 +313,9 @@ BOOST_FUSION_ADAPT_STRUCT(
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    ast_intersectable_assignment,
-    (ast_intersectable, intersectable)
-)
-
-BOOST_FUSION_ADAPT_STRUCT(
-    ast_camera_assignment,
-    (ast_camera, camera)
-)
-
-BOOST_FUSION_ADAPT_STRUCT(
-    ast_light_assignment,
-    (std::vector<ast_light>, lights)
+    ast_assignment,
+    (std::string, name)
+    (ast_value, value)
 )
 
 Scene buildScene(std::vector<ast_assignment> assignments);
