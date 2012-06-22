@@ -83,6 +83,7 @@ SceneGrammar::SceneGrammar() : SceneGrammar::base_type(assignments_rule, "inters
 bool SceneGrammar::parse(string filename)
 {
   ifstream in(filename.c_str(), ifstream::in);
+  if(!in.is_open() || in.eof()) return false;
   std::string str((istreambuf_iterator<char>(in)), istreambuf_iterator<char>());
   std::string::iterator begin = str.begin();
   std::string::iterator end = str.end();

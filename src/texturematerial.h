@@ -15,7 +15,7 @@ class TextureMaterial : public Material
 public:
     TextureMaterial() {}
 
-    void load(std::string filename);
+    bool load(std::string filename);
     cv::Vec3f shade(const HitRecord & hit, QVector3D direction) const;
 
     bool isMirror() const

@@ -9,10 +9,16 @@
 
 using namespace cv;
 
-void TextureMaterial::load(std::string filename)
+bool TextureMaterial::load(std::string filename)
 {
-    imread(filename).convertTo(texture, CV_32F, 1./255.);
-
+    Mat img = imread(filename);
+    if(img.data == 0)
+    {
+        std::cout << "Error loading texture \"" << filename << "\"\n";
+        return false;
+    }
+    img.convertTo(texture, CV_32F, 1./255.);
+    return true;
 }
 
 cv::Vec3f TextureMaterial::shade(const HitRecord & hit, QVector3D) const
