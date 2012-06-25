@@ -28,8 +28,10 @@ void addSample(const Sample &cameraSample, float weight, Mat &film, Mat &mean, M
     assert(0 <= x && x < film.size().width);
     assert(0 <= y && y < film.size().height);
 
+    Vec3f depositValue = weight * value;
+
 #pragma omp critical
-    film.at<Vec3f>(y, x) += weight * value;
+    film.at<Vec3f>(y, x) += depositValue;
 
     float oldSumWeight = sumweight.at<float>(y, x);
     float newSumWeight = weight + oldSumWeight;
@@ -109,15 +111,21 @@ void MetropolisRenderer::render(const Scene & scene, Mat & film, const boost::pr
 #endif
   const int numSamples = numPixelSamples * film.size().width * film.size().height / numThreads;
 
+#pragma omp parallel for
   for(int n = 0; n < num_films; n++)
   {
     films[n] = Mat::zeros(film.size(), film.type());
     biased_mean[n] = Mat::zeros(film.size(), film.type());
     biased_m2[n] = Mat::zeros(film.size(), film.type());
     sumweight[n] = Mat::zeros(film.size(), CV_32FC1);
+  }
+
+
 #pragma omp parallel for
-    for(int t = 0; t < numThreads; t++)
-    {
+  for(int t = 0; t < numThreads; t++)
+  {
+      for(int n = 0; n < num_films; n++)
+      {
         MetropolisSample currentSample = sample;
         Vec3f currentValue = value;
         Path currentPath = path;
@@ -144,7 +152,12 @@ void MetropolisRenderer::render(const Scene & scene, Mat & film, const boost::pr
                 currentValue = newValue;
             }
         }
-    }
+      }
+  }
+
+#pragma omp parallel for
+  for(int n = 0; n < num_films; n++)
+  {
     Mat sumweight3;
     merge(std::vector<Mat>(3, sumweight[n]), sumweight3);
     biased_var[n] = biased_m2[n] / sumweight3;
