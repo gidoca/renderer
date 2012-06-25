@@ -16,11 +16,11 @@ SceneGrammar::SceneGrammar() : SceneGrammar::base_type(assignments_rule, "inters
   using namespace boost::spirit;
 
   string_literal_rule %= boost::spirit::lit('"') >> *(boost::spirit::ascii::char_ - '"') >> '"';
+  identifier_rule %= *(boost::spirit::ascii::alnum | '_');
 
-  assignments_rule %= *(intersectable_assignment_rule | camera_assignment_rule | light_assignment_rule);
-  intersectable_assignment_rule %= boost::spirit::lit("intersectable") >> "=" >> intersectable_rule >> ";";
-  camera_assignment_rule %= boost::spirit::lit("camera") >> "=" >> camera_rule >> ";";
-  light_assignment_rule %= boost::spirit::lit("lights") >> "=" >> light_list_rule >> ";";
+  assignments_rule %= *assignment_rule;
+  assignment_rule %= identifier_rule >> "=" >> value_rule >> ";";
+  value_rule %= intersectable_rule | light_list_rule | camera_rule;
 
   intersectable_rule %= intersectable_list_rule | sphere_rule | box_rule | quad_rule | plane_rule | obj_rule | instance_rule;
   intersectable_rule.name("intersectable");
@@ -49,16 +49,20 @@ SceneGrammar::SceneGrammar() : SceneGrammar::base_type(assignments_rule, "inters
   matrix_translate_rule.name("translation matrix");
   matrix_rotate_rule %= boost::spirit::lit("rotate") >> "(" >> boost::spirit::tag::float_() >> "," >> vector3_literal_rule >> ")";
   matrix_rotate_rule.name("rotation matrix");
+  matrix_scale_rule %= boost::spirit::lit("scale") >> "(" >> boost::spirit::tag::float_() >>  ")";
+  matrix_scale_rule.name("scale matrix");
   matrix_rule %= basic_matrix_rule >> *(boost::spirit::lit("*") >> basic_matrix_rule);
   matrix_rule.name("matrix");
-  basic_matrix_rule %= matrix_literal_rule | matrix_translate_rule | matrix_rotate_rule;
+  basic_matrix_rule %= matrix_literal_rule | matrix_translate_rule | matrix_rotate_rule | matrix_scale_rule;
   basic_matrix_rule.name("basic matrix");
 
   diffuse_material_rule %= boost::spirit::lit("diffuse") >> "(" >> vector3_literal_rule >> ")";
   diffuse_material_rule.name("diffuse material");
   mirror_material_rule %= boost::spirit::lit("mirror") >> "(" >> boost::spirit::tag::float_() >> ")";
   mirror_material_rule.name("mirror material");
-  material_rule %= diffuse_material_rule | mirror_material_rule;
+  texture_material_rule %= boost::spirit::lit("texture") >> "(" >> string_literal_rule >> ")";
+  texture_material_rule.name("texture material");
+  material_rule %= diffuse_material_rule | mirror_material_rule | texture_material_rule;
   material_rule.name("material");
 
   camera_rule %= boost::spirit::lit("camera") >> "(" >> vector3_literal_rule >> "," >> vector3_literal_rule >> "," >> vector3_literal_rule >> "," >> boost::spirit::tag::float_() >> "," >> boost::spirit::tag::float_() >> "," >> boost::spirit::tag::float_() >> ")";
@@ -69,9 +73,9 @@ SceneGrammar::SceneGrammar() : SceneGrammar::base_type(assignments_rule, "inters
   cone_light_rule %= boost::spirit::lit("conelight") >> "(" >> vector3_literal_rule >> "," >> vector3_literal_rule >> "," >> boost::spirit::tag::float_() >> "," >> vector3_literal_rule >> ")";
   light_rule %= point_light_rule | area_light_rule | cone_light_rule;
 
-  boost::spirit::qi::on_error
+  boost::spirit::qi::on_error<boost::spirit::qi::fail>
   (
-      intersectable_rule,
+      assignments_rule,
       cerr << val("Error, expecting ") << _4 << val(" here: \"") << construct<std::string>(_3, _2) << val("\"\n")
   );
 }
@@ -79,6 +83,7 @@ SceneGrammar::SceneGrammar() : SceneGrammar::base_type(assignments_rule, "inters
 bool SceneGrammar::parse(string filename)
 {
   ifstream in(filename.c_str(), ifstream::in);
+  if(!in.is_open() || in.eof()) return false;
   std::string str((istreambuf_iterator<char>(in)), istreambuf_iterator<char>());
   std::string::iterator begin = str.begin();
   std::string::iterator end = str.end();

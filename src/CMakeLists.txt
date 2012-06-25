@@ -12,7 +12,7 @@ set(renderingproject_HEADERS win.h)
 set(renderingproject_SRCS main.cpp camera.cpp plane.cpp sphere.cpp
   sceneast.cpp sceneparser.cpp
   triangle.cpp intersectableinstance.cpp
-  darkmatter.cpp diffusematerial.cpp phongmaterial.cpp
+  darkmatter.cpp diffusematerial.cpp phongmaterial.cpp texturematerial.cpp
   conelight.cpp intersectablelist.cpp
   pointlight.cpp objreader.cpp mirrormaterial.cpp
   axisalignedbox.cpp

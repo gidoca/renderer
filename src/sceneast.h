@@ -41,9 +41,15 @@ struct ast_mirror_material
   float coefficient;
 };
 
+struct ast_texture_material
+{
+    std::string filename;
+};
+
 typedef boost::variant<
     ast_diffuse_material,
-    ast_mirror_material
+    ast_mirror_material,
+    ast_texture_material
     > ast_material;
 
 struct ast_matrix_literal
@@ -62,10 +68,16 @@ struct ast_matrix_rotate
   ast_vector3_literal axis;
 };
 
+struct ast_matrix_scale
+{
+  float factor;
+};
+
 typedef boost::variant<
     ast_matrix_literal,
     ast_matrix_translate,
-    ast_matrix_rotate
+    ast_matrix_rotate,
+    ast_matrix_scale
     > ast_basic_matrix;
 
 struct ast_matrix
@@ -118,7 +130,7 @@ struct ast_plane
 
 struct ast_obj
 {
-    std::vector<char> filename;
+    std::string filename;
     ast_material material;
 };
 
@@ -154,22 +166,13 @@ struct ast_cone_light
 
 typedef boost::variant<ast_point_light, ast_area_light, ast_cone_light> ast_light;
 
-struct ast_intersectable_assignment
-{
-    ast_intersectable intersectable;
-};
+typedef boost::variant<std::vector<ast_light>, ast_camera, ast_intersectable> ast_value;
 
-struct ast_camera_assignment
+struct ast_assignment
 {
-    ast_camera camera;
+    std::string name;
+    ast_value value;
 };
-
-struct ast_light_assignment
-{
-    std::vector<ast_light> lights;
-};
-
-typedef boost::variant<ast_intersectable_assignment, ast_camera_assignment, ast_light_assignment> ast_assignment;
 
 BOOST_FUSION_ADAPT_STRUCT(
     ast_intersectable_list,
@@ -207,7 +210,7 @@ BOOST_FUSION_ADAPT_STRUCT(
 
 BOOST_FUSION_ADAPT_STRUCT(
     ast_obj,
-    (std::vector<char>, filename)
+    (std::string, filename)
     (ast_material, material)
 )
 
@@ -258,6 +261,11 @@ BOOST_FUSION_ADAPT_STRUCT(
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
+    ast_matrix_scale,
+    (float, factor)
+)
+
+BOOST_FUSION_ADAPT_STRUCT(
     ast_diffuse_material,
     (ast_vector3_literal, color)
 )
@@ -265,6 +273,11 @@ BOOST_FUSION_ADAPT_STRUCT(
 BOOST_FUSION_ADAPT_STRUCT(
     ast_mirror_material,
     (float, coefficient)
+)
+
+BOOST_FUSION_ADAPT_STRUCT(
+    ast_texture_material,
+    (std::string, filename)
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
@@ -300,18 +313,9 @@ BOOST_FUSION_ADAPT_STRUCT(
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
-    ast_intersectable_assignment,
-    (ast_intersectable, intersectable)
-)
-
-BOOST_FUSION_ADAPT_STRUCT(
-    ast_camera_assignment,
-    (ast_camera, camera)
-)
-
-BOOST_FUSION_ADAPT_STRUCT(
-    ast_light_assignment,
-    (std::vector<ast_light>, lights)
+    ast_assignment,
+    (std::string, name)
+    (ast_value, value)
 )
 
 Scene buildScene(std::vector<ast_assignment> assignments);
