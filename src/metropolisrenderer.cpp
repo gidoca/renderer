@@ -181,7 +181,9 @@ void MetropolisRenderer::render(const Scene & scene, Mat & film, const boost::pr
   film2 = f.filter(films[1], films[0], filteredVar);
   Mat m = ((film1 + film2) / 2.);
   m.copyTo(film);
-  imwrite("/home/gidoca/mean.exr", noisy_mean);
+  imwrite("/tmp/mean.exr", noisy_mean);
+  imwrite("/tmp/film0.exr", films[0]);
+  imwrite("/tmp/film1.exr", films[1]);
 }
 
 options_description MetropolisRenderer::options()
