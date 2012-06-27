@@ -10,13 +10,14 @@
 HitRecord Triangle::intersect(Ray ray, float from, float to) const
 {
     QVector3D ad = ray.getOrigin() - p1;
-    QVector3D adxde = QVector3D::crossProduct(ad, ray.getDirection());
     QVector3D abxac = QVector3D::crossProduct(p2 - p1, p3 - p1);
 
     float w = -QVector3D::dotProduct(abxac, ray.getDirection());
     if(w == 0) return HitRecord();
     float t = QVector3D::dotProduct(abxac, ad) / w;
     if(t < from || t > to) return HitRecord();
+
+    QVector3D adxde = QVector3D::crossProduct(ad, ray.getDirection());
     float u = QVector3D::dotProduct(adxde, p3 - p1) / w;
     if(u < 0 || u > 1) return HitRecord();
     float v = -QVector3D::dotProduct(adxde, p2 - p1) / w;
