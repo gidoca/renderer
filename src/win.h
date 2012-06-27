@@ -35,6 +35,7 @@ public:
     insertAction(0, saveAct);
 
     setWindowTitle("Rendering...");
+    setFixedSize(QSize(film.size().width, film.size().height));
   }
   
 private Q_SLOTS:
