@@ -17,7 +17,7 @@
 
 #define MAX_DEPTH 4
 
-typedef boost::mpl::list<MetropolisRenderer, PerPixelRenderer, EnergyRedistributionRenderer> renderers;
+typedef boost::mpl::list<MetropolisRenderer, MetropolisFltRenderer, PerPixelRenderer, EnergyRedistributionRenderer> renderers;
 
 class Renderer
 {

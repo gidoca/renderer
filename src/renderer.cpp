@@ -7,6 +7,7 @@
 #include "energyredistributionrenderer.h"
 #include "perpixelrenderer.h"
 #include "metropolisrenderer.h"
+#include "metropolisfltrenderer.h"
 
 #include <gsl/gsl_rng.h>
 #include <gsl/gsl_randist.h>
