@@ -14,6 +14,7 @@
 #include "perpixelrenderer.h"
 #include "unidipathtracingintegrator.h"
 #include "metropolisrenderer.h"
+#include "metropolisfltrenderer.h"
 #include "energyredistributionrenderer.h"
 #include "scene.h"
 #include "tonemapper.h"

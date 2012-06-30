@@ -23,6 +23,7 @@ class JitteredSampler;
 class Light;
 class Material;
 class MetropolisRenderer;
+class MetropolisFltRenderer;
 class MetropolisSample;
 class MirrorMaterial;
 class ObjReader;
