@@ -22,15 +22,12 @@ cv::Mat channelMean(const cv::Mat &in)
 {
     vector<Mat> splitted;
     Mat outSingle = Mat::zeros(in.size(), CV_MAKETYPE(in.type(), 1));
-    split(in, splitted);
+    split(in.mul(in), splitted);
     for(unsigned int i = 0; i < splitted.size(); i++)
     {
-        outSingle += splitted[i] / splitted.size();
+        outSingle += splitted[i];// / splitted.size();
     }
-    Mat out(in.size(), in.type());
-    int channelMapping[] = {0, 0, 0, 1, 0, 2};
-    mixChannels(&outSingle, 1, &out, 1, channelMapping, 3);
-    return out;
+    return outSingle;
 //    return in;
 }
 
@@ -38,16 +35,24 @@ cv::Mat computeWeights(const Mat& source, const Mat& target, const Mat& var, con
 {
     Mat weights, temp, temp2, diff, d2;
     diff = source - target;
-    imwrite("/tmp/diff.exr", diff);
-    blur(diff.mul(diff), d2, Size(patchSize, patchSize), Point(-1, -1), BORDER_REFLECT);
+//    Mat sqdiff = channelMean(diff);
+    Mat sqdiff = diff.mul(diff);
+    blur(sqdiff, d2, Size(patchSize, patchSize), Point(-1, -1), BORDER_REFLECT);
 //            exp(-max(d2 - 2 * pixvar, 0) / (1e-10f + h2 * pixvar), weights);
     //use min(var1, pixvar)
 //    exp(-(d2 - (var + min(shiftedVar, var))) / (1e-8f + h2 * (var + shiftedVar)), temp);
+//    exp(-(d2 - channelMean(var + shiftedVar)) / (1e-8f + h2 * channelMean(var + shiftedVar)), temp);
     exp(-(d2 - (var + shiftedVar)) / (1e-8f + h2 * (var + shiftedVar)), temp);
     blur(temp, temp2, Size(patchSize, patchSize), Point(-1, -1), BORDER_REFLECT);
     //threshold?
-    weights = max(channelMean(temp2), 0);
+//    weights = max(channelMean(temp2), 0);
+    weights = max(temp2, 0);
     assert(checkRange(weights));
+//    assert(weights.channels() == 1);
+//    Mat out(source.size(), source.type());
+//    int channelMapping[] = {0, 0, 0, 1, 0, 2};
+//    mixChannels(&weights, 1, &out, 1, channelMapping, 3);
+//    return out;
     return weights;
 }
 
