@@ -146,17 +146,20 @@ void MetropolisFltRenderer::render(const Scene & scene, Mat & film, const boost:
   for(int n = 0; n < num_films; n++)
   {
     Mat sumweight3;
-    merge(std::vector<Mat>(3, sumweight[n]), sumweight3);
+    merge(std::vector<Mat>(3, sumweight[n] + 1e-8f), sumweight3);
     biased_var[n] = biased_m2[n] / sumweight3;
   }
 
 
   Mat noisy_variance;
   var(film, noisy_variance, films);
+  assert(checkRange(noisy_variance));
   Mat noisy_mean = film;
 
   Mat meanvar, varvar;
   var(meanvar, varvar, biased_var);
+  assert(checkRange(meanvar));
+  assert(checkRange(varvar));
 
   SymmetricFilter f;
 

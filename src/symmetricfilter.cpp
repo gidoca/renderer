@@ -33,16 +33,19 @@ cv::Mat channelMean(const cv::Mat &in)
 
 cv::Mat computeWeights(const Mat& source, const Mat& target, const Mat& var, const Mat& shiftedVar, int patchSize, float h2)
 {
+    assert(checkRange(source));
+    assert(checkRange(target));
     Mat weights, temp, temp2, diff, d2;
     diff = source - target;
 //    Mat sqdiff = channelMean(diff);
     Mat sqdiff = diff.mul(diff);
     blur(sqdiff, d2, Size(patchSize, patchSize), Point(-1, -1), BORDER_REFLECT);
+    assert(checkRange(sqdiff));
 //            exp(-max(d2 - 2 * pixvar, 0) / (1e-10f + h2 * pixvar), weights);
     //use min(var1, pixvar)
-//    exp(-(d2 - (var + min(shiftedVar, var))) / (1e-8f + h2 * (var + shiftedVar)), temp);
+    exp(-(d2 - (var + min(shiftedVar, var))) / (1e-8f * Mat::ones(source.size(), source.type()) + h2 * (var + shiftedVar)), temp);
 //    exp(-(d2 - channelMean(var + shiftedVar)) / (1e-8f + h2 * channelMean(var + shiftedVar)), temp);
-    exp(-(d2 - (var + shiftedVar)) / (1e-8f * Mat::ones(source.size(), source.type()) + h2 * (var + shiftedVar)), temp);
+//    exp(-(d2 - (var + shiftedVar)) / (1e-8f * Mat::ones(source.size(), source.type()) + h2 * (var + shiftedVar)), temp);
     blur(temp, temp2, Size(patchSize, patchSize), Point(-1, -1), BORDER_REFLECT);
     //threshold?
 //    weights = max(channelMean(temp2), 0);
@@ -58,6 +61,7 @@ cv::Mat computeWeights(const Mat& source, const Mat& target, const Mat& var, con
 
 cv::Mat SymmetricFilter::filter(const cv::Mat &image, const cv::Mat &guide, const cv::Mat &pixvar)
 {
+    assert(checkRange(image));
     Mat source1, source2, source_S, weights1, weights2, weights_S, data1, data2, var1, var2, var_S;
     Mat area = Mat::zeros(image.size(), image.type());
     Mat acc = Mat::zeros(image.size(), image.type());
