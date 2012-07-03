@@ -37,12 +37,13 @@ void addSample(const Sample &cameraSample, float weight, Mat &film, Vec3f value)
 
 void MetropolisRenderer::render(const Scene & scene, Mat & film, const boost::program_options::variables_map vm)
 {
-  gsl_rng *rng = gsl_rng_alloc(gsl_rng_taus);
-  int seed = getSeed(vm);
-  gsl_rng_set(rng, seed);
+  gsl_rng *globalrng = gsl_rng_alloc(gsl_rng_taus);
+  const int seed = getSeed(vm);
+  gsl_rng_set(globalrng, seed);
+
 
   MetropolisSample sample(scene.light.size());
-  sample.largeStep(rng);
+  sample.largeStep(globalrng);
   Path path = sample.cameraPathFromSample(*scene.object, scene.camera);
   UniDiPathTracingIntegrator integrator;
   Vec3f value = integrator.integrate(path, *scene.object, scene.light, sample.lightSample1, sample.lightIndex);
@@ -55,7 +56,7 @@ void MetropolisRenderer::render(const Scene & scene, Mat & film, const boost::pr
   vector<MetropolisSample> bootstrapSamples;
   for(int i = 0; i < numInitialSamples; i++)
   {
-    sample.largeStep(rng);
+    sample.largeStep(globalrng);
     path = sample.cameraPathFromSample(*scene.object, scene.camera);
     Vec3f l = integrator.integrate(path, *scene.object, scene.light, sample.lightSample1, sample.lightIndex);
     sumI += norm(l);
@@ -64,16 +65,18 @@ void MetropolisRenderer::render(const Scene & scene, Mat & film, const boost::pr
   }
   const float b = sumI / numInitialSamples;
 
-  const float contribOffset = gsl_rng_uniform(rng) * sumI;
+  const float contribOffset = gsl_rng_uniform(globalrng) * sumI;
   sumI = 0;
   for(int i = 0; i < numInitialSamples; i++)
   {
-    sample.largeStep(rng);
+    sample.largeStep(globalrng);
     sample = bootstrapSamples[i];
     sumI += bootstrapI[i];
     if(sumI > contribOffset) break;
   }
-//  sample.largeStep(rng);
+//  sample.largeStep(globalrng);
+
+  gsl_rng_free(globalrng);
 
   const int numPixelSamples = vm["met-mutations"].as<int>();
 #ifdef NDEBUG
@@ -86,6 +89,8 @@ void MetropolisRenderer::render(const Scene & scene, Mat & film, const boost::pr
 #pragma omp parallel for
   for(int t = 0; t < numThreads; t++)
   {
+        gsl_rng *rng = gsl_rng_alloc(gsl_rng_taus);
+        gsl_rng_set(rng, numThreads * seed + t);
         MetropolisSample currentSample = sample;
         Vec3f currentValue = value;
         Path currentPath = path;
@@ -112,6 +117,7 @@ void MetropolisRenderer::render(const Scene & scene, Mat & film, const boost::pr
                 currentValue = newValue;
             }
         }
+        gsl_rng_free(rng);
   }
 }
 

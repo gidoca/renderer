@@ -19,10 +19,10 @@ void EnergyRedistributionRenderer::render(const Scene &scene, Mat &film, boost::
 {
   const int seed = getSeed(vm);
 
-  gsl_rng *rng = gsl_rng_alloc(gsl_rng_taus);
-  gsl_rng_set(rng, seed);
-  const float ed = computeEd(scene, rng, vm["erpt-mutations"].as<int>());
-  gsl_rng_free(rng);
+  gsl_rng *globalrng = gsl_rng_alloc(gsl_rng_taus);
+  gsl_rng_set(globalrng, seed);
+  const float ed = computeEd(scene, globalrng, vm["erpt-mutations"].as<int>());
+  gsl_rng_free(globalrng);
 
   Size size = film.size();
 
