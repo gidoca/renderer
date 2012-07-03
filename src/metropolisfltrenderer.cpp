@@ -49,12 +49,13 @@ void MetropolisFltRenderer::render(const Scene & scene, Mat & film, const boost:
   Mat biased_mean[num_films], biased_m2[num_films];
   vector<Mat> films(num_films), biased_var(num_films);
   Mat sumweight[num_films];
-  gsl_rng *rng = gsl_rng_alloc(gsl_rng_taus);
-  int seed = getSeed(vm);
-  gsl_rng_set(rng, seed);
+
+  gsl_rng *globalrng = gsl_rng_alloc(gsl_rng_taus);
+  const int seed = getSeed(vm);
+  gsl_rng_set(globalrng, seed);
 
   MetropolisSample sample(scene.light.size());
-  sample.largeStep(rng);
+  sample.largeStep(globalrng);
   Path path = sample.cameraPathFromSample(*scene.object, scene.camera);
   UniDiPathTracingIntegrator integrator;
   Vec3f value = integrator.integrate(path, *scene.object, scene.light, sample.lightSample1, sample.lightIndex);
@@ -67,7 +68,7 @@ void MetropolisFltRenderer::render(const Scene & scene, Mat & film, const boost:
   vector<MetropolisSample> bootstrapSamples;
   for(int i = 0; i < numInitialSamples; i++)
   {
-    sample.largeStep(rng);
+    sample.largeStep(globalrng);
     path = sample.cameraPathFromSample(*scene.object, scene.camera);
     Vec3f l = integrator.integrate(path, *scene.object, scene.light, sample.lightSample1, sample.lightIndex);
     sumI += norm(l);
@@ -76,11 +77,11 @@ void MetropolisFltRenderer::render(const Scene & scene, Mat & film, const boost:
   }
   const float b = sumI / numInitialSamples;
 
-  const float contribOffset = gsl_rng_uniform(rng) * sumI;
+  const float contribOffset = gsl_rng_uniform(globalrng) * sumI;
   sumI = 0;
   for(int i = 0; i < numInitialSamples; i++)
   {
-    sample.largeStep(rng);
+    sample.largeStep(globalrng);
     sample = bootstrapSamples[i];
     sumI += bootstrapI[i];
     if(sumI > contribOffset) break;
@@ -108,6 +109,8 @@ void MetropolisFltRenderer::render(const Scene & scene, Mat & film, const boost:
 #pragma omp parallel for
   for(int t = 0; t < numThreads; t++)
   {
+      gsl_rng *rng = gsl_rng_alloc(gsl_rng_taus);
+      gsl_rng_set(rng, numThreads * seed + t);
       for(int n = 0; n < num_films; n++)
       {
         MetropolisSample currentSample = sample;
@@ -148,9 +151,9 @@ void MetropolisFltRenderer::render(const Scene & scene, Mat & film, const boost:
   }
 
 
-  Mat noisy_mean;
   Mat noisy_variance;
-  var(noisy_mean, noisy_variance, films);
+  var(film, noisy_variance, films);
+  Mat noisy_mean = film;
 
   Mat meanvar, varvar;
   var(meanvar, varvar, biased_var);
@@ -160,12 +163,13 @@ void MetropolisFltRenderer::render(const Scene & scene, Mat & film, const boost:
   Mat filteredVar;
   filteredVar = f.filter(noisy_variance, meanvar, varvar);
 
+  imwrite("/tmp/mean.exr", noisy_mean);
+
   Mat film1, film2;
   film1 = f.filter(films[0], films[1], filteredVar);
   film2 = f.filter(films[1], films[0], filteredVar);
   Mat m = ((film1 + film2) / 2.);
   m.copyTo(film);
-  imwrite("/tmp/mean.exr", noisy_mean);
   imwrite("/tmp/film0.exr", films[0]);
   imwrite("/tmp/film1.exr", films[1]);
 }

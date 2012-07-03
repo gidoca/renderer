@@ -42,7 +42,7 @@ cv::Mat computeWeights(const Mat& source, const Mat& target, const Mat& var, con
     //use min(var1, pixvar)
 //    exp(-(d2 - (var + min(shiftedVar, var))) / (1e-8f + h2 * (var + shiftedVar)), temp);
 //    exp(-(d2 - channelMean(var + shiftedVar)) / (1e-8f + h2 * channelMean(var + shiftedVar)), temp);
-    exp(-(d2 - (var + shiftedVar)) / (1e-8f + h2 * (var + shiftedVar)), temp);
+    exp(-(d2 - (var + shiftedVar)) / (1e-8f * Mat::ones(source.size(), source.type()) + h2 * (var + shiftedVar)), temp);
     blur(temp, temp2, Size(patchSize, patchSize), Point(-1, -1), BORDER_REFLECT);
     //threshold?
 //    weights = max(channelMean(temp2), 0);
