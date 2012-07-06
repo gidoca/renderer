@@ -15,6 +15,8 @@
 
 #include <omp.h>
 
+#include <QTime>
+
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 
@@ -45,6 +47,14 @@ void addSample(const Sample &cameraSample, float weight, Mat &film, Mat &mean, M
 
 void MetropolisFltRenderer::render(const Scene & scene, Mat & film, const boost::program_options::variables_map vm)
 {
+  QTime time;
+  time.start();
+
+  if(vm.count("verbose"))
+  {
+    std::cout << "Starting bootstrapping\n";
+  }
+
   const int num_films = 2;
   Mat biased_mean[num_films], biased_m2[num_films];
   vector<Mat> films(num_films), biased_var(num_films);
@@ -87,6 +97,11 @@ void MetropolisFltRenderer::render(const Scene & scene, Mat & film, const boost:
     if(sumI > contribOffset) break;
   }
 //  sample.largeStep(rng);
+
+  if(vm.count("verbose"))
+  {
+    std::cout << "Bootstrapping complete, " << time.elapsed() / 1000 << "s elapsed, starting initial rendering\n";
+  }
 
   const int numPixelSamples = vm["met-mutations"].as<int>();
 #ifdef NDEBUG
@@ -140,6 +155,11 @@ void MetropolisFltRenderer::render(const Scene & scene, Mat & film, const boost:
             }
         }
       }
+  }
+
+  if(vm.count("verbose"))
+  {
+    std::cout << "Rendering complete, " << time.elapsed() / 1000 << "s elapsed, starting initial filtering\n";
   }
 
 #pragma omp parallel for
