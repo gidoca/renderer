@@ -62,7 +62,6 @@ cv::Mat computeWeights(const Mat& source, const Mat& target, const Mat& var, con
 cv::Mat SymmetricFilter::filter(const cv::Mat &image, const cv::Mat &guide, const cv::Mat &pixvar)
 {
     assert(checkRange(image));
-    Mat source1, source2, source_S, weights1, weights2, weights_S, data1, data2, var1, var2, var_S;
     Mat area = Mat::zeros(image.size(), image.type());
     Mat acc = Mat::zeros(image.size(), image.type());
 
@@ -80,29 +79,33 @@ cv::Mat SymmetricFilter::filter(const cv::Mat &image, const cv::Mat &guide, cons
 
     Mat paddedVariance = padArray(pixvar, padding);
 
+#pragma omp parallel for
     for(int dy = -windowRadius; dy <= 0; dy++)
     {
         for(int dx = -windowRadius; dx <= windowRadius; dx++)
         {
-            source1 = paddedGuide(Range(padding + dy, padding + dy + guide.size().height), Range(padding + dx, padding + dx + guide.size().width));
-            source2 = paddedGuide(Range(padding - dy, padding - dy + guide.size().height), Range(padding - dx, padding - dx + guide.size().width));
-            source_S = (source1 + source2) / 2.;
-            data1 = paddedImage(Range(padding + dy, padding + dy + guide.size().height), Range(padding + dx, padding + dx + image.size().width));
-            data2 = paddedImage(Range(padding - dy, padding - dy + guide.size().height), Range(padding - dx, padding - dx + image.size().width));
-            var1 = paddedVariance(Range(padding + dy, padding + dy + guide.size().height), Range(padding + dx, padding + dx + image.size().width));
-            var2 = paddedVariance(Range(padding - dy, padding - dy + guide.size().height), Range(padding - dx, padding - dx + image.size().width));
-            var_S = (var1 + var2) / 4;
+            Mat source1 = paddedGuide(Range(padding + dy, padding + dy + guide.size().height), Range(padding + dx, padding + dx + guide.size().width));
+            Mat source2 = paddedGuide(Range(padding - dy, padding - dy + guide.size().height), Range(padding - dx, padding - dx + guide.size().width));
+            Mat source_S = (source1 + source2) / 2.;
+            Mat data1 = paddedImage(Range(padding + dy, padding + dy + guide.size().height), Range(padding + dx, padding + dx + image.size().width));
+            Mat data2 = paddedImage(Range(padding - dy, padding - dy + guide.size().height), Range(padding - dx, padding - dx + image.size().width));
+            Mat var1 = paddedVariance(Range(padding + dy, padding + dy + guide.size().height), Range(padding + dx, padding + dx + image.size().width));
+            Mat var2 = paddedVariance(Range(padding - dy, padding - dy + guide.size().height), Range(padding - dx, padding - dx + image.size().width));
+            Mat var_S = (var1 + var2) / 4;
 
             if(dx == 0 && dy == 0)
             {
-                area += 1;
-                acc += data1;
+#pragma omp critical
+                {
+                    area += 1;
+                    acc += data1;
+                }
                 break;
             }
 
-            weights1 = computeWeights(source1, guide, pixvar, var1, patchSize, h2);
-            weights2 = computeWeights(source2, guide, pixvar, var2, patchSize, h2);
-            weights_S = computeWeights(source_S, guide, pixvar, var_S, patchSize, h2);
+            Mat weights1 = computeWeights(source1, guide, pixvar, var1, patchSize, h2);
+            Mat weights2 = computeWeights(source2, guide, pixvar, var2, patchSize, h2);
+            Mat weights_S = computeWeights(source_S, guide, pixvar, var_S, patchSize, h2);
 
             vector<Mat> weights1_split, weights2_split, weights_S_split;
             split(weights1, weights1_split);
@@ -116,10 +119,15 @@ cv::Mat SymmetricFilter::filter(const cv::Mat &image, const cv::Mat &guide, cons
             add(weights_S, 0, weights1, idx);
             add(weights_S, 0, weights2, idx);
 
-            area += weights1 + weights2;
-            acc += weights1.mul(data1) + weights2.mul(data2);
-            assert(checkRange(area));
-            assert(checkRange(acc));
+            Mat totalWeights = weights1 + weights2;
+            Mat totalData = weights1.mul(data1) + weights2.mul(data2);
+#pragma omp critical
+            {
+                area += totalWeights;
+                acc += totalData;
+                assert(checkRange(area));
+                assert(checkRange(acc));
+            }
         }
     }
 
