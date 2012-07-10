@@ -61,7 +61,7 @@ void MetropolisFltRenderer::render(const Scene & scene, Mat & film, const boost:
 
   if(vm.count("verbose"))
   {
-    std::cout << "Starting bootstrapping\n";
+    cout << "Starting bootstrapping" << endl;
   }
 
   const int num_films = 2;
@@ -109,7 +109,7 @@ void MetropolisFltRenderer::render(const Scene & scene, Mat & film, const boost:
 
   if(vm.count("verbose"))
   {
-    std::cout << "Bootstrapping complete, " << time.elapsed() / 1000 << "s elapsed, starting initial rendering\n";
+    cout << "Bootstrapping complete, " << time.elapsed() / 1000 << "s elapsed, starting initial rendering" << endl;
   }
 
   const int numPixelSamples = vm["met-mutations"].as<int>();
@@ -163,7 +163,7 @@ void MetropolisFltRenderer::render(const Scene & scene, Mat & film, const boost:
 
   if(vm.count("verbose"))
   {
-    std::cout << "Rendering complete, " << time.elapsed() / 1000 << "s elapsed, starting initial filtering\n";
+    cout << "Initial rendering complete, " << time.elapsed() / 1000 << "s elapsed, starting initial filtering" << endl;
   }
 
 #pragma omp parallel for
