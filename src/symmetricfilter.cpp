@@ -22,10 +22,10 @@ cv::Mat channelMean(const cv::Mat &in)
 {
     vector<Mat> splitted;
     Mat outSingle = Mat::zeros(in.size(), CV_MAKETYPE(in.type(), 1));
-    split(in.mul(in), splitted);
+    split(in, splitted);
     for(unsigned int i = 0; i < splitted.size(); i++)
     {
-        outSingle += splitted[i];// / splitted.size();
+        outSingle += splitted[i] / splitted.size();
     }
     return outSingle;
 //    return in;
@@ -43,7 +43,7 @@ cv::Mat computeWeights(const Mat& source, const Mat& target, const Mat& var, con
     assert(checkRange(sqdiff));
 //            exp(-max(d2 - 2 * pixvar, 0) / (1e-10f + h2 * pixvar), weights);
     //use min(var1, pixvar)
-    exp(-max(d2 - (var + min(shiftedVar, var)), 0) / (1e-8f * Mat::ones(source.size(), source.type()) + h2 * (var + shiftedVar)), temp);
+    exp(-max(channelMean(d2 - (var + min(shiftedVar, var))), 0) / (1e-8f * Mat::ones(source.size(), CV_32F) + h2 * channelMean(var + shiftedVar)), temp);
 //    exp(-(d2 - channelMean(var + shiftedVar)) / (1e-8f + h2 * channelMean(var + shiftedVar)), temp);
 //    exp(-(d2 - (var + shiftedVar)) / (1e-8f * Mat::ones(source.size(), source.type()) + h2 * (var + shiftedVar)), temp);
     blur(temp, temp2, Size(patchSize, patchSize), Point(-1, -1), BORDER_REFLECT);
@@ -51,12 +51,12 @@ cv::Mat computeWeights(const Mat& source, const Mat& target, const Mat& var, con
 //    weights = max(channelMean(temp2), 0);
     weights = max(temp2, 0);
     assert(checkRange(weights));
-//    assert(weights.channels() == 1);
-//    Mat out(source.size(), source.type());
-//    int channelMapping[] = {0, 0, 0, 1, 0, 2};
-//    mixChannels(&weights, 1, &out, 1, channelMapping, 3);
-//    return out;
-    return weights;
+    assert(weights.channels() == 1);
+    Mat out(source.size(), source.type());
+    int channelMapping[] = {0, 0, 0, 1, 0, 2};
+    mixChannels(&weights, 1, &out, 1, channelMapping, 3);
+    return out;
+//    return weights;
 }
 
 cv::Mat SymmetricFilter::filter(const cv::Mat &image, const cv::Mat &guide, const cv::Mat &pixvar)
@@ -92,6 +92,7 @@ cv::Mat SymmetricFilter::filter(const cv::Mat &image, const cv::Mat &guide, cons
             Mat var1 = paddedVariance(Range(padding + dy, padding + dy + guide.size().height), Range(padding + dx, padding + dx + image.size().width));
             Mat var2 = paddedVariance(Range(padding - dy, padding - dy + guide.size().height), Range(padding - dx, padding - dx + image.size().width));
             Mat var_S = (var1 + var2) / 4;
+
 
             if(dx == 0 && dy == 0)
             {

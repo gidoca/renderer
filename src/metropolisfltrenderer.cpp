@@ -199,6 +199,7 @@ void MetropolisFltRenderer::render(const Scene & scene, Mat & film, const boost:
   m.copyTo(film);
   imwrite("/tmp/film0.exr", films[0]);
   imwrite("/tmp/film1.exr", films[1]);
+  imwrite("/tmp/var.exr", filteredVar);
 }
 
 options_description MetropolisFltRenderer::options()
