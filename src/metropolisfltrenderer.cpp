@@ -140,11 +140,11 @@ void MetropolisFltRenderer::render(const Scene & scene, Mat & film, const boost:
             float accept = min(1., norm(newValue) / norm(currentValue));
             assert(!isnan(accept));
 
-            if(norm(currentValue) > 0)
+            if(norm(currentValue) > 0 && accept < 1)
             {
                 addSample(currentSample.cameraSample, 1 - accept, films[n], biased_mean[n], biased_m2[n], sumweight[n], currentValue * (1 / norm(currentValue) * b / numPixelSamples));
             }
-            if(norm(newValue) > 0)
+            if(norm(newValue) > 0 && accept > 0)
             {
                 addSample(currentSample.cameraSample, accept, films[n], biased_mean[n], biased_m2[n], sumweight[n], newValue * (1 / norm(newValue) * b / numPixelSamples));
             }
