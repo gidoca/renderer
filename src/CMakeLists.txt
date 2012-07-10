@@ -20,7 +20,6 @@ set(renderingproject_SRCS main.cpp camera.cpp plane.cpp sphere.cpp
   simpleintegrator.cpp unidipathtracingintegrator.cpp bidipathtracingintegrator.cpp
   quad.cpp csgobject.cpp csgintersection.cpp bvh.cpp
   renderer.cpp perpixelrenderer.cpp metropolisrenderer.cpp metropolisfltrenderer.cpp
-  #film.cpp
   tonemapper.cpp
   symmetricfilter.cpp
   win.cpp energyredistributionrenderer.cpp metropolissample.cpp
@@ -32,8 +31,9 @@ add_executable(renderingproject ${renderingproject_SRCS})
 target_link_libraries(renderingproject ${QT_LIBRARIES} ${GSL_LIBRARIES} ${OPENEXR_LIBRARIES} ${Boost_LIBRARIES} ${OpenCV_LIBS})
 #target_link_libraries(stst ${QT_LIBRARIES})
 
-set(COMMON_CXX_FLAGS "-Wextra -Wall -Wno-unused-parameter")
+#-Wno-unitialized suppresses warnings from boost
+set(COMMON_CXX_FLAGS "-Wextra -Wall -Wno-unused-parameter -Wno-uninitialized -std=c++0x")
 
-set(CMAKE_CXX_FLAGS_RELEASE "${COMMON_CXX_FLAGS} -fopenmp -DNDEBUG -march=native -O3 -fno-strict-aliasing")
-set(CMAKE_CXX_FLAGS_DEBUG "${COMMON_CXX_FLAGS} -g")
+set(CMAKE_CXX_FLAGS_RELEASE "${COMMON_CXX_FLAGS} -fopenmp -DNDEBUG -march=native -O3")
+set(CMAKE_CXX_FLAGS_DEBUG "${COMMON_CXX_FLAGS} -g -Wno-unknown-pragmas")
 
