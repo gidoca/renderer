@@ -24,6 +24,14 @@ using namespace std;
 using namespace boost::program_options;
 using namespace cv;
 
+#ifdef NDEBUG
+MetropolisFltRenderer::MetropolisFltRenderer() : numThreads(omp_get_max_threads())
+#else
+MetropolisFltRenderer::MetropolisFltRenderer() : numThreads(1)
+#endif
+{
+}
+
 void addSample(const Sample &cameraSample, float weight, Mat &film, Mat &mean, Mat &m2, Mat &sumweight, Vec3f value)
 {
     int x = (int)(cameraSample.getSample().x() * film.size().width);
@@ -34,15 +42,16 @@ void addSample(const Sample &cameraSample, float weight, Mat &film, Mat &mean, M
     Vec3f depositValue = weight * value;
 
 #pragma omp critical
-    film.at<Vec3f>(y, x) += depositValue;
-
-    float oldSumWeight = sumweight.at<float>(y, x);
-    float newSumWeight = weight + oldSumWeight;
-    Vec3f delta = value - mean.at<Vec3f>(y, x);
-    Vec3f R = delta * (weight / newSumWeight);
-    mean.at<Vec3f>(y, x) += R;
-    m2.at<Vec3f>(y, x) += oldSumWeight * delta.mul(R);
-    sumweight.at<float>(y, x) = newSumWeight;
+    {
+        float oldSumWeight = sumweight.at<float>(y, x);
+        float newSumWeight = weight + oldSumWeight;
+        Vec3f delta = value - mean.at<Vec3f>(y, x);
+        Vec3f R = delta * (weight / newSumWeight);
+        mean.at<Vec3f>(y, x) += R;
+        m2.at<Vec3f>(y, x) += oldSumWeight * delta.mul(R);
+        sumweight.at<float>(y, x) = newSumWeight;
+        film.at<Vec3f>(y, x) += depositValue;
+    }
 }
 
 void MetropolisFltRenderer::render(const Scene & scene, Mat & film, const boost::program_options::variables_map vm)
@@ -104,11 +113,6 @@ void MetropolisFltRenderer::render(const Scene & scene, Mat & film, const boost:
   }
 
   const int numPixelSamples = vm["met-mutations"].as<int>();
-#ifdef NDEBUG
-  const int numThreads = omp_get_max_threads();
-#else
-  const int numThreads = 1;
-#endif
   const int numSamples = numPixelSamples * film.size().width * film.size().height / numThreads;
 
 #pragma omp parallel for

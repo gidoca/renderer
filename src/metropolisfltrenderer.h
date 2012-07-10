@@ -14,11 +14,15 @@
 class MetropolisFltRenderer : public Renderer
 {
 public:
+  MetropolisFltRenderer();
+
   void render(const Scene & scene, cv::Mat & film, const boost::program_options::variables_map vm);
 
   static boost::program_options::options_description options();
   
   static const std::string name;
+
+  const int numThreads;
 };
 
 #endif // METROPOLISFLTRENDERER_H
