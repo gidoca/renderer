@@ -35,67 +35,65 @@ MetropolisFltRenderer::MetropolisFltRenderer() :
 {
 }
 
-void addSample(const Sample &cameraSample, float weight, Mat &film, Mat &mean, Mat &m2, Mat &sumweight, Vec3f value)
+Point2i getPos(const Sample& cameraSample, Size size)
 {
-    int x = (int)(cameraSample.getSample().x() * film.size().width);
-    int y = (int)(cameraSample.getSample().y() * film.size().height);
+    int x = (int)(cameraSample.getSample().x() * size.width);
+    int y = (int)(cameraSample.getSample().y() * size.height);
     assert(0 <= x && x < film.size().width);
     assert(0 <= y && y < film.size().height);
+    return Point2i(x, y);
+}
 
+void addSample(const Sample &cameraSample, float weight, Mat &film, Mat &mean, Mat &m2, Mat &sumweight, Vec3f value)
+{
+    Point2i pos = getPos(cameraSample, film.size());
     Vec3f depositValue = weight * value;
 
 #pragma omp critical
     {
-        float oldSumWeight = sumweight.at<float>(y, x);
+        float oldSumWeight = sumweight.at<float>(pos);
         float newSumWeight = weight + oldSumWeight;
-        Vec3f delta = value - mean.at<Vec3f>(y, x);
+        Vec3f delta = value - mean.at<Vec3f>(pos);
         Vec3f R = delta * (weight / newSumWeight);
-        mean.at<Vec3f>(y, x) += R;
-        m2.at<Vec3f>(y, x) += oldSumWeight * delta.mul(R);
-        sumweight.at<float>(y, x) = newSumWeight;
-        film.at<Vec3f>(y, x) += depositValue;
+        mean.at<Vec3f>(pos) += R;
+        m2.at<Vec3f>(pos) += oldSumWeight * delta.mul(R);
+        sumweight.at<float>(pos) = newSumWeight;
+        film.at<Vec3f>(pos) += depositValue;
     }
 }
 
-void MetropolisFltRenderer::render(const Scene & scene, Mat & film, const boost::program_options::variables_map vm)
+void MetropolisFltRenderer::renderStep(Size size, const Scene& scene, vector<Mat>& films, vector<Mat>& biased_var, vector<Mat>& biased_mean, vector<Mat>& biased_m2)
 {
-  QTime time;
-  time.start();
+    renderStep(size, scene, Mat::ones(size, CV_32F), films, biased_var, biased_mean, biased_m2);
+}
 
-  if(vm.count("verbose"))
-  {
-    cout << "Starting bootstrapping" << endl;
-  }
-
-  const int num_films = 2;
-  Mat biased_mean[num_films], biased_m2[num_films];
-  vector<Mat> films(num_films), biased_var(num_films);
-  Mat sumweight[num_films];
+void MetropolisFltRenderer::renderStep(Size size, const Scene& scene, Mat importanceMap, vector<Mat>& films, vector<Mat>& biased_var, vector<Mat>& biased_mean, vector<Mat>& biased_m2)
+{
+  const int numInitialSamples = vm["met-bootstrap"].as<int>();
+  const float largeStepProb = vm["met-large-step-prob"].as<float>();
+  const int numPixelSamples = vm["met-mutations"].as<int>();
 
   gsl_rng *globalrng = gsl_rng_alloc(gsl_rng_taus);
   const int seed = getSeed(vm);
   gsl_rng_set(globalrng, seed);
 
-  MetropolisSample sample(scene.light.size());
-  sample.largeStep(globalrng);
-  Path path = sample.cameraPathFromSample(*scene.object, scene.camera);
+  MetropolisSample initialSample(scene.light.size());
+  initialSample.largeStep(globalrng);
   UniDiPathTracingIntegrator integrator;
-  Vec3f value = integrator.integrate(path, *scene.object, scene.light, sample.lightSample1, sample.lightIndex);
 
-  const int numInitialSamples = vm["met-bootstrap"].as<int>();
-  const float largeStepProb = vm["met-large-step-prob"].as<float>();
+  const int num_films = 2;
 
   float sumI = 0;
   vector<float> bootstrapI;
   vector<MetropolisSample> bootstrapSamples;
   for(int i = 0; i < numInitialSamples; i++)
   {
-    sample.largeStep(globalrng);
-    path = sample.cameraPathFromSample(*scene.object, scene.camera);
-    Vec3f l = integrator.integrate(path, *scene.object, scene.light, sample.lightSample1, sample.lightIndex);
-    sumI += norm(l);
-    bootstrapI.push_back(norm(l));
-    bootstrapSamples.push_back(sample);
+    initialSample.largeStep(globalrng);
+    Path initialPath = initialSample.cameraPathFromSample(*scene.object, scene.camera);
+    Vec3f l = integrator.integrate(initialPath, *scene.object, scene.light, initialSample.lightSample1, initialSample.lightIndex);
+    sumI += norm(l) * importanceMap.at<float>(getPos(initialSample.cameraSample, size));
+    bootstrapI.push_back(norm(l) * importanceMap.at<float>(getPos(initialSample.cameraSample, size)));
+    bootstrapSamples.push_back(initialSample);
   }
   const float b = sumI / numInitialSamples;
 
@@ -103,70 +101,58 @@ void MetropolisFltRenderer::render(const Scene & scene, Mat & film, const boost:
   sumI = 0;
   for(int i = 0; i < numInitialSamples; i++)
   {
-    sample.largeStep(globalrng);
-    sample = bootstrapSamples[i];
+    initialSample.largeStep(globalrng);
+    initialSample = bootstrapSamples[i];
     sumI += bootstrapI[i];
     if(sumI > contribOffset) break;
   }
-//  sample.largeStep(rng);
 
-  if(vm.count("verbose"))
-  {
-    cout << "Bootstrapping complete, " << time.elapsed() / 1000 << "s elapsed, starting initial rendering" << endl;
-  }
-
-  const int numPixelSamples = vm["met-mutations"].as<int>();
-  const int numSamples = numPixelSamples * film.size().width * film.size().height / numThreads;
+  Mat sumweight[num_films];
 
 #pragma omp parallel for
   for(int n = 0; n < num_films; n++)
   {
-    films[n] = Mat::zeros(film.size(), film.type());
-    biased_mean[n] = Mat::zeros(film.size(), film.type());
-    biased_m2[n] = Mat::zeros(film.size(), film.type());
-    sumweight[n] = Mat::zeros(film.size(), CV_32FC1);
+    films[n] = Mat::zeros(size, CV_32FC3);
+    biased_mean[n] = Mat::zeros(size, CV_32FC3);
+    biased_m2[n] = Mat::zeros(size, CV_32FC3);
+    sumweight[n] = Mat::zeros(size, CV_32FC1);
   }
 
+  const int numSamples = numPixelSamples * size.area() / numThreads;
 
 #pragma omp parallel for
   for(int t = 0; t < numThreads; t++)
   {
-      gsl_rng *rng = gsl_rng_alloc(gsl_rng_taus);
-      gsl_rng_set(rng, numThreads * seed + t);
-      for(int n = 0; n < num_films; n++)
+    gsl_rng *rng = gsl_rng_alloc(gsl_rng_taus);
+    gsl_rng_set(rng, numThreads * seed + t);
+    for(int n = 0; n < num_films; n++)
+    {
+      MetropolisSample currentSample = initialSample;
+      Vec3f currentValue = integrator.integrate(initialSample.cameraPathFromSample(*scene.object, scene.camera), *scene.object, scene.light, initialSample.lightSample1, initialSample.lightIndex);
+
+      for(int i = 0; i < numSamples; i++)
       {
-        MetropolisSample currentSample = sample;
-        Vec3f currentValue = value;
-        Path currentPath = path;
+          MetropolisSample newSample = currentSample.mutated(rng, largeStepProb);
+          Vec3f newValue = integrator.integrate(newSample.cameraPathFromSample(*scene.object, scene.camera), *scene.object, scene.light, newSample.lightSample1, newSample.lightIndex);
+          float accept = min(1., norm(newValue) * importanceMap.at<float>(getPos(newSample.cameraSample, size)) / (norm(currentValue) * importanceMap.at<float>(getPos(currentSample.cameraSample, size))));
+          assert(!isnan(accept));
 
-        for(int i = 0; i < numSamples; i++)
-        {
-            MetropolisSample newSample = currentSample.mutated(rng, largeStepProb);
-            currentPath = newSample.cameraPathFromSample(*scene.object, scene.camera);
-            Vec3f newValue = integrator.integrate(currentPath, *scene.object, scene.light, newSample.lightSample1, newSample.lightIndex);
-            float accept = min(1., norm(newValue) / norm(currentValue));
-            assert(!isnan(accept));
-
-            if(norm(currentValue) > 0 && accept < 1)
-            {
-                addSample(currentSample.cameraSample, 1 - accept, films[n], biased_mean[n], biased_m2[n], sumweight[n], currentValue * (1 / norm(currentValue) * b / numPixelSamples));
-            }
-            if(norm(newValue) > 0 && accept > 0)
-            {
-                addSample(currentSample.cameraSample, accept, films[n], biased_mean[n], biased_m2[n], sumweight[n], newValue * (1 / norm(newValue) * b / numPixelSamples));
-            }
-            if(gsl_rng_uniform(rng) < accept)
-            {
-                currentSample = newSample;
-                currentValue = newValue;
-            }
-        }
+          if(norm(currentValue) > 0 && accept < 1)
+          {
+              addSample(currentSample.cameraSample, 1 - accept, films[n], biased_mean[n], biased_m2[n], sumweight[n], currentValue * (1 / (norm(currentValue) * importanceMap.at<float>(getPos(currentSample.cameraSample, size))) * b / numPixelSamples));
+          }
+          if(norm(newValue) > 0 && accept > 0)
+          {
+              addSample(newSample.cameraSample, accept, films[n], biased_mean[n], biased_m2[n], sumweight[n], newValue * (1 / (norm(newValue) * importanceMap.at<float>(getPos(newSample.cameraSample, size))) * b / numPixelSamples));
+          }
+          if(gsl_rng_uniform(rng) < accept)
+          {
+              currentSample = newSample;
+              currentValue = newValue;
+          }
       }
-  }
-
-  if(vm.count("verbose"))
-  {
-    cout << "Initial rendering complete, " << time.elapsed() / 1000 << "s elapsed, starting initial filtering" << endl;
+    }
+    gsl_rng_free(rng);
   }
 
 #pragma omp parallel for
@@ -176,12 +162,40 @@ void MetropolisFltRenderer::render(const Scene & scene, Mat & film, const boost:
     merge(std::vector<Mat>(3, sumweight[n] + 1e-8f), sumweight3);
     biased_var[n] = biased_m2[n] / sumweight3;
   }
+}
 
+void MetropolisFltRenderer::render(const Scene & scene, Mat & film, const boost::program_options::variables_map vm)
+{
+  this->vm = vm;
+
+  QTime time;
+  time.start();
+
+  if(vm.count("verbose"))
+  {
+    cout << "Starting initial rendering" << endl;
+  }
+
+  const int num_films = 2;
+  vector<Mat> biased_mean(num_films), biased_m2(num_films);
+  vector<Mat> films(num_films), biased_var(num_films);
+
+  renderStep(film.size(), scene, films, biased_var, biased_mean, biased_m2);
+
+  if(vm.count("verbose"))
+  {
+    cout << "Initial rendering complete, " << time.elapsed() / 1000 << "s elapsed, starting filtering" << endl;
+  }
 
   Mat noisy_variance;
   var(film, noisy_variance, films);
+
+  if(vm.count("metflt-disable-filter"))
+  {
+      return;
+  }
+
   assert(checkRange(noisy_variance));
-  Mat noisy_mean = film;
 
   Mat meanvar, varvar;
   var(meanvar, varvar, biased_var);
@@ -193,16 +207,17 @@ void MetropolisFltRenderer::render(const Scene & scene, Mat & film, const boost:
   Mat filteredVar;
   filteredVar = f.filter(noisy_variance, meanvar, varvar);
 
-  imwrite("/tmp/mean.exr", noisy_mean);
-
   Mat film1, film2;
   film1 = f.filter(films[0], films[1], filteredVar);
   film2 = f.filter(films[1], films[0], filteredVar);
-  Mat m = ((film1 + film2) / 2.);
-  m.copyTo(film);
-  imwrite("/tmp/film0.exr", films[0]);
-  imwrite("/tmp/film1.exr", films[1]);
-  imwrite("/tmp/var.exr", filteredVar);
+//  film = (film1 + film2) / 2.;
+
+  Mat importanceMap = channelMean(filteredVar) + .1;
+  renderStep(film.size(), scene, importanceMap, films, biased_var, biased_mean, biased_m2);
+  Mat newOut;
+  var(newOut, noisy_variance, films);
+
+  film = film * .5f + newOut * .5f;
 }
 
 options_description MetropolisFltRenderer::options()
@@ -212,7 +227,8 @@ options_description MetropolisFltRenderer::options()
       ("metflt-large-step-prob", value<float>()->default_value(0.1f, "0.1"), "the probability for a mutation to be a large step mutation")
       ("metflt-bootstrap", value<int>()->default_value(1000), "number of bootstrapping samples")
       ("metflt-mutations", value<int>()->default_value(16), "average number of path mutations per pixel")
-      ("metflt-fixed-seed", "use a fixed seed for the RNG to make the resulting image deterministic");
+      ("metflt-fixed-seed", "use a fixed seed for the RNG to make the resulting image deterministic")
+      ("metflt-disable-filter", "disable filtering");
   return opts;
 }
 

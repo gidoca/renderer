@@ -1,5 +1,8 @@
 #include "symmetricfilter.h"
 
+#include "global.h"
+#include "mathhelper.h"
+
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/highgui/highgui.hpp>
 
@@ -16,19 +19,6 @@ cv::Mat padArray(const cv::Mat &array, int padding)
     Mat paddedArraySubheader = paddedArray(Range(padding, padding + array.size().height), Range(padding, padding + array.size().width));
     array.copyTo(paddedArraySubheader);
     return paddedArray;
-}
-
-cv::Mat channelMean(const cv::Mat &in)
-{
-    vector<Mat> splitted;
-    Mat outSingle = Mat::zeros(in.size(), CV_MAKETYPE(in.type(), 1));
-    split(in, splitted);
-    for(unsigned int i = 0; i < splitted.size(); i++)
-    {
-        outSingle += splitted[i] / splitted.size();
-    }
-    return outSingle;
-//    return in;
 }
 
 cv::Mat computeWeights(const Mat& source, const Mat& target, const Mat& var, const Mat& shiftedVar, int patchSize, float h2)

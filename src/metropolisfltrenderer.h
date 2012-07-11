@@ -22,7 +22,13 @@ public:
   
   static const std::string name;
 
+private:
+  void renderStep(cv::Size size, const Scene &scene, cv::Mat importanceMap, std::vector<cv::Mat> &films, std::vector<cv::Mat> &biased_var, std::vector<cv::Mat> &biased_mean, std::vector<cv::Mat> &biased_m2);
+  void renderStep(cv::Size size, const Scene &scene, std::vector<cv::Mat> &films, std::vector<cv::Mat> &biased_var, std::vector<cv::Mat> &biased_mean, std::vector<cv::Mat> &biased_m2);
+
   const int numThreads;
+
+  boost::program_options::variables_map vm;
 };
 
 #endif // METROPOLISFLTRENDERER_H

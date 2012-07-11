@@ -37,6 +37,13 @@ void addSample(const Sample &cameraSample, float weight, Mat &film, Vec3f value)
 
 void MetropolisRenderer::render(const Scene & scene, Mat & film, const boost::program_options::variables_map vm)
 {
+  Mat importanceMap(film.size(), CV_32F);
+  Mat importanceMapHalf = importanceMap(Range(0, film.size().width / 2), Range::all());
+  importanceMapHalf.setTo(2);
+  importanceMapHalf = importanceMap(Range(film.size().width / 2, film.size().width), Range::all());
+  importanceMapHalf.setTo(8);
+  imwrite("/tmp/imp.exr", importanceMap);
+
   gsl_rng *globalrng = gsl_rng_alloc(gsl_rng_taus);
   const int seed = getSeed(vm);
   gsl_rng_set(globalrng, seed);
@@ -59,8 +66,12 @@ void MetropolisRenderer::render(const Scene & scene, Mat & film, const boost::pr
     sample.largeStep(globalrng);
     path = sample.cameraPathFromSample(*scene.object, scene.camera);
     Vec3f l = integrator.integrate(path, *scene.object, scene.light, sample.lightSample1, sample.lightIndex);
-    sumI += norm(l);
-    bootstrapI.push_back(norm(l));
+    int currentImageX = (int)(sample.cameraSample.getSample().x() * film.size().width);
+    int currentImageY = (int)(sample.cameraSample.getSample().y() * film.size().height);
+    float currentImportance = importanceMap.at<float>(currentImageY, currentImageX);
+
+    sumI += norm(l) * currentImportance;
+    bootstrapI.push_back(norm(l) * currentImportance);
     bootstrapSamples.push_back(sample);
   }
   const float b = sumI / numInitialSamples;
@@ -95,26 +106,37 @@ void MetropolisRenderer::render(const Scene & scene, Mat & film, const boost::pr
         Vec3f currentValue = value;
         Path currentPath = path;
 
+        int currentImageX = (int)(currentSample.cameraSample.getSample().x() * film.size().width);
+        int currentImageY = (int)(currentSample.cameraSample.getSample().y() * film.size().height);
+        float currentImportance = importanceMap.at<float>(currentImageY, currentImageX);
+
         for(int i = 0; i < numSamples; i++)
         {
             MetropolisSample newSample = currentSample.mutated(rng, largeStepProb);
             currentPath = newSample.cameraPathFromSample(*scene.object, scene.camera);
             Vec3f newValue = integrator.integrate(currentPath, *scene.object, scene.light, newSample.lightSample1, newSample.lightIndex);
-            float accept = min(1., norm(newValue) / norm(currentValue));
+            int newImageX = (int)(newSample.cameraSample.getSample().x() * film.size().width);
+            int newImageY = (int)(newSample.cameraSample.getSample().y() * film.size().height);
+            float newImportance = importanceMap.at<float>(newImageY, newImageX);
+
+            float accept = min(1., norm(newValue) * newImportance / (norm(currentValue) * currentImportance));
             assert(!isnan(accept));
 
             if(norm(currentValue) > 0)
             {
-                addSample(currentSample.cameraSample, 1 - accept, film, currentValue * (1 / norm(currentValue) * b / numPixelSamples));
+                addSample(currentSample.cameraSample, 1 - accept, film, currentValue * (1.f / norm(currentValue) * b / numPixelSamples) * (1.f / currentImportance));
             }
             if(norm(newValue) > 0)
             {
-                addSample(currentSample.cameraSample, accept, film, newValue * (1 / norm(newValue) * b / numPixelSamples));
+                addSample(newSample.cameraSample, accept, film, newValue * (1.f / norm(newValue) * b / numPixelSamples) * (1.f / newImportance));
             }
             if(gsl_rng_uniform(rng) < accept)
             {
                 currentSample = newSample;
                 currentValue = newValue;
+                currentImageX = newImageX;
+                currentImageY = newImageY;
+                currentImportance = newImportance;
             }
         }
         gsl_rng_free(rng);
