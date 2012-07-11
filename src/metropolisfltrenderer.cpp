@@ -13,7 +13,9 @@
 #include <algorithm>
 #include <iostream>
 
+#ifdef NDEBUG
 #include <omp.h>
+#endif
 
 #include <QTime>
 
@@ -24,10 +26,11 @@ using namespace std;
 using namespace boost::program_options;
 using namespace cv;
 
+MetropolisFltRenderer::MetropolisFltRenderer() :
 #ifdef NDEBUG
-MetropolisFltRenderer::MetropolisFltRenderer() : numThreads(omp_get_max_threads())
+    numThreads(omp_get_max_threads())
 #else
-MetropolisFltRenderer::MetropolisFltRenderer() : numThreads(1)
+    numThreads(1)
 #endif
 {
 }
