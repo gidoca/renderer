@@ -69,9 +69,9 @@ void MetropolisFltRenderer::renderStep(Size size, const Scene& scene, vector<Mat
 
 void MetropolisFltRenderer::renderStep(Size size, const Scene& scene, Mat importanceMap, vector<Mat>& films, vector<Mat>& biased_var, vector<Mat>& biased_mean, vector<Mat>& biased_m2)
 {
-  const int numInitialSamples = vm["met-bootstrap"].as<int>();
-  const float largeStepProb = vm["met-large-step-prob"].as<float>();
-  const int numPixelSamples = vm["met-mutations"].as<int>();
+  const int numInitialSamples = vm["metflt-bootstrap"].as<int>();
+  const float largeStepProb = vm["metflt-large-step-prob"].as<float>();
+  const int numPixelSamples = vm["metflt-mutations"].as<int>() / vm["metflt-num-passes"].as<int>();
 
   gsl_rng *globalrng = gsl_rng_alloc(gsl_rng_taus);
   const int seed = getSeed(vm);
@@ -108,17 +108,12 @@ void MetropolisFltRenderer::renderStep(Size size, const Scene& scene, Mat import
   }
 
   Mat sumweight[num_films];
-
-#pragma omp parallel for
   for(int n = 0; n < num_films; n++)
   {
-    films[n] = Mat::zeros(size, CV_32FC3);
-    biased_mean[n] = Mat::zeros(size, CV_32FC3);
-    biased_m2[n] = Mat::zeros(size, CV_32FC3);
     sumweight[n] = Mat::zeros(size, CV_32FC1);
   }
 
-  const int numSamples = numPixelSamples * size.area() / numThreads;
+  const int numSamples = numPixelSamples * size.area() / (numThreads);
 
 #pragma omp parallel for
   for(int t = 0; t < numThreads; t++)
@@ -167,6 +162,7 @@ void MetropolisFltRenderer::renderStep(Size size, const Scene& scene, Mat import
 void MetropolisFltRenderer::render(const Scene & scene, Mat & film, const boost::program_options::variables_map vm)
 {
   this->vm = vm;
+  numPasses = vm["metflt-num-passes"].as<int>();
 
   QTime time;
   time.start();
@@ -180,6 +176,13 @@ void MetropolisFltRenderer::render(const Scene & scene, Mat & film, const boost:
   vector<Mat> biased_mean(num_films), biased_m2(num_films);
   vector<Mat> films(num_films), biased_var(num_films);
 
+  for(int n = 0; n < num_films; n++)
+  {
+    films[n] = Mat::zeros(film.size(), CV_32FC3);
+    biased_mean[n] = Mat::zeros(film.size(), CV_32FC3);
+    biased_m2[n] = Mat::zeros(film.size(), CV_32FC3);
+  }
+
   renderStep(film.size(), scene, films, biased_var, biased_mean, biased_m2);
 
   if(vm.count("verbose"))
@@ -189,11 +192,6 @@ void MetropolisFltRenderer::render(const Scene & scene, Mat & film, const boost:
 
   Mat noisy_variance;
   var(film, noisy_variance, films);
-
-  if(vm.count("metflt-disable-filter"))
-  {
-      return;
-  }
 
   assert(checkRange(noisy_variance));
 
@@ -207,17 +205,32 @@ void MetropolisFltRenderer::render(const Scene & scene, Mat & film, const boost:
   Mat filteredVar;
   filteredVar = f.filter(noisy_variance, meanvar, varvar);
 
-  Mat film1, film2;
-  film1 = f.filter(films[0], films[1], filteredVar);
-  film2 = f.filter(films[1], films[0], filteredVar);
-//  film = (film1 + film2) / 2.;
+  vector<Mat> filteredFilms(2);
+  Mat varOfFiltered;
+  filteredFilms[0] = (f.filter(films[0], films[1], filteredVar));
+  filteredFilms[1] = (f.filter(films[1], films[0], filteredVar));
 
-  Mat importanceMap = channelMean(filteredVar) + .1;
-  renderStep(film.size(), scene, importanceMap, films, biased_var, biased_mean, biased_m2);
-  Mat newOut;
-  var(newOut, noisy_variance, films);
+  for(int i = 0; i < vm["metflt-num-passes"].as<int>() - 1; i++)
+  {
+    var(film, varOfFiltered, filteredFilms);
+    Mat importanceMap = channelMean(varOfFiltered) / (channelMean(film) + 0.0001) + 0.0001;
+    renderStep(film.size(), scene, importanceMap, films, biased_var, biased_mean, biased_m2);
+    Mat newOut;
+    var(newOut, noisy_variance, films);
+    var(meanvar, varvar, biased_var);
+    filteredVar = f.filter(noisy_variance, meanvar, varvar);
+    filteredFilms[0] = f.filter(films[0], films[1], filteredVar);
+    filteredFilms[1] = f.filter(films[1], films[0], filteredVar);
 
-  film = film * .5f + newOut * .5f;
+    if(vm.count("metflt-omit-filter"))
+    {
+        film = newOut;
+    }
+    else
+    {
+        film = filteredFilms[0] * .5f + filteredFilms[1] * .5f;
+    }
+  }
 }
 
 options_description MetropolisFltRenderer::options()
@@ -228,7 +241,8 @@ options_description MetropolisFltRenderer::options()
       ("metflt-bootstrap", value<int>()->default_value(1000), "number of bootstrapping samples")
       ("metflt-mutations", value<int>()->default_value(16), "average number of path mutations per pixel")
       ("metflt-fixed-seed", "use a fixed seed for the RNG to make the resulting image deterministic")
-      ("metflt-disable-filter", "disable filtering");
+      ("metflt-omit-filter", "don't filter the image")
+      ("metflt-num-passes", value<int>()->default_value(3), "the number of filtering passes");
   return opts;
 }
 

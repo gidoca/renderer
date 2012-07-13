@@ -39,10 +39,9 @@ void MetropolisRenderer::render(const Scene & scene, Mat & film, const boost::pr
 {
   Mat importanceMap(film.size(), CV_32F);
   Mat importanceMapHalf = importanceMap(Range(0, film.size().width / 2), Range::all());
-  importanceMapHalf.setTo(2);
+  importanceMapHalf.setTo(1000);
   importanceMapHalf = importanceMap(Range(film.size().width / 2, film.size().width), Range::all());
-  importanceMapHalf.setTo(8);
-  imwrite("/tmp/imp.exr", importanceMap);
+  importanceMapHalf.setTo(3000);
 
   gsl_rng *globalrng = gsl_rng_alloc(gsl_rng_taus);
   const int seed = getSeed(vm);
@@ -66,12 +65,12 @@ void MetropolisRenderer::render(const Scene & scene, Mat & film, const boost::pr
     sample.largeStep(globalrng);
     path = sample.cameraPathFromSample(*scene.object, scene.camera);
     Vec3f l = integrator.integrate(path, *scene.object, scene.light, sample.lightSample1, sample.lightIndex);
-    int currentImageX = (int)(sample.cameraSample.getSample().x() * film.size().width);
-    int currentImageY = (int)(sample.cameraSample.getSample().y() * film.size().height);
-    float currentImportance = importanceMap.at<float>(currentImageY, currentImageX);
+//    int currentImageX = (int)(sample.cameraSample.getSample().x() * film.size().width);
+//    int currentImageY = (int)(sample.cameraSample.getSample().y() * film.size().height);
+//    float currentImportance = importanceMap.at<float>(currentImageY, currentImageX);
 
-    sumI += norm(l) * currentImportance;
-    bootstrapI.push_back(norm(l) * currentImportance);
+    sumI += norm(l);
+    bootstrapI.push_back(norm(l));
     bootstrapSamples.push_back(sample);
   }
   const float b = sumI / numInitialSamples;
@@ -96,6 +95,8 @@ void MetropolisRenderer::render(const Scene & scene, Mat & film, const boost::pr
   const int numThreads = 1;
 #endif
   const int numSamples = numPixelSamples * film.size().width * film.size().height / numThreads;
+
+  float factor = 0, tfactor = 0;
 
 #pragma omp parallel for
   for(int t = 0; t < numThreads; t++)
@@ -125,10 +126,15 @@ void MetropolisRenderer::render(const Scene & scene, Mat & film, const boost::pr
             if(norm(currentValue) > 0)
             {
                 addSample(currentSample.cameraSample, 1 - accept, film, currentValue * (1.f / norm(currentValue) * b / numPixelSamples) * (1.f / currentImportance));
+                factor += (1 - accept) * norm(currentValue) *  currentImportance;
+                tfactor += (1 - accept) * norm(currentValue);
             }
             if(norm(newValue) > 0)
             {
                 addSample(newSample.cameraSample, accept, film, newValue * (1.f / norm(newValue) * b / numPixelSamples) * (1.f / newImportance));
+
+                factor += accept * norm(newValue) * newImportance;
+                tfactor += accept * norm(newValue);
             }
             if(gsl_rng_uniform(rng) < accept)
             {
@@ -141,6 +147,7 @@ void MetropolisRenderer::render(const Scene & scene, Mat & film, const boost::pr
         }
         gsl_rng_free(rng);
   }
+  film *= factor / tfactor;
 }
 
 options_description MetropolisRenderer::options()

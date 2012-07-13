@@ -27,6 +27,7 @@ private:
   void renderStep(cv::Size size, const Scene &scene, std::vector<cv::Mat> &films, std::vector<cv::Mat> &biased_var, std::vector<cv::Mat> &biased_mean, std::vector<cv::Mat> &biased_m2);
 
   const int numThreads;
+  int numPasses;
 
   boost::program_options::variables_map vm;
 };
