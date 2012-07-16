@@ -73,6 +73,7 @@ int main(int argc, char **argv) {
   options_description image("Image options");
 	image.add_options()
       ("renderer,r", value<string>()->default_value("pathtracing"), "the rendering algorithm to be used (either pathtracing or metropolis)")
+      ("fixed-seed,d", "use a fixed seed for the RNG to make the resulting image deterministic")
       ("scene,s", value<string>(), "the scene description file (mandatory)");
   command_line_options.add(image);
 

@@ -110,7 +110,7 @@ boost::program_options::options_description Renderer::options()
 
 int Renderer::getSeed(boost::program_options::variables_map vm)
 {
-  if(vm.count("pt-fixed-seed"))
+  if(vm.count("fixed-seed"))
   {
     return 0;
   }

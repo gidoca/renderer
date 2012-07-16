@@ -244,7 +244,6 @@ options_description MetropolisFltRenderer::options()
       ("metflt-large-step-prob", value<float>()->default_value(0.1f, "0.1"), "the probability for a mutation to be a large step mutation")
       ("metflt-bootstrap", value<int>()->default_value(1000), "number of bootstrapping samples")
       ("metflt-mutations", value<int>()->default_value(16), "average number of path mutations per pixel")
-      ("metflt-fixed-seed", "use a fixed seed for the RNG to make the resulting image deterministic")
       ("metflt-omit-filter", "don't filter the image")
       ("metflt-num-passes", value<int>()->default_value(3), "the number of filtering passes");
   return opts;
