@@ -209,6 +209,10 @@ void MetropolisFltRenderer::render(const Scene & scene, Mat & film, const boost:
   Mat varOfFiltered;
   filteredFilms[0] = (f.filter(films[0], films[1], filteredVar));
   filteredFilms[1] = (f.filter(films[1], films[0], filteredVar));
+  if(!vm.count("metflt-omit-filter"))
+  {
+      film = filteredFilms[0] * .5f + filteredFilms[1] * .5f;
+  }
 
   for(int i = 0; i < vm["metflt-num-passes"].as<int>() - 1; i++)
   {
