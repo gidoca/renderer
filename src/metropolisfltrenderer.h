@@ -23,8 +23,8 @@ public:
   static const std::string name;
 
 private:
-  void renderStep(cv::Size size, const Scene &scene, cv::Mat importanceMap, std::vector<cv::Mat> &films, std::vector<cv::Mat> &biased_var, std::vector<cv::Mat> &biased_mean, std::vector<cv::Mat> &biased_m2);
-  void renderStep(cv::Size size, const Scene &scene, std::vector<cv::Mat> &films, std::vector<cv::Mat> &biased_var, std::vector<cv::Mat> &biased_mean, std::vector<cv::Mat> &biased_m2);
+  void renderStep(cv::Size size, const Scene &scene, cv::Mat importanceMap, std::vector<cv::Mat> &films, std::vector<cv::Mat> &biased_var, std::vector<cv::Mat> &biased_mean, std::vector<cv::Mat> &biased_m2, int seed);
+  void renderStep(cv::Size size, const Scene &scene, std::vector<cv::Mat> &films, std::vector<cv::Mat> &biased_var, std::vector<cv::Mat> &biased_mean, std::vector<cv::Mat> &biased_m2, int seed);
 
   const int numThreads;
   int numPasses;

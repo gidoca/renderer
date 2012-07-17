@@ -41,7 +41,7 @@ void MetropolisRenderer::render(const Scene & scene, Mat & film, const boost::pr
   Mat importanceMapHalf = importanceMap(Range(0, film.size().width / 2), Range::all());
   importanceMapHalf.setTo(1000);
   importanceMapHalf = importanceMap(Range(film.size().width / 2, film.size().width), Range::all());
-  importanceMapHalf.setTo(3000);
+  importanceMapHalf.setTo(1000);
 
   gsl_rng *globalrng = gsl_rng_alloc(gsl_rng_taus);
   const int seed = getSeed(vm);

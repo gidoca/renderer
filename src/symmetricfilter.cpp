@@ -43,8 +43,9 @@ cv::Mat computeWeights(const Mat& source, const Mat& target, const Mat& var, con
     assert(checkRange(weights));
     assert(weights.channels() == 1);
     Mat out(source.size(), source.type());
-    int channelMapping[] = {0, 0, 0, 1, 0, 2};
-    mixChannels(&weights, 1, &out, 1, channelMapping, 3);
+    /*int channelMapping[] = {0, 0, 0, 1, 0, 2};
+    mixChannels(&weights, 1, &out, 1, channelMapping, 3);*/
+    merge(vector<Mat>(3, weights), out);
     return out;
 //    return weights;
 }
@@ -88,7 +89,7 @@ cv::Mat SymmetricFilter::filter(const cv::Mat &image, const cv::Mat &guide, cons
             {
 #pragma omp critical
                 {
-                    area += 1;
+                    add(area, Scalar(Vec3f(1, 1, 1)), area);
                     acc += data1;
                 }
                 break;
@@ -97,6 +98,7 @@ cv::Mat SymmetricFilter::filter(const cv::Mat &image, const cv::Mat &guide, cons
             Mat weights1 = computeWeights(source1, guide, pixvar, var1, patchSize, h2);
             Mat weights2 = computeWeights(source2, guide, pixvar, var2, patchSize, h2);
             Mat weights_S = computeWeights(source_S, guide, pixvar, var_S, patchSize, h2);
+            imwrite("/tmp/weights1.exr", weights1);
 
             vector<Mat> weights1_split, weights2_split, weights_S_split;
             split(weights1, weights1_split);
@@ -107,8 +109,8 @@ cv::Mat SymmetricFilter::filter(const cv::Mat &image, const cv::Mat &guide, cons
             {
                 idx |= weights_S_split[i] > max(weights1_split[i], weights2_split[i]);
             }
-            add(weights_S, 0, weights1, idx);
-            add(weights_S, 0, weights2, idx);
+//            add(weights_S, Scalar(Vec3f()), weights1, idx);
+//            add(weights_S, Scalar(Vec3f()), weights2, idx);
 
             Mat totalWeights = weights1 + weights2;
             Mat totalData = weights1.mul(data1) + weights2.mul(data2);
@@ -121,6 +123,5 @@ cv::Mat SymmetricFilter::filter(const cv::Mat &image, const cv::Mat &guide, cons
             }
         }
     }
-
     return acc / area;
 }
