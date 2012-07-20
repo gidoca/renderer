@@ -44,7 +44,7 @@ Point2i getPos(const Sample& cameraSample, Size size)
     return Point2i(x, y);
 }
 
-void addSample(const Sample &cameraSample, float weight, Mat &film, Mat &mean, Mat &m2, Mat &sumweight, Vec3f value)
+void MetropolisFltRenderer::addSample(const Sample &cameraSample, float weight, Mat &film, Mat &mean, Mat &m2, Mat &sumweight, Vec3f value, float importance)
 {
     Point2i pos = getPos(cameraSample, film.size());
     Vec3f depositValue = weight * value;
@@ -59,6 +59,8 @@ void addSample(const Sample &cameraSample, float weight, Mat &film, Mat &mean, M
         m2.at<Vec3f>(pos) += oldSumWeight * delta.mul(R);
         sumweight.at<float>(pos) = newSumWeight;
         film.at<Vec3f>(pos) += depositValue;
+        virtualSamples.at<float>(pos) += weight;
+        realSamples.at<float>(pos) += weight * importance;
     }
 }
 
@@ -90,8 +92,8 @@ void MetropolisFltRenderer::renderStep(Size size, const Scene& scene, Mat import
     initialSample.largeStep(globalrng);
     Path initialPath = initialSample.cameraPathFromSample(*scene.object, scene.camera);
     Vec3f l = integrator.integrate(initialPath, *scene.object, scene.light, initialSample.lightSample1, initialSample.lightIndex);
-    sumI += norm(l) * importanceMap.at<float>(getPos(initialSample.cameraSample, size));
-    bootstrapI.push_back(norm(l) * importanceMap.at<float>(getPos(initialSample.cameraSample, size)));
+    sumI += norm(l);// * importanceMap.at<float>(getPos(initialSample.cameraSample, size));
+    bootstrapI.push_back(norm(l));// * importanceMap.at<float>(getPos(initialSample.cameraSample, size)));
     bootstrapSamples.push_back(initialSample);
   }
   const float b = sumI / numInitialSamples;
@@ -123,6 +125,7 @@ void MetropolisFltRenderer::renderStep(Size size, const Scene& scene, Mat import
     {
       MetropolisSample currentSample = initialSample;
       Vec3f currentValue = integrator.integrate(initialSample.cameraPathFromSample(*scene.object, scene.camera), *scene.object, scene.light, initialSample.lightSample1, initialSample.lightIndex);
+      float currentImportance = importanceMap.at<float>(getPos(currentSample.cameraSample, size));
 
       for(int i = 0; i < numSamples; i++)
       {
@@ -130,19 +133,21 @@ void MetropolisFltRenderer::renderStep(Size size, const Scene& scene, Mat import
           Vec3f newValue = integrator.integrate(newSample.cameraPathFromSample(*scene.object, scene.camera), *scene.object, scene.light, newSample.lightSample1, newSample.lightIndex);
           float accept = min(1., norm(newValue) * importanceMap.at<float>(getPos(newSample.cameraSample, size)) / (norm(currentValue) * importanceMap.at<float>(getPos(currentSample.cameraSample, size))));
           assert(!isnan(accept));
+          float newImportance = importanceMap.at<float>(getPos(newSample.cameraSample, size));
 
           if(norm(currentValue) > 0 && accept < 1)
           {
-              addSample(currentSample.cameraSample, 1 - accept, films[n], biased_mean[n], biased_m2[n], sumweight[n], currentValue * (1 / (norm(currentValue) * importanceMap.at<float>(getPos(currentSample.cameraSample, size))) * b / vm["metflt-mutations"].as<int>()));
+              addSample(currentSample.cameraSample, 1 - accept, films[n], biased_mean[n], biased_m2[n], sumweight[n], currentValue * (1 / norm(currentValue) * b / vm["metflt-mutations"].as<int>()), currentImportance);
           }
           if(norm(newValue) > 0 && accept > 0)
           {
-              addSample(newSample.cameraSample, accept, films[n], biased_mean[n], biased_m2[n], sumweight[n], newValue * (1 / (norm(newValue) * importanceMap.at<float>(getPos(newSample.cameraSample, size))) * b / vm["metflt-mutations"].as<int>()));
+              addSample(newSample.cameraSample, accept, films[n], biased_mean[n], biased_m2[n], sumweight[n], newValue * (1 / norm(newValue) * b / vm["metflt-mutations"].as<int>()), newImportance);
           }
           if(gsl_rng_uniform(rng) < accept)
           {
               currentSample = newSample;
               currentValue = newValue;
+              currentImportance = newImportance;
           }
       }
     }
@@ -163,6 +168,9 @@ void MetropolisFltRenderer::render(const Scene & scene, Mat & film, const boost:
   this->vm = vm;
   const int seed = getSeed(vm);
   numPasses = vm["metflt-num-passes"].as<int>();
+
+  virtualSamples = Mat::zeros(film.size(), CV_32F);
+  realSamples = Mat::zeros(film.size(), CV_32F);
 
   QTime time;
   time.start();
@@ -224,6 +232,8 @@ void MetropolisFltRenderer::render(const Scene & scene, Mat & film, const boost:
   for(int i = 1; i < vm["metflt-num-passes"].as<int>(); i++)
   {
     Mat importanceMap = channelMean(varOfFiltered) / (channelMean(filteredMean) + 1e-8) + 1e-8;
+    importanceMap *= film.size().area() / sum(importanceMap)[0];
+    imwrite("/tmp/importancemap.exr", importanceMap);
     renderStep(film.size(), scene, importanceMap, films, biased_var, biased_mean, biased_m2, seed + i);
     var(newOut, noisy_variance, films);
     var(meanvar, varvar, biased_var);
@@ -242,6 +252,8 @@ void MetropolisFltRenderer::render(const Scene & scene, Mat & film, const boost:
         film = .5 * filteredFilms[0] + .5 * filteredFilms[1];
     }
   }
+
+  film = film.mul(extend(virtualSamples / realSamples));
 }
 
 options_description MetropolisFltRenderer::options()

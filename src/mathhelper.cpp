@@ -33,3 +33,9 @@ cv::Mat channelMean(const cv::Mat &in)
 //    return in;
 }
 
+cv::Mat extend(const cv::Mat &in, int nchan)
+{
+    Mat out;
+    merge(vector<Mat>(nchan, in), out);
+    return out;
+}

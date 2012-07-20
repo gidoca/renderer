@@ -37,11 +37,15 @@ void addSample(const Sample &cameraSample, float weight, Mat &film, Vec3f value)
 
 void MetropolisRenderer::render(const Scene & scene, Mat & film, const boost::program_options::variables_map vm)
 {
-  Mat importanceMap(film.size(), CV_32F);
-  Mat importanceMapHalf = importanceMap(Range(0, film.size().width / 2), Range::all());
-  importanceMapHalf.setTo(1000);
-  importanceMapHalf = importanceMap(Range(film.size().width / 2, film.size().width), Range::all());
-  importanceMapHalf.setTo(1000);
+    Mat importanceMap(film.size(), CV_32F);
+//    for(int i = 0; i < film.size().height; i++)
+//    {
+//        Mat importanceMapHalf = importanceMap(Range(i, i + 1), Range::all());
+//        importanceMapHalf.setTo(((i / 50) & 0x1) + 10.5);
+//    }
+    importanceMap = Mat::ones(film.size(), CV_32F);
+
+    importanceMap *= importanceMap.size().area() / sum(importanceMap)[0];
 
   gsl_rng *globalrng = gsl_rng_alloc(gsl_rng_taus);
   const int seed = getSeed(vm);
@@ -96,7 +100,8 @@ void MetropolisRenderer::render(const Scene & scene, Mat & film, const boost::pr
 #endif
   const int numSamples = numPixelSamples * film.size().width * film.size().height / numThreads;
 
-  float factor = 0, tfactor = 0;
+  Mat virtualSamples = Mat::zeros(film.size(), CV_32F);
+  Mat realSamples = Mat::zeros(film.size(), CV_32F);
 
 #pragma omp parallel for
   for(int t = 0; t < numThreads; t++)
@@ -125,16 +130,15 @@ void MetropolisRenderer::render(const Scene & scene, Mat & film, const boost::pr
 
             if(norm(currentValue) > 0)
             {
-                addSample(currentSample.cameraSample, 1 - accept, film, currentValue * (1.f / norm(currentValue) * b / numPixelSamples) * (1.f / currentImportance));
-                factor += (1 - accept) * norm(currentValue) *  currentImportance;
-                tfactor += (1 - accept) * norm(currentValue);
+                addSample(currentSample.cameraSample, 1 - accept, film, currentValue * (1.f / norm(currentValue) * b / numPixelSamples));
+                virtualSamples.at<float>(currentImageY, currentImageX) += (1 - accept) / currentImportance;
+                realSamples.at<float>(currentImageY, currentImageX) += 1 - accept;
             }
             if(norm(newValue) > 0)
             {
-                addSample(newSample.cameraSample, accept, film, newValue * (1.f / norm(newValue) * b / numPixelSamples) * (1.f / newImportance));
-
-                factor += accept * norm(newValue) * newImportance;
-                tfactor += accept * norm(newValue);
+                addSample(newSample.cameraSample, accept, film, newValue * (1.f / norm(newValue) * b / numPixelSamples));
+                virtualSamples.at<float>(newImageY, newImageX) += accept / newImportance;
+                realSamples.at<float>(newImageY, newImageX) += accept;
             }
             if(gsl_rng_uniform(rng) < accept)
             {
@@ -147,7 +151,7 @@ void MetropolisRenderer::render(const Scene & scene, Mat & film, const boost::pr
         }
         gsl_rng_free(rng);
   }
-  film *= factor / tfactor;
+  film = film.mul(extend(virtualSamples / realSamples));
 }
 
 options_description MetropolisRenderer::options()
