@@ -31,7 +31,7 @@ private:
   const int numThreads;
   int numPasses;
 
-  cv::Mat virtualSamples, realSamples;
+  cv::Mat sumImportance;
 
   boost::program_options::variables_map vm;
 };

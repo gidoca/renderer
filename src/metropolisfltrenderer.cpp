@@ -39,8 +39,8 @@ Point2i getPos(const Sample& cameraSample, Size size)
 {
     int x = (int)(cameraSample.getSample().x() * size.width);
     int y = (int)(cameraSample.getSample().y() * size.height);
-    assert(0 <= x && x < film.size().width);
-    assert(0 <= y && y < film.size().height);
+    assert(0 <= x && x < size.width);
+    assert(0 <= y && y < size.height);
     return Point2i(x, y);
 }
 
@@ -59,8 +59,6 @@ void MetropolisFltRenderer::addSample(const Sample &cameraSample, float weight, 
         m2.at<Vec3f>(pos) += oldSumWeight * delta.mul(R);
         sumweight.at<float>(pos) = newSumWeight;
         film.at<Vec3f>(pos) += depositValue;
-        virtualSamples.at<float>(pos) += weight;
-        realSamples.at<float>(pos) += weight * importance;
     }
 }
 
@@ -108,13 +106,16 @@ void MetropolisFltRenderer::renderStep(Size size, const Scene& scene, Mat import
     if(sumI > contribOffset) break;
   }
 
-  Mat sumweight[num_films];
+  Mat sumweight[num_films], currentFilms[num_films];
   for(int n = 0; n < num_films; n++)
   {
-    sumweight[n] = Mat::zeros(size, CV_32FC1);
+    sumweight[n] = Mat::zeros(size, CV_32F);
+    currentFilms[n] = Mat::zeros(size, CV_32FC3);
   }
 
-  const int numSamples = numPixelSamples * size.area() / (numThreads);
+  const int numSamples = numPixelSamples * size.area() / numThreads;
+
+
 
 #pragma omp parallel for
   for(int t = 0; t < numThreads; t++)
@@ -137,11 +138,11 @@ void MetropolisFltRenderer::renderStep(Size size, const Scene& scene, Mat import
 
           if(norm(currentValue) > 0 && accept < 1)
           {
-              addSample(currentSample.cameraSample, 1 - accept, films[n], biased_mean[n], biased_m2[n], sumweight[n], currentValue * (1 / norm(currentValue) * b / vm["metflt-mutations"].as<int>()), currentImportance);
+              addSample(currentSample.cameraSample, 1 - accept, currentFilms[n], biased_mean[n], biased_m2[n], sumweight[n], currentValue * (1 / (norm(currentValue) * currentImportance) * b / numPixelSamples), currentImportance);
           }
           if(norm(newValue) > 0 && accept > 0)
           {
-              addSample(newSample.cameraSample, accept, films[n], biased_mean[n], biased_m2[n], sumweight[n], newValue * (1 / norm(newValue) * b / vm["metflt-mutations"].as<int>()), newImportance);
+              addSample(newSample.cameraSample, accept, currentFilms[n], biased_mean[n], biased_m2[n], sumweight[n], newValue * (1 / (norm(newValue) * newImportance) * b / numPixelSamples), newImportance);
           }
           if(gsl_rng_uniform(rng) < accept)
           {
@@ -157,10 +158,14 @@ void MetropolisFltRenderer::renderStep(Size size, const Scene& scene, Mat import
 #pragma omp parallel for
   for(int n = 0; n < num_films; n++)
   {
+      films[n] = (extend(sumImportance).mul(films[n]) + extend(importanceMap).mul(currentFilms[n])) / extend(importanceMap + sumImportance);
+
     Mat sumweight3;
     merge(std::vector<Mat>(3, sumweight[n] + 1e-8f), sumweight3);
     biased_var[n] = biased_m2[n] / sumweight3;
   }
+
+  sumImportance += importanceMap;
 }
 
 void MetropolisFltRenderer::render(const Scene & scene, Mat & film, const boost::program_options::variables_map vm)
@@ -169,8 +174,7 @@ void MetropolisFltRenderer::render(const Scene & scene, Mat & film, const boost:
   const int seed = getSeed(vm);
   numPasses = vm["metflt-num-passes"].as<int>();
 
-  virtualSamples = Mat::zeros(film.size(), CV_32F);
-  realSamples = Mat::zeros(film.size(), CV_32F);
+  sumImportance = Mat::zeros(film.size(), CV_32F);
 
   QTime time;
   time.start();
@@ -232,6 +236,11 @@ void MetropolisFltRenderer::render(const Scene & scene, Mat & film, const boost:
   for(int i = 1; i < vm["metflt-num-passes"].as<int>(); i++)
   {
     Mat importanceMap = channelMean(varOfFiltered) / (channelMean(filteredMean) + 1e-8) + 1e-8;
+//        for(int i = 0; i < film.size().height; i++)
+//        {
+//            Mat importanceMapHalf = importanceMap(Range(i, i + 1), Range::all());
+//            importanceMapHalf.setTo(40 * ((i / 50) & 0x1) + .5);
+//        }
     importanceMap *= film.size().area() / sum(importanceMap)[0];
     imwrite("/tmp/importancemap.exr", importanceMap);
     renderStep(film.size(), scene, importanceMap, films, biased_var, biased_mean, biased_m2, seed + i);
@@ -252,8 +261,6 @@ void MetropolisFltRenderer::render(const Scene & scene, Mat & film, const boost:
         film = .5 * filteredFilms[0] + .5 * filteredFilms[1];
     }
   }
-
-  film = film.mul(extend(virtualSamples / realSamples));
 }
 
 options_description MetropolisFltRenderer::options()
