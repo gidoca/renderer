@@ -26,7 +26,7 @@ private:
   void renderStep(cv::Size size, const Scene &scene, cv::Mat importanceMap, std::vector<cv::Mat> &films, std::vector<cv::Mat> &biased_var, std::vector<cv::Mat> &biased_mean, std::vector<cv::Mat> &biased_m2, int seed);
   void renderStep(cv::Size size, const Scene &scene, std::vector<cv::Mat> &films, std::vector<cv::Mat> &biased_var, std::vector<cv::Mat> &biased_mean, std::vector<cv::Mat> &biased_m2, int seed);
 
-  void addSample(const Sample &cameraSample, float weight, cv::Mat &film, cv::Mat &mean, cv::Mat &m2, cv::Mat &sumweight, cv::Vec3f value, float importance);
+  void addSample(const Sample &cameraSample, float weight, cv::Mat &film, cv::Mat &mean, cv::Mat &m2, cv::Mat &sumweight, cv::Vec3f value);
 
   const int numThreads;
   int numPasses;
