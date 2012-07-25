@@ -235,6 +235,11 @@ void MetropolisFltRenderer::render(const Scene & scene, Mat & film, const boost:
 
   for(int i = 1; i < vm["metflt-num-passes"].as<int>(); i++)
   {
+    if(vm.count("verbose"))
+    {
+      cout << time.elapsed() / 1000 << "s elapsed, starting rendering pass " << i << endl;
+    }
+
     Mat importanceMap = channelMean(varOfFiltered) / (channelMean(filteredMean) + 1e-8) + 1e-8;
     importanceMap *= film.size().area() / sum(importanceMap)[0];
     imwrite("/tmp/importancemap.exr", importanceMap);
@@ -246,14 +251,15 @@ void MetropolisFltRenderer::render(const Scene & scene, Mat & film, const boost:
     filteredFilms[1] = f.filter(films[1], films[0], filteredVar);
     Mat filteredMean;
     var(filteredMean, varOfFiltered, filteredFilms);
+    imwrite("/tmp/newout.exr", newOut);
 
     if(vm.count("metflt-omit-filter"))
     {
-        film = .5 * films[0] + .5 * films[1];
+        film = newOut;
     }
     else
     {
-        film = .5 * filteredFilms[0] + .5 * filteredFilms[1];
+        film = filteredMean;
     }
   }
 }

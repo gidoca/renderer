@@ -135,30 +135,4 @@ int main(int argc, char **argv) {
     future.waitForFinished();
     return 0;
   }
-
-
 }
-
-
-/*
-int main(void)
-{
-    cv::Mat imgorig = cv::imread("ramp.png");
-    cv::Mat guideorig = cv::imread("ramp_guide.png");
-    cv::Mat pix_var = 0.0025 * cv::Mat::ones(imgorig.size(), CV_32FC1);
-
-    cv::Mat imggray, guidegray;
-    cv::cvtColor(imgorig, imggray, CV_RGB2GRAY);
-    cv::cvtColor(guideorig, guidegray, CV_RGB2GRAY);
-
-    cv::Mat img, guide;
-    imggray.convertTo(img, CV_32FC1, 1./255);
-    guidegray.convertTo(guide, CV_32FC1, 1./255);
-
-    SymmetricFilter f;
-    cv::Mat out = f.filter(img, guide, pix_var);
-
-    cv::imshow("filtered", out);
-    cv::waitKey();
-}
-*/

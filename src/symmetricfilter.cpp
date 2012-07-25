@@ -109,8 +109,8 @@ cv::Mat SymmetricFilter::filter(const cv::Mat &image, const cv::Mat &guide, cons
             {
                 idx |= weights_S_split[i] > max(weights1_split[i], weights2_split[i]);
             }
-//            add(weights_S, Scalar(Vec3f()), weights1, idx);
-//            add(weights_S, Scalar(Vec3f()), weights2, idx);
+            add(weights_S, Scalar(Vec3f()), weights1, idx);
+            add(weights_S, Scalar(Vec3f()), weights2, idx);
 
             Mat totalWeights = weights1 + weights2;
             Mat totalData = weights1.mul(data1) + weights2.mul(data2);
