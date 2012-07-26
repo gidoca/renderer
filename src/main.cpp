@@ -40,13 +40,13 @@ struct option_adder
   }
 };
 
-void render(Renderer * renderer, cv::Mat film, Scene scene, variables_map vm)
+void render(Renderer * renderer, cv::Mat *film, Scene scene, variables_map vm)
 {  
   QTime time;
   time.start();
-  renderer->render(scene, film, vm);
+  renderer->render(scene, *film, vm);
   if(vm.count("save-exr")) {
-      imwrite(vm["save-exr"].as<string>(), film);
+      imwrite(vm["save-exr"].as<string>(), *film);
   }
 //  if(vm.count("save-img")) film.saveImg(vm["save-img"].as<string>());
   delete renderer;
@@ -120,12 +120,12 @@ int main(int argc, char **argv) {
 
   Scene scene = buildScene(parser.getAst());
   
-  cv::Mat film(scene.camera.getResolution().height(), scene.camera.getResolution().width(), CV_32FC3);
+  cv::Mat * film = new cv::Mat(scene.camera.getResolution().height(), scene.camera.getResolution().width(), CV_32FC3);
   QFuture< void > future = QtConcurrent::run(render, renderer, film, scene, vm);
   
   if(vm.count("gui") || (!vm.count("save-exr") && !vm.count("save-img")))
   {
-    Win l(film, future);
+    Win l(*film, future);
     l.show();
   
     return app.exec();

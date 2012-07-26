@@ -16,7 +16,7 @@ class Win: public QLabel
   Q_OBJECT
   
 public:
-  Win(cv::Mat film, QFuture< void > future): tonemapper(QSize(film.size().width, film.size().height)), film(film), future(future)
+  Win(cv::Mat & film, QFuture< void > future): tonemapper(QSize(film.size().width, film.size().height)), film(film), future(future)
   {
     cv::Size size = film.size();
     setPixmap(QPixmap(QSize(size.width, size.height)));
@@ -46,7 +46,7 @@ private Q_SLOTS:
 private:
   Tonemapper tonemapper;
   QTimer timer;
-  cv::Mat film;
+  cv::Mat & film;
   QFuture<void> future;
 };
 
