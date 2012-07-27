@@ -49,7 +49,7 @@ cv::Mat computeWeights(const Mat& source, const Mat& target, const Mat& var, con
 cv::Mat SymmetricFilter::filter(const cv::Mat &image, const cv::Mat &guide, const cv::Mat &pixvar)
 {
     assert(checkRange(image));
-    Mat area = Mat::zeros(image.size(), image.type());
+    Mat area = Mat::zeros(image.size(), CV_32F);
     Mat acc = Mat::zeros(image.size(), image.type());
 
     const int patchSize = 7;
@@ -71,13 +71,17 @@ cv::Mat SymmetricFilter::filter(const cv::Mat &image, const cv::Mat &guide, cons
     {
         for(int dx = -windowRadius; dx <= windowRadius; dx++)
         {
-            Mat source1 = paddedGuide(Range(padding + dy, padding + dy + guide.size().height), Range(padding + dx, padding + dx + guide.size().width));
-            Mat source2 = paddedGuide(Range(padding - dy, padding - dy + guide.size().height), Range(padding - dx, padding - dx + guide.size().width));
+            Range yrange1(padding + dy, padding + dy + guide.size().height);
+            Range xrange1(padding + dx, padding + dx + guide.size().width);
+            Range yrange2(padding - dy, padding - dy + guide.size().height);
+            Range xrange2(padding - dx, padding - dx + guide.size().width);
+            Mat source1 = paddedGuide(yrange1, xrange1);
+            Mat source2 = paddedGuide(yrange2, xrange2);
             Mat source_S = (source1 + source2) / 2.;
-            Mat data1 = paddedImage(Range(padding + dy, padding + dy + guide.size().height), Range(padding + dx, padding + dx + image.size().width));
-            Mat data2 = paddedImage(Range(padding - dy, padding - dy + guide.size().height), Range(padding - dx, padding - dx + image.size().width));
-            Mat var1 = paddedVariance(Range(padding + dy, padding + dy + guide.size().height), Range(padding + dx, padding + dx + image.size().width));
-            Mat var2 = paddedVariance(Range(padding - dy, padding - dy + guide.size().height), Range(padding - dx, padding - dx + image.size().width));
+            Mat data1 = paddedImage(yrange1, xrange1);
+            Mat data2 = paddedImage(yrange2, xrange2);
+            Mat var1 = paddedVariance(yrange1, xrange1);
+            Mat var2 = paddedVariance(yrange2, xrange2);
             Mat varS = (var1 + var2) / 4;
 
 
@@ -99,7 +103,7 @@ cv::Mat SymmetricFilter::filter(const cv::Mat &image, const cv::Mat &guide, cons
             add(weightsS, 0, weights1, idx);
             add(weightsS, 0, weights2, idx);
 
-            Mat totalWeights = extend(weights1 + weights2);
+            Mat totalWeights = weights1 + weights2;
             Mat totalData = extend(weights1).mul(data1) + extend(weights2).mul(data2);
 #pragma omp critical
             {
@@ -110,5 +114,5 @@ cv::Mat SymmetricFilter::filter(const cv::Mat &image, const cv::Mat &guide, cons
             }
         }
     }
-    return acc / area;
+    return acc / extend(area);
 }
