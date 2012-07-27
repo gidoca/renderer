@@ -220,8 +220,8 @@ void MetropolisFltRenderer::render(const Scene & scene, Mat & film, const boost:
 
   vector<Mat> filteredFilms(2);
   Mat varOfFiltered;
-  filteredFilms[0] = (f.filter(films[0], films[1], filteredVar));
-  filteredFilms[1] = (f.filter(films[1], films[0], filteredVar));
+  filteredFilms[0] = f.filter(films[0], films[1], filteredVar);
+  filteredFilms[1] = f.filter(films[1], films[0], filteredVar);
   Mat filteredMean;
   var(filteredMean, varOfFiltered, filteredFilms);
   if(!vm.count("metflt-omit-filter"))
@@ -240,6 +240,10 @@ void MetropolisFltRenderer::render(const Scene & scene, Mat & film, const boost:
     Mat importanceMap = channelMean(varOfFiltered) / (channelMean(filteredMean) + 1e-8) + 1e-8;
     importanceMap *= film.size().area() / sum(importanceMap)[0];
     renderStep(film.size(), scene, importanceMap, films, biased_var, biased_mean, biased_m2, seed + i);
+    if(vm.count("verbose"))
+    {
+      cout << time.elapsed() / 1000 << "s elapsed, starting filtering pass " << i << endl;
+    }
     var(newOut, noisy_variance, films);
     var(meanvar, varvar, biased_var);
     filteredVar = f.filter(noisy_variance, meanvar, varvar);
