@@ -42,12 +42,8 @@ cv::Mat computeWeights(const Mat& source, const Mat& target, const Mat& var, con
     weights = max(temp2, 0);
     assert(checkRange(weights));
     assert(weights.channels() == 1);
-    Mat out(source.size(), source.type());
-    /*int channelMapping[] = {0, 0, 0, 1, 0, 2};
-    mixChannels(&weights, 1, &out, 1, channelMapping, 3);*/
-    merge(vector<Mat>(3, weights), out);
-    return out;
-//    return weights;
+//    return extend(weights);
+    return weights;
 }
 
 cv::Mat SymmetricFilter::filter(const cv::Mat &image, const cv::Mat &guide, const cv::Mat &pixvar)
@@ -82,7 +78,7 @@ cv::Mat SymmetricFilter::filter(const cv::Mat &image, const cv::Mat &guide, cons
             Mat data2 = paddedImage(Range(padding - dy, padding - dy + guide.size().height), Range(padding - dx, padding - dx + image.size().width));
             Mat var1 = paddedVariance(Range(padding + dy, padding + dy + guide.size().height), Range(padding + dx, padding + dx + image.size().width));
             Mat var2 = paddedVariance(Range(padding - dy, padding - dy + guide.size().height), Range(padding - dx, padding - dx + image.size().width));
-            Mat var_S = (var1 + var2) / 4;
+            Mat varS = (var1 + var2) / 4;
 
 
             if(dx == 0 && dy == 0)
@@ -97,23 +93,14 @@ cv::Mat SymmetricFilter::filter(const cv::Mat &image, const cv::Mat &guide, cons
 
             Mat weights1 = computeWeights(source1, guide, pixvar, var1, patchSize, h2);
             Mat weights2 = computeWeights(source2, guide, pixvar, var2, patchSize, h2);
-            Mat weights_S = computeWeights(source_S, guide, pixvar, var_S, patchSize, h2);
-            imwrite("/tmp/weights1.exr", weights1);
+            Mat weightsS = computeWeights(source_S, guide, pixvar, varS, patchSize, h2);
 
-            vector<Mat> weights1_split, weights2_split, weights_S_split;
-            split(weights1, weights1_split);
-            split(weights2, weights2_split);
-            split(weights_S, weights_S_split);
-            Mat idx = Mat::zeros(weights1.size(), CV_8UC1);
-            for(unsigned int i = 0; i< weights1_split.size(); i++)
-            {
-                idx |= weights_S_split[i] > max(weights1_split[i], weights2_split[i]);
-            }
-            add(weights_S, Scalar(Vec3f()), weights1, idx);
-            add(weights_S, Scalar(Vec3f()), weights2, idx);
+            Mat idx = weightsS > max(weights1, weights2);
+            add(weightsS, 0, weights1, idx);
+            add(weightsS, 0, weights2, idx);
 
-            Mat totalWeights = weights1 + weights2;
-            Mat totalData = weights1.mul(data1) + weights2.mul(data2);
+            Mat totalWeights = extend(weights1 + weights2);
+            Mat totalData = extend(weights1).mul(data1) + extend(weights2).mul(data2);
 #pragma omp critical
             {
                 area += totalWeights;

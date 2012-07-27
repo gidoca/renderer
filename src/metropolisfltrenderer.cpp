@@ -160,9 +160,7 @@ void MetropolisFltRenderer::renderStep(Size size, const Scene& scene, Mat import
   {
       films[n] = (extend(sumImportance).mul(films[n]) + extend(importanceMap).mul(currentFilms[n])) / extend(importanceMap + sumImportance);
 
-    Mat sumweight3;
-    merge(std::vector<Mat>(3, sumweight[n] + 1e-8f), sumweight3);
-    biased_var[n] = biased_m2[n] / sumweight3;
+      biased_var[n] = biased_m2[n] / extend(sumweight[n] + 1e-8);
   }
 
   sumImportance += importanceMap;
@@ -242,7 +240,6 @@ void MetropolisFltRenderer::render(const Scene & scene, Mat & film, const boost:
 
     Mat importanceMap = channelMean(varOfFiltered) / (channelMean(filteredMean) + 1e-8) + 1e-8;
     importanceMap *= film.size().area() / sum(importanceMap)[0];
-    imwrite("/tmp/importancemap.exr", importanceMap);
     renderStep(film.size(), scene, importanceMap, films, biased_var, biased_mean, biased_m2, seed + i);
     var(newOut, noisy_variance, films);
     var(meanvar, varvar, biased_var);
@@ -251,7 +248,6 @@ void MetropolisFltRenderer::render(const Scene & scene, Mat & film, const boost:
     filteredFilms[1] = f.filter(films[1], films[0], filteredVar);
     Mat filteredMean;
     var(filteredMean, varOfFiltered, filteredFilms);
-    imwrite("/tmp/newout.exr", newOut);
 
     if(vm.count("metflt-omit-filter"))
     {
