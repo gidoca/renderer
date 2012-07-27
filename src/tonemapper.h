@@ -15,7 +15,7 @@ public:
     
   }
   
-  virtual QImage tonemap(const cv::Mat & film);
+  virtual QImage tonemap(const cv::Mat film);
   
 protected:
   virtual QRgb map(const cv::Mat & film, int row, int column);

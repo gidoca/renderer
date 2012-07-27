@@ -11,7 +11,7 @@ inline int Tonemapper::clamp(float x)
   return x <= 0 ? 0 : (x >= 255 ? 255 : x);
 }
 
-QImage Tonemapper::tonemap(const cv::Mat &film)
+QImage Tonemapper::tonemap(const cv::Mat film)
 {
   for(int i = 0; i < image.height(); i++)
   {
