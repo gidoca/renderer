@@ -9,6 +9,7 @@
 #include "diffusematerial.h"
 #include "mirrormaterial.h"
 #include "texturematerial.h"
+#include "transparentmaterial.h"
 #include "camera.h"
 #include "scene.h"
 #include "pointlight.h"
@@ -88,6 +89,11 @@ struct material_builder : boost::static_visitor<Material*>
     TextureMaterial* out = new TextureMaterial();
     out->load(material.filename);
     return out;
+  }
+
+  Material* operator()(ast_refractive_material material) const
+  {
+      return new TransparentMaterial(material.coefficient);
   }
 };
 

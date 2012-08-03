@@ -46,10 +46,16 @@ struct ast_texture_material
     std::string filename;
 };
 
+struct ast_refractive_material
+{
+    float coefficient;
+};
+
 typedef boost::variant<
     ast_diffuse_material,
     ast_mirror_material,
-    ast_texture_material
+    ast_texture_material,
+    ast_refractive_material
     > ast_material;
 
 struct ast_matrix_literal
@@ -278,6 +284,11 @@ BOOST_FUSION_ADAPT_STRUCT(
 BOOST_FUSION_ADAPT_STRUCT(
     ast_texture_material,
     (std::string, filename)
+)
+
+BOOST_FUSION_ADAPT_STRUCT(
+    ast_refractive_material,
+    (float, coefficient)
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
