@@ -114,7 +114,7 @@ void MetropolisFltRenderer::renderStep(Size size, const Scene& scene, Mat import
   {
     sumweight[n] = Mat::zeros(size, CV_32F);
     currentFilms[n] = Mat::zeros(size, CV_32FC3);
-    films[n] = extend(sumImportance).mul(films[n]) / extend(newSumImportance);
+//    films[n] = extend(sumImportance).mul(films[n]) / extend(newSumImportance);
   }
 
   const int numSamples = numPixelSamples * size.area() / numThreads;
