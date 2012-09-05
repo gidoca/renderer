@@ -42,6 +42,7 @@ class SceneGrammar;
 class SimpleIntegrator;
 class Sphere;
 class Tonemapper;
+class TransparentMaterial;
 class Triangle;
 class UniDiPathTracingIntegrator;
 

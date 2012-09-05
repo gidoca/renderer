@@ -3,6 +3,7 @@
 #include "hitrecord.h"
 #include "intersectable.h"
 #include "jitteredsampler.h"
+#include "transparentmaterial.h"
 
 #include "energyredistributionrenderer.h"
 #include "perpixelrenderer.h"
@@ -85,6 +86,11 @@ Path Renderer::createPath(const Ray& primaryRay, const Intersectable &scene, Sam
       QVector3D surfaceNormal = hit.getSurfaceNormal();
       surfaceNormal.normalize();
       outDirection = oldRayDirection - 2 * QVector3D::dotProduct(oldRayDirection, surfaceNormal) * surfaceNormal;
+    }
+    else if(hit.getMaterial().refractive())
+    {
+        const TransparentMaterial* transparentMaterial = hit.getMaterial().refractive();
+        outDirection = transparentMaterial->outDirection(hit.getRay().getDirection(), hit.getSurfaceNormal());
     }
     else
     {
