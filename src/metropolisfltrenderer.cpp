@@ -263,6 +263,8 @@ void MetropolisFltRenderer::render(const Scene & scene, Mat & film, const boost:
     {
         film = filteredMean;
     }
+    QString fn = QString("/tmp/iteration%1.exr").arg(i);
+    imwrite(fn.toStdString(), film);
   }
 }
 
