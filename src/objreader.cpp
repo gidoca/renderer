@@ -37,6 +37,7 @@
 #include "quad.h"
 #include "intersectablelist.h"
 #include "material.h"
+#include "bvh.h"
 
 #define TOKEN_VERTEX_POS "v"
 #define TOKEN_VERTEX_NOR "vn"
@@ -115,9 +116,28 @@ Intersectable *ObjReader::getMesh(std::string filename, Material *material){
             _ObjMeshFaceIndex face_index;
             char interupt;
             for(int i = 0; i < 3; ++i){
-                str_stream >> face_index.pos_index[i] >> interupt
-                           >> face_index.tex_index[i] >> interupt
-                           >> face_index.nor_index[i];
+                str_stream >> face_index.pos_index[i];
+                if(str_stream.peek() == '/')
+                {
+                    str_stream >> interupt;
+                    if(str_stream.peek() == '/')
+                    {
+                        face_index.tex_index[i] = 0;
+                    }
+                    else
+                    {
+                        str_stream >> face_index.tex_index[i];
+                    }
+
+                    if(str_stream.peek() == '/')
+                    {
+                        str_stream >> interupt >> face_index.nor_index[i];
+                    }
+                    else
+                    {
+                        face_index.nor_index[i] = 0;
+                    }
+                }
             }
             faces.push_back(face_index);
         }
@@ -126,9 +146,21 @@ Intersectable *ObjReader::getMesh(std::string filename, Material *material){
     filestream.close();
 
     for(size_t i = 0; i < faces.size(); ++i){
-        Triangle *face = new Triangle(positions[faces[i].pos_index[0] - 1], positions[faces[i].pos_index[1] - 1], positions[faces[i].pos_index[2] - 1], material);
+        Triangle *face;
+        if(faces[i].nor_index[0] == 0 || faces[i].nor_index[1] == 0 || faces[i].nor_index[2] == 0)
+        {
+            face = new Triangle(positions[faces[i].pos_index[0] - 1], positions[faces[i].pos_index[1] - 1], positions[faces[i].pos_index[2] - 1], material);
+        }
+        else if(faces[i].tex_index[0] == 0 || faces[i].tex_index[1] == 0 || faces[i].tex_index[2] == 0)
+        {
+            face = new Triangle(positions[faces[i].pos_index[0] - 1], positions[faces[i].pos_index[1] - 1], positions[faces[i].pos_index[2] - 1], normals[faces[i].nor_index[0] - 1], normals[faces[i].nor_index[1] - 1], normals[faces[i].nor_index[2] - 1], material);
+        }
+        else
+        {
+            face = new Triangle(positions[faces[i].pos_index[0] - 1], positions[faces[i].pos_index[1] - 1], positions[faces[i].pos_index[2] - 1], normals[faces[i].nor_index[0] - 1], normals[faces[i].nor_index[1] - 1], normals[faces[i].nor_index[2] - 1], texcoords[faces[i].tex_index[0] - 1], texcoords[faces[i].tex_index[1] - 1], texcoords[faces[i].tex_index[2] - 1], material);
+        }
         myMesh.faces.push_back(face);
     }
 
-    return new IntersectableList(myMesh.faces);
+    return BVHNode::create(new IntersectableList(myMesh.faces), 4);
 }
