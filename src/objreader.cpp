@@ -62,6 +62,33 @@ struct _ObjMeshFaceIndex{
     int nor_index[3];
 };
 
+void read_index(_ObjMeshFaceIndex& face_index, int i, std::stringstream& str_stream)
+{
+    char interupt;
+    str_stream >> face_index.pos_index[i];
+    if(str_stream.peek() == '/')
+    {
+        str_stream >> interupt;
+        if(str_stream.peek() == '/')
+        {
+            face_index.tex_index[i] = 0;
+        }
+        else
+        {
+            str_stream >> face_index.tex_index[i];
+        }
+
+        if(str_stream.peek() == '/')
+        {
+            str_stream >> interupt >> face_index.nor_index[i];
+        }
+        else
+        {
+            face_index.nor_index[i] = 0;
+        }
+    }
+}
+
 /* Call this function to load a model, only loads triangulated meshes */
 Intersectable *ObjReader::getMesh(std::string filename, Material *material){
     ObjMesh myMesh;
@@ -114,30 +141,8 @@ Intersectable *ObjReader::getMesh(std::string filename, Material *material){
             normals.push_back(nor);
         }else if(type_str == TOKEN_FACE){
             _ObjMeshFaceIndex face_index;
-            char interupt;
             for(int i = 0; i < 3; ++i){
-                str_stream >> face_index.pos_index[i];
-                if(str_stream.peek() == '/')
-                {
-                    str_stream >> interupt;
-                    if(str_stream.peek() == '/')
-                    {
-                        face_index.tex_index[i] = 0;
-                    }
-                    else
-                    {
-                        str_stream >> face_index.tex_index[i];
-                    }
-
-                    if(str_stream.peek() == '/')
-                    {
-                        str_stream >> interupt >> face_index.nor_index[i];
-                    }
-                    else
-                    {
-                        face_index.nor_index[i] = 0;
-                    }
-                }
+                read_index(face_index, i, str_stream);
             }
             faces.push_back(face_index);
         }
