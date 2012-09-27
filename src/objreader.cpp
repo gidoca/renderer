@@ -28,6 +28,7 @@
 #include <vector>
 #include <sstream>
 #include <fstream>
+#include <iostream>
 #include <list>
 
 #include <QVector3D>
@@ -87,6 +88,11 @@ void read_index(_ObjMeshFaceIndex& face_index, int i, std::stringstream& str_str
             face_index.nor_index[i] = 0;
         }
     }
+    else
+    {
+        face_index.tex_index[i] = 0;
+        face_index.nor_index[i] = 0;
+    }
 }
 
 /* Call this function to load a model, only loads triangulated meshes */
@@ -141,14 +147,22 @@ Intersectable *ObjReader::getMesh(std::string filename, Material *material){
             normals.push_back(nor);
         }else if(type_str == TOKEN_FACE){
             _ObjMeshFaceIndex face_index;
-            for(int i = 0; i < 3; ++i){
-                read_index(face_index, i, str_stream);
+            read_index(face_index, 0, str_stream);
+            read_index(face_index, 2, str_stream);
+            while(!str_stream.eof())
+            {
+                face_index.pos_index[1] = face_index.pos_index[2];
+                face_index.nor_index[1] = face_index.nor_index[2];
+                face_index.tex_index[1] = face_index.tex_index[2];
+                read_index(face_index, 2, str_stream);
+                faces.push_back(face_index);
             }
-            faces.push_back(face_index);
         }
     }
     // Explicit closing of the file
     filestream.close();
+
+    std::cout << "ObjReader: " << faces.size() << " faces" << std::endl;
 
     for(size_t i = 0; i < faces.size(); ++i){
         Triangle *face;
@@ -167,5 +181,5 @@ Intersectable *ObjReader::getMesh(std::string filename, Material *material){
         myMesh.faces.push_back(face);
     }
 
-    return BVHNode::create(new IntersectableList(myMesh.faces), 4);
+    return BVHNode::create(new IntersectableList(myMesh.faces), 6);
 }
