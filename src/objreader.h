@@ -4,11 +4,12 @@
 #include "global.h"
 
 #include <string>
+#include <map>
 
 class ObjReader
 {
   public:
-    static Intersectable* getMesh(std::string fileName, Material * material);
+    static Intersectable* getMesh(std::string fileName, Material * defaultMaterial, std::map<std::string, Material*> materials);
 };
 
 #endif

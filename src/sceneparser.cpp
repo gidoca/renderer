@@ -20,7 +20,7 @@ SceneGrammar::SceneGrammar() : SceneGrammar::base_type(assignments_rule, "inters
 
   assignments_rule %= *assignment_rule;
   assignment_rule %= identifier_rule >> "=" >> value_rule >> ";";
-  value_rule %= intersectable_rule | light_list_rule | camera_rule;
+  value_rule %= intersectable_rule | light_list_rule | camera_rule | material_rule;
 
   intersectable_rule %= intersectable_list_rule | sphere_rule | box_rule | quad_rule | plane_rule | obj_rule | instance_rule;
   intersectable_rule.name("intersectable");

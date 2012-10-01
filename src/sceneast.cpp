@@ -120,6 +120,8 @@ Camera ast_camera::asCamera() const
 
 struct intersectable_builder : boost::static_visitor<Intersectable*>
 {
+  intersectable_builder(std::map<std::string, Material*>& materials) : materials(materials) {}
+
   Intersectable* operator()(const ast_sphere& s) const
   {
     return new Sphere(s.center.asQVector(), s.radius, boost::apply_visitor(material_builder(), s.material));
@@ -142,11 +144,13 @@ struct intersectable_builder : boost::static_visitor<Intersectable*>
 
   Intersectable* operator()(const ast_obj& o) const
   {
-      return ObjReader::getMesh(o.filename.c_str(), boost::apply_visitor(material_builder(), o.material));
+      return ObjReader::getMesh(o.filename.c_str(), boost::apply_visitor(material_builder(), o.material), materials);
   }
 
   Intersectable* operator()(const ast_intersectable_list& l) const;
   Intersectable* operator()(const ast_instance& i) const;
+
+  std::map<std::string, Material*>& materials;
 };
 
 Intersectable* intersectable_builder::operator()(ast_intersectable_list const& l) const
@@ -155,7 +159,7 @@ Intersectable* intersectable_builder::operator()(ast_intersectable_list const& l
 
   BOOST_FOREACH( ast_intersectable n, l.children )
   {
-    intersectables.push_back(boost::apply_visitor(intersectable_builder(), n));
+    intersectables.push_back(boost::apply_visitor(*this, n));
   }
 
   return new IntersectableList(intersectables);
@@ -163,7 +167,7 @@ Intersectable* intersectable_builder::operator()(ast_intersectable_list const& l
 
 Intersectable* intersectable_builder::operator()(const ast_instance& i) const
 {
-    return new IntersectableInstance(i.transform.asQMatrix4x4(), boost::apply_visitor(intersectable_builder(), i.intersectable));
+    return new IntersectableInstance(i.transform.asQMatrix4x4(), boost::apply_visitor(*this, i.intersectable));
 }
 
 struct light_builder : boost::static_visitor<const Light*>
@@ -186,6 +190,8 @@ struct light_builder : boost::static_visitor<const Light*>
 
 struct scene_builder : boost::static_visitor<void>
 {
+    scene_builder() : intersectable_b(materials) {}
+
     void addAssignment(ast_assignment assignment)
     {
         current_name = assignment.name;
@@ -212,6 +218,11 @@ struct scene_builder : boost::static_visitor<void>
         this->lights[current_name] = out;
     }
 
+    void operator()(ast_material material)
+    {
+        materials[current_name] = boost::apply_visitor(material_builder(), material);
+    }
+
     Scene getScene()
     {
         Scene result(cameras["camera"]);
@@ -223,6 +234,7 @@ struct scene_builder : boost::static_visitor<void>
     map<string, Camera> cameras;
     map<string, Intersectable*> intersectables;
     map<string, vector<const Light*> > lights;
+    map<string, Material*> materials;
 
 private:
     string current_name;

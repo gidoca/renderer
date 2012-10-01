@@ -5,6 +5,7 @@
 #include "camera.h"
 
 #include <vector>
+#include <map>
 
 class Scene
 {

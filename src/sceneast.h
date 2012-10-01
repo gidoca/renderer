@@ -172,7 +172,7 @@ struct ast_cone_light
 
 typedef boost::variant<ast_point_light, ast_area_light, ast_cone_light> ast_light;
 
-typedef boost::variant<std::vector<ast_light>, ast_camera, ast_intersectable> ast_value;
+typedef boost::variant<std::vector<ast_light>, ast_camera, ast_intersectable, ast_material> ast_value;
 
 struct ast_assignment
 {

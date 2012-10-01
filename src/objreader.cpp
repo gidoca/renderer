@@ -30,6 +30,7 @@
 #include <fstream>
 #include <iostream>
 #include <list>
+#include <map>
 
 #include <QVector3D>
 #include <opencv2/core/core.hpp>
@@ -44,6 +45,7 @@
 #define TOKEN_VERTEX_NOR "vn"
 #define TOKEN_VERTEX_TEX "vt"
 #define TOKEN_FACE "f"
+#define TOKEN_MATERIAL "usemtl"
 
 struct ObjMeshVertex{
     QVector3D pos;
@@ -61,6 +63,7 @@ struct _ObjMeshFaceIndex{
     int pos_index[3];
     int tex_index[3];
     int nor_index[3];
+    Material* material;
 };
 
 inline void read_index(std::stringstream& str_stream, int& dest, int total_num)
@@ -106,7 +109,7 @@ void read_indices(_ObjMeshFaceIndex& face_index, int i, std::stringstream& str_s
 }
 
 /* Call this function to load a model, only loads triangulated meshes */
-Intersectable *ObjReader::getMesh(std::string filename, Material *material){
+Intersectable *ObjReader::getMesh(std::string filename, Material *defaultMaterial, std::map<std::string, Material*> materials){
     ObjMesh myMesh;
 
     std::vector<QVector3D>          positions;
@@ -125,6 +128,8 @@ Intersectable *ObjReader::getMesh(std::string filename, Material *material){
 
     std::ifstream filestream;
     filestream.open(filename.c_str());
+
+    Material *currentMaterial = defaultMaterial;
 
     std::string line_stream;	// No longer depending on char arrays thanks to: Dale Weiler
     while(std::getline(filestream, line_stream)){
@@ -157,6 +162,7 @@ Intersectable *ObjReader::getMesh(std::string filename, Material *material){
             normals.push_back(nor);
         }else if(type_str == TOKEN_FACE){
             _ObjMeshFaceIndex face_index;
+            face_index.material = currentMaterial;
             read_indices(face_index, 0, str_stream, positions.size(), texcoords.size(), normals.size());
             read_indices(face_index, 2, str_stream, positions.size(), texcoords.size(), normals.size());
             while(!str_stream.eof())
@@ -166,6 +172,13 @@ Intersectable *ObjReader::getMesh(std::string filename, Material *material){
                 face_index.tex_index[1] = face_index.tex_index[2];
                 read_indices(face_index, 2, str_stream, positions.size(), texcoords.size(), normals.size());
                 faces.push_back(face_index);
+            }
+        }else if(type_str == TOKEN_MATERIAL){
+            std::string name;
+            str_stream >> name;
+            currentMaterial = materials[name];
+            if(currentMaterial == 0){
+                currentMaterial = defaultMaterial;
             }
         }
     }
@@ -178,15 +191,15 @@ Intersectable *ObjReader::getMesh(std::string filename, Material *material){
         Triangle *face;
         if(faces[i].nor_index[0] == 0 || faces[i].nor_index[1] == 0 || faces[i].nor_index[2] == 0)
         {
-            face = new Triangle(positions[faces[i].pos_index[0] - 1], positions[faces[i].pos_index[1] - 1], positions[faces[i].pos_index[2] - 1], material);
+            face = new Triangle(positions[faces[i].pos_index[0] - 1], positions[faces[i].pos_index[1] - 1], positions[faces[i].pos_index[2] - 1], faces[i].material);
         }
         else if(faces[i].tex_index[0] == 0 || faces[i].tex_index[1] == 0 || faces[i].tex_index[2] == 0)
         {
-            face = new Triangle(positions[faces[i].pos_index[0] - 1], positions[faces[i].pos_index[1] - 1], positions[faces[i].pos_index[2] - 1], normals[faces[i].nor_index[0] - 1], normals[faces[i].nor_index[1] - 1], normals[faces[i].nor_index[2] - 1], material);
+            face = new Triangle(positions[faces[i].pos_index[0] - 1], positions[faces[i].pos_index[1] - 1], positions[faces[i].pos_index[2] - 1], normals[faces[i].nor_index[0] - 1], normals[faces[i].nor_index[1] - 1], normals[faces[i].nor_index[2] - 1], faces[i].material);
         }
         else
         {
-            face = new Triangle(positions[faces[i].pos_index[0] - 1], positions[faces[i].pos_index[1] - 1], positions[faces[i].pos_index[2] - 1], normals[faces[i].nor_index[0] - 1], normals[faces[i].nor_index[1] - 1], normals[faces[i].nor_index[2] - 1], texcoords[faces[i].tex_index[0] - 1], texcoords[faces[i].tex_index[1] - 1], texcoords[faces[i].tex_index[2] - 1], material);
+            face = new Triangle(positions[faces[i].pos_index[0] - 1], positions[faces[i].pos_index[1] - 1], positions[faces[i].pos_index[2] - 1], normals[faces[i].nor_index[0] - 1], normals[faces[i].nor_index[1] - 1], normals[faces[i].nor_index[2] - 1], texcoords[faces[i].tex_index[0] - 1], texcoords[faces[i].tex_index[1] - 1], texcoords[faces[i].tex_index[2] - 1], faces[i].material);
         }
         myMesh.faces.push_back(face);
     }
