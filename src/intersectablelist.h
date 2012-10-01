@@ -11,7 +11,7 @@ class IntersectableList : public Intersectable
 {
 
   public:
-    IntersectableList(std::list<Intersectable*> components) : components(components), bBox(boundingBox())
+    IntersectableList(std::list<Intersectable*> components) : components(components)
     {
 
     }
@@ -26,7 +26,6 @@ class IntersectableList : public Intersectable
 
   private:
     std::list<Intersectable* > components;
-    const AxisAlignedBox* bBox;
   
 };
 

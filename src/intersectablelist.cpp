@@ -5,7 +5,6 @@
 
 IntersectableList::~IntersectableList()
 {
-  delete bBox;
 }
 
 HitRecord IntersectableList::intersect(Ray ray, float from, float to) const

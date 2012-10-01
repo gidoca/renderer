@@ -63,10 +63,19 @@ struct _ObjMeshFaceIndex{
     int nor_index[3];
 };
 
-void read_index(_ObjMeshFaceIndex& face_index, int i, std::stringstream& str_stream)
+inline void read_index(std::stringstream& str_stream, int& dest, int total_num)
+{
+    str_stream >> dest;
+    if(dest < 0)
+    {
+        dest += total_num + 1;
+    }
+}
+
+void read_indices(_ObjMeshFaceIndex& face_index, int i, std::stringstream& str_stream, int num_positions, int num_texcoords, int num_normals)
 {
     char interupt;
-    str_stream >> face_index.pos_index[i];
+    read_index(str_stream, face_index.pos_index[i], num_positions);
     if(str_stream.peek() == '/')
     {
         str_stream >> interupt;
@@ -76,12 +85,13 @@ void read_index(_ObjMeshFaceIndex& face_index, int i, std::stringstream& str_str
         }
         else
         {
-            str_stream >> face_index.tex_index[i];
+            read_index(str_stream, face_index.tex_index[i], num_texcoords);
         }
 
         if(str_stream.peek() == '/')
         {
-            str_stream >> interupt >> face_index.nor_index[i];
+            str_stream >> interupt;
+            read_index(str_stream, face_index.nor_index[i], num_normals);
         }
         else
         {
@@ -147,14 +157,14 @@ Intersectable *ObjReader::getMesh(std::string filename, Material *material){
             normals.push_back(nor);
         }else if(type_str == TOKEN_FACE){
             _ObjMeshFaceIndex face_index;
-            read_index(face_index, 0, str_stream);
-            read_index(face_index, 2, str_stream);
+            read_indices(face_index, 0, str_stream, positions.size(), texcoords.size(), normals.size());
+            read_indices(face_index, 2, str_stream, positions.size(), texcoords.size(), normals.size());
             while(!str_stream.eof())
             {
                 face_index.pos_index[1] = face_index.pos_index[2];
                 face_index.nor_index[1] = face_index.nor_index[2];
                 face_index.tex_index[1] = face_index.tex_index[2];
-                read_index(face_index, 2, str_stream);
+                read_indices(face_index, 2, str_stream, positions.size(), texcoords.size(), normals.size());
                 faces.push_back(face_index);
             }
         }
@@ -181,5 +191,5 @@ Intersectable *ObjReader::getMesh(std::string filename, Material *material){
         myMesh.faces.push_back(face);
     }
 
-    return BVHNode::create(new IntersectableList(myMesh.faces), 6);
+    return BVHNode::create(new IntersectableList(myMesh.faces), 5);
 }
