@@ -132,6 +132,7 @@ Intersectable *ObjReader::getMesh(std::string filename, Material *defaultMateria
     Material *currentMaterial = defaultMaterial;
 
     std::string line_stream;	// No longer depending on char arrays thanks to: Dale Weiler
+    int num_faces = 0;
     while(std::getline(filestream, line_stream)){
         std::stringstream str_stream(line_stream);
         std::string type_str;
@@ -173,6 +174,7 @@ Intersectable *ObjReader::getMesh(std::string filename, Material *defaultMateria
                 read_indices(face_index, 2, str_stream, positions.size(), texcoords.size(), normals.size());
                 faces.push_back(face_index);
             }
+            num_faces++;
         }else if(type_str == TOKEN_MATERIAL){
             std::string name;
             str_stream >> name;
@@ -185,7 +187,7 @@ Intersectable *ObjReader::getMesh(std::string filename, Material *defaultMateria
     // Explicit closing of the file
     filestream.close();
 
-    std::cout << "ObjReader: " << faces.size() << " faces" << std::endl;
+    std::cout << "ObjReader: " << faces.size() << " triangles, " << num_faces << " faces" << std::endl;
 
     for(size_t i = 0; i < faces.size(); ++i){
         Triangle *face;

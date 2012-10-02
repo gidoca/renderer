@@ -121,6 +121,7 @@ int main(int argc, char **argv) {
   Scene scene = buildScene(parser.getAst());
   
   cv::Mat * film = new cv::Mat(scene.camera.getResolution().height(), scene.camera.getResolution().width(), CV_32FC3);
+  film->setTo(cv::Vec3f(0, 0, 0));
   QFuture< void > future = QtConcurrent::run(render, renderer, film, scene, vm);
   
   if(vm.count("gui") || (!vm.count("save-exr") && !vm.count("save-img")))
