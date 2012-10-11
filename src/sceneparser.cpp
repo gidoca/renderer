@@ -64,7 +64,7 @@ SceneGrammar::SceneGrammar() : SceneGrammar::base_type(assignments_rule, "inters
   texture_material_rule.name("texture material");
   refractive_material_rule %= boost::spirit::lit("refractive") >> "(" >> boost::spirit::tag::float_() >> ")";
   refractive_material_rule.name("refractive material");
-  material_rule %= diffuse_material_rule | mirror_material_rule | texture_material_rule | refractive_material_rule;
+  material_rule %= diffuse_material_rule | mirror_material_rule | texture_material_rule | refractive_material_rule | identifier_rule;
   material_rule.name("material");
 
   camera_rule %= boost::spirit::lit("camera") >> "(" >> vector3_literal_rule >> "," >> vector3_literal_rule >> "," >> vector3_literal_rule >> "," >> boost::spirit::tag::float_() >> "," >> boost::spirit::tag::float_() >> "," >> boost::spirit::tag::float_() >> ")";

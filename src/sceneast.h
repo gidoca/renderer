@@ -55,7 +55,8 @@ typedef boost::variant<
     ast_diffuse_material,
     ast_mirror_material,
     ast_texture_material,
-    ast_refractive_material
+    ast_refractive_material,
+    std::vector<char>
     > ast_material;
 
 struct ast_matrix_literal

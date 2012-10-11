@@ -74,6 +74,8 @@ QMatrix4x4 ast_matrix::asQMatrix4x4() const
 
 struct material_builder : boost::static_visitor<Material*>
 {
+  material_builder(std::map<std::string, Material*>& materials) : materials(materials) {}
+
   Material* operator()(ast_diffuse_material material) const
   {
     return new DiffuseMaterial(material.color.asSpectrum());
@@ -95,6 +97,13 @@ struct material_builder : boost::static_visitor<Material*>
   {
       return new TransparentMaterial(material.coefficient);
   }
+
+  Material* operator()(std::vector<char> identifier) const
+  {
+      return materials[std::string(identifier.begin(), identifier.end())];
+  }
+
+  std::map<std::string, Material*>& materials;
 };
 
 QVector3D ast_vector3_literal::asQVector() const
@@ -120,37 +129,39 @@ Camera ast_camera::asCamera() const
 
 struct intersectable_builder : boost::static_visitor<Intersectable*>
 {
-  intersectable_builder(std::map<std::string, Material*>& materials) : materials(materials) {}
+  intersectable_builder(std::map<std::string, Material*>& materials) : materials(materials), material_b(materials) {}
 
   Intersectable* operator()(const ast_sphere& s) const
   {
-    return new Sphere(s.center.asQVector(), s.radius, boost::apply_visitor(material_builder(), s.material));
+    return new Sphere(s.center.asQVector(), s.radius, boost::apply_visitor(material_b, s.material));
   }
 
   Intersectable* operator()(const ast_box& b) const
   {
-    return new AxisAlignedBox(b.min.asQVector(), b.max.asQVector(), boost::apply_visitor(material_builder(), b.material));
+    return new AxisAlignedBox(b.min.asQVector(), b.max.asQVector(), boost::apply_visitor(material_b, b.material));
   }
 
   Intersectable* operator()(const ast_quad& q) const
   {
-    return new Quad(q.p1.asQVector(), q.p2.asQVector(), q.p3.asQVector(), q.p4.asQVector(), boost::apply_visitor(material_builder(), q.material));
+    return new Quad(q.p1.asQVector(), q.p2.asQVector(), q.p3.asQVector(), q.p4.asQVector(), boost::apply_visitor(material_b, q.material));
   }
 
   Intersectable* operator()(const ast_plane& p) const
   {
-      return new Plane(p.vector.asQVector(), boost::apply_visitor(material_builder(), p.material));
+      return new Plane(p.vector.asQVector(), boost::apply_visitor(material_b, p.material));
   }
 
   Intersectable* operator()(const ast_obj& o) const
   {
-      return ObjReader::getMesh(o.filename.c_str(), boost::apply_visitor(material_builder(), o.material), materials);
+      return ObjReader::getMesh(o.filename.c_str(), boost::apply_visitor(material_b, o.material), materials);
   }
 
   Intersectable* operator()(const ast_intersectable_list& l) const;
   Intersectable* operator()(const ast_instance& i) const;
 
   std::map<std::string, Material*>& materials;
+
+  material_builder material_b;
 };
 
 Intersectable* intersectable_builder::operator()(ast_intersectable_list const& l) const
@@ -190,7 +201,7 @@ struct light_builder : boost::static_visitor<const Light*>
 
 struct scene_builder : boost::static_visitor<void>
 {
-    scene_builder() : intersectable_b(materials) {}
+    scene_builder() : intersectable_b(materials), material_b(materials) {}
 
     void addAssignment(ast_assignment assignment)
     {
@@ -220,7 +231,7 @@ struct scene_builder : boost::static_visitor<void>
 
     void operator()(ast_material material)
     {
-        materials[current_name] = boost::apply_visitor(material_builder(), material);
+        materials[current_name] = boost::apply_visitor(material_b, material);
     }
 
     Scene getScene()
@@ -240,6 +251,7 @@ private:
     string current_name;
 
     intersectable_builder intersectable_b;
+    material_builder material_b;
     light_builder light_b;
 };
 
