@@ -15,7 +15,7 @@
 #include "path.h"
 #include "sampler.h"
 
-#define MAX_DEPTH 4
+#define MAX_DEPTH 6
 
 typedef boost::mpl::list<MetropolisRenderer, MetropolisFltRenderer, PerPixelRenderer, EnergyRedistributionRenderer> renderers;
 
