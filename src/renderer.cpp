@@ -59,7 +59,7 @@ Path Renderer::createPath(const Ray &primaryRay, const Intersectable &scene, gsl
       terminationProb = 1;
       pathLength = MAX_DEPTH;
     }
-    for(int i = 0; i < pathLength; i++)
+    for(int i = 0; i < MAX_DEPTH; i++)
     {
       pathSamples[i] = sampler.getSamples().front();
     }
@@ -91,6 +91,8 @@ Path Renderer::createPath(const Ray& primaryRay, const Intersectable &scene, Sam
     {
         const TransparentMaterial* transparentMaterial = hit.getMaterial().refractive();
         outDirection = transparentMaterial->outDirection(hit.getRay().getDirection(), hit.getSurfaceNormal());
+        //Try not to terminate on refractive vertices
+        if(i == pathLength - 1 && pathLength < MAX_DEPTH) pathLength++;
     }
     else
     {
