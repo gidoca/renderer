@@ -80,7 +80,7 @@ void MetropolisFltRenderer::renderStep(Size size, const Scene& scene, Mat import
   initialSample.largeStep(globalrng);
   UniDiPathTracingIntegrator integrator;
 
-  const int num_films = 2;
+  const int num_films = films.size();
 
   float sumI = 0;
   vector<float> bootstrapI;
@@ -213,7 +213,7 @@ void MetropolisFltRenderer::render(const Scene & scene, Mat & film, const boost:
   SymmetricFilter f;
 
   Mat filteredVar;
-  if(vm.count("metflt-omit-filter"))
+  if(vm.count("metflt-omit-filter") || vm.count("metflt-omit-variance-filter"))
   {
       filteredVar = noisy_variance;
   }
@@ -227,12 +227,11 @@ void MetropolisFltRenderer::render(const Scene & scene, Mat & film, const boost:
   imwrite("/tmp/film.exr", film);
   imwrite("/tmp/var.exr", filteredVar);
 
-  vector<Mat> filteredFilms(2);
+  vector<Mat> filteredFilms(num_films);
   Mat varOfFiltered;
   if(vm.count("metflt-omit-filter"))
   {
-      filteredFilms[0] = films[0];
-      filteredFilms[1] = films[1];
+      filteredFilms = films;
   }
   else
   {
@@ -268,7 +267,7 @@ void MetropolisFltRenderer::render(const Scene & scene, Mat & film, const boost:
     }
     var(newOut, noisy_variance, films);
     var(meanvar, varvar, biased_var);
-    if(vm.count("metflt-omit-filter"))
+    if(vm.count("metflt-omit-filter") || vm.count("metflt-omit-variance-filter"))
     {
         filteredVar = noisy_variance;
     }
@@ -278,8 +277,7 @@ void MetropolisFltRenderer::render(const Scene & scene, Mat & film, const boost:
     }
     if(vm.count("metflt-omit-filter"))
     {
-        filteredFilms[0] = films[0];
-        filteredFilms[1] = films[1];
+        filteredFilms = films;
     }
     else
     {
@@ -310,6 +308,7 @@ options_description MetropolisFltRenderer::options()
       ("metflt-bootstrap", value<int>()->default_value(1000), "number of bootstrapping samples")
       ("metflt-mutations", value<int>()->default_value(16), "average number of path mutations per pixel")
       ("metflt-omit-filter", "don't filter the image")
+      ("metflt-omit-variance-filter", "filter the image using unfiltered guidance")
       ("metflt-num-passes", value<int>()->default_value(3), "the number of filtering passes");
   return opts;
 }
