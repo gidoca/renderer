@@ -62,12 +62,12 @@ void MetropolisFltRenderer::addSample(const Sample &cameraSample, float weight, 
     }
 }
 
-void MetropolisFltRenderer::renderStep(Size size, const Scene& scene, vector<Mat>& films, vector<Mat>& biased_var, vector<Mat>& biased_mean, vector<Mat>& biased_m2, int seed)
+void MetropolisFltRenderer::renderStep(Size size, const Scene& scene, vector<Mat>& films, vector<Mat>& biased_var, vector<Mat>& biased_mean, vector<Mat>& biased_m2, vector<Mat>& sumweight, int seed)
 {
-    renderStep(size, scene, Mat::ones(size, CV_32F), films, biased_var, biased_mean, biased_m2, seed);
+    renderStep(size, scene, Mat::ones(size, CV_32F), films, biased_var, biased_mean, biased_m2, sumweight, seed);
 }
 
-void MetropolisFltRenderer::renderStep(Size size, const Scene& scene, Mat importanceMap, vector<Mat>& films, vector<Mat>& biased_var, vector<Mat>& biased_mean, vector<Mat>& biased_m2, int seed)
+void MetropolisFltRenderer::renderStep(Size size, const Scene& scene, Mat importanceMap, vector<Mat>& films, vector<Mat>& biased_var, vector<Mat>& biased_mean, vector<Mat>& biased_m2, vector<Mat>& sumweight, int seed)
 {
   const int numInitialSamples = vm["metflt-bootstrap"].as<int>();
   const float largeStepProb = vm["metflt-large-step-prob"].as<float>();
@@ -109,12 +109,10 @@ void MetropolisFltRenderer::renderStep(Size size, const Scene& scene, Mat import
 
   Mat newSumImportance = sumImportance + importanceMap;
 
-  Mat sumweight[num_films], currentFilms[num_films];
   for(int n = 0; n < num_films; n++)
   {
-    sumweight[n] = Mat::zeros(size, CV_32F);
-    currentFilms[n] = Mat::zeros(size, CV_32FC3);
     films[n] = extend(sumImportance / newSumImportance).mul(films[n]);
+    biased_m2[n] = extend(sumImportance / newSumImportance).mul(extend(sumImportance / newSumImportance).mul(biased_m2[n]));
   }
 
   const int numSamples = numPixelSamples * size.area() / numThreads / vm["metflt-num-passes"].as<int>();
@@ -140,11 +138,11 @@ void MetropolisFltRenderer::renderStep(Size size, const Scene& scene, Mat import
 
           if(norm(currentValue) > 0 && accept < 1)
           {
-              addSample(currentSample.cameraSample, 1 - accept, films[n], biased_mean[n], biased_m2[n], sumweight[n], currentValue * (1 / (norm(currentValue) * newSumImportance.at<float>(currentPos)) * b * vm["metflt-num-passes"].as<int>() / numPixelSamples));
+              addSample(currentSample.cameraSample, (1 - accept) / newSumImportance.at<float>(currentPos), films[n], biased_mean[n], biased_m2[n], sumweight[n], currentValue * (1 / norm(currentValue) * b * vm["metflt-num-passes"].as<int>() / numPixelSamples));
           }
           if(norm(newValue) > 0 && accept > 0)
           {
-              addSample(newSample.cameraSample, accept, films[n], biased_mean[n], biased_m2[n], sumweight[n], newValue * (1 / (norm(newValue) * newSumImportance.at<float>(newPos)) * b * vm["metflt-num-passes"].as<int>() / numPixelSamples));
+              addSample(newSample.cameraSample, accept / newSumImportance.at<float>(newPos), films[n], biased_mean[n], biased_m2[n], sumweight[n], newValue * (1 / norm(newValue) * b * vm["metflt-num-passes"].as<int>() / numPixelSamples));
           }
           if(gsl_rng_uniform(rng) < accept)
           {
@@ -185,15 +183,17 @@ void MetropolisFltRenderer::render(const Scene & scene, Mat & film, const boost:
   const int num_films = 2;
   vector<Mat> biased_mean(num_films), biased_m2(num_films);
   vector<Mat> films(num_films), biased_var(num_films);
+  vector<Mat> sumweight(num_films);
 
   for(int n = 0; n < num_films; n++)
   {
     films[n] = Mat::zeros(film.size(), CV_32FC3);
     biased_mean[n] = Mat::zeros(film.size(), CV_32FC3);
     biased_m2[n] = Mat::zeros(film.size(), CV_32FC3);
+    sumweight[n] = Mat::zeros(film.size(), CV_32F);
   }
 
-  renderStep(film.size(), scene, films, biased_var, biased_mean, biased_m2, seed);
+  renderStep(film.size(), scene, films, biased_var, biased_mean, biased_m2, sumweight, seed);
 
   if(vm.count("verbose"))
   {
@@ -260,7 +260,7 @@ void MetropolisFltRenderer::render(const Scene & scene, Mat & film, const boost:
     importanceMap *= importanceMap.size().area() / sum(importanceMap)[0];
     QString fn = QString("/tmp/importance%1.exr").arg(i);
     imwrite(fn.toStdString(), importanceMap);
-    renderStep(film.size(), scene, importanceMap, films, biased_var, biased_mean, biased_m2, seed + i);
+    renderStep(film.size(), scene, importanceMap, films, biased_var, biased_mean, biased_m2, sumweight, seed + i);
     if(vm.count("verbose"))
     {
       cout << time.elapsed() / 1000 << "s elapsed, starting filtering pass " << i << "/" << (vm["metflt-num-passes"].as<int>() - 1) << endl;
