@@ -33,6 +33,19 @@ cv::Mat channelMean(const cv::Mat &in)
 //    return in;
 }
 
+cv::Mat channelNorm(const Mat &in)
+{
+    vector<Mat> splitted;
+    Mat outSquared = Mat::zeros(in.size(), CV_MAKETYPE(in.type(), 1)), out;
+    split(in, splitted);
+    for(unsigned int i = 0; i < splitted.size(); i++)
+    {
+        outSquared += splitted[i].mul(splitted[i]);
+    }
+    sqrt(outSquared, out);
+    return out;
+}
+
 cv::Mat extend(const cv::Mat &in, int nchan)
 {
     Mat out;

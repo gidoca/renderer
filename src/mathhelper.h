@@ -6,6 +6,7 @@
 
 void var(cv::Mat &mean, cv::Mat &var, std::vector<cv::Mat> in);
 cv::Mat channelMean(const cv::Mat &in);
+cv::Mat channelNorm(const cv::Mat &in);
 cv::Mat extend(const cv::Mat &in, int nchan = 3);
 
 template <typename T> inline constexpr
