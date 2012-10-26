@@ -77,7 +77,8 @@ void EnergyRedistributionRenderer::equalDispositionFlow(Mat &film, MetropolisSam
       MetropolisSample z = y;
       z.smallStep(rng);
       Path yPath = y.cameraPathFromSample(scene, camera);
-      float yLum = norm(integrator.integrate(yPath, scene, light, y.lightSample1, y.lightIndex));
+      Vec3f yVal = integrator.integrate(yPath, scene, light, y.lightSample1, y.lightIndex);
+      float yLum = norm(yVal);
       Path zPath = z.cameraPathFromSample(scene, camera);
       float zLum = norm(integrator.integrate(zPath, scene, light, z.lightSample1, z.lightIndex));
       float q = std::min<float>(1, zLum / yLum);
@@ -89,7 +90,7 @@ void EnergyRedistributionRenderer::equalDispositionFlow(Mat &film, MetropolisSam
       int pixelX = (int)(y.cameraSample.getSample().x() * film.size().width);
       int pixelY = (int)(y.cameraSample.getSample().y() * film.size().height);
       #pragma omp critical
-      film.at<Vec3f>(pixelY, pixelX) += depVal * (1.f / (vm["erpt-x-samples"].as<int>() * vm["erpt-y-samples"].as<int>()));
+      film.at<Vec3f>(pixelY, pixelX) += norm(depVal) * yVal* (1 / norm(yVal)) * (1.f / (vm["erpt-x-samples"].as<int>() * vm["erpt-y-samples"].as<int>()));
     }
   }
 }
