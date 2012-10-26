@@ -38,6 +38,11 @@ QVector3D Sample::getCosineWeightedDirection(QVector3D w, float & pdf) const
   transform.setColumn(1, v);
   transform.setColumn(2, w);
   QVector3D randomDirection = transform.map(normalizedDirection);
+  float dp = QVector3D::dotProduct(randomDirection, w);
+  if(dp < 0)
+  {
+      randomDirection -= 2 * dp * w;
+  }
   assert(QVector3D::dotProduct(randomDirection, w) >= 0);
   return randomDirection;
 }
