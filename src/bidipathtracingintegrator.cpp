@@ -11,6 +11,7 @@
 #include <list>
 #include <cassert>
 #include <cmath>
+#include <algorithm>
 
 using namespace cv;
 
@@ -46,8 +47,10 @@ Vec3f BiDiPathTracingIntegrator::integrate(const Ray &ray, const Intersectable &
       {
         Vec3f eyeBrdf = eyeHitIt->getMaterial().shade(*eyeHitIt, connDirection);
         Vec3f lightBrdf = lightHitIt->getMaterial().shade(*lightHitIt, -connDirection);
-
-        color = color.mul(*eyeAlphaIt).mul(*lightAlphaIt).mul(eyeBrdf).mul(lightBrdf) * (geometryTerm / (eyeInd + lightInd));
+        int pathLength = eyeInd + lightInd + 1;
+        int nPaths = std::min<int>(pathLength - 1, eyePath.alphaValues.size()) + std::min<int>(pathLength - 2, lightPath.alphaValues.size()) + 2 - pathLength;
+        assert(nPaths > 0);
+        color = color.mul(*eyeAlphaIt).mul(*lightAlphaIt).mul(eyeBrdf).mul(lightBrdf) * (geometryTerm / nPaths);
       }
 
       eyeAlphaIt++;
@@ -61,7 +64,7 @@ Vec3f BiDiPathTracingIntegrator::integrate(const Ray &ray, const Intersectable &
 
   std::list<Vec3f>::iterator eyeAlphaIt = eyePath.alphaValues.begin();
   std::list<HitRecord>::iterator eyeHitIt = eyePath.hitRecords.begin();
-  int eyeInd = 1;
+  int eyeInd = 2;
 
   while(eyeAlphaIt != eyePath.alphaValues.end() && eyeHitIt != eyePath.hitRecords.end())
   {
@@ -75,7 +78,10 @@ Vec3f BiDiPathTracingIntegrator::integrate(const Ray &ray, const Intersectable &
 //      assert(!isnan(lightIntensity.x()) && !isnan(lightIntensity.y()) && !isnan(lightIntensity.z()));
       brdf = eyeHitIt->getMaterial().shade(*eyeHitIt, lightDirection);
 //      assert(brdf.x() >= 0 && brdf.y() >= 0 && brdf.z() >= 0);
-      color += eyeAlphaIt->mul(brdf).mul(lightIntensity) * (inCos / eyeInd);
+      int nPaths = std::min<int>(eyeInd - 1, eyePath.alphaValues.size()) + 2 - eyeInd;
+      assert(nPaths > 0);
+//      int nPaths = eyeInd;
+      color += eyeAlphaIt->mul(brdf).mul(lightIntensity) * (inCos / nPaths);
     }
 
     eyeAlphaIt++;
