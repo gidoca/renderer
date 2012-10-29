@@ -15,7 +15,7 @@
 
 using namespace cv;
 
-Vec3f BiDiPathTracingIntegrator::integrate(const Ray &ray, const Intersectable &scene, const std::vector<const Light*> light, int, gsl_rng *rng) const
+Vec3f BiDiPathTracingIntegrator::integrate(const Ray &ray, const Intersectable &scene, const std::vector<const Light*> light, gsl_rng *rng) const
 {
   Vec3f color;
   JitteredSampler sampler(1, 1, rng);
@@ -48,6 +48,7 @@ Vec3f BiDiPathTracingIntegrator::integrate(const Ray &ray, const Intersectable &
         Vec3f eyeBrdf = eyeHitIt->getMaterial().shade(*eyeHitIt, connDirection);
         Vec3f lightBrdf = lightHitIt->getMaterial().shade(*lightHitIt, -connDirection);
         int pathLength = eyeInd + lightInd + 1;
+        //number of paths of the same length
         int nPaths = std::min<int>(pathLength - 1, eyePath.alphaValues.size()) + std::min<int>(pathLength - 2, lightPath.alphaValues.size()) + 2 - pathLength;
         assert(nPaths > 0);
         color += eyeAlphaIt->mul(*lightAlphaIt).mul(eyeBrdf).mul(lightBrdf) * (geometryTerm / nPaths);

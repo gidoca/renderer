@@ -106,7 +106,7 @@ float EnergyRedistributionRenderer::computeEd(const Scene &scene, gsl_rng *rng, 
     {
       QPointF pixelCoord(j, i);
       const Ray ray = scene.camera.getRay(pixelCoord);
-      ed += integrator.integrate(ray, *scene.object, scene.light, 4, rng);
+      ed += integrator.integrate(ray, *scene.object, scene.light, rng);
     }
   }
   return norm(ed) / (size.height() * size.width() * pathsPerPixel);

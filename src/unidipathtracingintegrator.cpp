@@ -11,7 +11,7 @@
 
 using namespace cv;
 
-Vec3f UniDiPathTracingIntegrator::integrate(const Ray& ray, const Intersectable& scene, const std::vector<const Light*> light, int, gsl_rng *rng) const
+Vec3f UniDiPathTracingIntegrator::integrate(const Ray& ray, const Intersectable& scene, const std::vector<const Light*> light, gsl_rng *rng) const
 {
   JitteredSampler sampler(1, 1, rng);
   Path path = Renderer::createPath(ray, scene, rng, Vec3f(1, 1, 1), terminationProb);
