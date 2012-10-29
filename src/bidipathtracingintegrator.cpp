@@ -50,7 +50,7 @@ Vec3f BiDiPathTracingIntegrator::integrate(const Ray &ray, const Intersectable &
         int pathLength = eyeInd + lightInd + 1;
         int nPaths = std::min<int>(pathLength - 1, eyePath.alphaValues.size()) + std::min<int>(pathLength - 2, lightPath.alphaValues.size()) + 2 - pathLength;
         assert(nPaths > 0);
-        color = color.mul(*eyeAlphaIt).mul(*lightAlphaIt).mul(eyeBrdf).mul(lightBrdf) * (geometryTerm / nPaths);
+        color += eyeAlphaIt->mul(*lightAlphaIt).mul(eyeBrdf).mul(lightBrdf) * (geometryTerm / nPaths);
       }
 
       eyeAlphaIt++;
