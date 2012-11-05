@@ -8,9 +8,13 @@
 class SymmetricFilter
 {
 public:
-    SymmetricFilter() {}
+    SymmetricFilter(int patchSize = 7, int windowRadius = 10) : patchSize(patchSize), windowRadius(windowRadius) {}
 
     cv::Mat filter(const cv::Mat & image, const cv::Mat &guide, const cv::Mat &pixvar);
+
+    const int patchSize;
+    const int windowRadius;
+
 };
 
 #endif // SYMMETRICFILTER_H

@@ -262,7 +262,7 @@ void MetropolisFltRenderer::render(const Scene & scene, Mat & film, const boost:
         cout << time.elapsed() / 1000 << "s elapsed, starting rendering pass " << i << "/" << (vm["metflt-num-passes"].as<int>() - 1) << endl;
     }
 
-    Mat importanceMap = channelMean(varOfFiltered) / (channelMean(filteredMean) + 1e-8) + 1e-8;
+    Mat importanceMap = channelMean(varOfFiltered) / (channelMean(filteredMean).mul(channelMean(filteredMean)) + 1e-2) + 1e-8;
 
     //Normalization needed for correct computation of weighted average
     importanceMap *= importanceMap.size().area() / sum(importanceMap)[0];

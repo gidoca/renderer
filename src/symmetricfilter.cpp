@@ -52,8 +52,6 @@ cv::Mat SymmetricFilter::filter(const cv::Mat &image, const cv::Mat &guide, cons
     Mat area = Mat::zeros(image.size(), CV_32F);
     Mat acc = Mat::zeros(image.size(), image.type());
 
-    const int patchSize = 7;
-    const int windowRadius = 10;
 
     const int padding = windowRadius;
 
