@@ -31,8 +31,12 @@
 #include <iostream>
 #include <list>
 #include <map>
+#include <algorithm>
 
 #include <QVector3D>
+#include <QDir>
+#include <QFileInfo>
+
 #include <opencv2/core/core.hpp>
 
 #include "triangle.h"
@@ -40,12 +44,19 @@
 #include "intersectablelist.h"
 #include "material.h"
 #include "bvh.h"
+#include "texturematerial.h"
+#include "diffusematerial.h"
 
 #define TOKEN_VERTEX_POS "v"
 #define TOKEN_VERTEX_NOR "vn"
 #define TOKEN_VERTEX_TEX "vt"
 #define TOKEN_FACE "f"
 #define TOKEN_MATERIAL "usemtl"
+#define TOKEN_MATERIAL_LIB "mtllib"
+
+#define TOKEN_NEW_MATERIAL "newmtl"
+#define TOKEN_DIFFUSE_COLOR "Kd"
+#define TOKEN_DIFFUSE_TEXTURE "map_Kd"
 
 struct ObjMeshVertex{
     QVector3D pos;
@@ -108,7 +119,7 @@ void read_indices(_ObjMeshFaceIndex& face_index, int i, std::stringstream& str_s
     }
 }
 
-/* Call this function to load a model, only loads triangulated meshes */
+/* Call this function to load a model */
 Intersectable *ObjReader::getMesh(std::string filename, Material *defaultMaterial, std::map<std::string, Material*> materials){
     ObjMesh myMesh;
 
@@ -128,6 +139,8 @@ Intersectable *ObjReader::getMesh(std::string filename, Material *defaultMateria
 
     std::ifstream filestream;
     filestream.open(filename.c_str());
+
+    QFileInfo objInfo = QFileInfo(QString(filename.c_str()));
 
     Material *currentMaterial = defaultMaterial;
 
@@ -183,6 +196,12 @@ Intersectable *ObjReader::getMesh(std::string filename, Material *defaultMateria
                 currentMaterial = defaultMaterial;
             }
         }
+        else if(type_str == TOKEN_MATERIAL_LIB){
+            std::string mtl_filename;
+            str_stream >> mtl_filename;
+
+            getMaterials(objInfo.dir().filePath(QString(mtl_filename.c_str())).toStdString(), materials);
+        }
     }
     // Explicit closing of the file
     filestream.close();
@@ -206,5 +225,54 @@ Intersectable *ObjReader::getMesh(std::string filename, Material *defaultMateria
         myMesh.faces.push_back(face);
     }
 
-    return BVHNode::create(new IntersectableList(myMesh.faces), 5);
+    return BVHNode::create(new IntersectableList(myMesh.faces), 6);
+}
+
+void createMaterial(cv::Vec3f diffuseColor, QDir dir, std::string textureFilename, std::string materialName, std::map<std::string, Material*> &materials)
+{
+    if(!textureFilename.empty())
+    {
+        std::replace(textureFilename.begin(), textureFilename.end(), '\\', '/');
+        textureFilename = dir.filePath(QString(textureFilename.c_str())).toStdString();
+        TextureMaterial* mat = new TextureMaterial();
+        if(mat->load(textureFilename))
+        {
+            materials[materialName] = mat;
+        }
+    }
+    else if(diffuseColor != cv::Vec3f())
+    {
+        materials[materialName] = new DiffuseMaterial(diffuseColor);
+    }
+}
+
+void ObjReader::getMaterials(std::string filename, std::map<std::string, Material*> &materials)
+{
+    std::ifstream filestream;
+    filestream.open(filename.c_str());
+
+    QFileInfo objInfo = QFileInfo(QString(filename.c_str()));
+
+    std::string current_material_name;
+    cv::Vec3f current_diffuse_color;
+    std::string current_texture_filename;
+
+    std::string line_stream;
+    while(std::getline(filestream, line_stream)){
+        std::stringstream str_stream(line_stream);
+        std::string type_str;
+        str_stream >> type_str;
+
+        if(type_str == TOKEN_NEW_MATERIAL){
+            createMaterial(current_diffuse_color, objInfo.dir(), current_texture_filename, current_material_name, materials);
+            str_stream >> current_material_name;
+        }
+        else if(type_str == TOKEN_DIFFUSE_COLOR){
+            str_stream >> current_diffuse_color[2] >> current_diffuse_color[1] >> current_diffuse_color[0];
+        }
+        else if(type_str == TOKEN_DIFFUSE_TEXTURE){
+            str_stream >> current_texture_filename;
+        }
+    }
+    createMaterial(current_diffuse_color, objInfo.dir(), current_texture_filename, current_material_name, materials);
 }

@@ -10,6 +10,7 @@ class ObjReader
 {
   public:
     static Intersectable* getMesh(std::string fileName, Material * defaultMaterial, std::map<std::string, Material*> materials);
+    static void getMaterials(std::string filename, std::map<std::string, Material*> &materials);
 };
 
 #endif
