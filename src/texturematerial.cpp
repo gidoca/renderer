@@ -9,6 +9,11 @@
 
 using namespace cv;
 
+inline float clamp(float x)
+{
+    return x <= 0 ? 0 : (x >= 1 ? 1 : x);
+}
+
 bool TextureMaterial::load(std::string filename)
 {
     Mat img = imread(filename);
@@ -32,5 +37,5 @@ cv::Vec3f TextureMaterial::shade(const HitRecord & hit, QVector3D) const
 
 cv::Vec3f TextureMaterial::get(Point2f location) const
 {
-    return texture.at<Vec3f>(Point2i(location.x * (texture.size().height - 1), location.y * (texture.size().width - 1)));
+    return texture.at<Vec3f>(Point2i(clamp(location.x) * (texture.size().height - 1), clamp(location.y) * (texture.size().width - 1)));
 }
