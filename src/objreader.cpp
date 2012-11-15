@@ -232,6 +232,7 @@ void createMaterial(cv::Vec3f diffuseColor, QDir dir, std::string textureFilenam
 {
     if(!textureFilename.empty())
     {
+        // This is a fix for broken mtl files that use the Windows path separator convention
         std::replace(textureFilename.begin(), textureFilename.end(), '\\', '/');
         textureFilename = dir.filePath(QString(textureFilename.c_str())).toStdString();
         TextureMaterial* mat = new TextureMaterial();

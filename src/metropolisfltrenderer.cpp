@@ -219,6 +219,7 @@ void MetropolisFltRenderer::render(const Scene & scene, Mat & film, const boost:
   assert(checkRange(varvar));
 
   SymmetricFilter f;
+  SymmetricFilter varF(1, 2);
 
   Mat filteredVar;
   if(vm.count("metflt-omit-filter") || vm.count("metflt-omit-variance-filter"))
@@ -227,7 +228,7 @@ void MetropolisFltRenderer::render(const Scene & scene, Mat & film, const boost:
   }
   else
   {
-      filteredVar = f.filter(noisy_variance, meanvar, varvar);
+      filteredVar = varF.filter(noisy_variance, meanvar, varvar);
   }
 
   imwrite("/tmp/film0.exr", films[0]);
