@@ -77,19 +77,21 @@ struct _ObjMeshFaceIndex{
     Material* material;
 };
 
-inline void read_index(std::stringstream& str_stream, int& dest, int total_num)
+inline bool read_index(std::stringstream& str_stream, int& dest, int total_num)
 {
     str_stream >> dest;
+    if(str_stream.fail()) return false;
     if(dest < 0)
     {
         dest += total_num + 1;
     }
+    return true;
 }
 
-void read_indices(_ObjMeshFaceIndex& face_index, int i, std::stringstream& str_stream, int num_positions, int num_texcoords, int num_normals)
+bool read_indices(_ObjMeshFaceIndex& face_index, int i, std::stringstream& str_stream, int num_positions, int num_texcoords, int num_normals)
 {
     char interupt;
-    read_index(str_stream, face_index.pos_index[i], num_positions);
+    if(!read_index(str_stream, face_index.pos_index[i], num_positions)) return false;
     if(str_stream.peek() == '/')
     {
         str_stream >> interupt;
@@ -99,13 +101,13 @@ void read_indices(_ObjMeshFaceIndex& face_index, int i, std::stringstream& str_s
         }
         else
         {
-            read_index(str_stream, face_index.tex_index[i], num_texcoords);
+            if(!read_index(str_stream, face_index.tex_index[i], num_texcoords)) return false;
         }
 
         if(str_stream.peek() == '/')
         {
             str_stream >> interupt;
-            read_index(str_stream, face_index.nor_index[i], num_normals);
+            if(!read_index(str_stream, face_index.nor_index[i], num_normals)) return false;
         }
         else
         {
@@ -117,6 +119,7 @@ void read_indices(_ObjMeshFaceIndex& face_index, int i, std::stringstream& str_s
         face_index.tex_index[i] = 0;
         face_index.nor_index[i] = 0;
     }
+    return true;
 }
 
 /* Call this function to load a model */
@@ -184,10 +187,10 @@ Intersectable *ObjReader::getMesh(std::string filename, Material *defaultMateria
                 triangle_index.pos_index[1] = triangle_index.pos_index[2];
                 triangle_index.nor_index[1] = triangle_index.nor_index[2];
                 triangle_index.tex_index[1] = triangle_index.tex_index[2];
-                read_indices(triangle_index, 2, str_stream, positions.size(), texcoords.size(), normals.size());
-                triangles.push_back(triangle_index);
-                char unused;
-                while(str_stream.peek() == ' ') str_stream >> unused;
+                if(read_indices(triangle_index, 2, str_stream, positions.size(), texcoords.size(), normals.size()))
+                {
+                    triangles.push_back(triangle_index);
+                }
             }
             num_faces++;
         }else if(type_str == TOKEN_MATERIAL){
