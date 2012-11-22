@@ -57,5 +57,5 @@ cv::Vec3f TextureMaterial::shade(const HitRecord & hit, QVector3D) const
 
 cv::Vec3f TextureMaterial::get(Point2f location) const
 {
-    return texture.at<Vec3f>(Point2i(clamp(location.x) * (texture.size().width - 1), clamp(location.y) * (texture.size().height - 1)));
+    return texture.at<Vec3f>(Point2i(clamp(location.x) * (texture.size().width - 1), clamp(1 - location.y) * (texture.size().height - 1)));
 }
