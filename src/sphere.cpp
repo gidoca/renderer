@@ -22,6 +22,7 @@
 
 #include <cmath>
 #include <limits>
+#include <iostream>
 
 #include "axisalignedbox.h"
 
@@ -40,6 +41,7 @@ IntersectionParameter Sphere::getCSGIntersection(Ray ray) const
 
     QVector3D location = ray.evaluate(result.intersections.front());
     result.normal = location - center;
+    result.texcoord = cv::Point2f(acosf(result.normal.z() / radius) / M_PI, atan2(result.normal.x(), result.normal.y()) / M_PI / 2 + 0.5f);
   }
   result.material = material;
   return result;

@@ -37,7 +37,7 @@ HitRecord CSGObject::intersect(Ray ray, float from, float to) const
       }
       else
       {
-        return HitRecord(*i, ray, parameter.material, parameter.normal);
+        return HitRecord(*i, ray, parameter.material, parameter.normal, parameter.texcoord);
       }
     }
   }

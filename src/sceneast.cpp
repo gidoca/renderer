@@ -124,7 +124,15 @@ struct material_builder : boost::static_visitor<Material*>
 
   Material* operator()(std::vector<char> identifier) const
   {
-      return materials[std::string(identifier.begin(), identifier.end())];
+      Material* material = materials[std::string(identifier.begin(), identifier.end())];
+      if(material == 0)
+      {
+          return DarkMatter::getInstance();
+      }
+      else
+      {
+          return material;
+      }
   }
 
   std::map<std::string, Material*>& materials;

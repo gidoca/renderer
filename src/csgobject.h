@@ -24,6 +24,8 @@
 #include "global.h"
 #include "intersectable.h"
 
+#include <opencv2/core/core.hpp>
+
 class IntersectionParameter
 {
   public:
@@ -33,6 +35,7 @@ class IntersectionParameter
     }
     std::list<float> intersections;
     QVector3D normal;
+    cv::Point2f texcoord;
     Material* material;
 };
 
