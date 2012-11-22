@@ -109,7 +109,11 @@ struct material_builder : boost::static_visitor<Material*>
   Material* operator()(ast_texture_material material) const
   {
     TextureMaterial* out = new TextureMaterial();
-    out->load(material.filename);
+    if(!out->load(material.filename))
+    {
+        delete out;
+        return DarkMatter::getInstance();
+    }
     return out;
   }
 
