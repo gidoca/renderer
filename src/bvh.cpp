@@ -34,10 +34,10 @@ BVHNode::BVHNode(Intersectable* left, Intersectable* right, AxisAlignedBox* bb) 
 
 }
 
-Intersectable* BVHNode::create(IntersectableList* list, int maxDepth)
+Intersectable* BVHNode::create(IntersectableList* list)
 {
   std::list< Intersectable* > intersectables = list->getComponents();
-  if(intersectables.size() == 1 || maxDepth == 0) return list;
+  if(intersectables.size() <= 5) return list;
   
   AxisAlignedBox * bb = list->boundingBox();
   QVector3D diff = bb->getMax() - bb->getMin();
@@ -49,15 +49,18 @@ Intersectable* BVHNode::create(IntersectableList* list, int maxDepth)
   for(std::list< Intersectable* >::const_iterator i = intersectables.begin(); i != intersectables.end(); i++)
   {
     AxisAlignedBox * curbb = (*i)->boundingBox();
-    float min, max;
+    float min, max, center;
     min = get(curbb->getMin(), splitAxis);
     max = get(curbb->getMax(), splitAxis);
-    if(min < splitPlane) left.push_back(*i);
-    if(splitPlane < max) right.push_back(*i);
+    center = (min + max) / 2;
+    if(center < splitPlane) left.push_back(*i);
+    if(splitPlane <= center) right.push_back(*i);
     delete curbb;
   }
-  //TODO delete all those intermediate list
-  BVHNode* node = new BVHNode(create(new IntersectableList(left), maxDepth - 1), create(new IntersectableList(right), maxDepth - 1), bb);
+  if(left.size() == 0 || right.size() == 0) return list;
+
+  //TODO delete all those intermediate lists
+  BVHNode* node = new BVHNode(create(new IntersectableList(left)), create(new IntersectableList(right)), bb);
   return node;
 }
 
