@@ -33,9 +33,6 @@ void var(Mat &mean, Mat &var, vector<Mat> in)
       sqr_sum += in[i].mul(in[i]);
     }
 
-    mean.create(sum.size(), sum.type());
-    var.create(sum.size(), sum.type());
-
     mean = sum * (1. / in.size());
     var = max((sqr_sum - sum.mul(mean)) / (in.size() - 1), 0);
 }

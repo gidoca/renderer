@@ -33,7 +33,7 @@
 #include <algorithm>
 #include <iostream>
 
-#ifdef NDEBUG
+#ifdef USE_OPENMP
 #include <omp.h>
 #endif
 
@@ -47,7 +47,7 @@ using namespace boost::program_options;
 using namespace cv;
 
 MetropolisFltRenderer::MetropolisFltRenderer() :
-#ifdef NDEBUG
+#ifdef USE_OPENMP
     numThreads(omp_get_max_threads())
 #else
     numThreads(1)

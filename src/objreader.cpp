@@ -235,6 +235,7 @@ Intersectable *ObjReader::getMesh(std::string filename, Material *defaultMateria
 
 void createMaterial(cv::Vec3f diffuseColor, QDir dir, std::string textureFilename, std::string materialName, std::map<std::string, Material*> &materials)
 {
+    bool noTexture = true;
     if(!textureFilename.empty())
     {
         // This is a fix for broken mtl files that use the Windows path separator convention
@@ -244,9 +245,11 @@ void createMaterial(cv::Vec3f diffuseColor, QDir dir, std::string textureFilenam
         if(mat->load(textureFilename))
         {
             materials[materialName] = mat;
+            noTexture = false;
         }
     }
-    else if(diffuseColor != cv::Vec3f())
+
+    if(diffuseColor != cv::Vec3f() && noTexture)
     {
         materials[materialName] = new DiffuseMaterial(diffuseColor);
     }

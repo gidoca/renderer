@@ -51,7 +51,7 @@ struct initializer
 
   template< typename R > void operator()(R)
   {
-    if(name == R::name)
+    if(name == R::name && *renderer == 0)
     {
       *renderer = new R();
     }
