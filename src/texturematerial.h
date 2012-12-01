@@ -34,6 +34,7 @@ class TextureMaterial : public Material
 {
 public:
     TextureMaterial() {}
+    virtual ~TextureMaterial() {}
 
     bool load(std::string filename);
     cv::Vec3f shade(const HitRecord & hit, QVector3D direction) const;

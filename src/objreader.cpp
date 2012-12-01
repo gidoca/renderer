@@ -230,7 +230,7 @@ Intersectable *ObjReader::getMesh(std::string filename, Material *defaultMateria
         myMesh.faces.push_back(face);
     }
 
-    return BVHNode::create(new IntersectableList(myMesh.faces), 6);
+    return BVHNode::create(new IntersectableList(myMesh.faces));
 }
 
 void createMaterial(cv::Vec3f diffuseColor, QDir dir, std::string textureFilename, std::string materialName, std::map<std::string, Material*> &materials)
