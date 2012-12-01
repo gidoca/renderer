@@ -66,7 +66,7 @@ struct ObjMeshVertex{
 
 /* This contains a list of triangles */
 struct ObjMesh{
-    std::list<Intersectable*> faces;
+    std::vector<Intersectable*> faces;
 };
 
 /* Internal structure */
@@ -212,6 +212,8 @@ Intersectable *ObjReader::getMesh(std::string filename, Material *defaultMateria
     filestream.close();
 
     std::cout << "ObjReader: " << triangles.size() << " triangles, " << num_faces << " faces" << std::endl;
+
+    myMesh.faces.reserve(triangles.size());
 
     for(size_t i = 0; i < triangles.size(); ++i){
         Triangle *face;

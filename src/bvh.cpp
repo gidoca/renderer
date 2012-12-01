@@ -24,40 +24,55 @@
 #include "vechelper.h"
 
 #include <list>
+#include <algorithm>
 
 #include <QVector3D>
 
 using namespace std;
+
+class IntersectableComparator
+{
+public:
+    IntersectableComparator(int splitAxis) : splitAxis(splitAxis) {}
+
+    bool operator()(Intersectable* a, Intersectable* b)
+    {
+        AxisAlignedBox *bb1 = a->boundingBox(), *bb2 = b->boundingBox();
+
+        float leftCenter = get(bb1->getMax() - bb1->getMin(), splitAxis) / 2;
+        float rightCenter = get(bb2->getMax() - bb2->getMin(), splitAxis) / 2;
+        delete bb1;
+        delete bb2;
+        return leftCenter < rightCenter;
+    }
+
+private:
+    int splitAxis;
+};
 
 BVHNode::BVHNode(Intersectable* left, Intersectable* right, AxisAlignedBox* bb) : bb(bb), left(left), right(right)
 {
 
 }
 
-Intersectable* BVHNode::create(IntersectableList* list, int maxDepth)
+Intersectable* BVHNode::create(IntersectableList* list)
 {
-  std::list< Intersectable* > intersectables = list->getComponents();
-  if(intersectables.size() == 1 || maxDepth == 0) return list;
+  std::vector< Intersectable* > intersectables = list->getComponents();
+  if(intersectables.size() == 1) return intersectables.front();
   
   AxisAlignedBox * bb = list->boundingBox();
   QVector3D diff = bb->getMax() - bb->getMin();
   int splitAxis = (diff.x() > diff.y() && diff.x() > diff.z() ? 0 : (diff.y() > diff.z() ? 1 : 2));
-  QVector3D splitPlanes = bb->getMin() + diff / 2;
-  float splitPlane = get(splitPlanes, splitAxis);
+  IntersectableComparator comparator(splitAxis);
+  sort(intersectables.begin(), intersectables.end(), comparator);
   
-  std::list< Intersectable* > left, right;
-  for(std::list< Intersectable* >::const_iterator i = intersectables.begin(); i != intersectables.end(); i++)
-  {
-    AxisAlignedBox * curbb = (*i)->boundingBox();
-    float min, max;
-    min = get(curbb->getMin(), splitAxis);
-    max = get(curbb->getMax(), splitAxis);
-    if(min < splitPlane) left.push_back(*i);
-    if(splitPlane < max) right.push_back(*i);
-    delete curbb;
-  }
-  //TODO delete all those intermediate list
-  BVHNode* node = new BVHNode(create(new IntersectableList(left), maxDepth - 1), create(new IntersectableList(right), maxDepth - 1), bb);
+  auto it0 = intersectables.begin(), it1 = intersectables.begin() + intersectables.size() / 2, it2 = intersectables.end();
+  std::vector< Intersectable* > left(it0, it1), right(it1, it2);
+
+  if(left.size() == 0 || right.size() == 0) return list;
+
+  //TODO delete all those intermediate lists
+  BVHNode* node = new BVHNode(create(new IntersectableList(left)), create(new IntersectableList(right)), bb);
   return node;
 }
 

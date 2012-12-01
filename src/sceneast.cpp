@@ -41,6 +41,7 @@
 #include <boost/variant/apply_visitor.hpp>
 
 #include <list>
+#include <vector>
 #include <map>
 
 #include <QMatrix4x4>
@@ -198,7 +199,8 @@ struct intersectable_builder : boost::static_visitor<Intersectable*>
 
 Intersectable* intersectable_builder::operator()(ast_intersectable_list const& l) const
 {
-  list<Intersectable*> intersectables;
+  vector<Intersectable*> intersectables;
+  intersectables.reserve(l.children.size());
 
   BOOST_FOREACH( ast_intersectable n, l.children )
   {
