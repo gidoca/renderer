@@ -25,6 +25,7 @@
 
 #include <list>
 #include <algorithm>
+#include <iostream>
 
 #include <QVector3D>
 
@@ -39,8 +40,8 @@ public:
     {
         AxisAlignedBox *bb1 = a->boundingBox(), *bb2 = b->boundingBox();
 
-        float leftCenter = get(bb1->getMax() - bb1->getMin(), splitAxis) / 2;
-        float rightCenter = get(bb2->getMax() - bb2->getMin(), splitAxis) / 2;
+        float leftCenter = get(bb1->getMax() + bb1->getMin(), splitAxis) / 2;
+        float rightCenter = get(bb2->getMax() + bb2->getMin(), splitAxis) / 2;
         delete bb1;
         delete bb2;
         return leftCenter < rightCenter;
