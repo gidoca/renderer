@@ -33,7 +33,7 @@ HitRecord IntersectableList::intersect(Ray ray, float from, float to) const
 
   HitRecord hit;
 
-  for(std::list< Intersectable* >::const_iterator i = components.begin(); i != components.end(); i++)
+  for(auto i = components.begin(); i != components.end(); i++)
   {
     const Intersectable & component = **i;
     HitRecord currentHit = component.intersect(ray, from, (to < hit.getRayParameter() ? to : hit.getRayParameter()));
@@ -49,7 +49,7 @@ AxisAlignedBox * IntersectableList::boundingBox() const
 {
   QVector3D min(std::numeric_limits< float >::infinity(), std::numeric_limits< float >::infinity(), std::numeric_limits< float >::infinity());
   QVector3D max = -min;
-  for(std::list<Intersectable*>::const_iterator i = components.begin(); i != components.end(); i++)
+  for(auto i = components.begin(); i != components.end(); i++)
   {
     AxisAlignedBox * boundingBox = (*i)->boundingBox();
     QVector3D currentMin = boundingBox->getMin();
@@ -66,7 +66,7 @@ AxisAlignedBox * IntersectableList::boundingBox() const
 }
 
 
-std::list< Intersectable* > IntersectableList::getComponents() const
+std::vector< Intersectable* > IntersectableList::getComponents() const
 {
   return components;
 }

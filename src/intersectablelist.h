@@ -25,13 +25,13 @@
 #include "intersectable.h"
 #include "axisalignedbox.h"
 
-#include <list>
+#include <vector>
 
 class IntersectableList : public Intersectable
 {
 
   public:
-    IntersectableList(std::list<Intersectable*> components) : components(components)
+    IntersectableList(std::vector<Intersectable*> components) : components(components)
     {
 
     }
@@ -42,10 +42,10 @@ class IntersectableList : public Intersectable
     HitRecord intersect(Ray ray, float from, float to) const;
     AxisAlignedBox* boundingBox() const;
     
-    std::list< Intersectable* > getComponents() const;
+    std::vector< Intersectable* > getComponents() const;
 
   private:
-    std::list<Intersectable* > components;
+    std::vector<Intersectable* > components;
   
 };
 
