@@ -126,6 +126,10 @@ int main(int argc, char **argv) {
     return -1;
   }
 
+  cout << "Loading scene..." << endl;
+  QTime time;
+  time.start();
+
   SceneGrammar parser;
   if(!vm.count("scene"))
   {
@@ -139,7 +143,9 @@ int main(int argc, char **argv) {
   }
 
   Scene scene = buildScene(parser.getAst());
-  
+
+  if(vm.count("verbose")) cout << "Scene loaded in " << time.elapsed() / 1000 << "s" << endl;
+
   cv::Mat * film = new cv::Mat(scene.camera.getResolution().height(), scene.camera.getResolution().width(), CV_32FC3);
   film->setTo(cv::Vec3f(0, 0, 0));
   QFuture< void > future = QtConcurrent::run(render, renderer, film, scene, vm);
