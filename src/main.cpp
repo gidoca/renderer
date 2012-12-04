@@ -60,10 +60,8 @@ struct option_adder
   }
 };
 
-void render(Renderer * renderer, cv::Mat *film, Scene scene, variables_map vm)
+void render(Renderer * renderer, cv::Mat *film, Scene scene, variables_map vm, QTime time)
 {  
-  QTime time;
-  time.start();
   renderer->render(scene, *film, vm);
   if(vm.count("save-exr")) {
       imwrite(vm["save-exr"].as<string>(), *film);
@@ -78,6 +76,9 @@ void render(Renderer * renderer, cv::Mat *film, Scene scene, variables_map vm)
 }
 
 int main(int argc, char **argv) {
+  QTime time;
+  time.start();
+
   QApplication app(argc, argv);
   options_description command_line_options;
 
@@ -126,9 +127,7 @@ int main(int argc, char **argv) {
     return -1;
   }
 
-  cout << "Loading scene..." << endl;
-  QTime time;
-  time.start();
+  if(vm.count("verbose")) cout << "Loading scene..." << endl;
 
   SceneGrammar parser;
   if(!vm.count("scene"))
@@ -144,11 +143,11 @@ int main(int argc, char **argv) {
 
   Scene scene = buildScene(parser.getAst());
 
-  if(vm.count("verbose")) cout << "Scene loaded in " << time.elapsed() / 1000 << "s" << endl;
+  if(vm.count("verbose")) cout << "Scene loaded, " << time.elapsed() / 1000 << "s elapsed." << endl;
 
   cv::Mat * film = new cv::Mat(scene.camera.getResolution().height(), scene.camera.getResolution().width(), CV_32FC3);
   film->setTo(cv::Vec3f(0, 0, 0));
-  QFuture< void > future = QtConcurrent::run(render, renderer, film, scene, vm);
+  QFuture< void > future = QtConcurrent::run(render, renderer, film, scene, vm, time);
   
   if(vm.count("gui") || (!vm.count("save-exr") && !vm.count("save-img")))
   {

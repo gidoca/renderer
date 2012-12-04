@@ -43,6 +43,7 @@
 #include <list>
 #include <vector>
 #include <map>
+#include <iostream>
 
 #include <QMatrix4x4>
 
@@ -186,7 +187,12 @@ struct intersectable_builder : boost::static_visitor<Intersectable*>
 
   Intersectable* operator()(const ast_obj& o) const
   {
-      return ObjReader::getMesh(o.filename.c_str(), boost::apply_visitor(material_b, o.material), materials);
+      Intersectable* mesh = ObjReader::getMesh(o.filename.c_str(), boost::apply_visitor(material_b, o.material), materials);
+      AxisAlignedBox* bb = mesh->boundingBox();
+      QVector3D min = bb->getMin(), max = bb->getMax();
+      delete bb;
+      std::cout << "Mesh bb min: " << min.x() << "," << min.y() << "," << min.z() << "; max: " << max.x() << "," << max.y() << "," << max.z() << std::endl;
+      return mesh;
   }
 
   Intersectable* operator()(const ast_intersectable_list& l) const;
