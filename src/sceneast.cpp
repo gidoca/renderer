@@ -81,6 +81,13 @@ struct matrix_evaluator : boost::static_visitor<QMatrix4x4>
         matrix.scale(matrix_scale.factor);
         return matrix;
     }
+
+    QMatrix4x4 operator()(ast_matrix_scale_vect matrix_scale) const
+    {
+        QMatrix4x4 matrix;
+        matrix.scale(matrix_scale.factor.asQVector());
+        return matrix;
+    }
 };
 
 QMatrix4x4 ast_matrix::asQMatrix4x4() const

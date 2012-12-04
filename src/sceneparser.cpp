@@ -71,9 +71,11 @@ SceneGrammar::SceneGrammar() : SceneGrammar::base_type(assignments_rule, "inters
   matrix_rotate_rule.name("rotation matrix");
   matrix_scale_rule %= boost::spirit::lit("scale") >> "(" >> boost::spirit::tag::float_() >>  ")";
   matrix_scale_rule.name("scale matrix");
+  matrix_scale_vect_rule %= boost::spirit::lit("scale") >> "(" >> vector3_literal_rule >>  ")";
+  matrix_scale_vect_rule.name("scale matrix non-uniformely");
   matrix_rule %= basic_matrix_rule >> *(boost::spirit::lit("*") >> basic_matrix_rule);
   matrix_rule.name("matrix");
-  basic_matrix_rule %= matrix_literal_rule | matrix_translate_rule | matrix_rotate_rule | matrix_scale_rule;
+  basic_matrix_rule %= matrix_literal_rule | matrix_translate_rule | matrix_rotate_rule | matrix_scale_rule | matrix_scale_vect_rule;
   basic_matrix_rule.name("basic matrix");
 
   diffuse_material_rule %= boost::spirit::lit("diffuse") >> "(" >> vector3_literal_rule >> ")";

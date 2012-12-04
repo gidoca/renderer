@@ -100,11 +100,17 @@ struct ast_matrix_scale
   float factor;
 };
 
+struct ast_matrix_scale_vect
+{
+  ast_vector3_literal factor;
+};
+
 typedef boost::variant<
     ast_matrix_literal,
     ast_matrix_translate,
     ast_matrix_rotate,
-    ast_matrix_scale
+    ast_matrix_scale,
+    ast_matrix_scale_vect
     > ast_basic_matrix;
 
 struct ast_matrix
@@ -290,6 +296,11 @@ BOOST_FUSION_ADAPT_STRUCT(
 BOOST_FUSION_ADAPT_STRUCT(
     ast_matrix_scale,
     (float, factor)
+)
+
+BOOST_FUSION_ADAPT_STRUCT(
+    ast_matrix_scale_vect,
+    (ast_vector3_literal, factor)
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
