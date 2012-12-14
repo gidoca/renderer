@@ -64,7 +64,7 @@ void PerPixelRenderer::render(const Scene & scene, cv::Mat & film, const boost::
     gsl_rng_set(rng, film.size().height * seed + i);
     if(vm.count("verbose"))
     {
-      std::cout << i * 100 / film.size().height << "% complete, ETA: " << time.elapsed() * (film.size().height - i) / ((i + 1) * 1000) << "s" << std::endl;
+      std::cout << i * 100 / film.size().height << "% complete, ETA: " << (long)time.elapsed() * (film.size().height - i) / ((i + 1) * 1000) << "s" << std::endl;
     }
     Vec3f * scanline = film.ptr<Vec3f>(i);
     for(int j = 0; j < film.size().width; j++)
