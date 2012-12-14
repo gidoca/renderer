@@ -27,6 +27,7 @@
 #include "intersectableinstance.h"
 #include "intersectablelist.h"
 #include "diffusematerial.h"
+#include "phongmaterial.h"
 #include "mirrormaterial.h"
 #include "texturematerial.h"
 #include "transparentmaterial.h"
@@ -108,6 +109,11 @@ struct material_builder : boost::static_visitor<Material*>
   Material* operator()(ast_diffuse_material material) const
   {
     return new DiffuseMaterial(material.color.asSpectrum());
+  }
+
+  Material* operator()(ast_phong_material material) const
+  {
+    return new PhongMaterial(material.diffuse.asSpectrum(), material.specular.asSpectrum(), material.specular_coeff);
   }
 
   Material* operator()(ast_mirror_material material) const

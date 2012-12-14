@@ -46,6 +46,8 @@
 #include "bvh.h"
 #include "texturematerial.h"
 #include "diffusematerial.h"
+#include "phongmaterial.h"
+#include "darkmatter.h"
 
 #define TOKEN_VERTEX_POS "v"
 #define TOKEN_VERTEX_NOR "vn"
@@ -57,6 +59,8 @@
 #define TOKEN_NEW_MATERIAL "newmtl"
 #define TOKEN_DIFFUSE_COLOR "Kd"
 #define TOKEN_DIFFUSE_TEXTURE "map_Kd"
+#define TOKEN_SPECULAR_COLOR "Ks"
+#define TOKEN_SPECULAR_COEFFICIENT "Ns"
 
 struct ObjMeshVertex{
     QVector3D pos;
@@ -235,9 +239,8 @@ Intersectable *ObjReader::getMesh(std::string filename, Material *defaultMateria
     return BVHNode::create(new IntersectableList(myMesh.faces));
 }
 
-void createMaterial(cv::Vec3f diffuseColor, QDir dir, std::string textureFilename, std::string materialName, std::map<std::string, Material*> &materials)
+void createMaterial(cv::Vec3f diffuseColor, cv::Vec3f specularColor, float specularCoefficient, QDir dir, std::string textureFilename, std::string materialName, std::map<std::string, Material*> &materials)
 {
-    bool noTexture = true;
     if(!textureFilename.empty())
     {
         // This is a fix for broken mtl files that use the Windows path separator convention
@@ -247,14 +250,24 @@ void createMaterial(cv::Vec3f diffuseColor, QDir dir, std::string textureFilenam
         if(mat->load(textureFilename))
         {
             materials[materialName] = mat;
-            noTexture = false;
+            return;
         }
     }
 
-    if(diffuseColor != cv::Vec3f() && noTexture)
+    if(diffuseColor != cv::Vec3f())
     {
-        materials[materialName] = new DiffuseMaterial(diffuseColor);
+        if(specularColor == cv::Vec3f() || specularCoefficient == 0)
+        {
+            materials[materialName] = new DiffuseMaterial(diffuseColor);
+        }
+        else
+        {
+            materials[materialName] = new PhongMaterial(diffuseColor, cv::Vec3f(), specularCoefficient);
+        }
+        return;
     }
+
+    materials[materialName] = DarkMatter::getInstance();
 }
 
 void ObjReader::getMaterials(std::string filename, std::map<std::string, Material*> &materials)
@@ -267,6 +280,8 @@ void ObjReader::getMaterials(std::string filename, std::map<std::string, Materia
     std::string current_material_name;
     cv::Vec3f current_diffuse_color;
     std::string current_texture_filename;
+    cv::Vec3f current_specular_color;
+    float current_specular_coefficient = 0;
 
     std::string line_stream;
     while(std::getline(filestream, line_stream)){
@@ -275,7 +290,7 @@ void ObjReader::getMaterials(std::string filename, std::map<std::string, Materia
         str_stream >> type_str;
 
         if(type_str == TOKEN_NEW_MATERIAL){
-            createMaterial(current_diffuse_color, objInfo.dir(), current_texture_filename, current_material_name, materials);
+            createMaterial(current_diffuse_color, current_specular_color, current_specular_coefficient, objInfo.dir(), current_texture_filename, current_material_name, materials);
             str_stream >> current_material_name;
         }
         else if(type_str == TOKEN_DIFFUSE_COLOR){
@@ -284,6 +299,12 @@ void ObjReader::getMaterials(std::string filename, std::map<std::string, Materia
         else if(type_str == TOKEN_DIFFUSE_TEXTURE){
             str_stream >> current_texture_filename;
         }
+        else if(type_str == TOKEN_SPECULAR_COLOR){
+            str_stream >> current_specular_color[2] >> current_specular_color[1] >> current_specular_color[0];
+        }
+        else if(type_str == TOKEN_SPECULAR_COEFFICIENT){
+            str_stream >> current_specular_coefficient;
+        }
     }
-    createMaterial(current_diffuse_color, objInfo.dir(), current_texture_filename, current_material_name, materials);
+    createMaterial(current_diffuse_color, current_specular_color, current_specular_coefficient, objInfo.dir(), current_texture_filename, current_material_name, materials);
 }

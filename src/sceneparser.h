@@ -79,6 +79,7 @@ private:
   qi::rule<std::string::iterator, ast_matrix(), boost::spirit::ascii::space_type> matrix_rule;
 
   qi::rule<std::string::iterator, ast_diffuse_material(), boost::spirit::ascii::space_type> diffuse_material_rule;
+  qi::rule<std::string::iterator, ast_phong_material(), boost::spirit::ascii::space_type> phong_material_rule;
   qi::rule<std::string::iterator, ast_mirror_material(), boost::spirit::ascii::space_type> mirror_material_rule;
   qi::rule<std::string::iterator, ast_texture_material(), boost::spirit::ascii::space_type> texture_material_rule;
   qi::rule<std::string::iterator, ast_refractive_material(), boost::spirit::ascii::space_type> refractive_material_rule;
