@@ -28,6 +28,7 @@ class BVHNode : public Intersectable
 {
 public:
   BVHNode(Intersectable * left, Intersectable * right, AxisAlignedBox * bb);
+  // Note that this method will delete the list in the end
   static Intersectable* create(IntersectableList * list);
   virtual AxisAlignedBox* boundingBox() const;
   virtual HitRecord intersect(Ray ray, float from, float to) const;  

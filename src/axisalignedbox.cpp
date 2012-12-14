@@ -87,10 +87,10 @@ QVector3D AxisAlignedBox::getMax() const
 
 void AxisAlignedBox::includePoint(QVector3D point)
 {
-  if(point.x() < min.x()) min.setX(point.x());
-  if(point.y() < min.y()) min.setY(point.y());
-  if(point.z() < min.z()) min.setZ(point.z());
-  if(point.x() > max.x()) max.setX(point.x());
-  if(point.y() > max.y()) max.setY(point.y());
-  if(point.z() > max.z()) max.setZ(point.z());
+    for(int i = 0; i < 3; i++)
+    {
+        float p = get(point, i);
+        if(p < get(min, i)) set(min, i, p);
+        if(p > get(max, i)) set(max, i, p);
+    }
 }
