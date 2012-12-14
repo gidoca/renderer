@@ -56,6 +56,7 @@ public:
   QVector3D getMax() const;
     
   void includePoint(QVector3D point);
+  void includeOther(const AxisAlignedBox *box);
   
 private:
   Material* material;

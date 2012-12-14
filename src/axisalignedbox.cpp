@@ -94,3 +94,9 @@ void AxisAlignedBox::includePoint(QVector3D point)
         if(p > get(max, i)) set(max, i, p);
     }
 }
+
+void AxisAlignedBox::includeOther(const AxisAlignedBox *box)
+{
+    includePoint(box->min);
+    includePoint(box->max);
+}

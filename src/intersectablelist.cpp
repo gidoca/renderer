@@ -47,22 +47,14 @@ HitRecord IntersectableList::intersect(Ray ray, float from, float to) const
 
 AxisAlignedBox * IntersectableList::boundingBox() const
 {
-  QVector3D min(std::numeric_limits< float >::infinity(), std::numeric_limits< float >::infinity(), std::numeric_limits< float >::infinity());
-  QVector3D max = -min;
+  AxisAlignedBox *out = new AxisAlignedBox;
   for(auto i = components.begin(); i != components.end(); i++)
   {
     AxisAlignedBox * boundingBox = (*i)->boundingBox();
-    QVector3D currentMin = boundingBox->getMin();
-    QVector3D currentMax = boundingBox->getMax();
+    out->includeOther(boundingBox);
     delete boundingBox;
-    if(currentMin.x() < min.x()) min.setX(currentMin.x());
-    if(currentMin.y() < min.y()) min.setY(currentMin.y());   
-    if(currentMin.z() < min.z()) min.setZ(currentMin.z());   
-    if(currentMax.x() > max.x()) max.setX(currentMax.x());
-    if(currentMax.y() > max.y()) max.setY(currentMax.y());   
-    if(currentMax.z() > max.z()) max.setZ(currentMax.z());   
   }
-  return new AxisAlignedBox(min, max, DarkMatter::getInstance());
+  return out;
 }
 
 
