@@ -23,6 +23,8 @@
 
 #include <QtGui/QVector3D>
 
+#include <limits>
+
 inline float get(const QVector3D& v, int i)
 {
   switch(i)
@@ -30,8 +32,18 @@ inline float get(const QVector3D& v, int i)
     case 0: return v.x();
     case 1: return v.y();
     case 2: return v.z();
-    default: return 0;
+    default: return std::numeric_limits<float>::quiet_NaN();
   }
+}
+
+inline void set(QVector3D& v, int i, float val)
+{
+    switch(i)
+    {
+    case 0: v.setX(val); break;
+    case 1: v.setY(val); break;
+    case 2: v.setZ(val); break;
+    }
 }
 
 #endif
