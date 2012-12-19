@@ -118,10 +118,6 @@ bool SceneGrammar::parse(string filename)
   boost::spirit::istream_iterator end;*/
 
   //Argument order changed
-#if BOOST_VERSION >= 104100
-  bool r = qi::phrase_parse(begin, end, *this, boost::spirit::ascii::space, ast);
-#else
-  bool r = qi::phrase_parse(begin, end, *this, ast, boost::spirit::ascii::space);
-#endif
+  bool r = qi::phrase_parse(begin, end, assignments_rule, boost::spirit::ascii::space, ast);
   return r && begin == end;
 }
