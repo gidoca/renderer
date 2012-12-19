@@ -105,4 +105,12 @@ HitRecord BVHNode::intersect(Ray ray, float from, float to) const
   }
 }
 
-
+std::vector<Intersectable*> BVHNode::containedIntersectables()
+{
+    std::vector<Intersectable*> out;
+    std::vector<Intersectable*> leftIntersectables = left->containedIntersectables();
+    out.insert(out.end(), leftIntersectables.begin(), leftIntersectables.end());
+    std::vector<Intersectable*> rightIntersectables = right->containedIntersectables();
+    out.insert(out.end(), rightIntersectables.begin(), rightIntersectables.end());
+    return out;
+}

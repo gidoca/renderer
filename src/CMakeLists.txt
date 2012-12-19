@@ -9,7 +9,7 @@ include(${QT_USE_FILE})
 ADD_DEFINITIONS(-DQT_NO_KEYWORDS)
 
 set(renderingproject_HEADERS win.h)
-set(renderingproject_SRCS main.cpp camera.cpp plane.cpp sphere.cpp
+set(renderingproject_SRCS main.cpp camera.cpp plane.cpp sphere.cpp intersectable.cpp
   sceneast.cpp sceneparser.cpp
   triangle.cpp intersectableinstance.cpp
   darkmatter.cpp diffusematerial.cpp phongmaterial.cpp texturematerial.cpp transparentmaterial.cpp

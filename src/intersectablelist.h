@@ -43,6 +43,7 @@ class IntersectableList : public Intersectable
     AxisAlignedBox* boundingBox() const;
     
     std::vector< Intersectable* > getComponents() const;
+    virtual std::vector< Intersectable* > containedIntersectables();
 
   private:
     std::vector<Intersectable* > components;

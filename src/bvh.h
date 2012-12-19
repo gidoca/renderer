@@ -31,7 +31,8 @@ public:
   // Note that this method will delete the list in the end
   static Intersectable* create(IntersectableList * list);
   virtual AxisAlignedBox* boundingBox() const;
-  virtual HitRecord intersect(Ray ray, float from, float to) const;  
+  virtual HitRecord intersect(Ray ray, float from, float to) const;
+  virtual std::vector<Intersectable*> containedIntersectables();
   
 private:
   AxisAlignedBox* bb;

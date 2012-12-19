@@ -37,6 +37,7 @@
 #include "arealight.h"
 #include "conelight.h"
 #include "objreader.h"
+#include "bvh.h"
 
 #include <boost/foreach.hpp>
 #include <boost/variant/apply_visitor.hpp>
@@ -290,7 +291,7 @@ struct scene_builder : boost::static_visitor<void>
     Scene getScene()
     {
         Scene result(cameras["camera"]);
-        result.object = intersectables["intersectable"];
+        result.object = BVHNode::create(new IntersectableList(intersectables["intersectable"]->containedIntersectables()));
         result.light = lights["lights"];
         return result;
     }

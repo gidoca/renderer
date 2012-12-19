@@ -43,7 +43,6 @@
 #include "quad.h"
 #include "intersectablelist.h"
 #include "material.h"
-#include "bvh.h"
 #include "texturematerial.h"
 #include "diffusematerial.h"
 #include "phongmaterial.h"
@@ -69,9 +68,7 @@ struct ObjMeshVertex{
 };
 
 /* This contains a list of triangles */
-struct ObjMesh{
-    std::vector<Intersectable*> faces;
-};
+typedef std::vector<Intersectable*> ObjMesh;
 
 /* Internal structure */
 struct _ObjMeshFaceIndex{
@@ -217,7 +214,7 @@ Intersectable *ObjReader::getMesh(std::string filename, Material *defaultMateria
 
     std::cout << "ObjReader: " << triangles.size() << " triangles, " << num_faces << " faces" << std::endl;
 
-    myMesh.faces.reserve(triangles.size());
+    myMesh.reserve(triangles.size());
 
     for(size_t i = 0; i < triangles.size(); ++i){
         Triangle *face;
@@ -233,10 +230,10 @@ Intersectable *ObjReader::getMesh(std::string filename, Material *defaultMateria
         {
             face = new Triangle(positions[triangles[i].pos_index[0] - 1], positions[triangles[i].pos_index[1] - 1], positions[triangles[i].pos_index[2] - 1], normals[triangles[i].nor_index[0] - 1], normals[triangles[i].nor_index[1] - 1], normals[triangles[i].nor_index[2] - 1], texcoords[triangles[i].tex_index[0] - 1], texcoords[triangles[i].tex_index[1] - 1], texcoords[triangles[i].tex_index[2] - 1], triangles[i].material);
         }
-        myMesh.faces.push_back(face);
+        myMesh.push_back(face);
     }
 
-    return BVHNode::create(new IntersectableList(myMesh.faces));
+    return new IntersectableList(myMesh);
 }
 
 void createMaterial(cv::Vec3f diffuseColor, cv::Vec3f specularColor, float specularCoefficient, QDir dir, std::string textureFilename, std::string materialName, std::map<std::string, Material*> &materials)

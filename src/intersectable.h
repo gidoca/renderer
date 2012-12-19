@@ -30,6 +30,7 @@
 #include <QtGui/QVector3D>
 
 #include <limits>
+#include <vector>
 
 class AxisAlignedBox;
 
@@ -38,6 +39,8 @@ class Intersectable
   public:
     virtual HitRecord intersect(Ray ray, float from = EPSILON, float to = std::numeric_limits< float >::infinity()) const = 0;
     virtual AxisAlignedBox * boundingBox() const = 0;
+
+    virtual std::vector<Intersectable*> containedIntersectables();
 };
 
 #endif // INTERSECTABLE_H
