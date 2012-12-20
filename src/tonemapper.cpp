@@ -49,6 +49,6 @@ QRgb Tonemapper::map(const cv::Mat &film, int row, int column)
   Vec3f irradiance = film.at<Vec3f>(row, column);
   assert(checkRange(irradiance));
   //OpenCV uses BGR byte order
-  return qRgb(clamp(255 * pow(irradiance[2], 1./2.3)), clamp(255 * pow(irradiance[1], 1./2.3)), clamp(255 * pow(irradiance[0], 1./2.3)));
+  return qRgb(clamp(255 * pow(irradiance[2], 1./gamma)), clamp(255 * pow(irradiance[1], 1./gamma)), clamp(255 * pow(irradiance[0], 1./gamma)));
 }
 

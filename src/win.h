@@ -36,32 +36,22 @@ class Win: public QLabel
   Q_OBJECT
   
 public:
-  Win(cv::Mat & film, QFuture< void > future): tonemapper(QSize(film.size().width, film.size().height)), film(film), future(future)
+  Win(cv::Mat & film, QFuture< void > future) : tonemapper(QSize(film.size().width, film.size().height)), film(film), future(future)
   {
-    cv::Size size = film.size();
-    setPixmap(QPixmap(QSize(size.width, size.height)));
-    connect(&timer, SIGNAL(timeout()), this, SLOT(update()));
-    timer.setInterval(100);
-    timer.start();
+      init();
+  }
 
-    setContextMenuPolicy(Qt::ActionsContextMenu);
-
-    QAction *saveAct = new QAction("Save image as...", this);
-    connect(saveAct, SIGNAL(triggered()), this, SLOT(saveImage()));
-    insertAction(0, saveAct);
-
-    saveAct = new QAction("Save image as EXR...", this);
-    connect(saveAct, SIGNAL(triggered()), this, SLOT(saveExr()));
-    insertAction(0, saveAct);
-
-    setWindowTitle("Rendering...");
-    setFixedSize(QSize(film.size().width, film.size().height));
+  Win(cv::Mat &film, QFuture<void> future, Tonemapper tonemapper) : tonemapper(tonemapper), film(film), future(future)
+  {
+      init();
   }
   
 private Q_SLOTS:
   void update();
   void saveImage();
   void saveExr();
+
+  void init();
   
 private:
   Tonemapper tonemapper;

@@ -30,9 +30,12 @@
 class Tonemapper
 {
 public:
-  Tonemapper(QSize size): image(size, QImage::Format_RGB32)
+  Tonemapper(QSize size): image(size, QImage::Format_RGB32), gamma(2.2)
   {
-    
+  }
+
+  Tonemapper(QSize size, float gamma) : image(size, QImage::Format_RGB32), gamma(gamma)
+  {
   }
   
   virtual QImage tonemap(const cv::Mat film);
@@ -43,6 +46,7 @@ protected:
   
 private:
   QImage image;
+  float gamma;
   
 };
 

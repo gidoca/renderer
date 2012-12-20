@@ -71,3 +71,25 @@ void Win::saveExr()
   if(filename.isNull() || !filename.endsWith(".exr")) return;
   imwrite(filename.toStdString(), film);
 }
+
+void Win::init()
+{
+    cv::Size size = film.size();
+    setPixmap(QPixmap(QSize(size.width, size.height)));
+    connect(&timer, SIGNAL(timeout()), this, SLOT(update()));
+    timer.setInterval(100);
+    timer.start();
+
+    setContextMenuPolicy(Qt::ActionsContextMenu);
+
+    QAction *saveAct = new QAction("Save image as...", this);
+    connect(saveAct, SIGNAL(triggered()), this, SLOT(saveImage()));
+    insertAction(0, saveAct);
+
+    saveAct = new QAction("Save image as EXR...", this);
+    connect(saveAct, SIGNAL(triggered()), this, SLOT(saveExr()));
+    insertAction(0, saveAct);
+
+    setWindowTitle("Rendering...");
+    setFixedSize(QSize(film.size().width, film.size().height));
+}
