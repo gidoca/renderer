@@ -51,7 +51,7 @@ struct initializer
 
   template< typename R > void operator()(R)
   {
-    if(name == R::name && *renderer == 0)
+    if(name == R::name && *renderer == nullptr)
     {
       *renderer = new R();
     }
@@ -60,7 +60,7 @@ struct initializer
 
 Renderer *getRendererByName(string name)
 {
-  Renderer * renderer = 0;
+  Renderer * renderer = nullptr;
   boost::mpl::for_each<renderers>(initializer(&renderer, name));
   return renderer;
 }
@@ -94,7 +94,6 @@ Path Renderer::createPath(const Ray& primaryRay, const Intersectable &scene, Sam
   {
     if(!hit.intersects()) return result;
 
-//    assert(!isnan(alpha.x()) && !isnan(alpha.y()) && !isnan(alpha.z()));
     result.alphaValues.push_back(alpha);
     result.hitRecords.push_back(hit);
 
@@ -122,8 +121,6 @@ Path Renderer::createPath(const Ray& primaryRay, const Intersectable &scene, Sam
       float cos = QVector3D::dotProduct(outDirection.normalized(), hit.getSurfaceNormal().normalized());
       assert(cos >= 0 && !isnan(pdf));
       assert(pdf > 0 && !isnan(pdf));
-//      assert(brdf.x() >= 0 && brdf.y() >= 0 && brdf.z() >= 0);
-//      assert(!isnan(brdf.x()) && !isnan(brdf.y()) && !isnan(brdf.z()));
       alpha = alpha.mul(brdf) * (cos / pdf / russianRoulettePdf);
     }
     hit = scene.intersect(Ray(hit.getIntersectingPoint(), outDirection));

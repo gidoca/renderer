@@ -179,22 +179,22 @@ struct intersectable_builder : boost::static_visitor<Intersectable*>
 {
   intersectable_builder(std::map<std::string, Material*>& materials) : materials(materials), material_b(materials) {}
 
-  Intersectable* operator()(const ast_sphere& s) const
+  Sphere* operator()(const ast_sphere& s) const
   {
     return new Sphere(s.center.asQVector(), s.radius, boost::apply_visitor(material_b, s.material));
   }
 
-  Intersectable* operator()(const ast_box& b) const
+  AxisAlignedBox* operator()(const ast_box& b) const
   {
     return new AxisAlignedBox(b.min.asQVector(), b.max.asQVector(), boost::apply_visitor(material_b, b.material));
   }
 
-  Intersectable* operator()(const ast_quad& q) const
+  Quad* operator()(const ast_quad& q) const
   {
     return new Quad(q.p1.asQVector(), q.p2.asQVector(), q.p3.asQVector(), q.p4.asQVector(), boost::apply_visitor(material_b, q.material));
   }
 
-  Intersectable* operator()(const ast_plane& p) const
+  Plane* operator()(const ast_plane& p) const
   {
       return new Plane(p.vector.asQVector(), boost::apply_visitor(material_b, p.material));
   }
@@ -209,15 +209,15 @@ struct intersectable_builder : boost::static_visitor<Intersectable*>
       return mesh;
   }
 
-  Intersectable* operator()(const ast_intersectable_list& l) const;
-  Intersectable* operator()(const ast_instance& i) const;
+  IntersectableList* operator()(const ast_intersectable_list& l) const;
+  IntersectableInstance* operator()(const ast_instance& i) const;
 
   std::map<std::string, Material*>& materials;
 
   material_builder material_b;
 };
 
-Intersectable* intersectable_builder::operator()(ast_intersectable_list const& l) const
+IntersectableList* intersectable_builder::operator()(ast_intersectable_list const& l) const
 {
   vector<Intersectable*> intersectables;
   intersectables.reserve(l.children.size());
@@ -230,7 +230,7 @@ Intersectable* intersectable_builder::operator()(ast_intersectable_list const& l
   return new IntersectableList(intersectables);
 }
 
-Intersectable* intersectable_builder::operator()(const ast_instance& i) const
+IntersectableInstance* intersectable_builder::operator()(const ast_instance& i) const
 {
     return new IntersectableInstance(i.transform.asQMatrix4x4(), boost::apply_visitor(*this, i.intersectable));
 }
