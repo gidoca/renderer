@@ -51,7 +51,7 @@ public:
   static Path createPath(const Ray & primaryRay, const Intersectable & scene, Sample pathSamples[], cv::Vec3f initialAlpha = cv::Vec3f(1, 1, 1), int pathLength = MAX_DEPTH, float russianRoulettePdf = 1);
 
 protected:
-  int getSeed(boost::program_options::variables_map vm);
+  unsigned long getSeed(boost::program_options::variables_map vm);
 };
 
 Renderer *getRendererByName(std::string name);

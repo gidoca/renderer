@@ -133,14 +133,14 @@ boost::program_options::options_description Renderer::options()
   return boost::program_options::options_description("Renderer");
 }
 
-int Renderer::getSeed(boost::program_options::variables_map vm)
+unsigned long Renderer::getSeed(boost::program_options::variables_map vm)
 {
   if(vm.count("fixed-seed"))
   {
-    return 0;
+      return vm["seed"].as<unsigned long>();
   }
   else
   {
-    return QTime::currentTime().msec() + 1000 * QTime::currentTime().second();
+    return QTime::currentTime().msec() + 1000ul * QTime::currentTime().second();
   }
 }

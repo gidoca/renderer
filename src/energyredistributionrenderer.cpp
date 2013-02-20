@@ -37,9 +37,9 @@ using namespace cv;
 
 void EnergyRedistributionRenderer::render(const Scene &scene, Mat &film, boost::program_options::variables_map vm)
 {
-  const int seed = getSeed(vm);
+  const unsigned long seed = getSeed(vm);
 
-  gsl_rng *globalrng = gsl_rng_alloc(gsl_rng_taus);
+  gsl_rng *globalrng = gsl_rng_alloc(gsl_rng_taus2);
   gsl_rng_set(globalrng, seed);
   const float ed = computeEd(scene, globalrng, vm["erpt-mutations"].as<int>());
   gsl_rng_free(globalrng);
@@ -56,7 +56,7 @@ void EnergyRedistributionRenderer::render(const Scene &scene, Mat &film, boost::
     {
         std::cout << i * 100 / size.height << "% complete, ETA: " << time.elapsed() * (size.height - i) / ((i + 1) * 1000) << "s" << std::endl;
     }
-    gsl_rng *rng = gsl_rng_alloc(gsl_rng_taus);
+    gsl_rng *rng = gsl_rng_alloc(gsl_rng_taus2);
     gsl_rng_set(rng, size.height * seed + i);
     for(int j = 0; j < size.width; j++)
     {

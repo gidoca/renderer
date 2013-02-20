@@ -67,8 +67,8 @@ void MetropolisRenderer::render(const Scene & scene, Mat & film, const boost::pr
 
     importanceMap *= importanceMap.size().area() / sum(importanceMap)[0];
 
-  gsl_rng *globalrng = gsl_rng_alloc(gsl_rng_taus);
-  const int seed = getSeed(vm);
+  gsl_rng *globalrng = gsl_rng_alloc(gsl_rng_taus2);
+  const unsigned long seed = getSeed(vm);
   gsl_rng_set(globalrng, seed);
 
 
@@ -126,7 +126,7 @@ void MetropolisRenderer::render(const Scene & scene, Mat & film, const boost::pr
 #pragma omp parallel for
   for(int t = 0; t < numThreads; t++)
   {
-        gsl_rng *rng = gsl_rng_alloc(gsl_rng_taus);
+        gsl_rng *rng = gsl_rng_alloc(gsl_rng_taus2);
         gsl_rng_set(rng, numThreads * seed + t);
         MetropolisSample currentSample = sample;
         Vec3f currentValue = value;

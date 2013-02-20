@@ -97,8 +97,9 @@ int main(int argc, char **argv) {
 	
   options_description image("Image options");
 	image.add_options()
-      ("renderer,r", value<string>()->default_value("pathtracing"), "the rendering algorithm to be used (either pathtracing or metropolis)")
+      ("renderer,r", value<string>()->default_value("pathtracing"), "the rendering algorithm to be used (either pathtracing (the default), energyredist, metropolisflt, or metropolis)")
       ("fixed-seed,d", "use a fixed seed for the RNG to make the resulting image deterministic")
+      ("seed", value<unsigned long>()->default_value(0), "the random generator seed to use when the --fixed-seed option is set; defaults to 0")
       ("scene,s", value<string>(), "the scene description file (mandatory)")
       ("gamma,g", value<float>()->default_value(2.2f, "2.2"), "the gamma correction to apply to the display and to LDR image file output");
   command_line_options.add(image);

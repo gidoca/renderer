@@ -82,18 +82,18 @@ void MetropolisFltRenderer::addSample(const Sample &cameraSample, float weight, 
     }
 }
 
-void MetropolisFltRenderer::renderStep(Size size, const Scene& scene, vector<Mat>& films, vector<Mat>& biased_var, vector<Mat>& biased_mean, vector<Mat>& biased_m2, vector<Mat>& sumweight, int seed, bool firstIteration)
+void MetropolisFltRenderer::renderStep(Size size, const Scene& scene, vector<Mat>& films, vector<Mat>& biased_var, vector<Mat>& biased_mean, vector<Mat>& biased_m2, vector<Mat>& sumweight, unsigned long seed, bool firstIteration)
 {
     renderStep(size, scene, Mat::ones(size, CV_32F), films, biased_var, biased_mean, biased_m2, sumweight, seed, firstIteration);
 }
 
-void MetropolisFltRenderer::renderStep(Size size, const Scene& scene, Mat importanceMap, vector<Mat>& films, vector<Mat>& biased_var, vector<Mat>& biased_mean, vector<Mat>& biased_m2, vector<Mat>& sumweight, int seed, bool firstIteration)
+void MetropolisFltRenderer::renderStep(Size size, const Scene& scene, Mat importanceMap, vector<Mat>& films, vector<Mat>& biased_var, vector<Mat>& biased_mean, vector<Mat>& biased_m2, vector<Mat>& sumweight, unsigned long seed, bool firstIteration)
 {
   const int numInitialSamples = vm["metflt-bootstrap"].as<int>();
   const float largeStepProb = vm["metflt-large-step-prob"].as<float>();
   const int numPixelSamples = vm["metflt-mutations"].as<int>();
 
-  gsl_rng *globalrng = gsl_rng_alloc(gsl_rng_taus);
+  gsl_rng *globalrng = gsl_rng_alloc(gsl_rng_taus2);
   gsl_rng_set(globalrng, seed);
 
   MetropolisSample initialSample(scene.light.size());
@@ -148,7 +148,7 @@ void MetropolisFltRenderer::renderStep(Size size, const Scene& scene, Mat import
 #pragma omp parallel for
   for(int t = 0; t < numThreads; t++)
   {
-    gsl_rng *rng = gsl_rng_alloc(gsl_rng_taus);
+    gsl_rng *rng = gsl_rng_alloc(gsl_rng_taus2);
     gsl_rng_set(rng, numThreads * seed + t);
     for(int n = 0; n < num_films; n++)
     {
