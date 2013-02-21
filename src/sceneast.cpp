@@ -291,7 +291,7 @@ struct scene_builder : boost::static_visitor<void>
     Scene getScene()
     {
         Scene result(cameras["camera"]);
-        result.object = BVHNode::create(new IntersectableList(intersectables["intersectable"]->containedIntersectables()));
+        result.object = intersectables["intersectable"]->createBVH();
         result.light = lights["lights"];
         return result;
     }

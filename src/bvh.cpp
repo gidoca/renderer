@@ -114,3 +114,8 @@ std::vector<Intersectable*> BVHNode::containedIntersectables()
     out.insert(out.end(), rightIntersectables.begin(), rightIntersectables.end());
     return out;
 }
+
+Intersectable* BVHNode::createBVH()
+{
+    return this;
+}

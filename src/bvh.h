@@ -33,6 +33,7 @@ public:
   virtual AxisAlignedBox* boundingBox() const;
   virtual HitRecord intersect(Ray ray, float from, float to) const;
   virtual std::vector<Intersectable*> containedIntersectables();
+  virtual Intersectable* createBVH();
   
 private:
   AxisAlignedBox* bb;
