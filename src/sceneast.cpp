@@ -140,15 +140,22 @@ struct material_builder : boost::static_visitor<Material*>
 
   Material* operator()(std::vector<char> identifier) const
   {
-      Material* material = materials[std::string(identifier.begin(), identifier.end())];
+      std::string name = std::string(identifier.begin(), identifier.end());
+      Material* material = materials[name];
       if(material == 0)
       {
+          std::cout << "No such variable: " << name << std::endl;
           return DarkMatter::getInstance();
       }
       else
       {
           return material;
       }
+  }
+
+  Material* operator()(ast_literal_material material) const
+  {
+      return boost::apply_visitor(*this, material);
   }
 
   std::map<std::string, Material*>& materials;
@@ -283,9 +290,33 @@ struct scene_builder : boost::static_visitor<void>
         this->lights[current_name] = out;
     }
 
-    void operator()(ast_material material)
+    void operator()(ast_literal_material material)
     {
         materials[current_name] = boost::apply_visitor(material_b, material);
+    }
+
+    void operator()(std::string identifier)
+    {
+        if(cameras.count(identifier))
+        {
+            cameras[current_name] = cameras[identifier];
+        }
+        else if(intersectables.count(identifier))
+        {
+            intersectables[current_name] = intersectables[identifier];
+        }
+        else if(lights.count(identifier))
+        {
+            lights[current_name] = lights[identifier];
+        }
+        else if(materials.count(identifier))
+        {
+            materials[current_name] = materials[identifier];
+        }
+//        else
+//        {
+            std::cout << "Could not assign to " << current_name << ", no such variable: " << identifier << std::endl;
+//        }
     }
 
     Scene getScene()

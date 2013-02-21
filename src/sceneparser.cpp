@@ -40,7 +40,7 @@ SceneGrammar::SceneGrammar() : SceneGrammar::base_type(assignments_rule, "inters
 
   assignments_rule %= *assignment_rule;
   assignment_rule %= identifier_rule >> "=" >> value_rule >> ";";
-  value_rule %= intersectable_rule | light_list_rule | camera_rule | material_rule;
+  value_rule %= intersectable_rule | light_list_rule | camera_rule | material_literal_rule | identifier_rule;
 
   intersectable_rule %= intersectable_list_rule | sphere_rule | box_rule | quad_rule | plane_rule | obj_rule | instance_rule;
   intersectable_rule.name("intersectable");
@@ -88,8 +88,10 @@ SceneGrammar::SceneGrammar() : SceneGrammar::base_type(assignments_rule, "inters
   texture_material_rule.name("texture material");
   refractive_material_rule %= boost::spirit::lit("refractive") >> "(" >> boost::spirit::tag::float_() >> ")";
   refractive_material_rule.name("refractive material");
-  material_rule %= diffuse_material_rule | phong_material_rule | mirror_material_rule | texture_material_rule | refractive_material_rule | identifier_rule;
+  material_rule %= material_literal_rule | identifier_rule;
   material_rule.name("material");
+  material_literal_rule %= diffuse_material_rule | phong_material_rule | mirror_material_rule | texture_material_rule | refractive_material_rule;
+  material_literal_rule.name("material literal");
 
   camera_rule %= boost::spirit::lit("camera") >> "(" >> vector3_literal_rule >> "," >> vector3_literal_rule >> "," >> vector3_literal_rule >> "," >> boost::spirit::tag::float_() >> "," >> boost::spirit::tag::float_() >> "," >> boost::spirit::tag::float_() >> ")";
 
