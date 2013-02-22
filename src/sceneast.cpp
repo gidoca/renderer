@@ -267,6 +267,7 @@ struct scene_builder : boost::static_visitor<void>
     void addAssignment(ast_assignment assignment)
     {
         current_name = assignment.name;
+        deleteAllVars(current_name);
         boost::apply_visitor(*this, assignment.value);
     }
 
@@ -313,10 +314,10 @@ struct scene_builder : boost::static_visitor<void>
         {
             materials[current_name] = materials[identifier];
         }
-//        else
-//        {
+        else
+        {
             std::cout << "Could not assign to " << current_name << ", no such variable: " << identifier << std::endl;
-//        }
+        }
     }
 
     Scene getScene()
@@ -333,6 +334,14 @@ struct scene_builder : boost::static_visitor<void>
     map<string, Material*> materials;
 
 private:
+    void deleteAllVars(std::string name)
+    {
+        cameras.erase(name);
+        intersectables.erase(name);
+        lights.erase(name);
+        materials.erase(name);
+    }
+
     string current_name;
 
     intersectable_builder intersectable_b;
