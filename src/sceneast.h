@@ -83,7 +83,11 @@ typedef boost::variant<
     ast_phong_material,
     ast_mirror_material,
     ast_texture_material,
-    ast_refractive_material,
+    ast_refractive_material
+    > ast_literal_material;
+
+typedef boost::variant<
+    ast_literal_material,
     std::vector<char>
     > ast_material;
 
@@ -207,7 +211,7 @@ struct ast_cone_light
 
 typedef boost::variant<ast_point_light, ast_area_light, ast_cone_light> ast_light;
 
-typedef boost::variant<std::vector<ast_light>, ast_camera, ast_intersectable, ast_material> ast_value;
+typedef boost::variant<std::vector<ast_light>, ast_camera, ast_intersectable, ast_literal_material, std::string> ast_value;
 
 struct ast_assignment
 {

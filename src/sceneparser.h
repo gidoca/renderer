@@ -83,6 +83,7 @@ private:
   qi::rule<std::string::iterator, ast_mirror_material(), boost::spirit::ascii::space_type> mirror_material_rule;
   qi::rule<std::string::iterator, ast_texture_material(), boost::spirit::ascii::space_type> texture_material_rule;
   qi::rule<std::string::iterator, ast_refractive_material(), boost::spirit::ascii::space_type> refractive_material_rule;
+  qi::rule<std::string::iterator, ast_literal_material(), boost::spirit::ascii::space_type> material_literal_rule;
   qi::rule<std::string::iterator, ast_material(), boost::spirit::ascii::space_type> material_rule;
 
   qi::rule<std::string::iterator, ast_camera(), boost::spirit::ascii::space_type> camera_rule;

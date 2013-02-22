@@ -27,7 +27,6 @@
 class BVHNode : public Intersectable
 {
 public:
-  BVHNode(Intersectable * left, Intersectable * right, AxisAlignedBox * bb);
   // Note that this method will delete the list in the end
   static Intersectable* create(IntersectableList * list);
   virtual AxisAlignedBox* boundingBox() const;
@@ -36,6 +35,7 @@ public:
   virtual Intersectable* createBVH();
   
 private:
+  BVHNode(Intersectable * left, Intersectable * right, AxisAlignedBox * bb);
   AxisAlignedBox* bb;
   Intersectable *left, *right;
 };
