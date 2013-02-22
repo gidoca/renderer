@@ -41,6 +41,7 @@
 #include "tonemapper.h"
 #include "win.h"
 #include "sceneparser.h"
+#include "scenedumper.h"
 
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
@@ -147,6 +148,8 @@ int main(int argc, char **argv) {
     return -1;
   }
 
+  SceneDumper d;
+  d.dump(parser.getAst());
   Scene scene = buildScene(parser.getAst());
 
   if(vm.count("verbose")) cout << "Scene loaded, " << time.elapsed() / 1000 << "s elapsed." << endl;
