@@ -49,6 +49,7 @@ public:
   }
 
 public Q_SLOTS:
+  void starting();
   void complete();
   
 private Q_SLOTS:

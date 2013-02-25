@@ -144,6 +144,7 @@ int main(int argc, char **argv) {
   {
     Win l(*film, scene, tm);
     QObject::connect(renderer, SIGNAL(finishedRendering()), &l, SLOT(complete()));
+    QObject::connect(renderer, SIGNAL(startingRendering()), &l, SLOT(starting()));
     QObject::connect(&l, SIGNAL(rerender(Scene)), renderer, SLOT(startRendering(Scene)));
     l.show();
   

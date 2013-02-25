@@ -326,6 +326,8 @@ void MetropolisFltRenderer::render()
     }
     fn = QString("/tmp/iteration%1.exr").arg(i);
     imwrite(fn.toStdString(), *film);
+
+    if(doStop) return;
   }
 }
 

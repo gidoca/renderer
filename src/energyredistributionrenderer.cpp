@@ -52,6 +52,8 @@ void EnergyRedistributionRenderer::render()
   #pragma omp parallel for schedule(dynamic)
   for(int i = 0; i < size.height; i++)
   {
+    if(doStop) continue;
+
     if(vm.count("verbose"))
     {
         std::cout << i * 100 / size.height << "% complete, ETA: " << time.elapsed() * (size.height - i) / ((i + 1) * 1000) << "s" << std::endl;

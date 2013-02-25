@@ -152,6 +152,7 @@ void Renderer::startRendering(Scene scene)
     doStop = false;
     this->scene = scene;
     film->setTo(cv::Vec3f(0, 0, 0));
+    Q_EMIT startingRendering();
     start();
 }
 

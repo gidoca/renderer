@@ -86,7 +86,7 @@ void Win::init()
     connect(saveAct, SIGNAL(triggered()), this, SLOT(saveExr()));
     insertAction(0, saveAct);
 
-    setWindowTitle("Rendering...");
+    setWindowTitle("Idle");
     setFixedSize(QSize(film.size().width, film.size().height));
 }
 
@@ -94,13 +94,18 @@ void Win::keyReleaseEvent(QKeyEvent *event)
 {
     if(event->key() == Qt::Key_F5)
     {
-        timer.start();
         Q_EMIT rerender(scene);
     }
     else
     {
         QWidget::keyPressEvent(event);
     }
+}
+
+void Win::starting()
+{
+    setWindowTitle("Rendering...");
+    timer.start();
 }
 
 void Win::complete()

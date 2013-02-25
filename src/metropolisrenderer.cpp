@@ -126,6 +126,8 @@ void MetropolisRenderer::render()
 #pragma omp parallel for
   for(int t = 0; t < numThreads; t++)
   {
+        if(doStop) continue;
+
         gsl_rng *rng = gsl_rng_alloc(gsl_rng_taus2);
         gsl_rng_set(rng, numThreads * seed + t);
         MetropolisSample currentSample = sample;

@@ -68,6 +68,7 @@ public Q_SLOTS:
   void startRendering(Scene scene);
 
 Q_SIGNALS:
+  void startingRendering();
   void finishedRendering();
 
 protected:

@@ -60,6 +60,8 @@ void PerPixelRenderer::render()
   #pragma omp parallel for schedule(dynamic)
   for(int i = 0; i < film->size().height; i++)
   {
+    if(doStop) continue;
+
     gsl_rng *rng = gsl_rng_alloc(gsl_rng_taus2);
     gsl_rng_set(rng, film->size().height * seed + i);
     if(vm.count("verbose"))
