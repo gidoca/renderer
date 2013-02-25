@@ -259,7 +259,7 @@ void createMaterial(cv::Vec3f diffuseColor, cv::Vec3f specularColor, float specu
         }
         else
         {
-            materials[materialName] = new PhongMaterial(diffuseColor, cv::Vec3f(), specularCoefficient);
+            materials[materialName] = new PhongMaterial(diffuseColor, specularColor, specularCoefficient);
         }
         return;
     }
