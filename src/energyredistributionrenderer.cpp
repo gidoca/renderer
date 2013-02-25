@@ -35,8 +35,9 @@
 using namespace boost::program_options;
 using namespace cv;
 
-void EnergyRedistributionRenderer::render(const Scene &scene, Mat &film, boost::program_options::variables_map vm)
+void EnergyRedistributionRenderer::run()
 {
+  if(doStop) return;
   const unsigned long seed = getSeed(vm);
 
   gsl_rng *globalrng = gsl_rng_alloc(gsl_rng_taus2);
@@ -44,7 +45,7 @@ void EnergyRedistributionRenderer::render(const Scene &scene, Mat &film, boost::
   const float ed = computeEd(scene, globalrng, vm["erpt-mutations"].as<int>());
   gsl_rng_free(globalrng);
 
-  Size size = film.size();
+  Size size = film->size();
 
   QTime time;
   time.start();
@@ -70,7 +71,7 @@ void EnergyRedistributionRenderer::render(const Scene &scene, Mat &film, boost::
         point.ry() /= size.height;
         MetropolisSample initialSample(scene.light.size());
         initialSample.initAtPixel(point, rng);
-        equalDispositionFlow(film, initialSample, *scene.object, scene.light, scene.camera, rng, ed, vm);
+        equalDispositionFlow(*film, initialSample, *scene.object, scene.light, scene.camera, rng, ed, vm);
       }
     }
     gsl_rng_free(rng);

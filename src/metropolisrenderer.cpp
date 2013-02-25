@@ -55,15 +55,16 @@ void addSample(const Sample &cameraSample, float weight, Mat &film, Vec3f value)
     film.at<Vec3f>(y, x) += depositValue;
 }
 
-void MetropolisRenderer::render(const Scene & scene, Mat & film, const boost::program_options::variables_map vm)
+void MetropolisRenderer::run()
 {
-    Mat importanceMap(film.size(), CV_32F);
+    if(doStop) return;
+    Mat importanceMap(film->size(), CV_32F);
 //    for(int i = 0; i < film.size().height; i++)
 //    {
 //        Mat importanceMapHalf = importanceMap(Range(i, i + 1), Range::all());
 //        importanceMapHalf.setTo(((i / 50) & 0x1) + 10.5);
 //    }
-    importanceMap = Mat::ones(film.size(), CV_32F);
+    importanceMap = Mat::ones(film->size(), CV_32F);
 
     importanceMap *= importanceMap.size().area() / sum(importanceMap)[0];
 
@@ -118,10 +119,10 @@ void MetropolisRenderer::render(const Scene & scene, Mat & film, const boost::pr
 #else
   const int numThreads = 1;
 #endif
-  const int numSamples = numPixelSamples * film.size().width * film.size().height / numThreads;
+  const int numSamples = numPixelSamples * film->size().area() / numThreads;
 
-  Mat virtualSamples = Mat::zeros(film.size(), CV_32F);
-  Mat realSamples = Mat::zeros(film.size(), CV_32F);
+  Mat virtualSamples = Mat::zeros(film->size(), CV_32F);
+  Mat realSamples = Mat::zeros(film->size(), CV_32F);
 
 #pragma omp parallel for
   for(int t = 0; t < numThreads; t++)
@@ -132,8 +133,8 @@ void MetropolisRenderer::render(const Scene & scene, Mat & film, const boost::pr
         Vec3f currentValue = value;
         Path currentPath = path;
 
-        int currentImageX = (int)(currentSample.cameraSample.getSample().x() * film.size().width);
-        int currentImageY = (int)(currentSample.cameraSample.getSample().y() * film.size().height);
+        int currentImageX = (int)(currentSample.cameraSample.getSample().x() * film->size().width);
+        int currentImageY = (int)(currentSample.cameraSample.getSample().y() * film->size().height);
         float currentImportance = importanceMap.at<float>(currentImageY, currentImageX);
 
         for(int i = 0; i < numSamples; i++)
@@ -141,8 +142,8 @@ void MetropolisRenderer::render(const Scene & scene, Mat & film, const boost::pr
             MetropolisSample newSample = currentSample.mutated(rng, largeStepProb);
             currentPath = newSample.cameraPathFromSample(*scene.object, scene.camera);
             Vec3f newValue = integrator.integrate(currentPath, *scene.object, scene.light, newSample.lightSample1, newSample.lightIndex);
-            int newImageX = (int)(newSample.cameraSample.getSample().x() * film.size().width);
-            int newImageY = (int)(newSample.cameraSample.getSample().y() * film.size().height);
+            int newImageX = (int)(newSample.cameraSample.getSample().x() * film->size().width);
+            int newImageY = (int)(newSample.cameraSample.getSample().y() * film->size().height);
             float newImportance = importanceMap.at<float>(newImageY, newImageX);
 
             float accept = min(1., norm(newValue) * newImportance / (norm(currentValue) * currentImportance));
@@ -150,13 +151,13 @@ void MetropolisRenderer::render(const Scene & scene, Mat & film, const boost::pr
 
             if(norm(currentValue) > 0)
             {
-                addSample(currentSample.cameraSample, 1 - accept, film, currentValue * (1.f / norm(currentValue) * b / numPixelSamples));
+                addSample(currentSample.cameraSample, 1 - accept, *film, currentValue * (1.f / norm(currentValue) * b / numPixelSamples));
                 virtualSamples.at<float>(currentImageY, currentImageX) += (1 - accept) / currentImportance;
                 realSamples.at<float>(currentImageY, currentImageX) += 1 - accept;
             }
             if(norm(newValue) > 0)
             {
-                addSample(newSample.cameraSample, accept, film, newValue * (1.f / norm(newValue) * b / numPixelSamples));
+                addSample(newSample.cameraSample, accept, *film, newValue * (1.f / norm(newValue) * b / numPixelSamples));
                 virtualSamples.at<float>(newImageY, newImageX) += accept / newImportance;
                 realSamples.at<float>(newImageY, newImageX) += accept;
             }
@@ -171,7 +172,7 @@ void MetropolisRenderer::render(const Scene & scene, Mat & film, const boost::pr
         }
         gsl_rng_free(rng);
   }
-  film = film.mul(extend(virtualSamples / realSamples));
+  film->setTo(film->mul(extend(virtualSamples / realSamples)));
 }
 
 options_description MetropolisRenderer::options()

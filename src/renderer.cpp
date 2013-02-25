@@ -141,6 +141,16 @@ unsigned long Renderer::getSeed(boost::program_options::variables_map vm)
   }
   else
   {
-    return QTime::currentTime().msec() + 1000ul * QTime::currentTime().second();
+    return (unsigned long)QTime::currentTime().msec() + 1000ul * (unsigned long)QTime::currentTime().second();
   }
 }
+
+void Renderer::startRendering(Scene scene)
+{
+    doStop = true;
+    wait();
+    doStop = false;
+    this->scene = scene;
+    start();
+}
+

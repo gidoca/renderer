@@ -33,11 +33,11 @@ void Win::update()
     QImage image = tonemapper.tonemap(film);
     setPixmap(QPixmap::fromImage(image));
     repaint();
-    if(future.isFinished())
+    /*if(future.isFinished())
     {
       timer.stop();
       setWindowTitle("Rendering complete.");
-    }
+    }*/
 }
 
 void Win::saveImage()
@@ -67,7 +67,8 @@ void Win::saveExr()
   QString formatString = "OpenEXR (*.exr)";
 
   QString filename = QFileDialog::getSaveFileName(this, "Save image as",  QString(), formatString);
-  if(filename.isNull() || !filename.endsWith(".exr")) return;
+  if(!filename.endsWith(".exr")) filename += ".exr";
+  if(filename.isNull()) return;
   imwrite(filename.toStdString(), film);
 }
 

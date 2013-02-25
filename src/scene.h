@@ -30,6 +30,7 @@
 class Scene
 {
 public:
+  Scene() {}
   Scene(Camera camera): camera(camera) {}
 
   const Intersectable * object;
