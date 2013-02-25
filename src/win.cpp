@@ -19,7 +19,6 @@
  * USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 #include "win.h"
-#include "win.moc"
 
 #include <QImage>
 #include <QFileDialog>
