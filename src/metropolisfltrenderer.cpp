@@ -192,9 +192,8 @@ void MetropolisFltRenderer::renderStep(Size size, const Scene& scene, Mat import
   sumImportance = newSumImportance;
 }
 
-void MetropolisFltRenderer::run()
+void MetropolisFltRenderer::render()
 {
-  if(doStop) return;
   this->vm = vm;
   const int seed = getSeed(vm);
   numPasses = vm["metflt-num-passes"].as<int>();

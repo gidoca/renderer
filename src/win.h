@@ -23,6 +23,8 @@
 
 #include "tonemapper.h"
 
+#include "scene.h"
+
 #include <QLabel>
 #include <QTimer>
 #include <QFuture>
@@ -36,28 +38,37 @@ class Win: public QLabel
   Q_OBJECT
   
 public:
-  Win(cv::Mat & film) : tonemapper(QSize(film.size().width, film.size().height)), film(film)
+  Win(cv::Mat & film, Scene scene) : tonemapper(QSize(film.size().width, film.size().height)), film(film), scene(scene)
   {
       init();
   }
 
-  Win(cv::Mat &film, Tonemapper tonemapper) : tonemapper(tonemapper), film(film)
+  Win(cv::Mat &film, Scene scene, Tonemapper tonemapper) : tonemapper(tonemapper), film(film), scene(scene)
   {
       init();
   }
+
+public Q_SLOTS:
+  void complete();
   
 private Q_SLOTS:
   void update();
   void saveImage();
   void saveExr();
 
+Q_SIGNALS:
+  void rerender(Scene scene);
+
+protected:
+  void keyReleaseEvent(QKeyEvent * event);
+
+private:
   void init();
   
-private:
   Tonemapper tonemapper;
   QTimer timer;
   cv::Mat & film;
-//  QFuture<void> future;
+  Scene scene;
 };
 
 #endif

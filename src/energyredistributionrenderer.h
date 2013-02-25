@@ -35,7 +35,7 @@
 class EnergyRedistributionRenderer: public Renderer
 {
 public:
-  void run();
+  void render();
 	
 	static boost::program_options::options_description options();
 

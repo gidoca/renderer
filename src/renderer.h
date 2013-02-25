@@ -67,8 +67,14 @@ public:
 public Q_SLOTS:
   void startRendering(Scene scene);
 
+Q_SIGNALS:
+  void finishedRendering();
+
 protected:
   unsigned long getSeed(boost::program_options::variables_map vm);
+
+  void run();
+  virtual void render() = 0;
 
   bool doStop;
   Scene scene;

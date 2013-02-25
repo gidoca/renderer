@@ -128,7 +128,6 @@ int main(int argc, char **argv) {
   Tonemapper tm(scene.camera.getResolution(), vm["gamma"].as<float>());
 
   cv::Mat * film = new cv::Mat(scene.camera.getResolution().height(), scene.camera.getResolution().width(), CV_32FC3);
-  film->setTo(cv::Vec3f(0, 0, 0));
 
   Renderer * renderer = getRendererByName(vm["renderer"].as<string>());
   if(renderer == 0)
@@ -143,7 +142,9 @@ int main(int argc, char **argv) {
   
   if(vm.count("gui") || (!vm.count("save-exr") && !vm.count("save-img")))
   {
-    Win l(*film, tm);
+    Win l(*film, scene, tm);
+    QObject::connect(renderer, SIGNAL(finishedRendering()), &l, SLOT(complete()));
+    QObject::connect(&l, SIGNAL(rerender(Scene)), renderer, SLOT(startRendering(Scene)));
     l.show();
   
     return app.exec();

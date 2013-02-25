@@ -55,9 +55,8 @@ void addSample(const Sample &cameraSample, float weight, Mat &film, Vec3f value)
     film.at<Vec3f>(y, x) += depositValue;
 }
 
-void MetropolisRenderer::run()
+void MetropolisRenderer::render()
 {
-    if(doStop) return;
     Mat importanceMap(film->size(), CV_32F);
 //    for(int i = 0; i < film.size().height; i++)
 //    {

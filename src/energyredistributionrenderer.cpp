@@ -35,9 +35,8 @@
 using namespace boost::program_options;
 using namespace cv;
 
-void EnergyRedistributionRenderer::run()
+void EnergyRedistributionRenderer::render()
 {
-  if(doStop) return;
   const unsigned long seed = getSeed(vm);
 
   gsl_rng *globalrng = gsl_rng_alloc(gsl_rng_taus2);

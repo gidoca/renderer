@@ -151,6 +151,13 @@ void Renderer::startRendering(Scene scene)
     wait();
     doStop = false;
     this->scene = scene;
+    film->setTo(cv::Vec3f(0, 0, 0));
     start();
 }
 
+void Renderer::run()
+{
+    if(doStop) return;
+    render();
+    Q_EMIT finishedRendering();
+}

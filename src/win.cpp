@@ -23,6 +23,7 @@
 #include <QImage>
 #include <QFileDialog>
 #include <QImageWriter>
+#include <QKeyEvent>
 
 #include <opencv2/highgui/highgui.hpp>
 
@@ -33,11 +34,6 @@ void Win::update()
     QImage image = tonemapper.tonemap(film);
     setPixmap(QPixmap::fromImage(image));
     repaint();
-    /*if(future.isFinished())
-    {
-      timer.stop();
-      setWindowTitle("Rendering complete.");
-    }*/
 }
 
 void Win::saveImage()
@@ -92,4 +88,24 @@ void Win::init()
 
     setWindowTitle("Rendering...");
     setFixedSize(QSize(film.size().width, film.size().height));
+}
+
+void Win::keyReleaseEvent(QKeyEvent *event)
+{
+    if(event->key() == Qt::Key_F5)
+    {
+        timer.start();
+        Q_EMIT rerender(scene);
+    }
+    else
+    {
+        QWidget::keyPressEvent(event);
+    }
+}
+
+void Win::complete()
+{
+    timer.stop();
+    update();
+    setWindowTitle("Rendering complete.");
 }

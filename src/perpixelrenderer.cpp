@@ -40,9 +40,8 @@ using namespace boost::program_options;
 using namespace std;
 using namespace cv;
 
-void PerPixelRenderer::run()
+void PerPixelRenderer::render()
 {
-  if(doStop) return;
   Integrator * integrator;
   if(vm["pt-integrator"].as<string>() == "unidi")
   {
