@@ -24,7 +24,6 @@
 #include <QFileDialog>
 #include <QImageWriter>
 #include <QKeyEvent>
-#include <iostream>
 
 #include <opencv2/highgui/highgui.hpp>
 
@@ -32,7 +31,6 @@ using namespace cv;
 
 void Win::update()
 {
-    std::cout << "up" << std::endl;
     QImage image = tonemapper.tonemap(film);
     setPixmap(QPixmap::fromImage(image));
     repaint();
@@ -76,7 +74,7 @@ void Win::init()
     setPixmap(QPixmap(QSize(size.width, size.height)));
     connect(&timer, SIGNAL(timeout()), this, SLOT(update()));
     timer.setInterval(100);
-    timer.start();
+//    timer.start();
 
     setContextMenuPolicy(Qt::ActionsContextMenu);
 
@@ -92,11 +90,42 @@ void Win::init()
     setFixedSize(QSize(film.size().width, film.size().height));
 }
 
+inline void Win::move(short sign, bool strafe)
+{
+    QVector3D dir = scene.camera.getLookAt() - scene.camera.getCOP();
+    if(strafe) dir = QVector3D::crossProduct(dir, scene.camera.getUp());
+    dir.normalize();
+    dir *= sign * stepSize;
+    scene.camera.setCOP(scene.camera.getCOP() + dir);
+    scene.camera.setLookAt(scene.camera.getLookAt() + dir);
+}
+
 void Win::keyReleaseEvent(QKeyEvent *event)
 {
     switch(event->key()) {
     case Qt::Key_F5:
         break;
+
+    case Qt::Key_Q:
+        stepSize /= 1.5;
+        return;
+    case Qt::Key_E:
+        stepSize *= 1.5;
+        return;
+
+    case Qt::Key_S:
+        move(-1, false);
+        break;
+    case Qt::Key_W:
+        move(1, false);
+        break;
+    case Qt::Key_A:
+        move(-1, true);
+        break;
+    case Qt::Key_D:
+        move(1, true);
+        break;
+
     default:
         QWidget::keyPressEvent(event);
         return;
@@ -107,14 +136,12 @@ void Win::keyReleaseEvent(QKeyEvent *event)
 
 void Win::starting()
 {
-    std::cout << "Starting" << std::endl;
     setWindowTitle("Rendering...");
     timer.start();
 }
 
 void Win::complete()
 {
-    std::cout << "Stopping" << std::endl;
     timer.stop();
     update();
     setWindowTitle("Rendering complete.");

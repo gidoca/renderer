@@ -38,12 +38,12 @@ class Win: public QLabel
   Q_OBJECT
   
 public:
-  Win(cv::Mat & film, Scene scene) : tonemapper(QSize(film.size().width, film.size().height)), film(film), scene(scene)
+  Win(cv::Mat & film, Scene scene) : tonemapper(QSize(film.size().width, film.size().height)), film(film), scene(scene), stepSize(1)
   {
       init();
   }
 
-  Win(cv::Mat &film, Scene scene, Tonemapper tonemapper) : tonemapper(tonemapper), film(film), scene(scene)
+  Win(cv::Mat &film, Scene scene, Tonemapper tonemapper) : tonemapper(tonemapper), film(film), scene(scene), stepSize(1)
   {
       init();
   }
@@ -65,11 +65,15 @@ protected:
 
 private:
   void init();
+
+  void move(short sign, bool strafe);
   
   Tonemapper tonemapper;
   QTimer timer;
   cv::Mat & film;
   Scene scene;
+
+  float stepSize;
 };
 
 #endif
