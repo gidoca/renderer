@@ -28,7 +28,7 @@
 #include <opencv2/highgui/highgui.hpp>
 
 using namespace cv;
-
+#include <iostream>
 void Win::update()
 {
     QImage image = tonemapper.tonemap(film);
@@ -100,10 +100,27 @@ inline void Win::move(short sign, bool strafe)
     scene.camera.setLookAt(scene.camera.getLookAt() + dir);
 }
 
+inline void Win::rotate(short sign, bool horizontal)
+{
+    QVector3D dir = scene.camera.getLookAt() - scene.camera.getCOP();
+    QVector3D axis = scene.camera.getUp();
+    if(!horizontal) axis = QVector3D::crossProduct(axis, dir);
+    QMatrix4x4 rot;
+    rot.rotate(sign * 3, axis);
+    dir = rot.map(dir);
+    scene.camera.setLookAt(scene.camera.getCOP() + dir);
+    if(!horizontal) scene.camera.setUp(rot.map(scene.camera.getUp()));
+}
+
 void Win::keyReleaseEvent(QKeyEvent *event)
 {
     switch(event->key()) {
     case Qt::Key_F5:
+        break;
+
+    case Qt::Key_R:
+        scene.camera = originalCamera;
+        stepSize = 1;
         break;
 
     case Qt::Key_Q:
@@ -124,6 +141,19 @@ void Win::keyReleaseEvent(QKeyEvent *event)
         break;
     case Qt::Key_D:
         move(1, true);
+        break;
+
+    case Qt::Key_Down:
+        rotate(1, false);
+        break;
+    case Qt::Key_Up:
+        rotate(-1, false);
+        break;
+    case Qt::Key_Left:
+        rotate(1, true);
+        break;
+    case Qt::Key_Right:
+        rotate(-1, true);
         break;
 
     default:

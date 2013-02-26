@@ -33,7 +33,7 @@ class Camera
 {
   public:
     Camera() {}
-    Camera(QVector3D cop, QVector3D look_at, QVector3D up, float fov, QSize resolution) : cop(cop), lookAt(look_at), up(up), fov(fov), resolution(resolution)
+    Camera(QVector3D cop, QVector3D lookAt, QVector3D up, float fov, QSize resolution) : cop(cop), lookAt(lookAt), up(up), fov(fov), resolution(resolution)
     {
         init();
     }
