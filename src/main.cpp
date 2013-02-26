@@ -143,8 +143,8 @@ int main(int argc, char **argv) {
   if(vm.count("gui") || (!vm.count("save-exr") && !vm.count("save-img")))
   {
     Win l(*film, scene, tm);
-    QObject::connect(renderer, SIGNAL(finishedRendering()), &l, SLOT(complete()));
-    QObject::connect(renderer, SIGNAL(startingRendering()), &l, SLOT(starting()));
+    QObject::connect(renderer, SIGNAL(finishedRendering()), &l, SLOT(complete()), Qt::QueuedConnection);
+    QObject::connect(renderer, SIGNAL(startingRendering()), &l, SLOT(starting()), Qt::QueuedConnection);
     QObject::connect(&l, SIGNAL(rerender(Scene)), renderer, SLOT(startRendering(Scene)));
     l.show();
   

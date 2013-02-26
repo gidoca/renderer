@@ -24,6 +24,7 @@
 #include <QFileDialog>
 #include <QImageWriter>
 #include <QKeyEvent>
+#include <iostream>
 
 #include <opencv2/highgui/highgui.hpp>
 
@@ -31,6 +32,7 @@ using namespace cv;
 
 void Win::update()
 {
+    std::cout << "up" << std::endl;
     QImage image = tonemapper.tonemap(film);
     setPixmap(QPixmap::fromImage(image));
     repaint();
@@ -92,24 +94,27 @@ void Win::init()
 
 void Win::keyReleaseEvent(QKeyEvent *event)
 {
-    if(event->key() == Qt::Key_F5)
-    {
-        Q_EMIT rerender(scene);
-    }
-    else
-    {
+    switch(event->key()) {
+    case Qt::Key_F5:
+        break;
+    default:
         QWidget::keyPressEvent(event);
+        return;
     }
+
+    Q_EMIT rerender(scene);
 }
 
 void Win::starting()
 {
+    std::cout << "Starting" << std::endl;
     setWindowTitle("Rendering...");
     timer.start();
 }
 
 void Win::complete()
 {
+    std::cout << "Stopping" << std::endl;
     timer.stop();
     update();
     setWindowTitle("Rendering complete.");
