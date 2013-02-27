@@ -161,6 +161,11 @@ struct material_builder : boost::static_visitor<Material*>
   std::map<std::string, Material*>& materials;
 };
 
+cv::Point2f ast_vector2_literal::asCVPoint() const
+{
+    return cv::Point2f(x, y);
+}
+
 QVector3D ast_vector3_literal::asQVector() const
 {
   return QVector3D(x, y, z);
@@ -214,6 +219,11 @@ struct intersectable_builder : boost::static_visitor<Intersectable*>
       delete bb;
       std::cout << "Mesh bb min: " << min.x() << "," << min.y() << "," << min.z() << "; max: " << max.x() << "," << max.y() << "," << max.z() << std::endl;
       return mesh;
+  }
+
+  Triangle* operator()(const ast_triangle& t) const
+  {
+      return new Triangle(t.p1.asQVector(), t.p2.asQVector(), t.p3.asQVector(), t.n1.asQVector(), t.n2.asQVector(), t.n3.asQVector(), t.t1.asCVPoint(), t.t2.asCVPoint(), t.t3.asCVPoint(), boost::apply_visitor(material_b, t.material));
   }
 
   IntersectableList* operator()(const ast_intersectable_list& l) const;

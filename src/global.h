@@ -85,6 +85,7 @@ struct ast_box;
 struct ast_quad;
 struct ast_plane;
 struct ast_obj;
+struct ast_triangle;
 struct ast_instance;
 struct ast_camera;
 struct ast_point_light;

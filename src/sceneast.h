@@ -34,6 +34,13 @@
 
 #include <opencv2/core/core.hpp>
 
+struct ast_vector2_literal
+{
+    float x, y;
+
+    cv::Point2f asCVPoint() const;
+};
+
 struct ast_vector3_literal
 {
   ast_vector3_literal() : x(0), y(0), z(0) {}
@@ -140,6 +147,7 @@ typedef boost::variant<
     ast_quad,
     ast_plane,
     ast_obj,
+    ast_triangle,
     boost::recursive_wrapper<ast_instance>
     > ast_intersectable;
 
@@ -176,6 +184,13 @@ struct ast_plane
 struct ast_obj
 {
     std::string filename;
+    ast_material material;
+};
+
+struct ast_triangle
+{
+    ast_vector3_literal p1, p2, p3, n1, n2, n3;
+    ast_vector2_literal t1, t2, t3;
     ast_material material;
 };
 
@@ -260,9 +275,29 @@ BOOST_FUSION_ADAPT_STRUCT(
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
+    ast_triangle,
+    (ast_vector3_literal, p1)
+    (ast_vector3_literal, p2)
+    (ast_vector3_literal, p3)
+    (ast_vector3_literal, n1)
+    (ast_vector3_literal, n2)
+    (ast_vector3_literal, n3)
+    (ast_vector2_literal, t1)
+    (ast_vector2_literal, t2)
+    (ast_vector2_literal, t3)
+    (ast_material, material)
+)
+
+BOOST_FUSION_ADAPT_STRUCT(
     ast_instance,
     (ast_matrix, transform)
     (ast_intersectable, intersectable)
+)
+
+BOOST_FUSION_ADAPT_STRUCT(
+    ast_vector2_literal,
+    (float, x)
+    (float, y)
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
