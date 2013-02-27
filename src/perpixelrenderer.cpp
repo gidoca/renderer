@@ -40,7 +40,7 @@ using namespace boost::program_options;
 using namespace std;
 using namespace cv;
 
-void PerPixelRenderer::render(const Scene & scene, cv::Mat & film, const boost::program_options::variables_map vm)
+void PerPixelRenderer::render()
 {
   Integrator * integrator;
   if(vm["pt-integrator"].as<string>() == "unidi")
@@ -58,16 +58,18 @@ void PerPixelRenderer::render(const Scene & scene, cv::Mat & film, const boost::
   unsigned long seed = getSeed(vm);
   
   #pragma omp parallel for schedule(dynamic)
-  for(int i = 0; i < film.size().height; i++)
+  for(int i = 0; i < film->size().height; i++)
   {
+    if(doStop) continue;
+
     gsl_rng *rng = gsl_rng_alloc(gsl_rng_taus2);
-    gsl_rng_set(rng, film.size().height * seed + i);
+    gsl_rng_set(rng, film->size().height * seed + i);
     if(vm.count("verbose"))
     {
-      std::cout << i * 100 / film.size().height << "% complete, ETA: " << (long)time.elapsed() * (film.size().height - i) / ((i + 1) * 1000) << "s" << std::endl;
+      std::cout << i * 100 / film->size().height << "% complete, ETA: " << (long)time.elapsed() * (film->size().height - i) / ((i + 1) * 1000) << "s" << std::endl;
     }
-    Vec3f * scanline = film.ptr<Vec3f>(i);
-    for(int j = 0; j < film.size().width; j++)
+    Vec3f * scanline = film->ptr<Vec3f>(i);
+    for(int j = 0; j < film->size().width; j++)
     {
 #ifndef NDEBUG
       //Black pixel

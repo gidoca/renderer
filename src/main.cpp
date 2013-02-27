@@ -61,25 +61,6 @@ struct option_adder
   }
 };
 
-void render(Renderer * renderer, cv::Mat *film, Scene scene, variables_map vm, Tonemapper tm, QTime time)
-{  
-  renderer->render(scene, *film, vm);
-  if(vm.count("save-exr"))
-  {
-      imwrite(vm["save-exr"].as<string>(), *film);
-  }
-  if(vm.count("save-img"))
-  {
-      QImage img = tm.tonemap(*film);
-      img.save(QString(vm["save-img"].as<string>().c_str()));
-  }
-  delete renderer;
-  if(vm.count("verbose"))
-  {
-    cout << "Rendering complete, " << time.elapsed() / 1000 << "s elapsed" << endl;
-  }
-}
-
 int main(int argc, char **argv) {
   QTime time;
   time.start();
@@ -100,7 +81,7 @@ int main(int argc, char **argv) {
 	image.add_options()
       ("renderer,r", value<string>()->default_value("pathtracing"), "the rendering algorithm to be used (either pathtracing (the default), energyredist, metropolisflt, or metropolis)")
       ("fixed-seed,d", "use a fixed seed for the RNG to make the resulting image deterministic")
-      ("seed", value<unsigned long>()->default_value(0), "the random generator seed to use when the --fixed-seed option is set; defaults to 0")
+      ("seed", value<unsigned long>()->default_value(0), "the random generator seed to use when the --fixed-seed option is set")
       ("scene,s", value<string>(), "the scene description file (mandatory)")
       ("gamma,g", value<float>()->default_value(2.2f, "2.2"), "the gamma correction to apply to the display and to LDR image file output");
   command_line_options.add(image);
@@ -127,13 +108,6 @@ int main(int argc, char **argv) {
     return 0;
   }
 
-  Renderer * renderer = getRendererByName(vm["renderer"].as<string>());
-  if(renderer == 0)
-  {
-    cerr << "Unknown renderer: " << vm["renderer"].as<string>() << endl;
-    return -1;
-  }
-
   if(vm.count("verbose")) cout << "Loading scene..." << endl;
 
   SceneGrammar parser;
@@ -157,19 +131,42 @@ int main(int argc, char **argv) {
   Tonemapper tm(scene.camera.getResolution(), vm["gamma"].as<float>());
 
   cv::Mat * film = new cv::Mat(scene.camera.getResolution().height(), scene.camera.getResolution().width(), CV_32FC3);
-  film->setTo(cv::Vec3f(0, 0, 0));
-  QFuture< void > future = QtConcurrent::run(std::bind(render, renderer, film, scene, vm, tm, time));
+
+  Renderer * renderer = getRendererByName(vm["renderer"].as<string>());
+  if(renderer == 0)
+  {
+    cerr << "Unknown renderer: " << vm["renderer"].as<string>() << endl;
+    return -1;
+  }
+
+  renderer->setOutput(film);
+  renderer->setOptions(vm);
   
   if(vm.count("gui") || (!vm.count("save-exr") && !vm.count("save-img")))
   {
-    Win l(*film, future, tm);
+    Win l(*film, scene, tm);
+    QObject::connect(renderer, SIGNAL(finishedRendering()), &l, SLOT(complete()), Qt::QueuedConnection);
+    QObject::connect(renderer, SIGNAL(startingRendering()), &l, SLOT(starting()), Qt::QueuedConnection);
+    QObject::connect(&l, SIGNAL(rerender(Scene)), renderer, SLOT(startRendering(Scene)));
     l.show();
-  
+
+    renderer->startRendering(scene);
+
     return app.exec();
   }
   else
   {
-    future.waitForFinished();
+    renderer->startRendering(scene);
+    renderer->wait();
+    if(vm.count("save-exr"))
+    {
+        imwrite(vm["save-exr"].as<string>(), *film);
+    }
+    if(vm.count("save-img"))
+    {
+        QImage img = tm.tonemap(*film);
+        img.save(QString(vm["save-img"].as<string>().c_str()));
+    }
     return 0;
   }
 }

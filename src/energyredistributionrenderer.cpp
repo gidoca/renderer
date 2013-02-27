@@ -35,7 +35,7 @@
 using namespace boost::program_options;
 using namespace cv;
 
-void EnergyRedistributionRenderer::render(const Scene &scene, Mat &film, boost::program_options::variables_map vm)
+void EnergyRedistributionRenderer::render()
 {
   const unsigned long seed = getSeed(vm);
 
@@ -44,7 +44,7 @@ void EnergyRedistributionRenderer::render(const Scene &scene, Mat &film, boost::
   const float ed = computeEd(scene, globalrng, vm["erpt-mutations"].as<int>());
   gsl_rng_free(globalrng);
 
-  Size size = film.size();
+  Size size = film->size();
 
   QTime time;
   time.start();
@@ -52,6 +52,8 @@ void EnergyRedistributionRenderer::render(const Scene &scene, Mat &film, boost::
   #pragma omp parallel for schedule(dynamic)
   for(int i = 0; i < size.height; i++)
   {
+    if(doStop) continue;
+
     if(vm.count("verbose"))
     {
         std::cout << i * 100 / size.height << "% complete, ETA: " << time.elapsed() * (size.height - i) / ((i + 1) * 1000) << "s" << std::endl;
@@ -70,7 +72,7 @@ void EnergyRedistributionRenderer::render(const Scene &scene, Mat &film, boost::
         point.ry() /= size.height;
         MetropolisSample initialSample(scene.light.size());
         initialSample.initAtPixel(point, rng);
-        equalDispositionFlow(film, initialSample, *scene.object, scene.light, scene.camera, rng, ed, vm);
+        equalDispositionFlow(*film, initialSample, *scene.object, scene.light, scene.camera, rng, ed, vm);
       }
     }
     gsl_rng_free(rng);

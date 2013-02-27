@@ -192,13 +192,13 @@ void MetropolisFltRenderer::renderStep(Size size, const Scene& scene, Mat import
   sumImportance = newSumImportance;
 }
 
-void MetropolisFltRenderer::render(const Scene & scene, Mat & film, const boost::program_options::variables_map vm)
+void MetropolisFltRenderer::render()
 {
   this->vm = vm;
   const int seed = getSeed(vm);
   numPasses = vm["metflt-num-passes"].as<int>();
 
-  sumImportance = Mat::zeros(film.size(), CV_32F);
+  sumImportance = Mat::zeros(film->size(), CV_32F);
 
   QTime time;
   time.start();
@@ -215,13 +215,13 @@ void MetropolisFltRenderer::render(const Scene & scene, Mat & film, const boost:
 
   for(int n = 0; n < num_films; n++)
   {
-    films[n] = Mat::zeros(film.size(), CV_32FC3);
-    biased_mean[n] = Mat::zeros(film.size(), CV_32FC3);
-    biased_m2[n] = Mat::zeros(film.size(), CV_32FC3);
-    sumweight[n] = Mat::zeros(film.size(), CV_32F);
+    films[n] = Mat::zeros(film->size(), CV_32FC3);
+    biased_mean[n] = Mat::zeros(film->size(), CV_32FC3);
+    biased_m2[n] = Mat::zeros(film->size(), CV_32FC3);
+    sumweight[n] = Mat::zeros(film->size(), CV_32F);
   }
 
-  renderStep(film.size(), scene, films, biased_var, biased_mean, biased_m2, sumweight, seed, true);
+  renderStep(film->size(), scene, films, biased_var, biased_mean, biased_m2, sumweight, seed, true);
 
   if(vm.count("verbose"))
   {
@@ -229,7 +229,7 @@ void MetropolisFltRenderer::render(const Scene & scene, Mat & film, const boost:
   }
 
   Mat noisy_variance;
-  var(film, noisy_variance, films);
+  var(*film, noisy_variance, films);
 
   assert(checkRange(noisy_variance));
 
@@ -253,7 +253,7 @@ void MetropolisFltRenderer::render(const Scene & scene, Mat & film, const boost:
 
   imwrite("/tmp/film0.exr", films[0]);
   imwrite("/tmp/film1.exr", films[1]);
-  imwrite("/tmp/film.exr", film);
+  imwrite("/tmp/film.exr", *film);
   imwrite("/tmp/var.exr", filteredVar);
 
   vector<Mat> filteredFilms(num_films);
@@ -271,7 +271,7 @@ void MetropolisFltRenderer::render(const Scene & scene, Mat & film, const boost:
   var(filteredMean, varOfFiltered, filteredFilms);
   if(!vm.count("metflt-omit-filter"))
   {
-      film = filteredMean;
+      *film = filteredMean;
   }
 
   Mat newOut;
@@ -289,7 +289,7 @@ void MetropolisFltRenderer::render(const Scene & scene, Mat & film, const boost:
     importanceMap *= importanceMap.size().area() / sum(importanceMap)[0];
     QString fn = QString("/tmp/importance%1.exr").arg(i);
     imwrite(fn.toStdString(), importanceMap);
-    renderStep(film.size(), scene, importanceMap, films, biased_var, biased_mean, biased_m2, sumweight, seed + i, false);
+    renderStep(film->size(), scene, importanceMap, films, biased_var, biased_mean, biased_m2, sumweight, seed + i, false);
     if(vm.count("verbose"))
     {
       cout << time.elapsed() / 1000 << "s elapsed, starting filtering pass " << i << "/" << (vm["metflt-num-passes"].as<int>() - 1) << endl;
@@ -318,14 +318,16 @@ void MetropolisFltRenderer::render(const Scene & scene, Mat & film, const boost:
 
     if(vm.count("metflt-omit-filter"))
     {
-        film = newOut;
+        *film = newOut;
     }
     else
     {
-        film = filteredMean;
+        *film = filteredMean;
     }
     fn = QString("/tmp/iteration%1.exr").arg(i);
-    imwrite(fn.toStdString(), film);
+    imwrite(fn.toStdString(), *film);
+
+    if(doStop) return;
   }
 }
 

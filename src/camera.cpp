@@ -22,9 +22,9 @@
 
 #include <cmath>
 
-Camera::Camera(QVector3D cop, QVector3D look_at, QVector3D up, float fov, QSize resolution) : resolution(resolution)
+void Camera::init()
 {
-  QVector3D w = (cop - look_at).normalized();
+  QVector3D w = (cop - lookAt).normalized();
   QVector3D u = QVector3D::normal(up, w);
   QVector3D v = QVector3D::crossProduct(w, u);
   aspect = (float) resolution.width() / resolution.height();

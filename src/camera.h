@@ -33,16 +33,65 @@ class Camera
 {
   public:
     Camera() {}
-    Camera(QVector3D cop, QVector3D look_at, QVector3D up, float fov, QSize resolution);
+    Camera(QVector3D cop, QVector3D lookAt, QVector3D up, float fov, QSize resolution) : cop(cop), lookAt(lookAt), up(up), fov(fov), resolution(resolution)
+    {
+        init();
+    }
 
-    inline QSize getResolution() const
+    QSize getResolution() const
     {
       return resolution;
     }
-    
+    QVector3D getCOP() const
+    {
+        return cop;
+    }
+    QVector3D getLookAt() const
+    {
+        return lookAt;
+    }
+    QVector3D getUp() const
+    {
+        return up;
+    }
+    float getFOV() const
+    {
+        return fov;
+    }
+
+    void setResolution(QSize resolution)
+    {
+        this->resolution = resolution;
+        init();
+    }
+    void setCOP(QVector3D cop)
+    {
+        this->cop = cop;
+        init();
+    }
+    void setLookAt(QVector3D lookAt)
+    {
+        this->lookAt = lookAt;
+        init();
+    }
+    void setUp(QVector3D up)
+    {
+        this->up = up;
+        init();
+    }
+    void setFOV(float fov)
+    {
+        this->fov = fov;
+        init();
+    }
+
     Ray getRay(QPointF point) const;
   private:
+    void init();
+
     float t, b, l, r, aspect;
+    QVector3D cop, lookAt, up;
+    float fov;
     QSize resolution;
     QMatrix4x4 extrinsicMatrix;
 };

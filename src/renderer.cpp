@@ -36,6 +36,7 @@
 #include <cmath>
 #include <cassert>
 #include <algorithm>
+#include <iostream>
 
 #include <QTime>
 
@@ -141,6 +142,25 @@ unsigned long Renderer::getSeed(boost::program_options::variables_map vm)
   }
   else
   {
-    return QTime::currentTime().msec() + 1000ul * QTime::currentTime().second();
+    return (unsigned long)QTime::currentTime().msec() + 1000ul * (unsigned long)QTime::currentTime().second();
   }
+}
+
+void Renderer::startRendering(Scene scene)
+{
+    doStop = true;
+    wait();
+    doStop = false;
+    this->scene = scene;
+    film->setTo(cv::Vec3f(0, 0, 0));
+    Q_EMIT startingRendering();
+    start();
+}
+
+void Renderer::run()
+{
+    if(doStop) return;
+    render();
+    if(vm.count("verbose")) std::cout << "Rendering complete" << std::endl;
+    Q_EMIT finishedRendering();
 }

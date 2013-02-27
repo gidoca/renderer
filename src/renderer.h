@@ -21,6 +21,8 @@
 #ifndef RENDERER_H
 #define RENDERER_H
 
+#include <QThread>
+
 #include <vector>
 #include <string>
 
@@ -39,19 +41,46 @@
 
 typedef boost::mpl::list<MetropolisRenderer, MetropolisFltRenderer, PerPixelRenderer, EnergyRedistributionRenderer> renderers;
 
-class Renderer
+class Renderer : public QThread
 {
+  Q_OBJECT
+
 public:
+  Renderer() : doStop(true) {}
+  Renderer(const Renderer& other) : QThread(), doStop(other.doStop), scene(other.scene), film(other.film), vm(other.vm) {}
   virtual ~Renderer() {}
-  virtual void render(const Scene & scene, cv::Mat & film, const boost::program_options::variables_map vm) = 0;
+
+  void setOutput(cv::Mat * film)
+  {
+      this->film = film;
+  }
+  void setOptions(const boost::program_options::variables_map vm)
+  {
+      this->vm = vm;
+  }
   
   static boost::program_options::options_description options();
 
   static Path createPath(const Ray & primaryRay, const Intersectable & scene, gsl_rng *rng, cv::Vec3f initialAlpha = cv::Vec3f(1, 1, 1), float terminationProb = 0.f);
   static Path createPath(const Ray & primaryRay, const Intersectable & scene, Sample pathSamples[], cv::Vec3f initialAlpha = cv::Vec3f(1, 1, 1), int pathLength = MAX_DEPTH, float russianRoulettePdf = 1);
 
+public Q_SLOTS:
+  void startRendering(Scene scene);
+
+Q_SIGNALS:
+  void startingRendering();
+  void finishedRendering();
+
 protected:
   unsigned long getSeed(boost::program_options::variables_map vm);
+
+  void run();
+  virtual void render() = 0;
+
+  bool doStop;
+  Scene scene;
+  cv::Mat * film;
+  boost::program_options::variables_map vm;
 };
 
 Renderer *getRendererByName(std::string name);
