@@ -23,14 +23,16 @@
 
 #include "global.h"
 
+#include "sceneast.h"
+
 #include <string>
 #include <map>
 
 class ObjReader
 {
   public:
-    static Intersectable* getMesh(std::string fileName, Material * defaultMaterial, std::map<std::string, Material*> materials);
-    static void getMaterials(std::string filename, std::map<std::string, Material*> &materials);
+    static ast_intersectable_list getMesh(std::string fileName, ast_literal_material defaultMaterial);
+    static void getMaterials(std::string filename, std::map<std::string, ast_literal_material> &materials);
 };
 
 #endif

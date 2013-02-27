@@ -41,6 +41,7 @@
 
 #include <boost/foreach.hpp>
 #include <boost/variant/apply_visitor.hpp>
+#include <boost/variant/get.hpp>
 
 #include <list>
 #include <vector>
@@ -211,16 +212,6 @@ struct intersectable_builder : boost::static_visitor<Intersectable*>
       return new Plane(p.vector.asQVector(), boost::apply_visitor(material_b, p.material));
   }
 
-  Intersectable* operator()(const ast_obj& o) const
-  {
-      Intersectable* mesh = ObjReader::getMesh(o.filename.c_str(), boost::apply_visitor(material_b, o.material), materials);
-      AxisAlignedBox* bb = mesh->boundingBox();
-      QVector3D min = bb->getMin(), max = bb->getMax();
-      delete bb;
-      std::cout << "Mesh bb min: " << min.x() << "," << min.y() << "," << min.z() << "; max: " << max.x() << "," << max.y() << "," << max.z() << std::endl;
-      return mesh;
-  }
-
   Triangle* operator()(const ast_triangle& t) const
   {
       return new Triangle(t.p1.asQVector(), t.p2.asQVector(), t.p3.asQVector(), t.n1.asQVector(), t.n2.asQVector(), t.n3.asQVector(), t.t1.asCVPoint(), t.t2.asCVPoint(), t.t3.asCVPoint(), boost::apply_visitor(material_b, t.material));
@@ -228,6 +219,7 @@ struct intersectable_builder : boost::static_visitor<Intersectable*>
 
   IntersectableList* operator()(const ast_intersectable_list& l) const;
   IntersectableInstance* operator()(const ast_instance& i) const;
+  Intersectable* operator()(const ast_obj& o) const;
 
   std::map<std::string, Material*>& materials;
 
@@ -250,6 +242,17 @@ IntersectableList* intersectable_builder::operator()(ast_intersectable_list cons
 IntersectableInstance* intersectable_builder::operator()(const ast_instance& i) const
 {
     return new IntersectableInstance(i.transform.asQMatrix4x4(), boost::apply_visitor(*this, i.intersectable));
+}
+
+Intersectable* intersectable_builder::operator()(const ast_obj& o) const
+{
+    ast_intersectable inters = ObjReader::getMesh(o.filename.c_str(), boost::get<ast_literal_material>(o.material));
+    Intersectable* mesh = boost::apply_visitor(*this, inters);
+    AxisAlignedBox* bb = mesh->boundingBox();
+    QVector3D min = bb->getMin(), max = bb->getMax();
+    delete bb;
+    std::cout << "Mesh bb min: " << min.x() << "," << min.y() << "," << min.z() << "; max: " << max.x() << "," << max.y() << "," << max.z() << std::endl;
+    return mesh;
 }
 
 struct light_builder : boost::static_visitor<const Light*>
