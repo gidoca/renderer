@@ -235,34 +235,6 @@ struct ast_assignment
     ast_value value;
 };
 
-inline bool operator==(const ast_vector2_literal & lhs, const ast_vector2_literal & rhs) {return boost::fusion::equal_to(lhs, rhs);}
-inline bool operator==(const ast_vector3_literal & lhs, const ast_vector3_literal & rhs) {return boost::fusion::equal_to(lhs, rhs);}
-inline bool operator==(const ast_vector4_literal & lhs, const ast_vector4_literal & rhs) {return boost::fusion::equal_to(lhs, rhs);}
-inline bool operator==(const ast_diffuse_material & lhs, const ast_diffuse_material & rhs) {return boost::fusion::equal_to(lhs, rhs);}
-inline bool operator==(const ast_phong_material & lhs, const ast_phong_material & rhs) {return boost::fusion::equal_to(lhs, rhs);}
-inline bool operator==(const ast_mirror_material & lhs, const ast_mirror_material & rhs) {return boost::fusion::equal_to(lhs, rhs);}
-inline bool operator==(const ast_texture_material & lhs, const ast_texture_material & rhs) {return boost::fusion::equal_to(lhs, rhs);}
-inline bool operator==(const ast_refractive_material & lhs, const ast_refractive_material & rhs) {return boost::fusion::equal_to(lhs, rhs);}
-inline bool operator==(const ast_matrix_literal & lhs, const ast_matrix_literal & rhs) {return boost::fusion::equal_to(lhs, rhs);}
-inline bool operator==(const ast_matrix_translate & lhs, const ast_matrix_translate & rhs) {return boost::fusion::equal_to(lhs, rhs);}
-inline bool operator==(const ast_matrix_rotate & lhs, const ast_matrix_rotate & rhs) {return boost::fusion::equal_to(lhs, rhs);}
-inline bool operator==(const ast_matrix_scale & lhs, const ast_matrix_scale & rhs) {return boost::fusion::equal_to(lhs, rhs);}
-inline bool operator==(const ast_matrix_scale_vect & lhs, const ast_matrix_scale_vect & rhs) {return boost::fusion::equal_to(lhs, rhs);}
-inline bool operator==(const ast_matrix & lhs, const ast_matrix & rhs) {return boost::fusion::equal_to(lhs, rhs);}
-inline bool operator==(const ast_intersectable_list & lhs, const ast_intersectable_list & rhs) {return boost::fusion::equal_to(lhs, rhs);}
-inline bool operator==(const ast_sphere & lhs, const ast_sphere & rhs) {return boost::fusion::equal_to(lhs, rhs);}
-inline bool operator==(const ast_box & lhs, const ast_box & rhs) {return boost::fusion::equal_to(lhs, rhs);}
-inline bool operator==(const ast_quad & lhs, const ast_quad & rhs) {return boost::fusion::equal_to(lhs, rhs);}
-inline bool operator==(const ast_plane & lhs, const ast_plane & rhs) {return boost::fusion::equal_to(lhs, rhs);}
-inline bool operator==(const ast_obj & lhs, const ast_obj & rhs) {return boost::fusion::equal_to(lhs, rhs);}
-inline bool operator==(const ast_triangle & lhs, const ast_triangle & rhs) {return boost::fusion::equal_to(lhs, rhs);}
-inline bool operator==(const ast_instance & lhs, const ast_instance & rhs) {return boost::fusion::equal_to(lhs, rhs);}
-inline bool operator==(const ast_camera & lhs, const ast_camera & rhs) {return boost::fusion::equal_to(lhs, rhs);}
-inline bool operator==(const ast_point_light & lhs, const ast_point_light & rhs) {return boost::fusion::equal_to(lhs, rhs);}
-inline bool operator==(const ast_area_light & lhs, const ast_area_light & rhs) {return boost::fusion::equal_to(lhs, rhs);}
-inline bool operator==(const ast_cone_light & lhs, const ast_cone_light & rhs) {return boost::fusion::equal_to(lhs, rhs);}
-inline bool operator==(const ast_assignment & lhs, const ast_assignment & rhs) {return boost::fusion::equal_to(lhs, rhs);}
-
 BOOST_FUSION_ADAPT_STRUCT(
     ast_intersectable_list,
     (std::vector<ast_intersectable>, children)

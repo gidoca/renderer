@@ -108,6 +108,10 @@ QMatrix4x4 ast_matrix::asQMatrix4x4() const
     return first;
 }
 
+template<typename T> bool operator==(const T & lhs, const T & rhs) {
+    return boost::fusion::equal_to(lhs, rhs);
+}
+
 struct variant_hasher: public boost::static_visitor<std::size_t> {
     template <class T>
     std::size_t operator()(T const& val) const {
