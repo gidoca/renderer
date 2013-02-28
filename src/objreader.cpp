@@ -239,8 +239,7 @@ void createMaterial(ast_vector3_literal diffuseColor, ast_vector3_literal specul
         ast_texture_material texture = {textureFilename};
         materials[materialName] = texture;
     }
-
-    if(diffuseColor.x != 0 || diffuseColor.y != 0 || diffuseColor.z != 0)
+    else if(diffuseColor.x != 0 || diffuseColor.y != 0 || diffuseColor.z != 0)
     {
         if((specularColor.x == 0 && specularColor.y == 0 && specularColor.z == 0) || specularCoefficient == 0)
         {
@@ -252,7 +251,6 @@ void createMaterial(ast_vector3_literal diffuseColor, ast_vector3_literal specul
             ast_phong_material phong = {diffuseColor, specularColor, specularCoefficient};
             materials[materialName] = phong;
         }
-        return;
     }
 }
 

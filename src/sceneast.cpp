@@ -42,10 +42,14 @@
 #include <boost/foreach.hpp>
 #include <boost/variant/apply_visitor.hpp>
 #include <boost/variant/get.hpp>
+#include <boost/fusion/include/equal_to.hpp>
+#include <boost/functional/hash.hpp>
+#include <boost/fusion/algorithm/iteration/fold.hpp>
 
 #include <list>
 #include <vector>
 #include <map>
+#include <unordered_map>
 #include <iostream>
 
 #include <QMatrix4x4>
@@ -104,9 +108,42 @@ QMatrix4x4 ast_matrix::asQMatrix4x4() const
     return first;
 }
 
+struct variant_hasher: public boost::static_visitor<std::size_t> {
+    template <class T>
+    std::size_t operator()(T const& val) const {
+        using namespace boost;
+        boost::hash<T> hasher;
+        return hasher(val);
+    }
+};
+
+struct hash_combine_s {
+    typedef std::size_t result_type;
+    template<class T>
+    std::size_t operator()(std::size_t current, const T& arg) {
+        boost::hash_combine(current, arg);
+        return(current);
+    }
+};
+
+template<typename T>
+std::size_t hash_value(const T& t)
+{
+    return boost::fusion::fold(t, 0, hash_combine_s());
+}
+
+template < BOOST_VARIANT_ENUM_PARAMS(typename T) >
+std::size_t hash_value(boost::variant< BOOST_VARIANT_ENUM_PARAMS(T) > const& val) {
+    std::size_t seed = boost::apply_visitor(variant_hasher(), val);
+    boost::hash_combine(seed, val.which());
+    return seed;
+}
+
+typedef std::unordered_map<ast_material, Material*, variant_hasher > ast_mat_map;
+
 struct material_builder : boost::static_visitor<Material*>
 {
-  material_builder(std::map<std::string, Material*>& materials) : materials(materials) {}
+  material_builder(std::map<std::string, Material*>& materials, ast_mat_map &ast_materials) : ast_materials(ast_materials), materials(materials) {}
 
   Material* operator()(ast_diffuse_material material) const
   {
@@ -156,9 +193,14 @@ struct material_builder : boost::static_visitor<Material*>
 
   Material* operator()(ast_literal_material material) const
   {
-      return boost::apply_visitor(*this, material);
+      if(!ast_materials.count(material))
+      {
+          ast_materials[material] = boost::apply_visitor(*this, material);
+      }
+      return ast_materials[material];
   }
 
+  ast_mat_map &ast_materials;
   std::map<std::string, Material*>& materials;
 };
 
@@ -190,43 +232,44 @@ Camera ast_camera::asCamera() const
 
 struct intersectable_builder : boost::static_visitor<Intersectable*>
 {
-  intersectable_builder(std::map<std::string, Material*>& materials) : materials(materials), material_b(materials) {}
+  intersectable_builder(std::map<std::string, Material*>& materials, ast_mat_map &ast_materials) : ast_materials(ast_materials), materials(materials), material_b(materials, ast_materials) {}
 
-  Sphere* operator()(const ast_sphere& s) const
+  Sphere* operator()(const ast_sphere& s)
   {
     return new Sphere(s.center.asQVector(), s.radius, boost::apply_visitor(material_b, s.material));
   }
 
-  AxisAlignedBox* operator()(const ast_box& b) const
+  AxisAlignedBox* operator()(const ast_box& b)
   {
     return new AxisAlignedBox(b.min.asQVector(), b.max.asQVector(), boost::apply_visitor(material_b, b.material));
   }
 
-  Quad* operator()(const ast_quad& q) const
+  Quad* operator()(const ast_quad& q)
   {
     return new Quad(q.p1.asQVector(), q.p2.asQVector(), q.p3.asQVector(), q.p4.asQVector(), boost::apply_visitor(material_b, q.material));
   }
 
-  Plane* operator()(const ast_plane& p) const
+  Plane* operator()(const ast_plane& p)
   {
       return new Plane(p.vector.asQVector(), boost::apply_visitor(material_b, p.material));
   }
 
-  Triangle* operator()(const ast_triangle& t) const
+  Triangle* operator()(const ast_triangle& t)
   {
       return new Triangle(t.p1.asQVector(), t.p2.asQVector(), t.p3.asQVector(), t.n1.asQVector(), t.n2.asQVector(), t.n3.asQVector(), t.t1.asCVPoint(), t.t2.asCVPoint(), t.t3.asCVPoint(), boost::apply_visitor(material_b, t.material));
   }
 
-  IntersectableList* operator()(const ast_intersectable_list& l) const;
-  IntersectableInstance* operator()(const ast_instance& i) const;
-  Intersectable* operator()(const ast_obj& o) const;
+  IntersectableList* operator()(const ast_intersectable_list& l);
+  IntersectableInstance* operator()(const ast_instance& i);
+  Intersectable* operator()(const ast_obj& o);
 
+  ast_mat_map &ast_materials;
   std::map<std::string, Material*>& materials;
 
   material_builder material_b;
 };
 
-IntersectableList* intersectable_builder::operator()(ast_intersectable_list const& l) const
+IntersectableList* intersectable_builder::operator()(ast_intersectable_list const& l)
 {
   vector<Intersectable*> intersectables;
   intersectables.reserve(l.children.size());
@@ -239,12 +282,12 @@ IntersectableList* intersectable_builder::operator()(ast_intersectable_list cons
   return new IntersectableList(intersectables);
 }
 
-IntersectableInstance* intersectable_builder::operator()(const ast_instance& i) const
+IntersectableInstance* intersectable_builder::operator()(const ast_instance& i)
 {
     return new IntersectableInstance(i.transform.asQMatrix4x4(), boost::apply_visitor(*this, i.intersectable));
 }
 
-Intersectable* intersectable_builder::operator()(const ast_obj& o) const
+Intersectable* intersectable_builder::operator()(const ast_obj& o)
 {
     ast_intersectable inters = ObjReader::getMesh(o.filename.c_str(), boost::get<ast_literal_material>(o.material));
     Intersectable* mesh = boost::apply_visitor(*this, inters);
@@ -275,7 +318,7 @@ struct light_builder : boost::static_visitor<const Light*>
 
 struct scene_builder : boost::static_visitor<void>
 {
-    scene_builder() : intersectable_b(materials), material_b(materials) {}
+    scene_builder() : intersectable_b(materials, ast_materials), material_b(materials, ast_materials) {}
 
     void addAssignment(ast_assignment assignment)
     {
@@ -345,6 +388,8 @@ struct scene_builder : boost::static_visitor<void>
     map<string, Intersectable*> intersectables;
     map<string, vector<const Light*> > lights;
     map<string, Material*> materials;
+
+    ast_mat_map ast_materials;
 
 private:
     void deleteAllVars(std::string name)
