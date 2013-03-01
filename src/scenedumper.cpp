@@ -74,12 +74,9 @@ public:
         out << '"' << s << '"';
     }
 
-    void operator()(ast_material m) const
-    {
-    }
-
     void operator()(ast_matrix m) const
     {
+        c();
         boost::apply_visitor(MatrixPrinter(out), m.first);
         BOOST_FOREACH(ast_basic_matrix mat, m.mult)
         {
@@ -88,10 +85,8 @@ public:
         }
     }
 
-    void operator()(ast_intersectable) const
-    {
-
-    }
+    void operator()(ast_material m) const;
+    void operator()(ast_intersectable) const;
 
 private:
     bool * const first;
@@ -119,6 +114,7 @@ public:
     void operator()(ast_intersectable value) const;
     void operator()(ast_literal_material l) const;
     void operator()(std::string value) const;
+    void operator()(std::vector<char> value) const;
     void operator()(ast_intersectable_list value) const;
 
     template<typename T>
@@ -171,6 +167,11 @@ void AstVisitor::operator ()(ast_literal_material l) const
     l.apply_visitor(*this);
 }
 
+void AstVisitor::operator()(std::vector<char> value) const
+{
+    out << std::string(value.begin(), value.end());
+}
+
 void AstVisitor::operator()(std::string value) const
 {
     out << value;
@@ -184,4 +185,16 @@ void AstVisitor::operator()(ast_intersectable_list value) const
         i.apply_visitor(*this);
     }
     out << "}";
+}
+
+void ad::operator()(ast_material m) const
+{
+    c();
+    boost::apply_visitor(AstVisitor(out), m);
+}
+
+void ad::operator()(ast_intersectable i) const
+{
+    c();
+    boost::apply_visitor(AstVisitor(out), i);
 }
