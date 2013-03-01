@@ -56,6 +56,34 @@
 
 using namespace std;
 
+const std::string ast_vector2_literal::function_name = "ast_vector2_literal";
+const std::string ast_vector3_literal::function_name = "ast_vector3_literal";
+const std::string ast_vector4_literal::function_name = "ast_vector4_literal";
+const std::string ast_diffuse_material::function_name = "diffuse";
+const std::string ast_phong_material::function_name = "phong";
+const std::string ast_mirror_material::function_name = "mirror";
+const std::string ast_texture_material::function_name = "texture";
+const std::string ast_refractive_material::function_name = "refractive";
+const std::string ast_matrix_literal::function_name = "ast_matrix_literal";
+const std::string ast_matrix_translate::function_name = "translate";
+const std::string ast_matrix_rotate::function_name = "rotate";
+const std::string ast_matrix_scale::function_name = "scale";
+const std::string ast_matrix_scale_vect::function_name = "scale";
+const std::string ast_matrix::function_name = "ast_matrix";
+const std::string ast_intersectable_list::function_name = "ast_intersectable_list";
+const std::string ast_sphere::function_name = "sphere";
+const std::string ast_box::function_name = "box";
+const std::string ast_quad::function_name = "quad";
+const std::string ast_plane::function_name = "plane";
+const std::string ast_obj::function_name = "obj";
+const std::string ast_triangle::function_name = "triangle";
+const std::string ast_instance::function_name = "instance";
+const std::string ast_camera::function_name = "camera";
+const std::string ast_point_light::function_name = "pointlight";
+const std::string ast_area_light::function_name = "srealight";
+const std::string ast_cone_light::function_name = "conelight";
+const std::string ast_assignment::function_name = "ast_assignment";
+
 struct matrix_evaluator : boost::static_visitor<QMatrix4x4>
 {
     QMatrix4x4 operator()(ast_matrix_literal literal) const
@@ -143,7 +171,7 @@ std::size_t hash_value(boost::variant< BOOST_VARIANT_ENUM_PARAMS(T) > const& val
     return seed;
 }
 
-typedef std::unordered_map<ast_material, Material*, variant_hasher > ast_mat_map;
+typedef std::unordered_map<ast_material, Material*, variant_hasher> ast_mat_map;
 
 struct material_builder : boost::static_visitor<Material*>
 {
