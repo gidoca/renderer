@@ -18,6 +18,9 @@
  * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
  * USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
+
+#include "main.h"
+
 #include <QtCore>
 #include <QApplication>
 #include <QTime>
@@ -60,6 +63,11 @@ struct option_adder
     desc->add(R::options());
   }
 };
+
+void PrintFinished::printTime()
+{
+    cout << "Rendering complete, " << timeElapsed.elapsed() / 1000 << "s elapsed." << endl;
+}
 
 int main(int argc, char **argv) {
   QTime time;
@@ -145,7 +153,9 @@ int main(int argc, char **argv) {
   if(vm.count("gui") || (!vm.count("save-exr") && !vm.count("save-img")))
   {
     Win l(*film, scene, tm);
+    PrintFinished p(time);
     QObject::connect(renderer, SIGNAL(finishedRendering()), &l, SLOT(complete()), Qt::QueuedConnection);
+    QObject::connect(renderer, SIGNAL(finishedRendering()), &p, SLOT(printTime()));
     QObject::connect(renderer, SIGNAL(startingRendering()), &l, SLOT(starting()), Qt::QueuedConnection);
     QObject::connect(&l, SIGNAL(rerender(Scene)), renderer, SLOT(startRendering(Scene)));
     l.show();
@@ -167,6 +177,7 @@ int main(int argc, char **argv) {
         QImage img = tm.tonemap(*film);
         img.save(QString(vm["save-img"].as<string>().c_str()));
     }
+    if(vm.count("verbose")) cout << "Rendering complete, " << time.elapsed() / 1000 << "s elapsed." << endl;
     return 0;
   }
 }

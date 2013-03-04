@@ -8,7 +8,7 @@ include(${QT_USE_FILE})
 #set(CMAKE_AUTOMOC TRUE)
 ADD_DEFINITIONS(${QT_DEFINITIONS} -DQT_NO_KEYWORDS)
 
-set(renderingproject_HEADERS win.h renderer.h)
+set(renderingproject_HEADERS win.h renderer.h main.h)
 set(renderingproject_SRCS main.cpp camera.cpp plane.cpp sphere.cpp intersectable.cpp
   sceneast.cpp sceneparser.cpp scenedumper.cpp
   triangle.cpp intersectableinstance.cpp
