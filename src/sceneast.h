@@ -177,7 +177,8 @@ typedef boost::variant<
     ast_plane,
     ast_obj,
     ast_triangle,
-    boost::recursive_wrapper<ast_instance>
+    boost::recursive_wrapper<ast_instance>,
+    boost::recursive_wrapper<ast_bvh_node>
     > ast_intersectable;
 
 struct ast_intersectable_list
@@ -243,6 +244,14 @@ struct ast_instance
   ast_intersectable intersectable;
 
   static const std::string function_name;
+};
+
+struct ast_bvh_node
+{
+    ast_intersectable left, right;
+    ast_box bb;
+
+    static const std::string function_name;
 };
 
 struct ast_camera
@@ -347,6 +356,13 @@ BOOST_FUSION_ADAPT_STRUCT(
     ast_instance,
     (ast_matrix, transform)
     (ast_intersectable, intersectable)
+)
+
+BOOST_FUSION_ADAPT_STRUCT(
+    ast_bvh_node,
+    (ast_intersectable, left)
+    (ast_intersectable, right)
+    (ast_box, bb)
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
@@ -471,5 +487,7 @@ BOOST_FUSION_ADAPT_STRUCT(
 )
 
 Scene buildScene(std::vector<ast_assignment> assignments);
+
+AxisAlignedBox* getBoundingBoxFromAst(ast_intersectable i);
 
 #endif // SCENEAST_H

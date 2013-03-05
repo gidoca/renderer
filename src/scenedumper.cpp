@@ -74,6 +74,12 @@ public:
         out << '"' << s << '"';
     }
 
+    //Needed to make it compile
+    void operator()(ast_box b) const
+    {
+        (*this)(ast_intersectable(b));
+    }
+
     void operator()(ast_matrix m) const
     {
         c();
@@ -159,7 +165,7 @@ void AstVisitor::operator()(std::vector<ast_light> value) const
 
 void AstVisitor::operator()(ast_intersectable value) const
 {
-    value.apply_visitor(*this);
+    boost::apply_visitor(*this, value);
 }
 
 void AstVisitor::operator ()(ast_literal_material l) const
@@ -182,7 +188,7 @@ void AstVisitor::operator()(ast_intersectable_list value) const
     out << "intersectables{";
     BOOST_FOREACH(ast_intersectable i, value.children)
     {
-        i.apply_visitor(*this);
+        boost::apply_visitor(*this, i);
     }
     out << "}";
 }

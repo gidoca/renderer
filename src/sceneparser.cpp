@@ -42,7 +42,7 @@ SceneGrammar::SceneGrammar() : SceneGrammar::base_type(assignments_rule, "inters
   assignment_rule %= identifier_rule >> "=" >> value_rule >> ";";
   value_rule %= intersectable_rule | light_list_rule | camera_rule | material_literal_rule | identifier_rule;
 
-  intersectable_rule %= intersectable_list_rule | sphere_rule | box_rule | quad_rule | plane_rule | obj_rule | triangle_rule | instance_rule;
+  intersectable_rule %= intersectable_list_rule | sphere_rule | box_rule | quad_rule | plane_rule | obj_rule | triangle_rule | instance_rule | bvh_node_rule;
   intersectable_rule.name("intersectable");
   intersectable_list_rule %= boost::spirit::lit("intersectables") >> boost::spirit::lit("{") >> *intersectable_rule >> boost::spirit::lit("}");
   intersectable_list_rule.name("list of intersectables");
@@ -60,6 +60,8 @@ SceneGrammar::SceneGrammar() : SceneGrammar::base_type(assignments_rule, "inters
   triangle_rule.name("triangle");
   instance_rule %= boost::spirit::lit("instance") >> "(" >> matrix_rule >> "," >> intersectable_rule >> ")";
   instance_rule.name("instance");
+  bvh_node_rule %= boost::spirit::lit("b") >> "(" >> intersectable_rule >> "," >> intersectable_rule >> "," >> box_rule >> ")";
+  bvh_node_rule.name("bvh node");
 
   vector2_literal_rule %= boost::spirit::lit("[") >> boost::spirit::tag::float_() >> boost::spirit::tag::float_() >> "]";
   vector2_literal_rule.name("2-vector literal");

@@ -78,6 +78,7 @@ const std::string ast_plane::function_name = "plane";
 const std::string ast_obj::function_name = "obj";
 const std::string ast_triangle::function_name = "triangle";
 const std::string ast_instance::function_name = "instance";
+const std::string ast_bvh_node::function_name = "b";
 const std::string ast_camera::function_name = "camera";
 const std::string ast_point_light::function_name = "pointlight";
 const std::string ast_area_light::function_name = "srealight";
@@ -293,6 +294,7 @@ struct intersectable_builder : boost::static_visitor<Intersectable*>
 
   IntersectableList* operator()(const ast_intersectable_list& l);
   IntersectableInstance* operator()(const ast_instance& i);
+  BVHNode* operator()(const ast_bvh_node& b);
   Intersectable* operator()(const ast_obj& o);
 
   ast_mat_map &ast_materials;
@@ -317,6 +319,13 @@ IntersectableList* intersectable_builder::operator()(ast_intersectable_list cons
 IntersectableInstance* intersectable_builder::operator()(const ast_instance& i)
 {
     return new IntersectableInstance(i.transform.asQMatrix4x4(), boost::apply_visitor(*this, i.intersectable));
+}
+
+BVHNode* intersectable_builder::operator ()(const ast_bvh_node& b)
+{
+    Intersectable *left = boost::apply_visitor(*this, b.left), *right = boost::apply_visitor(*this, b.right);
+    AxisAlignedBox* bb = (*this)(b.bb);
+    return new BVHNode(left, right, bb);
 }
 
 Intersectable* intersectable_builder::operator()(const ast_obj& o)
@@ -449,3 +458,13 @@ Scene buildScene(vector<ast_assignment> assignments)
   return builder.getScene();
 }
 
+AxisAlignedBox* getBoundingBoxFromAst(ast_intersectable i)
+{
+    ast_mat_map ast_materials;
+    map<std::string, Material*> materials;
+    intersectable_builder builder(materials, ast_materials);
+    Intersectable * intersectable = boost::apply_visitor(builder, i);
+    AxisAlignedBox* bb = intersectable->boundingBox();
+    delete intersectable;
+    return bb;
+}
