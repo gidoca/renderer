@@ -85,6 +85,35 @@ const std::string ast_area_light::function_name = "srealight";
 const std::string ast_cone_light::function_name = "conelight";
 const std::string ast_assignment::function_name = "ast_assignment";
 
+struct VariableResolver : boost::static_visitor<>
+{
+public:
+    void apply(ast_assignment &a);
+
+    void operator()(std::string name)
+    {
+        current = values[name];
+    }
+
+    template<typename T>
+    void operator()(T t)
+    {
+        current = ast_value(t);
+    }
+
+private:
+    std::map<std::string, ast_value> values;
+    ast_value current;
+};
+
+void VariableResolver::apply(ast_assignment & a)
+{
+    boost::apply_visitor(*this, a.value);
+    values[a.name] = current;
+    a.value = current;
+}
+
+
 struct matrix_evaluator : boost::static_visitor<QMatrix4x4>
 {
     QMatrix4x4 operator()(ast_matrix_literal literal) const
@@ -450,6 +479,12 @@ private:
 
 Scene buildScene(vector<ast_assignment> assignments)
 {
+  VariableResolver vr;
+  BOOST_FOREACH(ast_assignment assignment, assignments)
+  {
+    vr.apply(assignment);
+  }
+
   scene_builder builder;
   BOOST_FOREACH(ast_assignment assignment, assignments)
   {

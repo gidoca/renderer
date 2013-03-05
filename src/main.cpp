@@ -19,7 +19,7 @@
  * USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include "main.h"
+#include "printfinished.h"
 
 #include <QtCore>
 #include <QApplication>
@@ -64,10 +64,7 @@ struct option_adder
   }
 };
 
-void PrintFinished::printTime()
-{
-    cout << "Rendering complete, " << timeElapsed.elapsed() / 1000 << "s elapsed." << endl;
-}
+
 
 int main(int argc, char **argv) {
   QTime time;
@@ -130,8 +127,6 @@ int main(int argc, char **argv) {
     return -1;
   }
 
-  SceneDumper d;
-  d.dump(parser.getAst());
   Scene scene = buildScene(parser.getAst());
 
   if(vm.count("verbose")) cout << "Scene loaded, " << time.elapsed() / 1000 << "s elapsed." << endl;
