@@ -85,14 +85,101 @@ const std::string ast_area_light::function_name = "srealight";
 const std::string ast_cone_light::function_name = "conelight";
 const std::string ast_assignment::function_name = "ast_assignment";
 
+struct MaterialVariableResolver : boost::static_visitor<ast_literal_material>
+{
+    MaterialVariableResolver(std::map<std::string, ast_value> values) : values(values) {}
+
+    ast_literal_material operator()(ast_literal_material m) const
+    {
+        return m;
+    }
+
+    ast_literal_material operator()(std::vector<char> name) const
+    {
+        return boost::get<ast_literal_material>(boost::get<ast_material>(values.at(std::string(name.begin(), name.end()))));
+    }
+
+private:
+    std::map<std::string, ast_value> values;
+};
+
+struct IntersectableVariableResolver : boost::static_visitor<ast_intersectable>
+{
+    IntersectableVariableResolver(std::map<std::string, ast_value> values) : values(values) {}
+
+    ast_intersectable operator()(std::string name) const
+    {
+        const ast_value v = values.at(name);
+        return boost::get<ast_intersectable>(v);
+    }
+
+    ast_intersectable operator()(ast_intersectable_list l) const
+    {
+        for(unsigned int i = 0; i < l.children.size(); i++)
+        {
+            l.children[i] = boost::apply_visitor(*this, l.children[i]);
+        }
+        return l;
+    }
+
+    ast_intersectable operator()(ast_instance i) const
+    {
+        i.intersectable = boost::apply_visitor(*this, i.intersectable);
+        return i;
+    }
+
+    ast_bvh_node operator()(ast_bvh_node b) const
+    {
+        b.left = boost::apply_visitor(*this, b.left);
+        b.right = boost::apply_visitor(*this, b.right);
+        return b;
+    }
+
+    template<typename T>
+    ast_intersectable operator()(T t) const
+    {
+        t.material = boost::apply_visitor(MaterialVariableResolver(values), t.material);
+        return ast_intersectable(t);
+    }
+
+private:
+    const std::map<std::string, ast_value> values;
+};
+
 struct VariableResolver : boost::static_visitor<>
 {
-public:
-    void apply(ast_assignment &a);
+
+    void apply(ast_assignment &a)
+    {
+        boost::apply_visitor(*this, a.value);
+        values[a.name] = current;
+        a.value = current;
+    }
 
     void operator()(std::string name)
     {
         current = values[name];
+    }
+
+    void operator()(ast_intersectable_list l)
+    {
+        for(unsigned int i = 0; i < l.children.size(); i++)
+        {
+            boost::apply_visitor(IntersectableVariableResolver(values), l.children[i]);
+            l.children[i] = boost::get<ast_intersectable>(current);
+        }
+        current = ast_intersectable(l);
+    }
+    void operator()(ast_bvh_node b)
+    {
+        b.left = boost::apply_visitor(IntersectableVariableResolver(values), b.left);
+        b.right = boost::apply_visitor(IntersectableVariableResolver(values), b.right);
+        current = ast_intersectable(b);
+    }
+    void operator()(ast_instance i)
+    {
+        i.intersectable = boost::apply_visitor(IntersectableVariableResolver(values), i.intersectable);
+        current = ast_intersectable(i);
     }
 
     template<typename T>
@@ -106,12 +193,24 @@ private:
     ast_value current;
 };
 
-void VariableResolver::apply(ast_assignment & a)
+/*struct ObjLoader : boost::static_visitor<ast_value>
 {
-    boost::apply_visitor(*this, a.value);
-    values[a.name] = current;
-    a.value = current;
-}
+    void apply(ast_assignment &a)
+    {
+        a.value = boost::apply_visitor(*this, a.value);
+    }
+
+    ast_value operator()(ast_obj o)
+    {
+        return ast_intersectable(ObjReader::getMesh(o.filename, boost::get<ast_literal_material>(o.material)));
+    }
+
+    template<typename T>
+    ast_value operator()(T t)
+    {
+        return ast_value(t);
+    }
+};*/
 
 
 struct matrix_evaluator : boost::static_visitor<QMatrix4x4>
@@ -240,6 +339,7 @@ struct material_builder : boost::static_visitor<Material*>
 
   Material* operator()(std::vector<char> identifier) const
   {
+      std::cout << "varmat" << std::endl;
       std::string name = std::string(identifier.begin(), identifier.end());
       Material* material = materials[name];
       if(material == 0)
