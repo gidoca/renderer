@@ -2,47 +2,101 @@
 
 #include <boost/foreach.hpp>
 #include <boost/variant/apply_visitor.hpp>
-#include <boost/fusion/include/for_each.hpp>
-
-using boost::fusion::begin;
-using boost::fusion::end;
-using boost::fusion::next;
 
 #include <iostream>
 
 using namespace std;
 
+struct AstVisitor;
+class ad;
+
+class MatrixPrinter : public boost::static_visitor<>
+{
+public:
+    MatrixPrinter(std::ostream & out) : out(out) {}
+
+    void operator()(ast_matrix_literal m) const
+    {
+        out << '[';
+        out << '[' << m.v1.x << ' ' << m.v1.y << ' ' << m.v1.z << ' ' << m.v1.w << ']';
+        out << '[' << m.v2.x << ' ' << m.v2.y << ' ' << m.v2.z << ' ' << m.v2.w << ']';
+        out << '[' << m.v3.x << ' ' << m.v3.y << ' ' << m.v3.z << ' ' << m.v3.w << ']';
+        out << '[' << m.v4.x << ' ' << m.v4.y << ' ' << m.v4.z << ' ' << m.v4.w << ']';
+        out << ']';
+    }
+
+    template<typename T>
+    void operator()(T value) const
+    {
+        out << T::function_name;
+        out << "(";
+        bool first = true;
+        boost::fusion::for_each(value, ad(&first, out));
+        out << ')';
+    }
+
+private:
+    std::ostream & out;
+};
+
 class ad
 {
 public:
-    ad(bool *first) : first(first) {}
+    ad(bool *first, std::ostream & out) : first(first), out(out) {}
+
+    void operator()(ast_vector2_literal v) const
+    {
+        c();
+        out << '[' << v.x << ' ' << v.y << ']';
+    }
 
     void operator()(ast_vector3_literal v) const
     {
         c();
-        cout << '[' << v.x << ' ' << v.y << ' ' << v.z << ']';
+        out << '[' << v.x << ' ' << v.y << ' ' << v.z << ']';
     }
 
     void operator()(ast_vector4_literal v) const
     {
         c();
-        cout << '[' << v.x << ' ' << v.y << ' ' << v.z << ' ' << v.w << ']';
+        out << '[' << v.x << ' ' << v.y << ' ' << v.z << ' ' << v.w << ']';
     }
 
     void operator()(float f) const
     {
         c();
-        cout << f;
+        out << f;
     }
 
     void operator()(std::string s) const
     {
         c();
-        cout << '"' << s << '"';
+        out << '"' << s << '"';
     }
+
+    //Needed to make it compile
+    void operator()(ast_box b) const
+    {
+        (*this)(ast_intersectable(b));
+    }
+
+    void operator()(ast_matrix m) const
+    {
+        c();
+        boost::apply_visitor(MatrixPrinter(out), m.first);
+        BOOST_FOREACH(ast_basic_matrix mat, m.mult)
+        {
+            out << '*';
+            boost::apply_visitor(MatrixPrinter(out), mat);
+        }
+    }
+
+    void operator()(ast_material m) const;
+    void operator()(ast_intersectable) const;
 
 private:
     bool * const first;
+    std::ostream & out;
 
     void c() const
     {
@@ -52,9 +106,34 @@ private:
         }
         else
         {
-            cout << ',';
+            out << ',';
         }
     }
+};
+
+class AstVisitor : public boost::static_visitor<>
+{
+public:
+    AstVisitor(std::ostream & out) : out(out) {}
+
+    void operator()(std::vector<ast_light> value) const;
+    void operator()(ast_intersectable value) const;
+    void operator()(ast_literal_material l) const;
+    void operator()(std::string value) const;
+    void operator()(std::vector<char> value) const;
+    void operator()(ast_intersectable_list value) const;
+
+    template<typename T>
+    void operator()(T value) const
+    {
+        out << T::function_name;
+        out << "(";
+        bool first = true;
+        boost::fusion::for_each(value, ad(&first, out));
+        out << ')';
+    }
+private:
+    std::ostream & out;
 };
 
 SceneDumper::SceneDumper(std::ostream &out) : out(out) {}
@@ -62,7 +141,7 @@ SceneDumper::SceneDumper(std::ostream &out) : out(out) {}
 void SceneDumper::dump(ast_assignment assignment)
 {
     out << assignment.name << "=";
-    boost::apply_visitor(*this, assignment.value);
+    boost::apply_visitor(AstVisitor(out), assignment.value);
     out << ";" << endl;
 }
 
@@ -74,74 +153,54 @@ void SceneDumper::dump(vector<ast_assignment> assignments)
 }
 
 
-
-void SceneDumper::operator()(std::vector<ast_light> value)
+void AstVisitor::operator()(std::vector<ast_light> value) const
 {
-    out << "lights{" << "}";
+    out << "lights{";
+    BOOST_FOREACH(ast_light l, value)
+    {
+        l.apply_visitor(*this);
+    }
+    out << "}";
 }
 
-void SceneDumper::operator()(ast_camera value)
+void AstVisitor::operator()(ast_intersectable value) const
 {
-    out << "camera(";
-//    for(auto i = begin(value); i != end(value); i);
-    bool first = true;
-    boost::fusion::for_each(value, ad(&first));
-
-    out << ")";
+    boost::apply_visitor(*this, value);
 }
 
-void SceneDumper::operator()(ast_intersectable value)
+void AstVisitor::operator ()(ast_literal_material l) const
 {
-
+    l.apply_visitor(*this);
 }
 
-void SceneDumper::operator ()(ast_literal_material l)
+void AstVisitor::operator()(std::vector<char> value) const
 {
-    boost::apply_visitor(*this, l);
+    out << std::string(value.begin(), value.end());
 }
 
-void SceneDumper::operator()(ast_diffuse_material value)
-{
-    out << "diffuse(";
-    bool first = true;
-    boost::fusion::for_each(value, ad(&first));
-    out << ')';
-}
-
-void SceneDumper::operator()(ast_mirror_material value)
-{
-    out << "mirror(";
-    bool first = true;
-    boost::fusion::for_each(value, ad(&first));
-    out << ')';
-}
-
-void SceneDumper::operator()(ast_phong_material value)
-{
-    out << "phong(";
-    bool first = true;
-    boost::fusion::for_each(value, ad(&first));
-    out << ')';
-}
-
-void SceneDumper::operator()(ast_refractive_material value)
-{
-    out << "refractive(";
-    bool first = true;
-    boost::fusion::for_each(value, ad(&first));
-    out << ')';
-}
-
-void SceneDumper::operator()(ast_texture_material value)
-{
-    out << "texture(";
-    bool first = true;
-    boost::fusion::for_each(value, ad(&first));
-    out << ')';
-}
-
-void SceneDumper::operator()(std::string value)
+void AstVisitor::operator()(std::string value) const
 {
     out << value;
 }
 
+void AstVisitor::operator()(ast_intersectable_list value) const
+{
+    out << "intersectables{";
+    BOOST_FOREACH(ast_intersectable i, value.children)
+    {
+        boost::apply_visitor(*this, i);
+    }
+    out << "}";
+}
+
+void ad::operator()(ast_material m) const
+{
+    c();
+    boost::apply_visitor(AstVisitor(out), m);
+}
+
+void ad::operator()(ast_intersectable i) const
+{
+    c();
+    boost::apply_visitor(AstVisitor(out), i);
+}

@@ -161,6 +161,5 @@ void Renderer::run()
 {
     if(doStop) return;
     render();
-    if(vm.count("verbose")) std::cout << "Rendering complete" << std::endl;
     Q_EMIT finishedRendering();
 }
