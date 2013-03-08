@@ -96,7 +96,7 @@ struct MaterialVariableResolver : boost::static_visitor<ast_literal_material>
 
     ast_literal_material operator()(std::vector<char> name) const
     {
-        return boost::get<ast_literal_material>(boost::get<ast_material>(values.at(std::string(name.begin(), name.end()))));
+        return boost::get<ast_literal_material>(values.at(std::string(name.begin(), name.end())));
     }
 
 private:
@@ -161,25 +161,9 @@ struct VariableResolver : boost::static_visitor<>
         current = values[name];
     }
 
-    void operator()(ast_intersectable_list l)
+    void operator()(ast_intersectable i)
     {
-        for(unsigned int i = 0; i < l.children.size(); i++)
-        {
-            boost::apply_visitor(IntersectableVariableResolver(values), l.children[i]);
-            l.children[i] = boost::get<ast_intersectable>(current);
-        }
-        current = ast_intersectable(l);
-    }
-    void operator()(ast_bvh_node b)
-    {
-        b.left = boost::apply_visitor(IntersectableVariableResolver(values), b.left);
-        b.right = boost::apply_visitor(IntersectableVariableResolver(values), b.right);
-        current = ast_intersectable(b);
-    }
-    void operator()(ast_instance i)
-    {
-        i.intersectable = boost::apply_visitor(IntersectableVariableResolver(values), i.intersectable);
-        current = ast_intersectable(i);
+        current = boost::apply_visitor(IntersectableVariableResolver(values), i);
     }
 
     template<typename T>
