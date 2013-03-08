@@ -1,5 +1,4 @@
 cmake_minimum_required(VERSION 2.8.0)
-find_package(Qt4 REQUIRED)
 
 include_directories(${QT_INCLUDES} ${GSL_INCLUDE_DIR} ${OPENEXR_INCLUDE_PATHS} ${Boost_INCLUDE_DIRS} ${CMAKE_CURRENT_BINARY_DIR})
 
