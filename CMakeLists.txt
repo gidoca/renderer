@@ -1,6 +1,7 @@
 project(renderingproject)
 cmake_minimum_required(VERSION 2.6)
 set(CMAKE_MODULE_PATH ${renderingproject_SOURCE_DIR}/cmake/modules )
+find_package(Qt4 REQUIRED)
 find_package(GSL REQUIRED)
 find_package(OpenCV REQUIRED)
 find_package(Boost 1.41.0 COMPONENTS program_options REQUIRED)
