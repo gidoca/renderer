@@ -177,16 +177,52 @@ private:
     ast_value current;
 };
 
-/*struct ObjLoader : boost::static_visitor<ast_value>
+struct ObjLoaderI : boost::static_visitor<ast_intersectable>
+{
+    ast_intersectable operator()(ast_intersectable_list l) const
+    {
+        for(unsigned int i = 0; i < l.children.size(); i++)
+        {
+            l.children[i] = boost::apply_visitor(*this, l.children[i]);
+        }
+        return l;
+    }
+
+    ast_intersectable operator()(ast_instance i) const
+    {
+        i.intersectable = boost::apply_visitor(*this, i.intersectable);
+        return i;
+    }
+
+    ast_intersectable operator()(ast_bvh_node b) const
+    {
+        b.left = boost::apply_visitor(*this, b.left);
+        b.right = boost::apply_visitor(*this, b.right);
+        return b;
+    }
+
+    ast_intersectable operator()(ast_obj o) const
+    {
+        return ast_intersectable(ObjReader::getMesh(o.filename, boost::get<ast_literal_material>(o.material)));
+    }
+
+    template<typename T>
+    ast_intersectable operator()(T t) const
+    {
+        return t;
+    }
+};
+
+struct ObjLoader : boost::static_visitor<ast_value>
 {
     void apply(ast_assignment &a)
     {
         a.value = boost::apply_visitor(*this, a.value);
     }
 
-    ast_value operator()(ast_obj o)
+    ast_value operator()(ast_intersectable i)
     {
-        return ast_intersectable(ObjReader::getMesh(o.filename, boost::get<ast_literal_material>(o.material)));
+        return boost::apply_visitor(ObjLoaderI(), i);
     }
 
     template<typename T>
@@ -194,7 +230,7 @@ private:
     {
         return ast_value(t);
     }
-};*/
+};
 
 
 struct matrix_evaluator : boost::static_visitor<QMatrix4x4>
@@ -323,7 +359,6 @@ struct material_builder : boost::static_visitor<Material*>
 
   Material* operator()(std::vector<char> identifier) const
   {
-      std::cout << "varmat" << std::endl;
       std::string name = std::string(identifier.begin(), identifier.end());
       Material* material = materials[name];
       if(material == 0)
@@ -564,13 +599,19 @@ private:
 Scene buildScene(vector<ast_assignment> assignments)
 {
   VariableResolver vr;
-  BOOST_FOREACH(ast_assignment assignment, assignments)
+  BOOST_FOREACH(ast_assignment & assignment, assignments)
   {
     vr.apply(assignment);
   }
 
+  ObjLoader ol;
+  BOOST_FOREACH(ast_assignment & assignment, assignments)
+  {
+    ol.apply(assignment);
+  }
+
   scene_builder builder;
-  BOOST_FOREACH(ast_assignment assignment, assignments)
+  BOOST_FOREACH(ast_assignment & assignment, assignments)
   {
     builder.addAssignment(assignment);
   }
