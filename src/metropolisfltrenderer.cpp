@@ -205,7 +205,7 @@ void MetropolisFltRenderer::render()
 
   if(vm.count("verbose"))
   {
-    cout << "Starting initial rendering" << endl;
+    cerr << "Starting initial rendering" << endl;
   }
 
   const int num_films = 2;
@@ -225,7 +225,7 @@ void MetropolisFltRenderer::render()
 
   if(vm.count("verbose"))
   {
-    cout << "Initial rendering complete, " << time.elapsed() / 1000 << "s elapsed, starting filtering" << endl;
+    cerr << "Initial rendering complete, " << time.elapsed() / 1000 << "s elapsed, starting filtering" << endl;
   }
 
   Mat noisy_variance;
@@ -280,7 +280,7 @@ void MetropolisFltRenderer::render()
   {
     if(vm.count("verbose"))
     {
-        cout << time.elapsed() / 1000 << "s elapsed, starting rendering pass " << i << "/" << (vm["metflt-num-passes"].as<int>() - 1) << endl;
+        cerr << time.elapsed() / 1000 << "s elapsed, starting rendering pass " << i << "/" << (vm["metflt-num-passes"].as<int>() - 1) << endl;
     }
 
     Mat importanceMap = channelMean(varOfFiltered) / (channelMean(filteredMean).mul(channelMean(filteredMean)) + 1e-2) + 1e-8;
@@ -292,7 +292,7 @@ void MetropolisFltRenderer::render()
     renderStep(film->size(), scene, importanceMap, films, biased_var, biased_mean, biased_m2, sumweight, seed + i, false);
     if(vm.count("verbose"))
     {
-      cout << time.elapsed() / 1000 << "s elapsed, starting filtering pass " << i << "/" << (vm["metflt-num-passes"].as<int>() - 1) << endl;
+      cerr << time.elapsed() / 1000 << "s elapsed, starting filtering pass " << i << "/" << (vm["metflt-num-passes"].as<int>() - 1) << endl;
     }
     var(newOut, noisy_variance, films);
     var(meanvar, varvar, biased_var);

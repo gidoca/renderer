@@ -196,7 +196,7 @@ ast_intersectable_list ObjReader::getMesh(std::string filename, ast_literal_mate
     // Explicit closing of the file
     filestream.close();
 
-    std::cout << "ObjReader: " << triangles.size() << " triangles, " << num_faces << " faces" << std::endl;
+    std::cerr << "ObjReader: " << triangles.size() << " triangles, " << num_faces << " faces" << std::endl;
 
     myMesh.reserve(triangles.size());
 

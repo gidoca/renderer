@@ -363,7 +363,7 @@ struct material_builder : boost::static_visitor<Material*>
       Material* material = materials[name];
       if(material == 0)
       {
-          std::cout << "No such variable: " << name << std::endl;
+          std::cerr << "No such variable: " << name << std::endl;
           return DarkMatter::getInstance();
       }
       else
@@ -483,7 +483,7 @@ Intersectable* intersectable_builder::operator()(const ast_obj& o)
     AxisAlignedBox* bb = mesh->boundingBox();
     QVector3D min = bb->getMin(), max = bb->getMax();
     delete bb;
-    std::cout << "Mesh bb min: " << min.x() << "," << min.y() << "," << min.z() << "; max: " << max.x() << "," << max.y() << "," << max.z() << std::endl;
+    std::cerr << "Mesh bb min: " << min.x() << "," << min.y() << "," << min.z() << "; max: " << max.x() << "," << max.y() << "," << max.z() << std::endl;
     return mesh;
 }
 
@@ -561,7 +561,7 @@ struct scene_builder : boost::static_visitor<void>
         }
         else
         {
-            std::cout << "Could not assign to " << current_name << ", no such variable: " << identifier << std::endl;
+            std::cerr << "Could not assign to " << current_name << ", no such variable: " << identifier << std::endl;
         }
     }
 

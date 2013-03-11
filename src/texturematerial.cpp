@@ -39,12 +39,12 @@ bool TextureMaterial::load(std::string filename)
     Mat img = imread(filename);
     if(img.data == 0)
     {
-        std::cout << "Error loading texture \"" << filename << "\"" << std::endl;
+        std::cerr << "Error loading texture \"" << filename << "\"" << std::endl;
         return false;
     }
     else
     {
-        std::cout << "Successfully loaded texture \"" << filename << "\"" << std::endl;
+        std::cerr << "Successfully loaded texture \"" << filename << "\"" << std::endl;
     }
     img.convertTo(texture, CV_32F, 1./255.);
     return true;

@@ -113,7 +113,7 @@ int main(int argc, char **argv) {
     return 0;
   }
 
-  if(vm.count("verbose")) cout << "Loading scene..." << endl;
+  if(vm.count("verbose")) cerr << "Loading scene..." << endl;
 
   SceneGrammar parser;
   if(!vm.count("scene"))
@@ -129,7 +129,7 @@ int main(int argc, char **argv) {
 
   Scene scene = buildScene(parser.getAst());
 
-  if(vm.count("verbose")) cout << "Scene loaded, " << time.elapsed() / 1000 << "s elapsed." << endl;
+  if(vm.count("verbose")) cerr << "Scene loaded, " << time.elapsed() / 1000 << "s elapsed." << endl;
 
   Tonemapper tm(scene.camera.getResolution(), vm["gamma"].as<float>());
 
@@ -172,7 +172,7 @@ int main(int argc, char **argv) {
         QImage img = tm.tonemap(*film);
         img.save(QString(vm["save-img"].as<string>().c_str()));
     }
-    if(vm.count("verbose")) cout << "Rendering complete, " << time.elapsed() / 1000 << "s elapsed." << endl;
+    if(vm.count("verbose")) cerr << "Rendering complete, " << time.elapsed() / 1000 << "s elapsed." << endl;
     return 0;
   }
 }
