@@ -177,7 +177,27 @@ private:
     ast_value current;
 };
 
-struct ObjLoaderI : boost::static_visitor<ast_intersectable>
+template<typename V>
+struct IntersectableAssignmentVisitor : boost::static_visitor<ast_value>
+{
+    void apply(ast_assignment &a)
+    {
+        a.value = boost::apply_visitor(*this, a.value);
+    }
+
+    ast_value operator()(ast_intersectable i)
+    {
+        return boost::apply_visitor(V(), i);
+    }
+
+    template<typename T>
+    ast_value operator()(T t)
+    {
+        return ast_value(t);
+    }
+};
+
+struct ObjLoader : boost::static_visitor<ast_intersectable>
 {
     ast_intersectable operator()(ast_intersectable_list l) const
     {
@@ -213,25 +233,32 @@ struct ObjLoaderI : boost::static_visitor<ast_intersectable>
     }
 };
 
-struct ObjLoader : boost::static_visitor<ast_value>
+struct BVHCreator : boost::static_visitor<ast_intersectable>
 {
-    void apply(ast_assignment &a)
+    ast_intersectable operator()(ast_instance i) const
     {
-        a.value = boost::apply_visitor(*this, a.value);
+        i.intersectable = boost::apply_visitor(*this, i.intersectable);
+        return i;
     }
 
-    ast_value operator()(ast_intersectable i)
+    ast_intersectable operator()(ast_bvh_node b) const
     {
-        return boost::apply_visitor(ObjLoaderI(), i);
+        b.left = boost::apply_visitor(*this, b.left);
+        b.right = boost::apply_visitor(*this, b.right);
+        return b;
+    }
+
+    ast_intersectable operator()(ast_intersectable_list l) const
+    {
+        return BVHNode::create(l);
     }
 
     template<typename T>
-    ast_value operator()(T t)
+    ast_intersectable operator()(T t) const
     {
-        return ast_value(t);
+        return t;
     }
 };
-
 
 struct matrix_evaluator : boost::static_visitor<QMatrix4x4>
 {
@@ -616,11 +643,18 @@ void resolveVars(vector<ast_assignment> &assignments)
       vr.apply(assignment);
     }
 
-    ObjLoader ol;
+    IntersectableAssignmentVisitor<ObjLoader> ol;
     BOOST_FOREACH(ast_assignment & assignment, assignments)
     {
       ol.apply(assignment);
     }
+
+    //causes a segfault for some reason, disabling for now
+    /*IntersectableAssignmentVisitor<BVHCreator> bc;
+    BOOST_FOREACH(ast_assignment & assignment, assignments)
+    {
+      bc.apply(assignment);
+    }*/
 }
 
 AxisAlignedBox* getBoundingBoxFromAst(ast_intersectable i)

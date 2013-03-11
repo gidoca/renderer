@@ -19,6 +19,8 @@
  * USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+#include "global.h"
+
 #include "printfinished.h"
 
 #include <QtCore>
