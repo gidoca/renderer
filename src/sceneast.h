@@ -486,6 +486,7 @@ BOOST_FUSION_ADAPT_STRUCT(
     (ast_value, value)
 )
 
+void resolveVars(std::vector<ast_assignment> & assignments);
 Scene buildScene(std::vector<ast_assignment> assignments);
 
 AxisAlignedBox* getBoundingBoxFromAst(ast_intersectable i);

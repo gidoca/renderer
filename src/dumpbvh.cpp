@@ -21,6 +21,7 @@ int main(int argc, char** argv)
       return -1;
     }
     std::vector<ast_assignment> scene = parser.getAst();
+    resolveVars(scene);
 
     SceneDumper d;
     d.dump(scene);

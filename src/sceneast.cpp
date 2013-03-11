@@ -598,24 +598,29 @@ private:
 
 Scene buildScene(vector<ast_assignment> assignments)
 {
-  VariableResolver vr;
-  BOOST_FOREACH(ast_assignment & assignment, assignments)
-  {
-    vr.apply(assignment);
-  }
-
-  ObjLoader ol;
-  BOOST_FOREACH(ast_assignment & assignment, assignments)
-  {
-    ol.apply(assignment);
-  }
+  resolveVars(assignments);
 
   scene_builder builder;
   BOOST_FOREACH(ast_assignment & assignment, assignments)
   {
-    builder.addAssignment(assignment);
+      if(assignment.name == "camera" || assignment.name == "lights" || assignment.name == "intersectable") builder.addAssignment(assignment);
   }
   return builder.getScene();
+}
+
+void resolveVars(vector<ast_assignment> &assignments)
+{
+    VariableResolver vr;
+    BOOST_FOREACH(ast_assignment & assignment, assignments)
+    {
+      vr.apply(assignment);
+    }
+
+    ObjLoader ol;
+    BOOST_FOREACH(ast_assignment & assignment, assignments)
+    {
+      ol.apply(assignment);
+    }
 }
 
 AxisAlignedBox* getBoundingBoxFromAst(ast_intersectable i)
