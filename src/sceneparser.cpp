@@ -56,7 +56,7 @@ SceneGrammar::SceneGrammar() : SceneGrammar::base_type(assignments_rule, "inters
   plane_rule.name("plane");
   obj_rule %= boost::spirit::lit("obj") >> "(" >> string_literal_rule >> "," >> material_rule >> ")";
   obj_rule.name("obj");
-  triangle_rule %= boost::spirit::lit("triangle") >> "(" >> vector3_literal_rule >> "," >> vector3_literal_rule >> "," >> vector3_literal_rule >> "," >> vector3_literal_rule >> "," >> vector3_literal_rule >> "," >> vector3_literal_rule >> "," >> vector2_literal_rule >> "," >> vector2_literal_rule >> "," >> vector2_literal_rule >> "," >> material_rule >> ")";
+  triangle_rule %= boost::spirit::lit("t") >> "(" >> vector3_literal_rule >> "," >> vector3_literal_rule >> "," >> vector3_literal_rule >> "," >> vector3_literal_rule >> "," >> vector3_literal_rule >> "," >> vector3_literal_rule >> "," >> vector2_literal_rule >> "," >> vector2_literal_rule >> "," >> vector2_literal_rule >> "," >> material_rule >> ")";
   triangle_rule.name("triangle");
   instance_rule %= boost::spirit::lit("instance") >> "(" >> matrix_rule >> "," >> intersectable_rule >> ")";
   instance_rule.name("instance");

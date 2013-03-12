@@ -105,8 +105,21 @@ ast_intersectable BVHNode::create(ast_intersectable_list list)
     IntersectableComparator comparator(splitAxis);
     sort(intersectables.begin(), intersectables.end(), comparator);
 
-    auto it0 = intersectables.begin(), it1 = intersectables.end() + intersectables.size() / 2, it2 = intersectables.end();
-    std::vector<ast_intersectable> left(it0, it1), right(it1, it2);
+    // This causes an assertion failure in boost::variant
+//    auto it0 = intersectables.begin(), it1 = intersectables.end() + intersectables.size() / 2, it2 = intersectables.end();
+//    std::vector<ast_intersectable> left(it0, it1), right(it1, it2);
+    std::vector< ast_intersectable > left, right;
+    const unsigned int split = intersectables.size() / 2;
+    left.reserve(split);
+    right.reserve(intersectables.size() - split);
+    for(unsigned int i = 0; i < split; i++)
+    {
+        left.push_back(intersectables[i]);
+    }
+    for(unsigned int i = split; i < intersectables.size(); i++)
+    {
+        right.push_back(intersectables[i]);
+    }
 
     if(left.size() == 0 || right.size() == 0) return list;
 
@@ -120,7 +133,7 @@ ast_intersectable BVHNode::create(ast_intersectable_list list)
     bb_max.y = bb->getMax().y();
     bb_max.z = bb->getMax().z();
     ast_box ast_bb = {bb_min, bb_max, bb_mat};
-    ast_bvh_node out = {leftList, rightList, ast_bb};
+    ast_bvh_node out = {create(leftList), create(rightList), ast_bb};
     return out;
 }
 
