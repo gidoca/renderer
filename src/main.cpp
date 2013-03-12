@@ -120,12 +120,12 @@ int main(int argc, char **argv) {
   SceneGrammar parser;
   if(!vm.count("scene"))
   {
-    cerr << "Please specify the scene description file by using the -s option\n";
+    cerr << "Please specify the scene description file by using the -s option" << endl;
     return -1;
   }
   if(!parser.parse(vm["scene"].as<string>()))
   {
-    cerr << "Failed to parse scene\n";
+    cerr << "Failed to parse scene" << endl;
     return -1;
   }
 

@@ -17,7 +17,7 @@ int main(int argc, char** argv)
     SceneGrammar parser;
     if(!parser.parse(argv[1]))
     {
-      cerr << "Failed to parse scene\n";
+      cerr << "Failed to parse scene" << endl;
       return -1;
     }
     std::vector<ast_assignment> scene = parser.getAst();
