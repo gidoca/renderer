@@ -639,8 +639,6 @@ private:
 
 Scene buildScene(vector<ast_assignment> assignments)
 {
-  resolveVars(assignments);
-
   scene_builder builder;
   BOOST_FOREACH(ast_assignment & assignment, assignments)
   {

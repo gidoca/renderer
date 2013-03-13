@@ -30,6 +30,7 @@
 #include <list>
 #include <vector>
 #include <iostream>
+#include <fstream>
 #include <functional>
 
 #include <boost/program_options.hpp>
@@ -81,7 +82,8 @@ int main(int argc, char **argv) {
       ("verbose,v", "be verbose about progress, etc. ")
       ("gui,u", "display the result in a window")
       ("save-exr,e", value<string>(), "write the result to the specified EXR file")
-      ("save-img,i", value<string>(), "write the result to the specified LDR image file");
+      ("save-img,i", value<string>(), "write the result to the specified LDR image file")
+      ("dump-bvh,b", value<string>(), "write the bvh tree to the specified file");
   command_line_options.add(general); 
 	
   options_description image("Image options");
@@ -129,7 +131,17 @@ int main(int argc, char **argv) {
     return -1;
   }
 
-  Scene scene = buildScene(parser.getAst());
+  std::vector<ast_assignment> ast = parser.getAst();
+  resolveVars(ast);
+
+  if(vm.count("dump-bvh"))
+  {
+      ofstream bvhfile(vm["dump-bvh"].as<string>());
+      SceneDumper d(bvhfile);
+      d.dump(ast);
+  }
+
+  Scene scene = buildScene(ast);
 
   if(vm.count("verbose")) cerr << "Scene loaded, " << time.elapsed() / 1000 << "s elapsed." << endl;
 
@@ -147,7 +159,7 @@ int main(int argc, char **argv) {
   renderer->setOutput(film);
   renderer->setOptions(vm);
   
-  if(vm.count("gui") || (!vm.count("save-exr") && !vm.count("save-img")))
+  if(vm.count("gui") || (!vm.count("save-exr") && !vm.count("save-img") && !vm.count("dump-bvh")))
   {
     Win l(*film, scene, tm);
     PrintFinished p(time);
@@ -161,7 +173,7 @@ int main(int argc, char **argv) {
 
     return app.exec();
   }
-  else
+  else if(vm.count("save-exr") || vm.count("save-img"))
   {
     renderer->startRendering(scene);
     renderer->wait();
@@ -175,6 +187,10 @@ int main(int argc, char **argv) {
         img.save(QString(vm["save-img"].as<string>().c_str()));
     }
     if(vm.count("verbose")) cerr << "Rendering complete, " << time.elapsed() / 1000 << "s elapsed." << endl;
+    return 0;
+  }
+  else
+  {
     return 0;
   }
 }

@@ -28,10 +28,8 @@ set(renderingproject_SRCS camera.cpp plane.cpp sphere.cpp intersectable.cpp
 QT4_WRAP_CPP(renderingproject_HEADERS_MOC ${renderingproject_HEADERS})
 
 add_executable(renderingproject main.cpp ${renderingproject_SRCS} ${renderingproject_HEADERS_MOC})
-add_executable(dumpbvh dumpbvh.cpp ${renderingproject_SRCS} ${renderingproject_HEADERS_MOC})
 
 target_link_libraries(renderingproject ${QT_LIBRARIES} ${GSL_LIBRARIES} ${OPENEXR_LIBRARIES} ${Boost_LIBRARIES} ${OpenCV_LIBS})
-target_link_libraries(dumpbvh ${QT_LIBRARIES} ${GSL_LIBRARIES} ${OPENEXR_LIBRARIES} ${Boost_LIBRARIES} ${OpenCV_LIBS})
 
 #-Wno-unitialized suppresses warnings from boost
 set(COMMON_CXX_FLAGS "-Wextra -Wall -Wno-unused-parameter -Wno-uninitialized -std=c++0x")
