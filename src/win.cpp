@@ -116,7 +116,7 @@ inline void Win::rotate(short sign, bool horizontal)
     rot.rotate(sign * 3, axis);
     dir = rot.map(dir);
     scene.camera.setLookAt(scene.camera.getCOP() + dir);
-    scene.camera.setUp(rot.map(scene.camera.getUp()));
+//    scene.camera.setUp(rot.map(scene.camera.getUp()));
 }
 
 void Win::keyReleaseEvent(QKeyEvent *event)
