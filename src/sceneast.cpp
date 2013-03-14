@@ -610,6 +610,10 @@ struct scene_builder : boost::static_visitor<void>
     {
         Scene result(cameras["camera"]);
         result.object = intersectables["intersectable"]->createBVH();
+        AxisAlignedBox* bb = result.object->boundingBox();
+        QVector3D min = bb->getMin(), max = bb->getMax();
+        delete bb;
+        std::cerr << "Mesh bb min: " << min.x() << "," << min.y() << "," << min.z() << "; max: " << max.x() << "," << max.y() << "," << max.z() << std::endl;
         result.light = lights["lights"];
         return result;
     }
