@@ -29,6 +29,8 @@
 #include <QtCore/QSize>
 #include <QtGui/QMatrix4x4>
 
+#include <ostream>
+
 class Camera
 {
   public:
@@ -86,6 +88,8 @@ class Camera
     }
 
     Ray getRay(QPointF point) const;
+
+    friend std::ostream & operator<<(std::ostream & stream, const Camera& camera);
   private:
     void init();
 
@@ -95,5 +99,7 @@ class Camera
     QSize resolution;
     QMatrix4x4 extrinsicMatrix;
 };
+
+std::ostream & operator<<(std::ostream & stream, const Camera& camera);
 
 #endif

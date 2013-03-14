@@ -168,6 +168,8 @@ void Win::keyReleaseEvent(QKeyEvent *event)
         return;
     }
 
+    std::cerr << scene.camera << std::endl;
+
     Q_EMIT rerender(scene);
 }
 
