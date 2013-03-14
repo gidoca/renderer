@@ -609,7 +609,7 @@ struct scene_builder : boost::static_visitor<void>
     Scene getScene()
     {
         Scene result(cameras["camera"]);
-        result.object = intersectables["intersectable"];//->createBVH();
+        result.object = intersectables["intersectable"]->createBVH();
         result.light = lights["lights"];
         return result;
     }
@@ -660,12 +660,17 @@ void resolveVars(vector<ast_assignment> &assignments)
     {
       ol.apply(assignment);
     }
+}
 
+vector<ast_assignment> createBVH(vector<ast_assignment> assignments)
+{
     IntersectableAssignmentVisitor<BVHCreator> bc;
     BOOST_FOREACH(ast_assignment & assignment, assignments)
     {
       bc.apply(assignment);
     }
+
+    return assignments;
 }
 
 AxisAlignedBox* getBoundingBoxFromAst(ast_intersectable i)

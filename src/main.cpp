@@ -138,7 +138,7 @@ int main(int argc, char **argv) {
   {
       ofstream bvhfile(vm["dump-bvh"].as<string>());
       SceneDumper d(bvhfile);
-      d.dump(ast);
+      d.dump(createBVH(ast));
   }
 
   Scene scene = buildScene(ast);
