@@ -72,7 +72,7 @@ void EnergyRedistributionRenderer::render()
         point.ry() /= size.height;
         MetropolisSample initialSample(scene.light.size());
         initialSample.initAtPixel(point, rng);
-        equalDispositionFlow(*film, initialSample, *scene.object, scene.light, scene.camera, rng, ed, vm);
+        equalDispositionFlow(initialSample, *scene.object, scene.light, scene.camera, rng, ed, vm);
       }
     }
     gsl_rng_free(rng);
@@ -80,7 +80,7 @@ void EnergyRedistributionRenderer::render()
 
 }
 
-void EnergyRedistributionRenderer::equalDispositionFlow(Mat &film, MetropolisSample initialSample, const Intersectable &scene, std::vector<const Light *>light, const Camera & camera, gsl_rng *rng, float ed, variables_map vm)
+void EnergyRedistributionRenderer::equalDispositionFlow(MetropolisSample initialSample, const Intersectable &scene, std::vector<const Light *>light, const Camera & camera, gsl_rng *rng, float ed, variables_map vm)
 {
   UniDiPathTracingIntegrator integrator(0.1);
   Path initialPath = initialSample.cameraPathFromSample(scene, camera);
@@ -109,10 +109,10 @@ void EnergyRedistributionRenderer::equalDispositionFlow(Mat &film, MetropolisSam
       {
         y = z;
       }
-      int pixelX = (int)(y.cameraSample.getSample().x() * film.size().width);
-      int pixelY = (int)(y.cameraSample.getSample().y() * film.size().height);
+      int pixelX = (int)(y.cameraSample.getSample().x() * film->size().width);
+      int pixelY = (int)(y.cameraSample.getSample().y() * film->size().height);
       #pragma omp critical
-      film.at<Vec3f>(pixelY, pixelX) += norm(depVal) * yVal* (1 / norm(yVal)) * (1.f / (vm["erpt-x-samples"].as<int>() * vm["erpt-y-samples"].as<int>()));
+      film->at<Vec3f>(pixelY, pixelX) += norm(depVal) * yVal* (1 / norm(yVal)) * (1.f / (vm["erpt-x-samples"].as<int>() * vm["erpt-y-samples"].as<int>()));
     }
   }
 }
