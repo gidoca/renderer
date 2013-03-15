@@ -173,7 +173,7 @@ void MetropolisRenderer::render()
         }
         gsl_rng_free(rng);
   }
-  film->setTo(film->mul(extend(virtualSamples / realSamples)));
+  *film = film->mul(extend(virtualSamples / realSamples));
 }
 
 options_description MetropolisRenderer::options()
