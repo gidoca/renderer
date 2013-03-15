@@ -47,3 +47,36 @@ Ray Camera::getRay(QPointF point) const
  				    );
   return Ray(QVector4D(0, 0, 0, 1), pixelLocation).transform(extrinsicMatrix);
 }
+
+std::ostream & operator<<(std::ostream & stream, const Camera & camera)
+{
+    stream << "camera(";
+    stream << "[";
+    stream << camera.getCOP().x();
+    stream << " ";
+    stream << camera.getCOP().y();
+    stream << " ";
+    stream << camera.getCOP().z();
+    stream << "],";
+    stream << "[";
+    stream << camera.getLookAt().x();
+    stream << " ";
+    stream << camera.getLookAt().y();
+    stream << " ";
+    stream << camera.getLookAt().z();
+    stream << "],";
+    stream << "[";
+    stream << camera.getUp().x();
+    stream << " ";
+    stream << camera.getUp().y();
+    stream << " ";
+    stream << camera.getUp().z();
+    stream << "],";
+    stream << camera.getFOV();
+    stream << ",";
+    stream << camera.getResolution().width();
+    stream << ",";
+    stream << camera.getResolution().height();
+    stream << ")";
+    return stream;
+}
