@@ -52,8 +52,6 @@ private:
   int numPasses;
 
   cv::Mat sumImportance;
-
-  boost::program_options::variables_map vm;
 };
 
 #endif // METROPOLISFLTRENDERER_H

@@ -194,7 +194,6 @@ void MetropolisFltRenderer::renderStep(Size size, const Scene& scene, Mat import
 
 void MetropolisFltRenderer::render()
 {
-  this->vm = vm;
   const int seed = getSeed(vm);
   numPasses = vm["metflt-num-passes"].as<int>();
 
