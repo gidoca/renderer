@@ -82,11 +82,11 @@ inline bool read_index(std::stringstream& str_stream, int& dest, int total_num)
 
 bool read_indices(_ObjMeshFaceIndex& face_index, int i, std::stringstream& str_stream, int num_positions, int num_texcoords, int num_normals)
 {
-    char interupt;
+    char interrupt;
     if(!read_index(str_stream, face_index.pos_index[i], num_positions)) return false;
     if(str_stream.peek() == '/')
     {
-        str_stream >> interupt;
+        str_stream >> interrupt;
         if(str_stream.peek() == '/')
         {
             face_index.tex_index[i] = 0;
@@ -98,7 +98,7 @@ bool read_indices(_ObjMeshFaceIndex& face_index, int i, std::stringstream& str_s
 
         if(str_stream.peek() == '/')
         {
-            str_stream >> interupt;
+            str_stream >> interrupt;
             if(!read_index(str_stream, face_index.nor_index[i], num_normals)) return false;
         }
         else
@@ -183,6 +183,7 @@ ast_intersectable_list ObjReader::getMesh(std::string filename, ast_literal_mate
             str_stream >> name;
             currentMaterial = materials[name];
             if(currentMaterial.empty()){
+                std::cerr << "No such material: " << name << std::endl;
                 currentMaterial = defaultMaterial;
             }
         }
@@ -251,6 +252,10 @@ void createMaterial(ast_vector3_literal diffuseColor, ast_vector3_literal specul
             ast_phong_material phong = {diffuseColor, specularColor, specularCoefficient};
             materials[materialName] = phong;
         }
+    }
+    else
+    {
+        std::cerr << "Unknown material" << std::endl;
     }
 }
 
