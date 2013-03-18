@@ -339,7 +339,7 @@ std::size_t hash_value(const T& t)
     return boost::fusion::fold(t, 0, hash_combine_s());
 }
 
-#if BOOST_VERSION < 15000
+#if BOOST_VERSION < 105000
 template < BOOST_VARIANT_ENUM_PARAMS(typename T) >
 std::size_t hash_value(boost::variant< BOOST_VARIANT_ENUM_PARAMS(T) > const& val) {
     std::size_t seed = boost::apply_visitor(variant_hasher(), val);
