@@ -45,6 +45,7 @@
 #include <boost/fusion/include/equal_to.hpp>
 #include <boost/functional/hash.hpp>
 #include <boost/fusion/algorithm/iteration/fold.hpp>
+#include <boost/version.hpp>
 
 #include <list>
 #include <vector>
@@ -338,12 +339,14 @@ std::size_t hash_value(const T& t)
     return boost::fusion::fold(t, 0, hash_combine_s());
 }
 
+#if BOOST_VERSION < 15000
 template < BOOST_VARIANT_ENUM_PARAMS(typename T) >
 std::size_t hash_value(boost::variant< BOOST_VARIANT_ENUM_PARAMS(T) > const& val) {
     std::size_t seed = boost::apply_visitor(variant_hasher(), val);
     boost::hash_combine(seed, val.which());
     return seed;
 }
+#endif
 
 typedef std::unordered_map<ast_literal_material, Material*, variant_hasher> ast_mat_map;
 
