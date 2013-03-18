@@ -204,7 +204,7 @@ ast_intersectable_list ObjReader::getMesh(std::string filename, ast_literal_mate
         ast_triangle face;
         face.material = triangles[i].material;
 
-        if(triangles[i].pos_index[0] != 0 && triangles[i].pos_index[1] != 0 && triangles[i].nor_index[2] != 0)
+        if(triangles[i].pos_index[0] != 0 && triangles[i].pos_index[1] != 0 && triangles[i].pos_index[2] != 0)
         {
             face.p1 = positions[triangles[i].pos_index[0] - 1];
             face.p2 = positions[triangles[i].pos_index[1] - 1];

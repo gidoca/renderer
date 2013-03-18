@@ -519,8 +519,8 @@ Intersectable* intersectable_builder::operator()(const ast_obj& o)
 {
     ast_diffuse_material darkmatter = {ast_vector3_literal()};
     ast_literal_material mat = buildMaterials ? boost::get<ast_literal_material>(o.material) : darkmatter;
-    ast_intersectable inters = ObjReader::getMesh(o.filename.c_str(), mat);
-    Intersectable* mesh = boost::apply_visitor(*this, inters);
+    ast_intersectable_list inters = ObjReader::getMesh(o.filename.c_str(), mat);
+    Intersectable* mesh = (*this)(inters);
     AxisAlignedBox* bb = mesh->boundingBox();
     QVector3D min = bb->getMin(), max = bb->getMax();
     delete bb;
