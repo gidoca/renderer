@@ -279,7 +279,10 @@ void ObjReader::getMaterials(std::string filename, std::map<std::string, ast_lit
         str_stream >> type_str;
 
         if(type_str == TOKEN_NEW_MATERIAL){
-            createMaterial(current_diffuse_color, current_specular_color, current_specular_coefficient, objInfo.dir(), current_texture_filename, current_material_name, materials);
+            if(!current_material_name.empty())
+            {
+                createMaterial(current_diffuse_color, current_specular_color, current_specular_coefficient, objInfo.dir(), current_texture_filename, current_material_name, materials);
+            }
             str_stream >> current_material_name;
         }
         else if(type_str == TOKEN_DIFFUSE_COLOR){
