@@ -115,7 +115,7 @@ bool read_indices(_ObjMeshFaceIndex& face_index, int i, std::stringstream& str_s
 }
 
 /* Call this function to load a model */
-ast_intersectable_list ObjReader::getMesh(std::string filename, ast_literal_material defaultMaterial){
+ast_intersectable_list ObjReader::getMesh(std::string filename, ast_material defaultMaterial){
     std::map<std::string, ast_literal_material> materials;
     ObjMesh myMesh;
 

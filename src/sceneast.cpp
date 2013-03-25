@@ -200,7 +200,7 @@ struct IntersectableAssignmentVisitor : boost::static_visitor<ast_value>
 
 struct ObjLoader : boost::static_visitor<ast_intersectable>
 {
-    ast_intersectable operator()(ast_intersectable_list l) const
+    ast_intersectable_list operator()(ast_intersectable_list l) const
     {
         for(unsigned int i = 0; i < l.children.size(); i++)
         {
@@ -222,9 +222,9 @@ struct ObjLoader : boost::static_visitor<ast_intersectable>
         return b;
     }
 
-    ast_intersectable operator()(ast_obj o) const
+    ast_intersectable_list operator()(ast_obj o) const
     {
-        return ast_intersectable(ObjReader::getMesh(o.filename, boost::get<ast_literal_material>(o.material)));
+        return ObjReader::getMesh(o.filename, o.material);
     }
 
     template<typename T>
@@ -528,7 +528,7 @@ BVHNode* intersectable_builder::operator ()(const ast_bvh_node& b)
 Intersectable* intersectable_builder::operator()(const ast_obj& o)
 {
     ast_diffuse_material darkmatter = {ast_vector3_literal()};
-    ast_literal_material mat = buildMaterials ? boost::get<ast_literal_material>(o.material) : darkmatter;
+    ast_material mat = buildMaterials ? o.material : darkmatter;
     ast_intersectable_list inters = ObjReader::getMesh(o.filename.c_str(), mat);
     Intersectable* mesh = (*this)(inters);
     AxisAlignedBox* bb = mesh->boundingBox();
@@ -663,16 +663,15 @@ Scene buildScene(vector<ast_assignment> assignments)
 
 void resolveVars(vector<ast_assignment> &assignments)
 {
-    VariableResolver vr;
-    BOOST_FOREACH(ast_assignment & assignment, assignments)
-    {
-      vr.apply(assignment);
-    }
-
     IntersectableAssignmentVisitor<ObjLoader> ol;
     BOOST_FOREACH(ast_assignment & assignment, assignments)
     {
       ol.apply(assignment);
+    }
+    VariableResolver vr;
+    BOOST_FOREACH(ast_assignment & assignment, assignments)
+    {
+      vr.apply(assignment);
     }
 }
 

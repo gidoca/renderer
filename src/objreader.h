@@ -31,7 +31,7 @@
 class ObjReader
 {
   public:
-    static ast_intersectable_list getMesh(std::string fileName, ast_literal_material defaultMaterial);
+    static ast_intersectable_list getMesh(std::string fileName, ast_material defaultMaterial);
     static void getMaterials(std::string filename, std::map<std::string, ast_literal_material> &materials);
 };
 
