@@ -477,7 +477,7 @@ struct intersectable_builder : boost::static_visitor<Intersectable*>
 
   Triangle* operator()(const ast_triangle& t)
   {
-      if(t.n1.asQVector().lengthSquared() == 0 || t.n2.asQVector().lengthSquared() == 0 || t.n3.asQVector().lengthSquared() == 0)
+      if(t.n1.asQVector().isNull() || t.n2.asQVector().isNull() || t.n3.asQVector().isNull())
       {
           return new Triangle(t.p1.asQVector(), t.p2.asQVector(), t.p3.asQVector(), t.t1.asCVPoint(), t.t2.asCVPoint(), t.t3.asCVPoint(), getMaterial(t.material));
       }
