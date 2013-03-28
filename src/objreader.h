@@ -28,11 +28,21 @@
 #include <string>
 #include <map>
 
+#include <QDir>
+
 class ObjReader
 {
   public:
     static ast_intersectable_list getMesh(std::string fileName, ast_material defaultMaterial);
-    static void getMaterials(std::string filename, std::map<std::string, ast_literal_material> &materials);
+
+private:
+    ObjReader() {}
+
+    void getMaterials(std::string filename);
+    void createMaterial(ast_vector3_literal diffuseColor, ast_vector3_literal specularColor, float specularCoefficient, QDir dir, std::string textureFilename, std::string materialName);
+    ast_intersectable_list load(std::string fileName, ast_material defaultMaterial);
+
+    std::map<std::string, ast_literal_material> materials;
 };
 
 #endif

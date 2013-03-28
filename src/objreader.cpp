@@ -34,7 +34,6 @@
 #include <algorithm>
 
 #include <QVector3D>
-#include <QDir>
 #include <QFileInfo>
 
 #include <opencv2/core/core.hpp>
@@ -114,9 +113,14 @@ bool read_indices(_ObjMeshFaceIndex& face_index, int i, std::stringstream& str_s
     return true;
 }
 
+ast_intersectable_list ObjReader::getMesh(std::string fileName, ast_material defaultMaterial)
+{
+    ObjReader reader;
+    return reader.load(fileName, defaultMaterial);
+}
+
 /* Call this function to load a model */
-ast_intersectable_list ObjReader::getMesh(std::string filename, ast_material defaultMaterial){
-    std::map<std::string, ast_literal_material> materials;
+ast_intersectable_list ObjReader::load(std::string filename, ast_material defaultMaterial){
     ObjMesh myMesh;
 
     std::vector<ast_vector3_literal>          positions;
@@ -200,7 +204,7 @@ ast_intersectable_list ObjReader::getMesh(std::string filename, ast_material def
             std::string mtl_filename;
             str_stream >> mtl_filename;
 
-            getMaterials(objInfo.dir().filePath(QString(mtl_filename.c_str())).toStdString(), materials);
+            getMaterials(objInfo.dir().filePath(QString(mtl_filename.c_str())).toStdString());
         }
     }
     // Explicit closing of the file
@@ -239,7 +243,7 @@ ast_intersectable_list ObjReader::getMesh(std::string filename, ast_material def
     return m;
 }
 
-void createMaterial(ast_vector3_literal diffuseColor, ast_vector3_literal specularColor, float specularCoefficient, QDir dir, std::string textureFilename, std::string materialName, std::map<std::string, ast_literal_material> &materials)
+void ObjReader::createMaterial(ast_vector3_literal diffuseColor, ast_vector3_literal specularColor, float specularCoefficient, QDir dir, std::string textureFilename, std::string materialName)
 {
     if(!textureFilename.empty())
     {
@@ -268,7 +272,7 @@ void createMaterial(ast_vector3_literal diffuseColor, ast_vector3_literal specul
     }
 }
 
-void ObjReader::getMaterials(std::string filename, std::map<std::string, ast_literal_material> &materials)
+void ObjReader::getMaterials(std::string filename)
 {
     std::ifstream filestream;
     filestream.open(filename.c_str());
@@ -290,7 +294,7 @@ void ObjReader::getMaterials(std::string filename, std::map<std::string, ast_lit
         if(type_str == TOKEN_NEW_MATERIAL){
             if(!current_material_name.empty())
             {
-                createMaterial(current_diffuse_color, current_specular_color, current_specular_coefficient, objInfo.dir(), current_texture_filename, current_material_name, materials);
+                createMaterial(current_diffuse_color, current_specular_color, current_specular_coefficient, objInfo.dir(), current_texture_filename, current_material_name);
             }
             str_stream >> current_material_name;
         }
@@ -307,5 +311,5 @@ void ObjReader::getMaterials(std::string filename, std::map<std::string, ast_lit
             str_stream >> current_specular_coefficient;
         }
     }
-    createMaterial(current_diffuse_color, current_specular_color, current_specular_coefficient, objInfo.dir(), current_texture_filename, current_material_name, materials);
+    createMaterial(current_diffuse_color, current_specular_color, current_specular_coefficient, objInfo.dir(), current_texture_filename, current_material_name);
 }
