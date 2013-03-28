@@ -140,6 +140,7 @@ int main(int argc, char **argv) {
       SceneDumper d(bvhfile);
       d.dump(createBVH(ast));
       bvhfile.close();
+      if(!vm.count("gui") && !vm.count("save-exr") && !vm.count("save-img")) return 0;
   }
 
   Scene scene = buildScene(ast);

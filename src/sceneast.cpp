@@ -52,6 +52,7 @@
 #include <map>
 #include <unordered_map>
 #include <iostream>
+#include <algorithm>
 
 #include <QMatrix4x4>
 
@@ -188,7 +189,7 @@ struct IntersectableAssignmentVisitor : boost::static_visitor<ast_value>
 
     ast_value operator()(ast_intersectable i)
     {
-        return boost::apply_visitor(V(), i);
+        return boost::apply_visitor(v, i);
     }
 
     template<typename T>
@@ -196,6 +197,14 @@ struct IntersectableAssignmentVisitor : boost::static_visitor<ast_value>
     {
         return ast_value(t);
     }
+
+    V getVisitor()
+    {
+        return v;
+    }
+
+private:
+    V v;
 };
 
 struct ObjLoader : boost::static_visitor<ast_intersectable>
@@ -222,9 +231,13 @@ struct ObjLoader : boost::static_visitor<ast_intersectable>
         return b;
     }
 
-    ast_intersectable_list operator()(ast_obj o) const
+    ast_intersectable_list operator()(ast_obj o)
     {
-        return ObjReader::getMesh(o.filename, o.material);
+        ObjReader reader;
+        ast_intersectable_list result = reader.load(o.filename, o.material);
+        std::map<std::string, ast_literal_material> newMaterials = reader.getMaterials();
+        materials.insert(newMaterials.begin(), newMaterials.end());
+        return result;
     }
 
     template<typename T>
@@ -232,6 +245,14 @@ struct ObjLoader : boost::static_visitor<ast_intersectable>
     {
         return t;
     }
+
+    inline std::map<std::string, ast_literal_material> getMaterials()
+    {
+        return materials;
+    }
+
+private:
+    std::map<std::string, ast_literal_material> materials;
 };
 
 struct BVHCreator : boost::static_visitor<ast_intersectable>
@@ -529,7 +550,8 @@ Intersectable* intersectable_builder::operator()(const ast_obj& o)
 {
     ast_diffuse_material darkmatter = {ast_vector3_literal()};
     ast_material mat = buildMaterials ? o.material : darkmatter;
-    ast_intersectable_list inters = ObjReader::getMesh(o.filename.c_str(), mat);
+    ObjReader reader;
+    ast_intersectable_list inters = reader.load(o.filename.c_str(), mat);
     Intersectable* mesh = (*this)(inters);
     AxisAlignedBox* bb = mesh->boundingBox();
     QVector3D min = bb->getMin(), max = bb->getMax();
@@ -656,7 +678,7 @@ Scene buildScene(vector<ast_assignment> assignments)
   scene_builder builder;
   BOOST_FOREACH(ast_assignment & assignment, assignments)
   {
-      if(assignment.name == "camera" || assignment.name == "lights" || assignment.name == "intersectable") builder.addAssignment(assignment);
+      /*if(assignment.name == "camera" || assignment.name == "lights" || assignment.name == "intersectable")*/ builder.addAssignment(assignment);
   }
   return builder.getScene();
 }
@@ -668,11 +690,22 @@ void resolveVars(vector<ast_assignment> &assignments)
     {
       ol.apply(assignment);
     }
-    VariableResolver vr;
+
+    std::map<std::string, ast_literal_material> objMaterials = ol.getVisitor().getMaterials();
+    typedef std::pair<std::string, ast_literal_material> PairType;
+    BOOST_FOREACH(PairType material, objMaterials)
+    {
+        ast_assignment a;
+        a.name = material.first;
+        a.value = material.second;
+        assignments.insert(assignments.begin(), a);
+    }
+
+    /*VariableResolver vr;
     BOOST_FOREACH(ast_assignment & assignment, assignments)
     {
       vr.apply(assignment);
-    }
+    }*/
 }
 
 vector<ast_assignment> createBVH(vector<ast_assignment> assignments)

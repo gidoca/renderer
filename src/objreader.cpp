@@ -113,12 +113,6 @@ bool read_indices(_ObjMeshFaceIndex& face_index, int i, std::stringstream& str_s
     return true;
 }
 
-ast_intersectable_list ObjReader::getMesh(std::string fileName, ast_material defaultMaterial)
-{
-    ObjReader reader;
-    return reader.load(fileName, defaultMaterial);
-}
-
 /* Call this function to load a model */
 ast_intersectable_list ObjReader::load(std::string filename, ast_material defaultMaterial){
     ObjMesh myMesh;
@@ -194,7 +188,7 @@ ast_intersectable_list ObjReader::load(std::string filename, ast_material defaul
         }else if(type_str == TOKEN_MATERIAL){
             std::string name;
             str_stream >> name;
-            currentMaterial = materials[name];
+            currentMaterial = std::vector<char>(name.begin(), name.end());
             if(currentMaterial.empty()){
                 std::cerr << "No such material: " << name << std::endl;
                 currentMaterial = defaultMaterial;

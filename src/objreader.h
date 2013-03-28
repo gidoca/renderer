@@ -33,14 +33,16 @@
 class ObjReader
 {
   public:
-    static ast_intersectable_list getMesh(std::string fileName, ast_material defaultMaterial);
+    ast_intersectable_list load(std::string fileName, ast_material defaultMaterial);
+
+    inline std::map<std::string, ast_literal_material> getMaterials() const
+    {
+        return materials;
+    }
 
 private:
-    ObjReader() {}
-
     void getMaterials(std::string filename);
     void createMaterial(ast_vector3_literal diffuseColor, ast_vector3_literal specularColor, float specularCoefficient, QDir dir, std::string textureFilename, std::string materialName);
-    ast_intersectable_list load(std::string fileName, ast_material defaultMaterial);
 
     std::map<std::string, ast_literal_material> materials;
 };
