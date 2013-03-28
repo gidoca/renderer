@@ -148,9 +148,18 @@ ast_intersectable_list ObjReader::getMesh(std::string filename, ast_material def
         str_stream >> type_str;
         if(type_str == TOKEN_VERTEX_POS){
             ast_vector3_literal pos;
+            float w;
             str_stream >> pos.x;
             str_stream >> pos.y;
             str_stream >> pos.z;
+            str_stream.clear();
+            str_stream >> w;
+            if(!str_stream.fail() && w != 0)
+            {
+                pos.x /= w;
+                pos.y /= w;
+                pos.z /= w;
+            }
             positions.push_back(pos);
         }else if(type_str == TOKEN_VERTEX_TEX){
             ast_vector2_literal tex;
@@ -255,7 +264,7 @@ void createMaterial(ast_vector3_literal diffuseColor, ast_vector3_literal specul
     }
     else
     {
-        std::cerr << "Unknown material" << std::endl;
+        std::cerr << "Unsupported material: " << materialName << std::endl;
     }
 }
 
