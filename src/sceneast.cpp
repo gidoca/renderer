@@ -182,7 +182,7 @@ struct IntersectableAssignmentVisitor : boost::static_visitor<ast_value>
 
     ast_value operator()(ast_intersectable i)
     {
-        return boost::apply_visitor(v, i);
+        return ast_intersectable(boost::apply_visitor(v, i));
     }
 
     template<typename T>
@@ -270,6 +270,28 @@ struct BVHCreator : boost::static_visitor<ast_intersectable>
     ast_intersectable operator()(T t) const
     {
         return t;
+    }
+};
+
+struct Flattener : boost::static_visitor<ast_intersectable_list>
+{
+    ast_intersectable_list operator()(ast_intersectable_list l)
+    {
+        ast_intersectable_list out;
+        BOOST_FOREACH(ast_intersectable i, l.children)
+        {
+            ast_intersectable_list current = boost::apply_visitor(*this, i);
+            out.children.insert(out.children.begin(), current.children.begin(), current.children.end());
+        }
+        return out;
+    }
+
+    template<typename T>
+    ast_intersectable_list operator()(T t) const
+    {
+        ast_intersectable_list l;
+        l.children.push_back(t);
+        return l;
     }
 };
 
@@ -703,6 +725,12 @@ void resolveVars(vector<ast_assignment> &assignments)
 
 vector<ast_assignment> createBVH(vector<ast_assignment> assignments)
 {
+    IntersectableAssignmentVisitor<Flattener> fl;
+    BOOST_FOREACH(ast_assignment & assignment, assignments)
+    {
+        fl.apply(assignment);
+    }
+
     IntersectableAssignmentVisitor<BVHCreator> bc;
     BOOST_FOREACH(ast_assignment & assignment, assignments)
     {
