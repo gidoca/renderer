@@ -202,7 +202,7 @@ private:
 
 struct ObjLoader : boost::static_visitor<ast_intersectable>
 {
-    ast_intersectable_list operator()(ast_intersectable_list l) const
+    ast_intersectable_list operator()(ast_intersectable_list l)
     {
         for(unsigned int i = 0; i < l.children.size(); i++)
         {
@@ -211,13 +211,13 @@ struct ObjLoader : boost::static_visitor<ast_intersectable>
         return l;
     }
 
-    ast_intersectable operator()(ast_instance i) const
+    ast_instance operator()(ast_instance i)
     {
         i.intersectable = boost::apply_visitor(*this, i.intersectable);
         return i;
     }
 
-    ast_intersectable operator()(ast_bvh_node b) const
+    ast_bvh_node operator()(ast_bvh_node b)
     {
         b.left = boost::apply_visitor(*this, b.left);
         b.right = boost::apply_visitor(*this, b.right);
@@ -234,7 +234,7 @@ struct ObjLoader : boost::static_visitor<ast_intersectable>
     }
 
     template<typename T>
-    ast_intersectable operator()(T t) const
+    ast_intersectable operator()(T t)
     {
         return t;
     }
