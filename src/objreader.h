@@ -42,7 +42,7 @@ class ObjReader
 
 private:
     void getMaterials(std::string filename);
-    void createMaterial(ast_vector3_literal diffuseColor, ast_vector3_literal specularColor, float specularCoefficient, QDir dir, std::string textureFilename, std::string materialName);
+    void createMaterial(ast_vector3_literal diffuseColor, ast_vector3_literal specularColor, float specularCoefficient, float opticalDensity, QDir dir, std::string textureFilename, std::string materialName);
 
     std::map<std::string, ast_literal_material> materials;
 };

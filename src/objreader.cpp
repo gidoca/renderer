@@ -50,6 +50,7 @@
 #define TOKEN_DIFFUSE_TEXTURE "map_Kd"
 #define TOKEN_SPECULAR_COLOR "Ks"
 #define TOKEN_SPECULAR_COEFFICIENT "Ns"
+#define TOKEN_OPTICAL_DENSITY "Ni"
 
 struct ObjMeshVertex{
     QVector3D pos;
@@ -70,6 +71,7 @@ struct _ObjMeshFaceIndex{
 
 inline bool read_index(std::stringstream& str_stream, int& dest, int total_num)
 {
+    str_stream.clear();
     str_stream >> dest;
     if(str_stream.fail()) return false;
     if(dest < 0)
@@ -237,7 +239,7 @@ ast_intersectable_list ObjReader::load(std::string filename, ast_material defaul
     return m;
 }
 
-void ObjReader::createMaterial(ast_vector3_literal diffuseColor, ast_vector3_literal specularColor, float specularCoefficient, QDir dir, std::string textureFilename, std::string materialName)
+void ObjReader::createMaterial(ast_vector3_literal diffuseColor, ast_vector3_literal specularColor, float specularCoefficient, float opticalDensity, QDir dir, std::string textureFilename, std::string materialName)
 {
     if(!textureFilename.empty())
     {
@@ -246,6 +248,12 @@ void ObjReader::createMaterial(ast_vector3_literal diffuseColor, ast_vector3_lit
         textureFilename = dir.filePath(QString(textureFilename.c_str())).toStdString();
         ast_texture_material texture = {textureFilename};
         materials[materialName] = texture;
+    }
+    else if(opticalDensity != 0)
+    {
+        ast_refractive_material refractive;
+        refractive.coefficient = opticalDensity;
+        materials[materialName] = refractive;
     }
     else if(diffuseColor.x != 0 || diffuseColor.y != 0 || diffuseColor.z != 0)
     {
@@ -278,6 +286,7 @@ void ObjReader::getMaterials(std::string filename)
     std::string current_texture_filename;
     ast_vector3_literal current_specular_color;
     float current_specular_coefficient = 0;
+    float current_optical_density = 0;
 
     std::string line_stream;
     while(std::getline(filestream, line_stream)){
@@ -288,7 +297,7 @@ void ObjReader::getMaterials(std::string filename)
         if(type_str == TOKEN_NEW_MATERIAL){
             if(!current_material_name.empty())
             {
-                createMaterial(current_diffuse_color, current_specular_color, current_specular_coefficient, objInfo.dir(), current_texture_filename, current_material_name);
+                createMaterial(current_diffuse_color, current_specular_color, current_specular_coefficient, current_optical_density, objInfo.dir(), current_texture_filename, current_material_name);
             }
             str_stream >> current_material_name;
         }
@@ -304,6 +313,9 @@ void ObjReader::getMaterials(std::string filename)
         else if(type_str == TOKEN_SPECULAR_COEFFICIENT){
             str_stream >> current_specular_coefficient;
         }
+        else if(type_str == TOKEN_OPTICAL_DENSITY){
+            str_stream >> current_optical_density;
+        }
     }
-    createMaterial(current_diffuse_color, current_specular_color, current_specular_coefficient, objInfo.dir(), current_texture_filename, current_material_name);
+    createMaterial(current_diffuse_color, current_specular_color, current_specular_coefficient, current_optical_density, objInfo.dir(), current_texture_filename, current_material_name);
 }
