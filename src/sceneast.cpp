@@ -80,97 +80,6 @@ const std::string ast_point_light::function_name = "pointlight";
 const std::string ast_area_light::function_name = "srealight";
 const std::string ast_cone_light::function_name = "conelight";
 
-struct MaterialVariableResolver : boost::static_visitor<ast_literal_material>
-{
-    MaterialVariableResolver(std::map<std::string, ast_value> values) : values(values) {}
-
-    ast_literal_material operator()(ast_literal_material m) const
-    {
-        return m;
-    }
-
-    ast_literal_material operator()(std::vector<char> name) const
-    {
-        return boost::get<ast_literal_material>(values.at(std::string(name.begin(), name.end())));
-    }
-
-private:
-    std::map<std::string, ast_value> values;
-};
-
-struct IntersectableVariableResolver : boost::static_visitor<ast_intersectable>
-{
-    IntersectableVariableResolver(std::map<std::string, ast_value> values) : values(values) {}
-
-    ast_intersectable operator()(std::string name) const
-    {
-        const ast_value v = values.at(name);
-        return boost::get<ast_intersectable>(v);
-    }
-
-    ast_intersectable operator()(ast_intersectable_list l) const
-    {
-        for(unsigned int i = 0; i < l.children.size(); i++)
-        {
-            l.children[i] = boost::apply_visitor(*this, l.children[i]);
-        }
-        return l;
-    }
-
-    ast_intersectable operator()(ast_instance i) const
-    {
-        i.intersectable = boost::apply_visitor(*this, i.intersectable);
-        return i;
-    }
-
-    ast_bvh_node operator()(ast_bvh_node b) const
-    {
-        b.left = boost::apply_visitor(*this, b.left);
-        b.right = boost::apply_visitor(*this, b.right);
-        return b;
-    }
-
-    template<typename T>
-    ast_intersectable operator()(T t) const
-    {
-        t.material = boost::apply_visitor(MaterialVariableResolver(values), t.material);
-        return ast_intersectable(t);
-    }
-
-private:
-    const std::map<std::string, ast_value> values;
-};
-
-struct VariableResolver : boost::static_visitor<>
-{
-
-    void apply(ast_assignment &a)
-    {
-        boost::apply_visitor(*this, a.value);
-        values[a.name] = current;
-        a.value = current;
-    }
-
-    void operator()(std::string name)
-    {
-        current = values[name];
-    }
-
-    void operator()(ast_intersectable i)
-    {
-        current = boost::apply_visitor(IntersectableVariableResolver(values), i);
-    }
-
-    template<typename T>
-    void operator()(T t)
-    {
-        current = ast_value(t);
-    }
-
-private:
-    std::map<std::string, ast_value> values;
-    ast_value current;
-};
 
 template<typename V>
 struct IntersectableAssignmentVisitor : boost::static_visitor<ast_value>
@@ -715,12 +624,6 @@ void resolveVars(vector<ast_assignment> &assignments)
         a.value = material.second;
         assignments.insert(assignments.begin(), a);
     }
-
-    /*VariableResolver vr;
-    BOOST_FOREACH(ast_assignment & assignment, assignments)
-    {
-      vr.apply(assignment);
-    }*/
 }
 
 vector<ast_assignment> createBVH(vector<ast_assignment> assignments)
