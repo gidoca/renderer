@@ -40,8 +40,6 @@ struct ast_vector2_literal
     float x, y;
 
     cv::Point2f asCVPoint() const;
-
-    static const std::string function_name;
 };
 
 struct ast_vector3_literal
@@ -51,8 +49,6 @@ struct ast_vector3_literal
 
   QVector3D asQVector() const;
   cv::Vec3f asSpectrum() const;
-
-  static const std::string function_name;
 };
 
 struct ast_vector4_literal
@@ -61,8 +57,6 @@ struct ast_vector4_literal
   float x, y, z, w;
 
   QVector4D asQVector() const;
-
-  static const std::string function_name;
 };
 
 struct ast_diffuse_material
@@ -118,8 +112,6 @@ typedef boost::variant<
 struct ast_matrix_literal
 {
   ast_vector4_literal v1, v2, v3, v4;
-
-  static const std::string function_name;
 };
 
 struct ast_matrix_translate
@@ -165,8 +157,6 @@ struct ast_matrix
     std::vector<ast_basic_matrix> mult;
 
     QMatrix4x4 asQMatrix4x4() const;
-
-    static const std::string function_name;
 };
 
 typedef boost::variant<
@@ -184,8 +174,6 @@ typedef boost::variant<
 struct ast_intersectable_list
 {
   std::vector<ast_intersectable> children;
-
-  static const std::string function_name;
 };
 
 struct ast_sphere
@@ -294,8 +282,6 @@ struct ast_assignment
 {
     std::string name;
     ast_value value;
-
-    static const std::string function_name;
 };
 
 BOOST_FUSION_ADAPT_STRUCT(
