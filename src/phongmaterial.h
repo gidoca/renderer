@@ -25,18 +25,23 @@
 #include "diffusematerial.h"
 #include "intersectable.h"
 
-class PhongMaterial : public DiffuseMaterial
+class PhongMaterial : public Material
 {
   public:
-    PhongMaterial(cv::Vec3f color, cv::Vec3f specularColor, float specularCoefficient) : DiffuseMaterial(color), specularColor(specularColor), specularCoefficient(specularCoefficient)
+    PhongMaterial(cv::Vec3f color, cv::Vec3f specularColor, float specularCoefficient) : color(color), specularColor(specularColor), specularCoefficient(specularCoefficient)
     {
 
+    }
+
+    bool isMirror() const
+    {
+        return false;
     }
 
     cv::Vec3f shade(const HitRecord& hit, QVector3D direction) const;
 
   private:
-    const cv::Vec3f specularColor;
+    const cv::Vec3f color, specularColor;
     const float specularCoefficient;
 };
 
