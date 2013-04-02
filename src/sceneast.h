@@ -84,7 +84,15 @@ struct ast_mirror_material
 
 struct ast_texture_material
 {
+    ast_texture_material()
+    {
+        coefficient.x = 1;
+        coefficient.y = 1;
+        coefficient.z = 1;
+    }
+
     std::string filename;
+    ast_vector3_literal coefficient;
 
     static const std::string function_name;
 };
