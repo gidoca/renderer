@@ -30,6 +30,16 @@
 
 #include <QDir>
 
+struct ObjMaterial
+{
+    ast_vector3_literal diffuse_color;
+    std::string texture_filename;
+    ast_vector3_literal specular_color;
+    float specular_coefficient;
+    float optical_density;
+};
+
+
 class ObjReader
 {
   public:
@@ -42,7 +52,7 @@ class ObjReader
 
 private:
     void getMaterials(std::string filename);
-    void createMaterial(ast_vector3_literal diffuseColor, ast_vector3_literal specularColor, float specularCoefficient, float opticalDensity, QDir dir, std::string textureFilename, std::string materialName);
+    void createMaterial(ObjMaterial & material, QDir dir, std::string materialName);
 
     std::map<std::string, ast_literal_material> materials;
 };
