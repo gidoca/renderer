@@ -190,7 +190,7 @@ struct Flattener : boost::static_visitor<ast_intersectable_list>
         BOOST_FOREACH(ast_intersectable i, l.children)
         {
             ast_intersectable_list current = boost::apply_visitor(*this, i);
-            out.children.insert(out.children.begin(), current.children.begin(), current.children.end());
+            out.children.insert(out.children.end(), current.children.begin(), current.children.end());
         }
         return out;
     }
@@ -609,6 +609,7 @@ Scene buildScene(vector<ast_assignment> assignments)
 
 void resolveVars(vector<ast_assignment> &assignments)
 {
+    std::cerr << "Loading OBJs..." << std::endl;
     IntersectableAssignmentVisitor<ObjLoader> ol;
     BOOST_FOREACH(ast_assignment & assignment, assignments)
     {
@@ -628,12 +629,14 @@ void resolveVars(vector<ast_assignment> &assignments)
 
 vector<ast_assignment> createBVH(vector<ast_assignment> assignments)
 {
+    std::cerr << "Flattening..." << std::endl;
     IntersectableAssignmentVisitor<Flattener> fl;
     BOOST_FOREACH(ast_assignment & assignment, assignments)
     {
         fl.apply(assignment);
     }
 
+    std::cerr << "Creating BVH tree..." << std::endl;
     IntersectableAssignmentVisitor<BVHCreator> bc;
     BOOST_FOREACH(ast_assignment & assignment, assignments)
     {

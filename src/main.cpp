@@ -138,9 +138,15 @@ int main(int argc, char **argv) {
   {
       ofstream bvhfile(vm["dump-bvh"].as<string>());
       SceneDumper d(bvhfile);
-      d.dump(createBVH(ast));
+      std::vector<ast_assignment> bvhAst = createBVH(ast);
+      if(vm.count("verbose")) cerr << "Writing BVH tree to " << vm["dump-bvh"].as<string>() << endl;
+      d.dump(bvhAst);
       bvhfile.close();
-      if(!vm.count("gui") && !vm.count("save-exr") && !vm.count("save-img")) return 0;
+      if(!vm.count("gui") && !vm.count("save-exr") && !vm.count("save-img"))
+      {
+          if(vm.count("verbose")) cerr << "Dumping BVH complete, " << time.elapsed() / 1000 << "s elapsed." << endl;
+          return 0;
+      }
   }
 
   Scene scene = buildScene(ast);
