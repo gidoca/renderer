@@ -279,7 +279,7 @@ void ObjReader::createMaterial(ObjMaterial &material, QDir dir, std::string mate
         std::cerr << "Unsupported material: " << materialName << std::endl;
     }
 
-    material = ObjMaterial();
+//    material = ObjMaterial();
 }
 
 void ObjReader::getMaterials(std::string filename)
