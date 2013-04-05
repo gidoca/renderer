@@ -137,7 +137,7 @@ ast_intersectable_list ObjReader::load(std::string filename, ast_material defaul
     std::ifstream filestream;
     filestream.open(filename.c_str());
 
-    QFileInfo objInfo = QFileInfo(QString(filename.c_str()));
+    QFileInfo objInfo = QFileInfo(QString::fromStdString(filename));
 
     ast_material currentMaterial = defaultMaterial;
 
@@ -201,7 +201,7 @@ ast_intersectable_list ObjReader::load(std::string filename, ast_material defaul
             std::string mtl_filename;
             str_stream >> mtl_filename;
 
-            getMaterials(objInfo.dir().filePath(QString(mtl_filename.c_str())).toStdString());
+            getMaterials(objInfo.dir().filePath(QString::fromStdString(mtl_filename)).toStdString());
         }
     }
     // Explicit closing of the file
@@ -285,7 +285,7 @@ void ObjReader::getMaterials(std::string filename)
     std::ifstream filestream;
     filestream.open(filename.c_str());
 
-    QFileInfo objInfo = QFileInfo(QString(filename.c_str()));
+    QFileInfo objInfo = QFileInfo(QString::fromStdString(filename));
 
     std::string current_material_name;
 

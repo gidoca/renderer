@@ -192,7 +192,7 @@ int main(int argc, char **argv) {
     if(vm.count("save-img"))
     {
         QImage img = tm.tonemap(*film);
-        img.save(QString(vm["save-img"].as<string>().c_str()));
+        img.save(QString::fromStdString(vm["save-img"].as<string>()));
     }
     if(vm.count("verbose")) cerr << "Rendering complete, " << time.elapsed() / 1000 << "s elapsed." << endl;
     return 0;
