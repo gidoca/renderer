@@ -240,7 +240,7 @@ ast_intersectable_list ObjReader::load(std::string filename, ast_material defaul
     return m;
 }
 
-void ObjReader::createMaterial(ObjMaterial &material, QDir dir, std::string materialName)
+void ObjReader::createMaterial(ObjMaterial material, QDir dir, std::string materialName)
 {
     if(!material.texture_filename.empty())
     {
@@ -278,8 +278,6 @@ void ObjReader::createMaterial(ObjMaterial &material, QDir dir, std::string mate
     {
         std::cerr << "Unsupported material: " << materialName << std::endl;
     }
-
-//    material = ObjMaterial();
 }
 
 void ObjReader::getMaterials(std::string filename)
@@ -303,6 +301,7 @@ void ObjReader::getMaterials(std::string filename)
             if(!current_material_name.empty())
             {
                 createMaterial(currentMaterial, objInfo.dir(), current_material_name);
+//                currentMaterial = ObjMaterial();
             }
             str_stream >> current_material_name;
         }

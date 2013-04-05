@@ -52,7 +52,7 @@ class ObjReader
 
 private:
     void getMaterials(std::string filename);
-    void createMaterial(ObjMaterial & material, QDir dir, std::string materialName);
+    void createMaterial(ObjMaterial material, QDir dir, std::string materialName);
 
     std::map<std::string, ast_literal_material> materials;
 };
