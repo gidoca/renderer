@@ -37,6 +37,7 @@ struct ObjMaterial
     ast_vector3_literal specular_color;
     float specular_coefficient;
     float optical_density;
+    short illum;
 };
 
 

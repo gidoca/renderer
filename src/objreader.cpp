@@ -46,6 +46,7 @@
 #define TOKEN_MATERIAL_LIB "mtllib"
 
 #define TOKEN_NEW_MATERIAL "newmtl"
+#define TOKEN_ILLUMINATION "illum"
 #define TOKEN_DIFFUSE_COLOR "Kd"
 #define TOKEN_DIFFUSE_TEXTURE "map_Kd"
 #define TOKEN_SPECULAR_COLOR "Ks"
@@ -242,41 +243,40 @@ ast_intersectable_list ObjReader::load(std::string filename, ast_material defaul
 
 void ObjReader::createMaterial(ObjMaterial material, QDir dir, std::string materialName)
 {
-    if(!material.texture_filename.empty())
+    if(material.illum <= 2 || material.optical_density == 0)
     {
-        // This is a fix for broken mtl files that use the Windows path separator convention
-        std::replace(material.texture_filename.begin(), material.texture_filename.end(), '\\', '/');
-        material.texture_filename = dir.filePath(QString(material.texture_filename.c_str())).toStdString();
-        ast_texture_material texture;
-        texture.filename = material.texture_filename;
-        if(material.diffuse_color.x != 0 || material.diffuse_color.y != 0 || material.diffuse_color.z != 0)
+        if(!material.texture_filename.empty())
         {
-            texture.coefficient = material.diffuse_color;
+            // This is a fix for broken mtl files that use the Windows path separator convention
+            std::replace(material.texture_filename.begin(), material.texture_filename.end(), '\\', '/');
+            material.texture_filename = dir.filePath(QString(material.texture_filename.c_str())).toStdString();
+            ast_texture_material texture;
+            texture.filename = material.texture_filename;
+            if(material.diffuse_color.x != 0 || material.diffuse_color.y != 0 || material.diffuse_color.z != 0)
+            {
+                texture.coefficient = material.diffuse_color;
+            }
+            materials[materialName] = texture;
         }
-        materials[materialName] = texture;
-    }
-    else if(material.optical_density != 0)
-    {
-        ast_refractive_material refractive;
-        refractive.coefficient = material.optical_density;
-        materials[materialName] = refractive;
-    }
-    else if(material.diffuse_color.x != 0 || material.diffuse_color.y != 0 || material.diffuse_color.z != 0)
-    {
-        if((material.specular_color.x == 0 && material.specular_color.y == 0 && material.specular_color.z == 0) || material.specular_coefficient == 0)
+        else if(material.diffuse_color.x != 0 || material.diffuse_color.y != 0 || material.diffuse_color.z != 0)
         {
-            ast_diffuse_material diffuse = {material.diffuse_color};
-            materials[materialName] = diffuse;
-        }
-        else
-        {
-            ast_phong_material phong = {material.diffuse_color, material.specular_color, material.specular_coefficient};
-            materials[materialName] = phong;
+            if((material.specular_color.x == 0 && material.specular_color.y == 0 && material.specular_color.z == 0) || material.specular_coefficient == 0)
+            {
+                ast_diffuse_material diffuse = {material.diffuse_color};
+                materials[materialName] = diffuse;
+            }
+            else
+            {
+                ast_phong_material phong = {material.diffuse_color, material.specular_color, material.specular_coefficient};
+                materials[materialName] = phong;
+            }
         }
     }
     else
     {
-        std::cerr << "Unsupported material: " << materialName << std::endl;
+        ast_refractive_material refractive;
+        refractive.coefficient = material.optical_density;
+        materials[materialName] = refractive;
     }
 }
 
@@ -304,6 +304,10 @@ void ObjReader::getMaterials(std::string filename)
 //                currentMaterial = ObjMaterial();
             }
             str_stream >> current_material_name;
+        }
+        else if(type_str == TOKEN_ILLUMINATION)
+        {
+            str_stream >> currentMaterial.illum;
         }
         else if(type_str == TOKEN_DIFFUSE_COLOR){
             str_stream >> currentMaterial.diffuse_color.x >> currentMaterial.diffuse_color.y >> currentMaterial.diffuse_color.z;
