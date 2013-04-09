@@ -47,6 +47,17 @@ public:
         return leftCenter < rightCenter;
     }
 
+    bool operator()(ast_intersectable a, ast_intersectable b)
+    {
+        AxisAlignedBox *bb1 = getBoundingBoxFromAst(a), *bb2 = getBoundingBoxFromAst(b);
+
+        float leftCenter = get(bb1->getMax() + bb1->getMin(), splitAxis) / 2;
+        float rightCenter = get(bb2->getMax() + bb2->getMin(), splitAxis) / 2;
+        delete bb1;
+        delete bb2;
+        return leftCenter < rightCenter;
+    }
+
 private:
     int splitAxis;
 };
@@ -79,11 +90,52 @@ Intersectable* BVHNode::create(IntersectableList* list)
 
   delete list;
 
-  //TODO delete all those intermediate lists
   BVHNode* node = new BVHNode(create(new IntersectableList(left)), create(new IntersectableList(right)), bb);
   return node;
 }
 
+ast_intersectable BVHNode::create(ast_intersectable_list list)
+{
+    std::vector<ast_intersectable> intersectables = list.children;
+    if(intersectables.size() == 1) return intersectables.front();
+
+    AxisAlignedBox * bb = getBoundingBoxFromAst(list);
+    QVector3D diff = bb->getMax() - bb->getMin();
+    int splitAxis = (diff.x() > diff.y() && diff.x() > diff.z() ? 0 : (diff.y() > diff.z() ? 1 : 2));
+    IntersectableComparator comparator(splitAxis);
+    sort(intersectables.begin(), intersectables.end(), comparator);
+
+    // This causes an assertion failure in boost::variant
+//    auto it0 = intersectables.begin(), it1 = intersectables.end() + intersectables.size() / 2, it2 = intersectables.end();
+//    std::vector<ast_intersectable> left(it0, it1), right(it1, it2);
+    std::vector< ast_intersectable > left, right;
+    const unsigned int split = intersectables.size() / 2;
+    left.reserve(split);
+    right.reserve(intersectables.size() - split);
+    for(unsigned int i = 0; i < split; i++)
+    {
+        left.push_back(intersectables[i]);
+    }
+    for(unsigned int i = split; i < intersectables.size(); i++)
+    {
+        right.push_back(intersectables[i]);
+    }
+
+    if(left.size() == 0 || right.size() == 0) return list;
+
+    ast_intersectable_list leftList = {left}, rightList = {right};
+    ast_diffuse_material bb_mat = {ast_vector3_literal()};
+    ast_vector3_literal bb_min, bb_max;
+    bb_min.x = bb->getMin().x();
+    bb_min.y = bb->getMin().y();
+    bb_min.z = bb->getMin().z();
+    bb_max.x = bb->getMax().x();
+    bb_max.y = bb->getMax().y();
+    bb_max.z = bb->getMax().z();
+    ast_box ast_bb = {bb_min, bb_max, bb_mat};
+    ast_bvh_node out = {create(leftList), create(rightList), ast_bb};
+    return out;
+}
 
 AxisAlignedBox* BVHNode::boundingBox() const
 {
@@ -113,4 +165,9 @@ std::vector<Intersectable*> BVHNode::containedIntersectables()
     std::vector<Intersectable*> rightIntersectables = right->containedIntersectables();
     out.insert(out.end(), rightIntersectables.begin(), rightIntersectables.end());
     return out;
+}
+
+Intersectable* BVHNode::createBVH()
+{
+    return this;
 }

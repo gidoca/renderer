@@ -65,9 +65,12 @@ private:
   qi::rule<std::string::iterator, ast_quad(), boost::spirit::ascii::space_type> quad_rule;
   qi::rule<std::string::iterator, ast_plane(), boost::spirit::ascii::space_type> plane_rule;
   qi::rule<std::string::iterator, ast_obj(), boost::spirit::ascii::space_type> obj_rule;
+  qi::rule<std::string::iterator, ast_triangle(), boost::spirit::ascii::space_type> triangle_rule;
   qi::rule<std::string::iterator, ast_instance(), boost::spirit::ascii::space_type> instance_rule;
+  qi::rule<std::string::iterator, ast_bvh_node(), boost::spirit::ascii::space_type> bvh_node_rule;
   qi::rule<std::string::iterator, ast_intersectable(), boost::spirit::ascii::space_type> intersectable_rule;
 
+  qi::rule<std::string::iterator, ast_vector2_literal(), boost::spirit::ascii::space_type> vector2_literal_rule;
   qi::rule<std::string::iterator, ast_vector3_literal(), boost::spirit::ascii::space_type> vector3_literal_rule;
   qi::rule<std::string::iterator, ast_vector4_literal(), boost::spirit::ascii::space_type> vector4_literal_rule;
   qi::rule<std::string::iterator, ast_matrix_literal(), boost::spirit::ascii::space_type> matrix_literal_rule;

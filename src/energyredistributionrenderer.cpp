@@ -56,7 +56,7 @@ void EnergyRedistributionRenderer::render()
 
     if(vm.count("verbose"))
     {
-        std::cout << i * 100 / size.height << "% complete, ETA: " << time.elapsed() * (size.height - i) / ((i + 1) * 1000) << "s" << std::endl;
+        std::cerr << i * 100 / size.height << "% complete, ETA: " << time.elapsed() * (size.height - i) / ((i + 1) * 1000) << "s" << std::endl;
     }
     gsl_rng *rng = gsl_rng_alloc(gsl_rng_taus2);
     gsl_rng_set(rng, size.height * seed + i);

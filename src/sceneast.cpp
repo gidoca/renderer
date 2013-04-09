@@ -41,15 +41,168 @@
 
 #include <boost/foreach.hpp>
 #include <boost/variant/apply_visitor.hpp>
+#include <boost/variant/get.hpp>
+#include <boost/fusion/include/equal_to.hpp>
+#include <boost/functional/hash.hpp>
+#include <boost/fusion/algorithm/iteration/fold.hpp>
+#include <boost/version.hpp>
 
 #include <list>
 #include <vector>
 #include <map>
+#include <unordered_map>
 #include <iostream>
+#include <algorithm>
 
 #include <QMatrix4x4>
 
 using namespace std;
+
+const std::string ast_diffuse_material::function_name = "diffuse";
+const std::string ast_phong_material::function_name = "phong";
+const std::string ast_mirror_material::function_name = "mirror";
+const std::string ast_texture_material::function_name = "texture";
+const std::string ast_refractive_material::function_name = "refractive";
+const std::string ast_matrix_translate::function_name = "translate";
+const std::string ast_matrix_rotate::function_name = "rotate";
+const std::string ast_matrix_scale::function_name = "scale";
+const std::string ast_matrix_scale_vect::function_name = "scale";
+const std::string ast_sphere::function_name = "sphere";
+const std::string ast_box::function_name = "box";
+const std::string ast_quad::function_name = "quad";
+const std::string ast_plane::function_name = "plane";
+const std::string ast_obj::function_name = "obj";
+const std::string ast_triangle::function_name = "t";
+const std::string ast_instance::function_name = "instance";
+const std::string ast_bvh_node::function_name = "b";
+const std::string ast_camera::function_name = "camera";
+const std::string ast_point_light::function_name = "pointlight";
+const std::string ast_area_light::function_name = "srealight";
+const std::string ast_cone_light::function_name = "conelight";
+
+
+template<typename V>
+struct IntersectableAssignmentVisitor : boost::static_visitor<ast_value>
+{
+    void apply(ast_assignment &a)
+    {
+        a.value = boost::apply_visitor(*this, a.value);
+    }
+
+    ast_value operator()(ast_intersectable i)
+    {
+        return ast_intersectable(boost::apply_visitor(v, i));
+    }
+
+    template<typename T>
+    ast_value operator()(T t)
+    {
+        return ast_value(t);
+    }
+
+    V getVisitor()
+    {
+        return v;
+    }
+
+private:
+    V v;
+};
+
+struct ObjLoader : boost::static_visitor<ast_intersectable>
+{
+    ast_intersectable_list operator()(ast_intersectable_list l)
+    {
+        for(unsigned int i = 0; i < l.children.size(); i++)
+        {
+            l.children[i] = boost::apply_visitor(*this, l.children[i]);
+        }
+        return l;
+    }
+
+    ast_instance operator()(ast_instance i)
+    {
+        i.intersectable = boost::apply_visitor(*this, i.intersectable);
+        return i;
+    }
+
+    ast_bvh_node operator()(ast_bvh_node b)
+    {
+        b.left = boost::apply_visitor(*this, b.left);
+        b.right = boost::apply_visitor(*this, b.right);
+        return b;
+    }
+
+    ast_intersectable_list operator()(ast_obj o)
+    {
+        ObjReader reader;
+        ast_intersectable_list result = reader.load(o.filename, o.material);
+        std::map<std::string, ast_literal_material> newMaterials = reader.getMaterials();
+        materials.insert(newMaterials.begin(), newMaterials.end());
+        return result;
+    }
+
+    template<typename T>
+    ast_intersectable operator()(T t)
+    {
+        return t;
+    }
+
+    inline std::map<std::string, ast_literal_material> getMaterials()
+    {
+        return materials;
+    }
+
+private:
+    std::map<std::string, ast_literal_material> materials;
+};
+
+struct BVHCreator : boost::static_visitor<ast_intersectable>
+{
+    ast_intersectable operator()(ast_instance i) const
+    {
+        i.intersectable = boost::apply_visitor(*this, i.intersectable);
+        return i;
+    }
+
+    ast_intersectable operator()(ast_bvh_node b) const
+    {
+        return b;
+    }
+
+    ast_intersectable operator()(ast_intersectable_list l) const
+    {
+        return BVHNode::create(l);
+    }
+
+    template<typename T>
+    ast_intersectable operator()(T t) const
+    {
+        return t;
+    }
+};
+
+struct Flattener : boost::static_visitor<ast_intersectable_list>
+{
+    ast_intersectable_list operator()(ast_intersectable_list l)
+    {
+        ast_intersectable_list out;
+        BOOST_FOREACH(ast_intersectable i, l.children)
+        {
+            ast_intersectable_list current = boost::apply_visitor(*this, i);
+            out.children.insert(out.children.end(), current.children.begin(), current.children.end());
+        }
+        return out;
+    }
+
+    template<typename T>
+    ast_intersectable_list operator()(T t) const
+    {
+        ast_intersectable_list l;
+        l.children.push_back(t);
+        return l;
+    }
+};
 
 struct matrix_evaluator : boost::static_visitor<QMatrix4x4>
 {
@@ -103,9 +256,48 @@ QMatrix4x4 ast_matrix::asQMatrix4x4() const
     return first;
 }
 
+template<typename T> bool operator==(const T & lhs, const T & rhs) {
+    return boost::fusion::equal_to(lhs, rhs);
+}
+
+struct variant_hasher: public boost::static_visitor<std::size_t> {
+    template <class T>
+    std::size_t operator()(T const& val) const {
+        using namespace boost;
+        boost::hash<T> hasher;
+        return hasher(val);
+    }
+};
+
+struct hash_combine_s {
+    typedef std::size_t result_type;
+    template<class T>
+    std::size_t operator()(std::size_t current, const T& arg) {
+        boost::hash_combine(current, arg);
+        return(current);
+    }
+};
+
+template<typename T>
+std::size_t hash_value(const T& t)
+{
+    return boost::fusion::fold(t, 0, hash_combine_s());
+}
+
+#if BOOST_VERSION < 105000
+template < BOOST_VARIANT_ENUM_PARAMS(typename T) >
+std::size_t hash_value(boost::variant< BOOST_VARIANT_ENUM_PARAMS(T) > const& val) {
+    std::size_t seed = boost::apply_visitor(variant_hasher(), val);
+    boost::hash_combine(seed, val.which());
+    return seed;
+}
+#endif
+
+typedef std::unordered_map<ast_literal_material, Material*, variant_hasher> ast_mat_map;
+
 struct material_builder : boost::static_visitor<Material*>
 {
-  material_builder(std::map<std::string, Material*>& materials) : materials(materials) {}
+  material_builder(std::map<std::string, Material*>& materials, ast_mat_map &ast_materials) : ast_materials(ast_materials), materials(materials) {}
 
   Material* operator()(ast_diffuse_material material) const
   {
@@ -124,7 +316,7 @@ struct material_builder : boost::static_visitor<Material*>
 
   Material* operator()(ast_texture_material material) const
   {
-    TextureMaterial* out = new TextureMaterial();
+    TextureMaterial* out = new TextureMaterial(material.coefficient.asSpectrum());
     if(!out->load(material.filename))
     {
         delete out;
@@ -144,7 +336,7 @@ struct material_builder : boost::static_visitor<Material*>
       Material* material = materials[name];
       if(material == 0)
       {
-          std::cout << "No such variable: " << name << std::endl;
+          std::cerr << "No such variable: " << name << std::endl;
           return DarkMatter::getInstance();
       }
       else
@@ -155,11 +347,21 @@ struct material_builder : boost::static_visitor<Material*>
 
   Material* operator()(ast_literal_material material) const
   {
-      return boost::apply_visitor(*this, material);
+      if(!ast_materials.count(material))
+      {
+          ast_materials[material] = boost::apply_visitor(*this, material);
+      }
+      return ast_materials[material];
   }
 
+  ast_mat_map &ast_materials;
   std::map<std::string, Material*>& materials;
 };
+
+cv::Point2f ast_vector2_literal::asCVPoint() const
+{
+    return cv::Point2f(x, y);
+}
 
 QVector3D ast_vector3_literal::asQVector() const
 {
@@ -184,47 +386,66 @@ Camera ast_camera::asCamera() const
 
 struct intersectable_builder : boost::static_visitor<Intersectable*>
 {
-  intersectable_builder(std::map<std::string, Material*>& materials) : materials(materials), material_b(materials) {}
+  intersectable_builder(std::map<std::string, Material*>& materials, ast_mat_map &ast_materials, bool buildMaterials = true) : ast_materials(ast_materials), materials(materials), material_b(materials, ast_materials), buildMaterials(buildMaterials) {}
 
-  Sphere* operator()(const ast_sphere& s) const
+  inline Material * getMaterial(ast_material m)
   {
-    return new Sphere(s.center.asQVector(), s.radius, boost::apply_visitor(material_b, s.material));
+      if(buildMaterials)
+      {
+          return boost::apply_visitor(material_b, m);
+      }
+      else
+      {
+          return DarkMatter::getInstance();
+      }
   }
 
-  AxisAlignedBox* operator()(const ast_box& b) const
+  Sphere* operator()(const ast_sphere& s)
   {
-    return new AxisAlignedBox(b.min.asQVector(), b.max.asQVector(), boost::apply_visitor(material_b, b.material));
+    return new Sphere(s.center.asQVector(), s.radius, getMaterial(s.material));
   }
 
-  Quad* operator()(const ast_quad& q) const
+  AxisAlignedBox* operator()(const ast_box& b)
   {
-    return new Quad(q.p1.asQVector(), q.p2.asQVector(), q.p3.asQVector(), q.p4.asQVector(), boost::apply_visitor(material_b, q.material));
+    return new AxisAlignedBox(b.min.asQVector(), b.max.asQVector(), getMaterial(b.material));
   }
 
-  Plane* operator()(const ast_plane& p) const
+  Quad* operator()(const ast_quad& q)
   {
-      return new Plane(p.vector.asQVector(), boost::apply_visitor(material_b, p.material));
+    return new Quad(q.p1.asQVector(), q.p2.asQVector(), q.p3.asQVector(), q.p4.asQVector(), getMaterial(q.material));
   }
 
-  Intersectable* operator()(const ast_obj& o) const
+  Plane* operator()(const ast_plane& p)
   {
-      Intersectable* mesh = ObjReader::getMesh(o.filename.c_str(), boost::apply_visitor(material_b, o.material), materials);
-      AxisAlignedBox* bb = mesh->boundingBox();
-      QVector3D min = bb->getMin(), max = bb->getMax();
-      delete bb;
-      std::cout << "Mesh bb min: " << min.x() << "," << min.y() << "," << min.z() << "; max: " << max.x() << "," << max.y() << "," << max.z() << std::endl;
-      return mesh;
+      return new Plane(p.vector.asQVector(), getMaterial(p.material));
   }
 
-  IntersectableList* operator()(const ast_intersectable_list& l) const;
-  IntersectableInstance* operator()(const ast_instance& i) const;
+  Triangle* operator()(const ast_triangle& t)
+  {
+      if(t.n1.asQVector().isNull() || t.n2.asQVector().isNull() || t.n3.asQVector().isNull())
+      {
+          return new Triangle(t.p1.asQVector(), t.p2.asQVector(), t.p3.asQVector(), t.t1.asCVPoint(), t.t2.asCVPoint(), t.t3.asCVPoint(), getMaterial(t.material));
+      }
+      else
+      {
+        return new Triangle(t.p1.asQVector(), t.p2.asQVector(), t.p3.asQVector(), t.n1.asQVector(), t.n2.asQVector(), t.n3.asQVector(), t.t1.asCVPoint(), t.t2.asCVPoint(), t.t3.asCVPoint(), getMaterial(t.material));
+      }
+  }
 
+  IntersectableList* operator()(const ast_intersectable_list& l);
+  IntersectableInstance* operator()(const ast_instance& i);
+  BVHNode* operator()(const ast_bvh_node& b);
+  Intersectable* operator()(const ast_obj& o);
+
+  ast_mat_map &ast_materials;
   std::map<std::string, Material*>& materials;
 
   material_builder material_b;
+
+  const bool buildMaterials;
 };
 
-IntersectableList* intersectable_builder::operator()(ast_intersectable_list const& l) const
+IntersectableList* intersectable_builder::operator()(ast_intersectable_list const& l)
 {
   vector<Intersectable*> intersectables;
   intersectables.reserve(l.children.size());
@@ -237,9 +458,30 @@ IntersectableList* intersectable_builder::operator()(ast_intersectable_list cons
   return new IntersectableList(intersectables);
 }
 
-IntersectableInstance* intersectable_builder::operator()(const ast_instance& i) const
+IntersectableInstance* intersectable_builder::operator()(const ast_instance& i)
 {
     return new IntersectableInstance(i.transform.asQMatrix4x4(), boost::apply_visitor(*this, i.intersectable));
+}
+
+BVHNode* intersectable_builder::operator ()(const ast_bvh_node& b)
+{
+    Intersectable *left = boost::apply_visitor(*this, b.left), *right = boost::apply_visitor(*this, b.right);
+    AxisAlignedBox* bb = (*this)(b.bb);
+    return new BVHNode(left, right, bb);
+}
+
+Intersectable* intersectable_builder::operator()(const ast_obj& o)
+{
+    ast_diffuse_material darkmatter = {ast_vector3_literal()};
+    ast_material mat = buildMaterials ? o.material : darkmatter;
+    ObjReader reader;
+    ast_intersectable_list inters = reader.load(o.filename.c_str(), mat);
+    Intersectable* mesh = (*this)(inters);
+    AxisAlignedBox* bb = mesh->boundingBox();
+    QVector3D min = bb->getMin(), max = bb->getMax();
+    delete bb;
+    std::cerr << "Mesh bb min: " << min.x() << "," << min.y() << "," << min.z() << "; max: " << max.x() << "," << max.y() << "," << max.z() << std::endl;
+    return mesh;
 }
 
 struct light_builder : boost::static_visitor<const Light*>
@@ -262,7 +504,7 @@ struct light_builder : boost::static_visitor<const Light*>
 
 struct scene_builder : boost::static_visitor<void>
 {
-    scene_builder() : intersectable_b(materials), material_b(materials) {}
+    scene_builder() : intersectable_b(materials, ast_materials), material_b(materials, ast_materials) {}
 
     void addAssignment(ast_assignment assignment)
     {
@@ -316,14 +558,18 @@ struct scene_builder : boost::static_visitor<void>
         }
         else
         {
-            std::cout << "Could not assign to " << current_name << ", no such variable: " << identifier << std::endl;
+            std::cerr << "Could not assign to " << current_name << ", no such variable: " << identifier << std::endl;
         }
     }
 
     Scene getScene()
     {
         Scene result(cameras["camera"]);
-        result.object = BVHNode::create(new IntersectableList(intersectables["intersectable"]->containedIntersectables()));
+        result.object = intersectables["intersectable"]->createBVH();
+        AxisAlignedBox* bb = result.object->boundingBox();
+        QVector3D min = bb->getMin(), max = bb->getMax();
+        delete bb;
+        std::cerr << "Mesh bb min: " << min.x() << "," << min.y() << "," << min.z() << "; max: " << max.x() << "," << max.y() << "," << max.z() << std::endl;
         result.light = lights["lights"];
         return result;
     }
@@ -332,6 +578,8 @@ struct scene_builder : boost::static_visitor<void>
     map<string, Intersectable*> intersectables;
     map<string, vector<const Light*> > lights;
     map<string, Material*> materials;
+
+    ast_mat_map ast_materials;
 
 private:
     void deleteAllVars(std::string name)
@@ -352,10 +600,59 @@ private:
 Scene buildScene(vector<ast_assignment> assignments)
 {
   scene_builder builder;
-  BOOST_FOREACH(ast_assignment assignment, assignments)
+  BOOST_FOREACH(ast_assignment & assignment, assignments)
   {
-    builder.addAssignment(assignment);
+      /*if(assignment.name == "camera" || assignment.name == "lights" || assignment.name == "intersectable")*/ builder.addAssignment(assignment);
   }
   return builder.getScene();
 }
 
+void resolveVars(vector<ast_assignment> &assignments)
+{
+    std::cerr << "Loading OBJs..." << std::endl;
+    IntersectableAssignmentVisitor<ObjLoader> ol;
+    BOOST_FOREACH(ast_assignment & assignment, assignments)
+    {
+      ol.apply(assignment);
+    }
+
+    std::map<std::string, ast_literal_material> objMaterials = ol.getVisitor().getMaterials();
+    typedef std::pair<std::string, ast_literal_material> PairType;
+    BOOST_FOREACH(PairType material, objMaterials)
+    {
+        ast_assignment a;
+        a.name = material.first;
+        a.value = material.second;
+        assignments.insert(assignments.begin(), a);
+    }
+}
+
+vector<ast_assignment> createBVH(vector<ast_assignment> assignments)
+{
+    std::cerr << "Flattening..." << std::endl;
+    IntersectableAssignmentVisitor<Flattener> fl;
+    BOOST_FOREACH(ast_assignment & assignment, assignments)
+    {
+        fl.apply(assignment);
+    }
+
+    std::cerr << "Creating BVH tree..." << std::endl;
+    IntersectableAssignmentVisitor<BVHCreator> bc;
+    BOOST_FOREACH(ast_assignment & assignment, assignments)
+    {
+      bc.apply(assignment);
+    }
+
+    return assignments;
+}
+
+AxisAlignedBox* getBoundingBoxFromAst(ast_intersectable i)
+{
+    ast_mat_map ast_materials;
+    map<std::string, Material*> materials;
+    intersectable_builder builder(materials, ast_materials, false);
+    Intersectable * intersectable = boost::apply_visitor(builder, i);
+    AxisAlignedBox* bb = intersectable->boundingBox();
+    delete intersectable;
+    return bb;
+}

@@ -18,6 +18,11 @@
  * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
  * USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
+
+#include "global.h"
+
+#include "printfinished.h"
+
 #include <QtCore>
 #include <QApplication>
 #include <QTime>
@@ -25,6 +30,7 @@
 #include <list>
 #include <vector>
 #include <iostream>
+#include <fstream>
 #include <functional>
 
 #include <boost/program_options.hpp>
@@ -41,6 +47,7 @@
 #include "tonemapper.h"
 #include "win.h"
 #include "sceneparser.h"
+#include "scenedumper.h"
 
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
@@ -60,6 +67,8 @@ struct option_adder
   }
 };
 
+
+
 int main(int argc, char **argv) {
   QTime time;
   time.start();
@@ -73,11 +82,12 @@ int main(int argc, char **argv) {
       ("verbose,v", "be verbose about progress, etc. ")
       ("gui,u", "display the result in a window")
       ("save-exr,e", value<string>(), "write the result to the specified EXR file")
-      ("save-img,i", value<string>(), "write the result to the specified LDR image file");
+      ("save-img,i", value<string>(), "write the result to the specified LDR image file")
+      ("dump-bvh,b", value<string>(), "write the bvh tree to the specified file");
   command_line_options.add(general); 
 	
   options_description image("Image options");
-	image.add_options()
+  image.add_options()
       ("renderer,r", value<string>()->default_value("pathtracing"), "the rendering algorithm to be used (either pathtracing (the default), energyredist, metropolisflt, or metropolis)")
       ("fixed-seed,d", "use a fixed seed for the RNG to make the resulting image deterministic")
       ("seed", value<unsigned long>()->default_value(0), "the random generator seed to use when the --fixed-seed option is set")
@@ -107,23 +117,41 @@ int main(int argc, char **argv) {
     return 0;
   }
 
-  if(vm.count("verbose")) cout << "Loading scene..." << endl;
+  if(vm.count("verbose")) cerr << "Loading scene..." << endl;
 
   SceneGrammar parser;
   if(!vm.count("scene"))
   {
-    cerr << "Please specify the scene description file by using the -s option\n";
+    cerr << "Please specify the scene description file by using the -s option" << endl;
     return -1;
   }
   if(!parser.parse(vm["scene"].as<string>()))
   {
-    cerr << "Failed to parse scene\n";
+    cerr << "Failed to parse scene" << endl;
     return -1;
   }
 
-  Scene scene = buildScene(parser.getAst());
+  std::vector<ast_assignment> ast = parser.getAst();
+  resolveVars(ast);
 
-  if(vm.count("verbose")) cout << "Scene loaded, " << time.elapsed() / 1000 << "s elapsed." << endl;
+  if(vm.count("dump-bvh"))
+  {
+      ofstream bvhfile(vm["dump-bvh"].as<string>());
+      SceneDumper d(bvhfile);
+      std::vector<ast_assignment> bvhAst = createBVH(ast);
+      if(vm.count("verbose")) cerr << "Writing BVH tree to " << vm["dump-bvh"].as<string>() << endl;
+      d.dump(bvhAst);
+      bvhfile.close();
+      if(!vm.count("gui") && !vm.count("save-exr") && !vm.count("save-img"))
+      {
+          if(vm.count("verbose")) cerr << "Dumping BVH complete, " << time.elapsed() / 1000 << "s elapsed." << endl;
+          return 0;
+      }
+  }
+
+  Scene scene = buildScene(ast);
+
+  if(vm.count("verbose")) cerr << "Scene loaded, " << time.elapsed() / 1000 << "s elapsed." << endl;
 
   Tonemapper tm(scene.camera.getResolution(), vm["gamma"].as<float>());
 
@@ -139,10 +167,12 @@ int main(int argc, char **argv) {
   renderer->setOutput(film);
   renderer->setOptions(vm);
   
-  if(vm.count("gui") || (!vm.count("save-exr") && !vm.count("save-img")))
+  if(vm.count("gui") || (!vm.count("save-exr") && !vm.count("save-img") && !vm.count("dump-bvh")))
   {
     Win l(*film, scene, tm);
+    PrintFinished p(time);
     QObject::connect(renderer, SIGNAL(finishedRendering()), &l, SLOT(complete()), Qt::QueuedConnection);
+    QObject::connect(renderer, SIGNAL(finishedRendering()), &p, SLOT(printTime()));
     QObject::connect(renderer, SIGNAL(startingRendering()), &l, SLOT(starting()), Qt::QueuedConnection);
     QObject::connect(&l, SIGNAL(rerender(Scene)), renderer, SLOT(startRendering(Scene)));
     l.show();
@@ -151,7 +181,7 @@ int main(int argc, char **argv) {
 
     return app.exec();
   }
-  else
+  else if(vm.count("save-exr") || vm.count("save-img"))
   {
     renderer->startRendering(scene);
     renderer->wait();
@@ -162,8 +192,13 @@ int main(int argc, char **argv) {
     if(vm.count("save-img"))
     {
         QImage img = tm.tonemap(*film);
-        img.save(QString(vm["save-img"].as<string>().c_str()));
+        img.save(QString::fromStdString(vm["save-img"].as<string>()));
     }
+    if(vm.count("verbose")) cerr << "Rendering complete, " << time.elapsed() / 1000 << "s elapsed." << endl;
+    return 0;
+  }
+  else
+  {
     return 0;
   }
 }

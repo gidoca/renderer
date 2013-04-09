@@ -42,6 +42,7 @@ class Intersectable
     virtual AxisAlignedBox * boundingBox() const = 0;
 
     virtual std::vector<Intersectable*> containedIntersectables();
+    virtual Intersectable* createBVH();
 };
 
 #endif // INTERSECTABLE_H

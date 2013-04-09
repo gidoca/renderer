@@ -25,6 +25,7 @@
 
 #include <boost/variant/recursive_variant.hpp>
 #include <boost/fusion/include/adapt_struct.hpp>
+#include <boost/fusion/include/equal_to.hpp>
 
 #include <vector>
 
@@ -33,6 +34,13 @@
 #include <QMatrix4x4>
 
 #include <opencv2/core/core.hpp>
+
+struct ast_vector2_literal
+{
+    float x, y;
+
+    cv::Point2f asCVPoint() const;
+};
 
 struct ast_vector3_literal
 {
@@ -54,6 +62,8 @@ struct ast_vector4_literal
 struct ast_diffuse_material
 {
   ast_vector3_literal color;
+
+  static const std::string function_name;
 };
 
 struct ast_phong_material
@@ -61,21 +71,37 @@ struct ast_phong_material
   ast_vector3_literal diffuse;
   ast_vector3_literal specular;
   float specular_coeff;
+
+  static const std::string function_name;
 };
 
 struct ast_mirror_material
 {
   float coefficient;
+
+  static const std::string function_name;
 };
 
 struct ast_texture_material
 {
+    ast_texture_material()
+    {
+        coefficient.x = 1;
+        coefficient.y = 1;
+        coefficient.z = 1;
+    }
+
     std::string filename;
+    ast_vector3_literal coefficient;
+
+    static const std::string function_name;
 };
 
 struct ast_refractive_material
 {
     float coefficient;
+
+    static const std::string function_name;
 };
 
 typedef boost::variant<
@@ -99,22 +125,30 @@ struct ast_matrix_literal
 struct ast_matrix_translate
 {
   ast_vector3_literal translation_vector;
+
+  static const std::string function_name;
 };
 
 struct ast_matrix_rotate
 {
   float angle;
   ast_vector3_literal axis;
+
+  static const std::string function_name;
 };
 
 struct ast_matrix_scale
 {
   float factor;
+
+  static const std::string function_name;
 };
 
 struct ast_matrix_scale_vect
 {
   ast_vector3_literal factor;
+
+  static const std::string function_name;
 };
 
 typedef boost::variant<
@@ -140,7 +174,9 @@ typedef boost::variant<
     ast_quad,
     ast_plane,
     ast_obj,
-    boost::recursive_wrapper<ast_instance>
+    ast_triangle,
+    boost::recursive_wrapper<ast_instance>,
+    boost::recursive_wrapper<ast_bvh_node>
     > ast_intersectable;
 
 struct ast_intersectable_list
@@ -153,36 +189,65 @@ struct ast_sphere
   ast_vector3_literal center;
   float radius;
   ast_material material;
+
+  static const std::string function_name;
 };
 
 struct ast_box
 {
   ast_vector3_literal min, max;
   ast_material material;
+
+  static const std::string function_name;
 };
 
 struct ast_quad
 {
   ast_vector3_literal p1, p2, p3, p4;
   ast_material material;
+
+  static const std::string function_name;
 };
 
 struct ast_plane
 {
     ast_vector4_literal vector;
     ast_material material;
+
+    static const std::string function_name;
 };
 
 struct ast_obj
 {
     std::string filename;
     ast_material material;
+
+    static const std::string function_name;
+};
+
+struct ast_triangle
+{
+    ast_vector3_literal p1, p2, p3, n1, n2, n3;
+    ast_vector2_literal t1, t2, t3;
+    ast_material material;
+
+    static const std::string function_name;
 };
 
 struct ast_instance
 {
   ast_matrix transform;
   ast_intersectable intersectable;
+
+  static const std::string function_name;
+};
+
+struct ast_bvh_node
+{
+    ast_intersectable left, right;
+    ast_box bb;
+
+    static const std::string function_name;
 };
 
 struct ast_camera
@@ -191,22 +256,30 @@ struct ast_camera
     float fov, xres, yres;
 
     Camera asCamera() const;
+
+    static const std::string function_name;
 };
 
 struct ast_point_light
 {
     ast_vector3_literal location, intensity;
+
+    static const std::string function_name;
 };
 
 struct ast_area_light
 {
     ast_vector3_literal location, u_direction, v_direction, intensity;
+
+    static const std::string function_name;
 };
 
 struct ast_cone_light
 {
     ast_vector3_literal location, direction, intensity;
     float angle;
+
+    static const std::string function_name;
 };
 
 typedef boost::variant<ast_point_light, ast_area_light, ast_cone_light> ast_light;
@@ -260,9 +333,36 @@ BOOST_FUSION_ADAPT_STRUCT(
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
+    ast_triangle,
+    (ast_vector3_literal, p1)
+    (ast_vector3_literal, p2)
+    (ast_vector3_literal, p3)
+    (ast_vector3_literal, n1)
+    (ast_vector3_literal, n2)
+    (ast_vector3_literal, n3)
+    (ast_vector2_literal, t1)
+    (ast_vector2_literal, t2)
+    (ast_vector2_literal, t3)
+    (ast_material, material)
+)
+
+BOOST_FUSION_ADAPT_STRUCT(
     ast_instance,
     (ast_matrix, transform)
     (ast_intersectable, intersectable)
+)
+
+BOOST_FUSION_ADAPT_STRUCT(
+    ast_bvh_node,
+    (ast_intersectable, left)
+    (ast_intersectable, right)
+    (ast_box, bb)
+)
+
+BOOST_FUSION_ADAPT_STRUCT(
+    ast_vector2_literal,
+    (float, x)
+    (float, y)
 )
 
 BOOST_FUSION_ADAPT_STRUCT(
@@ -380,6 +480,10 @@ BOOST_FUSION_ADAPT_STRUCT(
     (ast_value, value)
 )
 
+void resolveVars(std::vector<ast_assignment> & assignments);
+std::vector<ast_assignment> createBVH(std::vector<ast_assignment> assignments);
 Scene buildScene(std::vector<ast_assignment> assignments);
+
+AxisAlignedBox* getBoundingBoxFromAst(ast_intersectable i);
 
 #endif // SCENEAST_H

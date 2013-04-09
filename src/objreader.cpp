@@ -34,19 +34,9 @@
 #include <algorithm>
 
 #include <QVector3D>
-#include <QDir>
 #include <QFileInfo>
 
 #include <opencv2/core/core.hpp>
-
-#include "triangle.h"
-#include "quad.h"
-#include "intersectablelist.h"
-#include "material.h"
-#include "texturematerial.h"
-#include "diffusematerial.h"
-#include "phongmaterial.h"
-#include "darkmatter.h"
 
 #define TOKEN_VERTEX_POS "v"
 #define TOKEN_VERTEX_NOR "vn"
@@ -56,10 +46,12 @@
 #define TOKEN_MATERIAL_LIB "mtllib"
 
 #define TOKEN_NEW_MATERIAL "newmtl"
+#define TOKEN_ILLUMINATION "illum"
 #define TOKEN_DIFFUSE_COLOR "Kd"
 #define TOKEN_DIFFUSE_TEXTURE "map_Kd"
 #define TOKEN_SPECULAR_COLOR "Ks"
 #define TOKEN_SPECULAR_COEFFICIENT "Ns"
+#define TOKEN_OPTICAL_DENSITY "Ni"
 
 struct ObjMeshVertex{
     QVector3D pos;
@@ -68,18 +60,20 @@ struct ObjMeshVertex{
 };
 
 /* This contains a list of triangles */
-typedef std::vector<Intersectable*> ObjMesh;
+typedef std::vector<ast_intersectable> ObjMesh;
 
 /* Internal structure */
 struct _ObjMeshFaceIndex{
     int pos_index[3];
     int tex_index[3];
     int nor_index[3];
-    Material* material;
+    ast_material material;
 };
+
 
 inline bool read_index(std::stringstream& str_stream, int& dest, int total_num)
 {
+    str_stream.clear();
     str_stream >> dest;
     if(str_stream.fail()) return false;
     if(dest < 0)
@@ -91,11 +85,11 @@ inline bool read_index(std::stringstream& str_stream, int& dest, int total_num)
 
 bool read_indices(_ObjMeshFaceIndex& face_index, int i, std::stringstream& str_stream, int num_positions, int num_texcoords, int num_normals)
 {
-    char interupt;
+    char interrupt;
     if(!read_index(str_stream, face_index.pos_index[i], num_positions)) return false;
     if(str_stream.peek() == '/')
     {
-        str_stream >> interupt;
+        str_stream >> interrupt;
         if(str_stream.peek() == '/')
         {
             face_index.tex_index[i] = 0;
@@ -107,7 +101,7 @@ bool read_indices(_ObjMeshFaceIndex& face_index, int i, std::stringstream& str_s
 
         if(str_stream.peek() == '/')
         {
-            str_stream >> interupt;
+            str_stream >> interrupt;
             if(!read_index(str_stream, face_index.nor_index[i], num_normals)) return false;
         }
         else
@@ -124,12 +118,12 @@ bool read_indices(_ObjMeshFaceIndex& face_index, int i, std::stringstream& str_s
 }
 
 /* Call this function to load a model */
-Intersectable *ObjReader::getMesh(std::string filename, Material *defaultMaterial, std::map<std::string, Material*> materials){
+ast_intersectable_list ObjReader::load(std::string filename, ast_material defaultMaterial){
     ObjMesh myMesh;
 
-    std::vector<QVector3D>          positions;
-    std::vector<cv::Point2f>        texcoords;
-    std::vector<QVector3D>          normals;
+    std::vector<ast_vector3_literal>          positions;
+    std::vector<ast_vector2_literal>          texcoords;
+    std::vector<ast_vector3_literal>          normals;
     std::vector<_ObjMeshFaceIndex>  triangles;
     /**
      * Load file, parse it
@@ -144,9 +138,9 @@ Intersectable *ObjReader::getMesh(std::string filename, Material *defaultMateria
     std::ifstream filestream;
     filestream.open(filename.c_str());
 
-    QFileInfo objInfo = QFileInfo(QString(filename.c_str()));
+    QFileInfo objInfo = QFileInfo(QString::fromStdString(filename));
 
-    Material *currentMaterial = defaultMaterial;
+    ast_material currentMaterial = defaultMaterial;
 
     std::string line_stream;	// No longer depending on char arrays thanks to: Dale Weiler
     int num_faces = 0;
@@ -155,28 +149,29 @@ Intersectable *ObjReader::getMesh(std::string filename, Material *defaultMateria
         std::string type_str;
         str_stream >> type_str;
         if(type_str == TOKEN_VERTEX_POS){
-            QVector3D pos;
-            float val;
-            str_stream >> val;
-            pos.setX(val);
-            str_stream >> val;
-            pos.setY(val);
-            str_stream >> val;
-            pos.setZ(val);
+            ast_vector3_literal pos;
+            float w;
+            str_stream >> pos.x;
+            str_stream >> pos.y;
+            str_stream >> pos.z;
+            str_stream.clear();
+            str_stream >> w;
+            if(!str_stream.fail() && w != 0)
+            {
+                pos.x /= w;
+                pos.y /= w;
+                pos.z /= w;
+            }
             positions.push_back(pos);
         }else if(type_str == TOKEN_VERTEX_TEX){
-            cv::Point2f tex;
+            ast_vector2_literal tex;
             str_stream >> tex.x >> tex.y;
             texcoords.push_back(tex);
         }else if(type_str == TOKEN_VERTEX_NOR){
-            QVector3D nor;
-            float val;
-            str_stream >> val;
-            nor.setX(val);
-            str_stream >> val;
-            nor.setY(val);
-            str_stream >> val;
-            nor.setZ(val);
+            ast_vector3_literal nor;
+            str_stream >> nor.x;
+            str_stream >> nor.y;
+            str_stream >> nor.z;
             normals.push_back(nor);
         }else if(type_str == TOKEN_FACE){
             _ObjMeshFaceIndex triangle_index;
@@ -197,8 +192,9 @@ Intersectable *ObjReader::getMesh(std::string filename, Material *defaultMateria
         }else if(type_str == TOKEN_MATERIAL){
             std::string name;
             str_stream >> name;
-            currentMaterial = materials[name];
-            if(currentMaterial == 0){
+            currentMaterial = std::vector<char>(name.begin(), name.end());
+            if(currentMaterial.empty()){
+                std::cerr << "No such material: " << name << std::endl;
                 currentMaterial = defaultMaterial;
             }
         }
@@ -206,79 +202,94 @@ Intersectable *ObjReader::getMesh(std::string filename, Material *defaultMateria
             std::string mtl_filename;
             str_stream >> mtl_filename;
 
-            getMaterials(objInfo.dir().filePath(QString(mtl_filename.c_str())).toStdString(), materials);
+            getMaterials(objInfo.dir().filePath(QString::fromStdString(mtl_filename)).toStdString());
         }
     }
     // Explicit closing of the file
     filestream.close();
 
-    std::cout << "ObjReader: " << triangles.size() << " triangles, " << num_faces << " faces" << std::endl;
+    std::cerr << "ObjReader: " << triangles.size() << " triangles, " << num_faces << " faces" << std::endl;
 
     myMesh.reserve(triangles.size());
 
     for(size_t i = 0; i < triangles.size(); ++i){
-        Triangle *face;
-        if(triangles[i].nor_index[0] == 0 || triangles[i].nor_index[1] == 0 || triangles[i].nor_index[2] == 0)
+        ast_triangle face;
+        face.material = triangles[i].material;
+
+        if(triangles[i].pos_index[0] != 0 && triangles[i].pos_index[1] != 0 && triangles[i].pos_index[2] != 0)
         {
-            face = new Triangle(positions[triangles[i].pos_index[0] - 1], positions[triangles[i].pos_index[1] - 1], positions[triangles[i].pos_index[2] - 1], triangles[i].material);
+            face.p1 = positions[triangles[i].pos_index[0] - 1];
+            face.p2 = positions[triangles[i].pos_index[1] - 1];
+            face.p3 = positions[triangles[i].pos_index[2] - 1];
         }
-        else if(triangles[i].tex_index[0] == 0 || triangles[i].tex_index[1] == 0 || triangles[i].tex_index[2] == 0)
+        if(triangles[i].nor_index[0] != 0 && triangles[i].nor_index[1] != 0 && triangles[i].nor_index[2] != 0)
         {
-            face = new Triangle(positions[triangles[i].pos_index[0] - 1], positions[triangles[i].pos_index[1] - 1], positions[triangles[i].pos_index[2] - 1], normals[triangles[i].nor_index[0] - 1], normals[triangles[i].nor_index[1] - 1], normals[triangles[i].nor_index[2] - 1], triangles[i].material);
+            face.n1 = normals[triangles[i].nor_index[0] - 1];
+            face.n2 = normals[triangles[i].nor_index[1] - 1];
+            face.n3 = normals[triangles[i].nor_index[2] - 1];
         }
-        else
+        if(triangles[i].tex_index[0] != 0 && triangles[i].tex_index[1] != 0 && triangles[i].tex_index[2] != 0)
         {
-            face = new Triangle(positions[triangles[i].pos_index[0] - 1], positions[triangles[i].pos_index[1] - 1], positions[triangles[i].pos_index[2] - 1], normals[triangles[i].nor_index[0] - 1], normals[triangles[i].nor_index[1] - 1], normals[triangles[i].nor_index[2] - 1], texcoords[triangles[i].tex_index[0] - 1], texcoords[triangles[i].tex_index[1] - 1], texcoords[triangles[i].tex_index[2] - 1], triangles[i].material);
+            face.t1 = texcoords[triangles[i].tex_index[0] - 1];
+            face.t2 = texcoords[triangles[i].tex_index[1] - 1];
+            face.t3 = texcoords[triangles[i].tex_index[2] - 1];
         }
         myMesh.push_back(face);
     }
 
-    return new IntersectableList(myMesh);
+    ast_intersectable_list m = { myMesh };
+    return m;
 }
 
-void createMaterial(cv::Vec3f diffuseColor, cv::Vec3f specularColor, float specularCoefficient, QDir dir, std::string textureFilename, std::string materialName, std::map<std::string, Material*> &materials)
+void ObjReader::createMaterial(ObjMaterial material, QDir dir, std::string materialName)
 {
-    if(!textureFilename.empty())
+    if(material.illum <= 2 || material.optical_density == 0)
     {
-        // This is a fix for broken mtl files that use the Windows path separator convention
-        std::replace(textureFilename.begin(), textureFilename.end(), '\\', '/');
-        textureFilename = dir.filePath(QString(textureFilename.c_str())).toStdString();
-        TextureMaterial* mat = new TextureMaterial();
-        if(mat->load(textureFilename))
+        if(!material.texture_filename.empty())
         {
-            materials[materialName] = mat;
-            return;
+            // This is a fix for broken mtl files that use the Windows path separator convention
+            std::replace(material.texture_filename.begin(), material.texture_filename.end(), '\\', '/');
+            material.texture_filename = dir.filePath(QString(material.texture_filename.c_str())).toStdString();
+            ast_texture_material texture;
+            texture.filename = material.texture_filename;
+            if(material.diffuse_color.x != 0 || material.diffuse_color.y != 0 || material.diffuse_color.z != 0)
+            {
+                texture.coefficient = material.diffuse_color;
+            }
+            materials[materialName] = texture;
+        }
+        else if(material.diffuse_color.x != 0 || material.diffuse_color.y != 0 || material.diffuse_color.z != 0)
+        {
+            if((material.specular_color.x == 0 && material.specular_color.y == 0 && material.specular_color.z == 0) || material.specular_coefficient == 0)
+            {
+                ast_diffuse_material diffuse = {material.diffuse_color};
+                materials[materialName] = diffuse;
+            }
+            else
+            {
+                ast_phong_material phong = {material.diffuse_color, material.specular_color, material.specular_coefficient};
+                materials[materialName] = phong;
+            }
         }
     }
-
-    if(diffuseColor != cv::Vec3f())
+    else
     {
-        if(specularColor == cv::Vec3f() || specularCoefficient == 0)
-        {
-            materials[materialName] = new DiffuseMaterial(diffuseColor);
-        }
-        else
-        {
-            materials[materialName] = new PhongMaterial(diffuseColor, specularColor, specularCoefficient);
-        }
-        return;
+        ast_refractive_material refractive;
+        refractive.coefficient = material.optical_density;
+        materials[materialName] = refractive;
     }
-
-    materials[materialName] = DarkMatter::getInstance();
 }
 
-void ObjReader::getMaterials(std::string filename, std::map<std::string, Material*> &materials)
+void ObjReader::getMaterials(std::string filename)
 {
     std::ifstream filestream;
     filestream.open(filename.c_str());
 
-    QFileInfo objInfo = QFileInfo(QString(filename.c_str()));
+    QFileInfo objInfo = QFileInfo(QString::fromStdString(filename));
 
     std::string current_material_name;
-    cv::Vec3f current_diffuse_color;
-    std::string current_texture_filename;
-    cv::Vec3f current_specular_color;
-    float current_specular_coefficient = 0;
+
+    ObjMaterial currentMaterial;
 
     std::string line_stream;
     while(std::getline(filestream, line_stream)){
@@ -287,21 +298,32 @@ void ObjReader::getMaterials(std::string filename, std::map<std::string, Materia
         str_stream >> type_str;
 
         if(type_str == TOKEN_NEW_MATERIAL){
-            createMaterial(current_diffuse_color, current_specular_color, current_specular_coefficient, objInfo.dir(), current_texture_filename, current_material_name, materials);
+            if(!current_material_name.empty())
+            {
+                createMaterial(currentMaterial, objInfo.dir(), current_material_name);
+                currentMaterial = ObjMaterial();
+            }
             str_stream >> current_material_name;
         }
+        else if(type_str == TOKEN_ILLUMINATION)
+        {
+            str_stream >> currentMaterial.illum;
+        }
         else if(type_str == TOKEN_DIFFUSE_COLOR){
-            str_stream >> current_diffuse_color[2] >> current_diffuse_color[1] >> current_diffuse_color[0];
+            str_stream >> currentMaterial.diffuse_color.x >> currentMaterial.diffuse_color.y >> currentMaterial.diffuse_color.z;
         }
         else if(type_str == TOKEN_DIFFUSE_TEXTURE){
-            str_stream >> current_texture_filename;
+            str_stream >> currentMaterial.texture_filename;
         }
         else if(type_str == TOKEN_SPECULAR_COLOR){
-            str_stream >> current_specular_color[2] >> current_specular_color[1] >> current_specular_color[0];
+            str_stream >> currentMaterial.specular_color.x >> currentMaterial.specular_color.y >> currentMaterial.specular_color.z;
         }
         else if(type_str == TOKEN_SPECULAR_COEFFICIENT){
-            str_stream >> current_specular_coefficient;
+            str_stream >> currentMaterial.specular_coefficient;
+        }
+        else if(type_str == TOKEN_OPTICAL_DENSITY){
+            str_stream >> currentMaterial.optical_density;
         }
     }
-    createMaterial(current_diffuse_color, current_specular_color, current_specular_coefficient, objInfo.dir(), current_texture_filename, current_material_name, materials);
+    createMaterial(currentMaterial, objInfo.dir(), current_material_name);
 }

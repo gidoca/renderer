@@ -7,9 +7,9 @@ include(${QT_USE_FILE})
 #set(CMAKE_AUTOMOC TRUE)
 ADD_DEFINITIONS(${QT_DEFINITIONS} -DQT_NO_KEYWORDS)
 
-set(renderingproject_HEADERS win.h renderer.h)
-set(renderingproject_SRCS main.cpp camera.cpp plane.cpp sphere.cpp intersectable.cpp
-  sceneast.cpp sceneparser.cpp
+set(renderingproject_HEADERS win.h renderer.h printfinished.h)
+set(renderingproject_SRCS camera.cpp plane.cpp sphere.cpp intersectable.cpp
+  sceneast.cpp sceneparser.cpp scenedumper.cpp
   triangle.cpp intersectableinstance.cpp
   darkmatter.cpp diffusematerial.cpp phongmaterial.cpp texturematerial.cpp transparentmaterial.cpp
   conelight.cpp intersectablelist.cpp
@@ -23,13 +23,13 @@ set(renderingproject_SRCS main.cpp camera.cpp plane.cpp sphere.cpp intersectable
   symmetricfilter.cpp
   win.cpp energyredistributionrenderer.cpp metropolissample.cpp
   mathhelper.cpp
+  printfinished.cpp
 )
 QT4_WRAP_CPP(renderingproject_HEADERS_MOC ${renderingproject_HEADERS})
 
-add_executable(renderingproject ${renderingproject_SRCS} ${renderingproject_HEADERS_MOC})
-#add_executable(stst stst.cpp sampler.cpp jitteredsampler.cpp)
+add_executable(renderingproject main.cpp ${renderingproject_SRCS} ${renderingproject_HEADERS_MOC})
+
 target_link_libraries(renderingproject ${QT_LIBRARIES} ${GSL_LIBRARIES} ${OPENEXR_LIBRARIES} ${Boost_LIBRARIES} ${OpenCV_LIBS})
-#target_link_libraries(stst ${QT_LIBRARIES})
 
 #-Wno-unitialized suppresses warnings from boost
 set(COMMON_CXX_FLAGS "-Wextra -Wall -Wno-unused-parameter -Wno-uninitialized -std=c++0x")

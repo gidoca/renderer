@@ -23,14 +23,39 @@
 
 #include "global.h"
 
+#include "sceneast.h"
+
 #include <string>
 #include <map>
+
+#include <QDir>
+
+struct ObjMaterial
+{
+    ast_vector3_literal diffuse_color;
+    std::string texture_filename;
+    ast_vector3_literal specular_color;
+    float specular_coefficient;
+    float optical_density;
+    short illum;
+};
+
 
 class ObjReader
 {
   public:
-    static Intersectable* getMesh(std::string fileName, Material * defaultMaterial, std::map<std::string, Material*> materials);
-    static void getMaterials(std::string filename, std::map<std::string, Material*> &materials);
+    ast_intersectable_list load(std::string fileName, ast_material defaultMaterial);
+
+    inline std::map<std::string, ast_literal_material> getMaterials() const
+    {
+        return materials;
+    }
+
+private:
+    void getMaterials(std::string filename);
+    void createMaterial(ObjMaterial material, QDir dir, std::string materialName);
+
+    std::map<std::string, ast_literal_material> materials;
 };
 
 #endif

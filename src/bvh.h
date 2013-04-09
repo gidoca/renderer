@@ -23,18 +23,22 @@
 
 #include "global.h"
 #include "intersectable.h"
+#include "sceneast.h"
 
 class BVHNode : public Intersectable
 {
 public:
+  BVHNode(Intersectable * left, Intersectable * right, AxisAlignedBox * bb);
+
   // Note that this method will delete the list in the end
   static Intersectable* create(IntersectableList * list);
+  static ast_intersectable create(ast_intersectable_list list);
   virtual AxisAlignedBox* boundingBox() const;
   virtual HitRecord intersect(Ray ray, float from, float to) const;
   virtual std::vector<Intersectable*> containedIntersectables();
-
+  virtual Intersectable* createBVH();
+  
 private:
-  BVHNode(Intersectable * left, Intersectable * right, AxisAlignedBox * bb);
   AxisAlignedBox* bb;
   Intersectable *left, *right;
 };
