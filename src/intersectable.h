@@ -21,8 +21,6 @@
 #ifndef INTERSECTABLE_H
 #define INTERSECTABLE_H
 
-#define EPSILON 0.001
-
 #include "global.h"
 #include "ray.h"
 #include "hitrecord.h"
@@ -38,7 +36,7 @@ class Intersectable
 {
   public:
     virtual ~Intersectable() {}
-    virtual HitRecord intersect(Ray ray, float from = EPSILON, float to = std::numeric_limits< float >::infinity()) const = 0;
+    virtual HitRecord intersect(Ray ray) const = 0;
     virtual AxisAlignedBox * boundingBox() const = 0;
 
     virtual std::vector<Intersectable*> containedIntersectables();

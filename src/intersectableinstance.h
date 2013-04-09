@@ -35,7 +35,7 @@ public:
 
   }
 
-  HitRecord intersect(Ray ray, float from, float to) const;
+  HitRecord intersect(Ray ray) const;
   AxisAlignedBox * boundingBox() const;
 
 private:

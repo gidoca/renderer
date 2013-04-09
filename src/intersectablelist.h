@@ -39,7 +39,7 @@ class IntersectableList : public Intersectable
     virtual ~IntersectableList();
 
 
-    HitRecord intersect(Ray ray, float from, float to) const;
+    HitRecord intersect(Ray ray) const;
     AxisAlignedBox* boundingBox() const;
     
     std::vector< Intersectable* > getComponents() const;

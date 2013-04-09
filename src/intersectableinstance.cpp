@@ -21,10 +21,10 @@
 #include "intersectableinstance.h"
 #include "axisalignedbox.h"
 
-HitRecord IntersectableInstance::intersect(Ray ray, float from, float to) const
+HitRecord IntersectableInstance::intersect(Ray ray) const
 {
   Ray transformedRay = ray.transform(inverseTransform);
-  HitRecord hitRecord = intersectable->intersect(transformedRay, from, to);
+  HitRecord hitRecord = intersectable->intersect(transformedRay);
   hitRecord.transform(transform);
   return hitRecord;
 }

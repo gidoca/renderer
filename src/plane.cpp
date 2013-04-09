@@ -24,12 +24,12 @@
 
 #include <limits>
 
-HitRecord Plane::intersect(Ray ray, float from, float to) const
+HitRecord Plane::intersect(Ray ray) const
 {
   float d = -QVector3D::dotProduct(ray.getDirection(), planeVector.toVector3D());
   float u = QVector4D::dotProduct(QVector4D(ray.getOrigin(), 1), planeVector);
   float t = u / d;
-  if(from < t && t < to)
+  if(ray.inRange(t))
   {
     return HitRecord(t, ray, material, planeVector.toVector3D());
   }

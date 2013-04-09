@@ -42,7 +42,7 @@ class IntersectionParameter
 class CSGObject : public Intersectable
 {
 public:
-  HitRecord intersect(Ray ray, float from = 0.00005, float to = std::numeric_limits< float >::infinity()) const;
+  HitRecord intersect(Ray ray) const;
   virtual IntersectionParameter getCSGIntersection(Ray ray) const = 0;
 };
 

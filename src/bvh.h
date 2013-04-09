@@ -34,7 +34,7 @@ public:
   static Intersectable* create(IntersectableList * list);
   static ast_intersectable create(ast_intersectable_list list);
   virtual AxisAlignedBox* boundingBox() const;
-  virtual HitRecord intersect(Ray ray, float from, float to) const;
+  virtual HitRecord intersect(Ray ray) const;
   virtual std::vector<Intersectable*> containedIntersectables();
   virtual Intersectable* createBVH();
   

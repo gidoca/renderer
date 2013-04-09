@@ -27,7 +27,7 @@ IntersectableList::~IntersectableList()
 {
 }
 
-HitRecord IntersectableList::intersect(Ray ray, float from, float to) const
+HitRecord IntersectableList::intersect(Ray ray) const
 {
 //  if(!bBox->intersect(ray, from, to).intersects()) return HitRecord();
 
@@ -36,7 +36,11 @@ HitRecord IntersectableList::intersect(Ray ray, float from, float to) const
   for(auto i = components.begin(); i != components.end(); i++)
   {
     const Intersectable & component = **i;
-    HitRecord currentHit = component.intersect(ray, from, (to < hit.getRayParameter() ? to : hit.getRayParameter()));
+    if(ray.getTo() > hit.getRayParameter())
+    {
+        ray = Ray(ray.getOrigin(), ray.getDirection(), ray.getFrom(), hit.getRayParameter());
+    }
+    HitRecord currentHit = component.intersect(ray);
     if(currentHit.intersects())
     {
       hit = currentHit;

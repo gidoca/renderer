@@ -22,16 +22,16 @@
 
 #include <list>
 
-HitRecord CSGObject::intersect(Ray ray, float from, float to) const
+HitRecord CSGObject::intersect(Ray ray) const
 {
   IntersectionParameter parameter = getCSGIntersection(ray);
   std::list<float> intersections = parameter.intersections;
-  if(intersections.empty() || from > intersections.back()) return HitRecord();
+  if(intersections.empty() || ray.getFrom() > intersections.back()) return HitRecord();
   for(std::list<float>::iterator i = intersections.begin(); i != intersections.end(); i++)
   {
-    if(*i >= from)
+    if(*i >= ray.getFrom())
     {
-      if(*i > to)
+      if(*i > ray.getTo())
       {
         return HitRecord();
       }

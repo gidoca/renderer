@@ -142,11 +142,11 @@ AxisAlignedBox* BVHNode::boundingBox() const
   return new AxisAlignedBox(*bb);
 }
 
-HitRecord BVHNode::intersect(Ray ray, float from, float to) const
+HitRecord BVHNode::intersect(Ray ray) const
 {
-  if(!bb->intersect(ray, from, to).intersects()) return HitRecord();
-  HitRecord lhit = left->intersect(ray, from, to);
-  HitRecord rhit = right->intersect(ray, from, to);
+  if(!bb->intersect(ray).intersects()) return HitRecord();
+  HitRecord lhit = left->intersect(ray);
+  HitRecord rhit = right->intersect(ray);
   if(!rhit.intersects() || lhit.getRayParameter() < rhit.getRayParameter())
   {
     return lhit;

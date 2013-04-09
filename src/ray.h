@@ -23,28 +23,36 @@
 
 #include "global.h"
 
+#include <limits>
+
 #include <QtGui/QVector3D>
 #include <QtGui/QMatrix4x4>
+
+#define EPSILON 0.001
 
 class Ray
 {
 
   public:
     Ray();
-    Ray(QVector3D origin, QVector3D direction);
-    Ray(QVector4D origin, QVector4D direction);
+    Ray(QVector3D origin, QVector3D direction, float from = EPSILON, float to = std::numeric_limits<float>::infinity());
+    Ray(QVector4D origin, QVector4D direction, float from = EPSILON, float to = std::numeric_limits<float>::infinity());
     
     QVector3D getOrigin() const;
     QVector3D getDirection() const;
-    
+    float getFrom() const;
+    float getTo() const;
+
     QVector3D evaluate(float u) const;
+    bool inRange(float u) const;
     
     Ray transform(QMatrix4x4 matrix);
 
   private:
-    void init(QVector4D origin, QVector4D direction);
+    void init(QVector4D origin, QVector4D direction, float from = EPSILON, float to = std::numeric_limits<float>::infinity());
     
     QVector3D origin, direction;
+    float from, to;
 };
 
 inline QVector3D Ray::getOrigin() const
@@ -57,30 +65,47 @@ inline QVector3D Ray::getDirection() const
   return direction;
 }
 
+inline float Ray::getFrom() const
+{
+    return from;
+}
+
+inline float Ray::getTo() const
+{
+    return to;
+}
+
 inline Ray::Ray()
 {
   init(QVector4D(), QVector4D());
 }
 
-inline Ray::Ray(QVector3D origin, QVector3D direction)
+inline Ray::Ray(QVector3D origin, QVector3D direction, float from, float to)
 {
-  init(QVector4D(origin, 1), direction);
+  init(QVector4D(origin, 1), direction, from, to);
 }
 
-inline Ray::Ray(QVector4D origin, QVector4D direction)
+inline Ray::Ray(QVector4D origin, QVector4D direction, float from, float to)
 {
-  init(origin, direction);
+  init(origin, direction, from, to);
 }
 
-inline void Ray::init(QVector4D origin, QVector4D direction)
+inline void Ray::init(QVector4D origin, QVector4D direction, float from, float to)
 {
-  this->origin = origin.toVector3DAffine();
-  this->direction = direction.toVector3D();
+    this->origin = origin.toVector3DAffine();
+    this->direction = direction.toVector3D();
+    this->from = from;
+    this-> to = to;
 }
 
 inline QVector3D Ray::evaluate(float u) const
 {
   return origin + u * direction;
+}
+
+inline bool Ray::inRange(float u) const
+{
+    return from < u && u < to;
 }
 
 inline Ray Ray::transform(QMatrix4x4 matrix)
