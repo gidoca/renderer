@@ -23,15 +23,27 @@
 #include "hitrecord.h"
 
 #include <opencv2/highgui/highgui.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
 
 #include <cmath>
 #include <iostream>
 
 using namespace cv;
 
+inline cv::Vec3f getColorSubpix(const cv::Mat& img, cv::Point2f pt)
+{
+    cv::Mat patch;
+    cv::getRectSubPix(img, cv::Size(1,1), pt, patch);
+    return patch.at<cv::Vec3f>(0,0);
+}
+
 inline float clamp(float x)
 {
-    return x <= 0 ? 0 : (x >= 1 ? 1 : x);
+//    float f = x <= 0 ? 0 : (x >= 1 ? 1 : x);
+    float f = fmod(x, 1.d);
+    if(f < 0) f += 1;
+    assert(f >= 0 && f <= 1);
+    return f;
 }
 
 bool TextureMaterial::load(std::string filename)
@@ -57,5 +69,5 @@ cv::Vec3f TextureMaterial::shade(const HitRecord & hit, QVector3D) const
 
 cv::Vec3f TextureMaterial::get(Point2f location) const
 {
-    return texture.at<Vec3f>(Point2i(clamp(location.x) * (texture.size().width - 1), clamp(1 - location.y) * (texture.size().height - 1))).mul(coefficient);
+    return getColorSubpix(texture, Point2f(clamp(location.x) * (texture.size().width - 1), clamp(1 - location.y) * (texture.size().height - 1))).mul(coefficient);
 }

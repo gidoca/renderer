@@ -301,7 +301,7 @@ void ObjReader::getMaterials(std::string filename)
             if(!current_material_name.empty())
             {
                 createMaterial(currentMaterial, objInfo.dir(), current_material_name);
-//                currentMaterial = ObjMaterial();
+                currentMaterial = ObjMaterial();
             }
             str_stream >> current_material_name;
         }

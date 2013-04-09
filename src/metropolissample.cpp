@@ -52,7 +52,7 @@ void mutate(qreal &s, gsl_rng *rng)
     delta *= -1;
   }
 
-  s = s + delta;
+  s += delta;
   if(s < 0) s += 1;
   if(s > 1) s -= 1;
   assert(0 <= s && s <= 1);
