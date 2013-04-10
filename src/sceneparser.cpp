@@ -105,7 +105,8 @@ SceneGrammar::SceneGrammar() : SceneGrammar::base_type(assignments_rule, "inters
   point_light_rule %= boost::spirit::lit("pointlight") >> "(" >> vector3_literal_rule >> "," >> vector3_literal_rule >> ")";
   area_light_rule %= boost::spirit::lit("arealight") >> "(" >> vector3_literal_rule >> "," >> vector3_literal_rule >> "," >> vector3_literal_rule >> "," >> vector3_literal_rule >> ")";
   cone_light_rule %= boost::spirit::lit("conelight") >> "(" >> vector3_literal_rule >> "," >> vector3_literal_rule >> "," >> boost::spirit::tag::float_() >> "," >> vector3_literal_rule >> ")";
-  light_rule %= point_light_rule | area_light_rule | cone_light_rule;
+  environment_map_rule %= boost::spirit::lit("environmentmap") >> "(" >> string_literal_rule >> "," >> vector3_literal_rule >> ")";
+  light_rule %= point_light_rule | area_light_rule | cone_light_rule | environment_map_rule;
 
   boost::spirit::qi::on_error<boost::spirit::qi::fail>
   (

@@ -24,6 +24,7 @@
 #include "global.h"
 
 #include <limits>
+#include <cassert>
 
 #include <QtGui/QVector3D>
 #include <QtGui/QMatrix4x4>
@@ -92,6 +93,7 @@ inline Ray::Ray(QVector4D origin, QVector4D direction, float from, float to)
 
 inline void Ray::init(QVector4D origin, QVector4D direction, float from, float to)
 {
+    assert(from <= to);
     this->origin = origin.toVector3DAffine();
     this->direction = direction.toVector3D();
     this->from = from;

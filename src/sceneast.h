@@ -282,7 +282,15 @@ struct ast_cone_light
     static const std::string function_name;
 };
 
-typedef boost::variant<ast_point_light, ast_area_light, ast_cone_light> ast_light;
+struct ast_environment_map
+{
+    std::string filename;
+    ast_vector3_literal coefficient;
+
+    static const std::string function_name;
+};
+
+typedef boost::variant<ast_point_light, ast_area_light, ast_cone_light, ast_environment_map> ast_light;
 
 typedef boost::variant<std::vector<ast_light>, ast_camera, ast_intersectable, ast_literal_material, std::string> ast_value;
 
@@ -472,6 +480,12 @@ BOOST_FUSION_ADAPT_STRUCT(
     (ast_vector3_literal, direction)
     (float, angle)
     (ast_vector3_literal, intensity)
+)
+
+BOOST_FUSION_ADAPT_STRUCT(
+        ast_environment_map,
+        (std::string, filename)
+        (ast_vector3_literal, coefficient)
 )
 
 BOOST_FUSION_ADAPT_STRUCT(

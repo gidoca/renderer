@@ -36,6 +36,7 @@
 #include "pointlight.h"
 #include "arealight.h"
 #include "conelight.h"
+#include "environmentmap.h"
 #include "objreader.h"
 #include "bvh.h"
 
@@ -79,6 +80,7 @@ const std::string ast_camera::function_name = "camera";
 const std::string ast_point_light::function_name = "pointlight";
 const std::string ast_area_light::function_name = "srealight";
 const std::string ast_cone_light::function_name = "conelight";
+const std::string ast_environment_map::function_name = "environmentmap";
 
 
 template<typename V>
@@ -499,6 +501,11 @@ struct light_builder : boost::static_visitor<const Light*>
     const Light* operator()(ast_cone_light cone_light) const
     {
         return new ConeLight(cone_light.location.asQVector(), cone_light.direction.asQVector(), cone_light.angle, cone_light.intensity.asSpectrum());
+    }
+
+    const Light* operator()(ast_environment_map envmap) const
+    {
+        return new EnvironmentMap(envmap.filename.c_str(), envmap.coefficient.asSpectrum());
     }
 };
 
