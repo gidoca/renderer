@@ -42,9 +42,8 @@ cv::Vec3f EnvironmentMap::getIntensity(const HitRecord &hit, QVector3D &directio
   }
 }
 
-Ray EnvironmentMap::getRandomRay(const Sample &sample1, const Sample &sample2, float &pdf) const
+Ray EnvironmentMap::getRandomRay(const Sample &sample1, const Sample &, float &pdf) const
 {
-    //TODO fixme
     pdf = 1;
-    return Ray();
+    return Ray(QVector3D(), sample1.getUniformSphereDirection(), -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity());
 }

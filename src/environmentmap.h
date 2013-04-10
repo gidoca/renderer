@@ -12,7 +12,7 @@ public:
     EnvironmentMap(const char* filename, cv::Vec3f coefficient);
 
     cv::Vec3f getIntensity(const HitRecord &hit, QVector3D &direction, const Intersectable &scene, const Sample &sample) const;
-    Ray getRandomRay(const Sample &sample1, const Sample &sample2, float &pdf) const;
+    Ray getRandomRay(const Sample &sample1, const Sample &, float &pdf) const;
 
     cv::Vec3f coefficient;
 
