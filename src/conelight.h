@@ -33,7 +33,7 @@ public:
     {
     }
 
-    cv::Vec3f getIntensity(const QVector3D &at, QVector3D &direction, const Intersectable &scene, const Sample &sample) const;
+    cv::Vec3f getIntensity(const HitRecord &hit, QVector3D &direction, const Intersectable &scene, const Sample &sample) const;
     Ray getRandomRay(const Sample &sample, const Sample&, float &pdf) const;
 
 private:

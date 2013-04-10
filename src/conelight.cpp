@@ -28,8 +28,9 @@
 
 using namespace cv;
 
-Vec3f ConeLight::getIntensity(const QVector3D & at, QVector3D &direction, const Intersectable &scene, const Sample &) const
+Vec3f ConeLight::getIntensity(const HitRecord &hit, QVector3D &direction, const Intersectable &scene, const Sample &) const
 {
+  QVector3D at = hit.getIntersectingPoint();
   direction = at - location;
   HitRecord shadowHit = scene.intersect(Ray(at, -direction.normalized(), EPSILON, direction.length()));
   cv::Vec3f part = cv::Vec3f(1, 1, 1);

@@ -33,7 +33,7 @@ class AreaLight : public Light
 public:
     AreaLight(QVector3D origin, QVector3D uDirection, QVector3D vDirection, cv::Vec3f intensity);
 
-    cv::Vec3f getIntensity(const QVector3D & at, QVector3D &direction, const Intersectable & scene, const Sample &sample) const;
+    cv::Vec3f getIntensity(const HitRecord & hit, QVector3D &direction, const Intersectable & scene, const Sample &sample) const;
     Ray getRandomRay(const Sample &sample1, const Sample &sample2, float &pdf) const;
 
 private:

@@ -26,8 +26,9 @@
 
 #include <cmath>
 
-cv::Vec3f PointLight::getIntensity (const QVector3D& at, QVector3D& direction, const Intersectable& scene, const Sample&) const
+cv::Vec3f PointLight::getIntensity (const HitRecord &hit, QVector3D& direction, const Intersectable& scene, const Sample&) const
 {
+  QVector3D at = hit.getIntersectingPoint();
   direction = getDirection(at);
   if(isOccluded(at, scene))
   {

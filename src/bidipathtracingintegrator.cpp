@@ -44,7 +44,7 @@ Vec3f BiDiPathTracingIntegrator::integrate(const Ray &ray, const Intersectable &
   Ray primaryLightRay = light[lightIndex]->getRandomRay(sampler.getSamples().front(), sampler.getSamples().front(), directionPdf);
   HitRecord initialLightHit = scene.intersect(primaryLightRay);
   QVector3D initialLightDirection;
-  Vec3f lightIntensity = light[lightIndex]->getIntensity(initialLightHit.getIntersectingPoint(), initialLightDirection, scene, sampler.getSamples().front());
+  Vec3f lightIntensity = light[lightIndex]->getIntensity(initialLightHit, initialLightDirection, scene, sampler.getSamples().front());
 
   Path lightPath = Renderer::createPath(primaryLightRay, scene, rng, lightIntensity * (1 / directionPdf));
   Path eyePath = Renderer::createPath(ray, scene, rng);
@@ -90,7 +90,7 @@ Vec3f BiDiPathTracingIntegrator::integrate(const Ray &ray, const Intersectable &
   while(eyeAlphaIt != eyePath.alphaValues.end() && eyeHitIt != eyePath.hitRecords.end())
   {
     QVector3D lightDirection;
-    lightIntensity = light[lightIndex]->getIntensity(eyeHitIt->getIntersectingPoint(), lightDirection, scene, sampler.getSamples().front());
+    lightIntensity = light[lightIndex]->getIntensity(*eyeHitIt, lightDirection, scene, sampler.getSamples().front());
 
     float inCos = QVector3D::dotProduct(-lightDirection.normalized(), eyeHitIt->getSurfaceNormal().normalized());
     Vec3f brdf;

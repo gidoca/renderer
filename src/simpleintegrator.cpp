@@ -55,7 +55,7 @@ Vec3f SimpleIntegrator::integrate(const Ray & ray, const Intersectable & scene, 
     for(std::list<Sample>::iterator i = samples.begin(); i != samples.end(); i++)
     {
       int lightIndex = gsl_rng_uniform_int(rng, light.size());
-      Vec3f lightIntensity = light[lightIndex]->getIntensity(hit.getIntersectingPoint(), direction, scene, *i);
+      Vec3f lightIntensity = light[lightIndex]->getIntensity(hit, direction, scene, *i);
       Vec3f shade = hit.getMaterial().shade(hit, direction);
       result += shade.mul(lightIntensity);
     }
