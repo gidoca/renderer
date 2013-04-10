@@ -31,8 +31,8 @@ cv::Vec3f EnvironmentMap::getIntensity(const HitRecord &hit, QVector3D &directio
   }
   else
   {
-    QVector2D imageCoords = direction.toVector2D();
-    imageCoords *= acos(direction.z()) / (imageCoords.length() * M_PI);
+    QVector2D imageCoords(direction.y(), direction.z());
+    imageCoords *= acos(direction.x()) / (imageCoords.length() * M_PI);
     float x = (((imageCoords.x() + 1.0) / 2.0) * image.size().width - 1);
     float y = (((imageCoords.y() + 1.0) / 2.0) * image.size().height - 1);
 //    float at = atan(sqrt(direction.x() / (1 - direction.x())));
