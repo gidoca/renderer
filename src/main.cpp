@@ -158,7 +158,7 @@ int main(int argc, char **argv) {
   cv::Mat * film = new cv::Mat(scene.camera.getResolution().height(), scene.camera.getResolution().width(), CV_32FC3);
 
   Renderer * renderer = getRendererByName(vm["renderer"].as<string>());
-  if(renderer == 0)
+  if(renderer == nullptr)
   {
     cerr << "Unknown renderer: " << vm["renderer"].as<string>() << endl;
     return -1;

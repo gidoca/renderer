@@ -71,6 +71,16 @@ struct _ObjMeshFaceIndex{
 };
 
 
+struct ObjMaterial
+{
+    ast_vector3_literal diffuse_color;
+    std::string texture_filename;
+    ast_vector3_literal specular_color;
+    float specular_coefficient;
+    float optical_density;
+    short illum;
+};
+
 inline bool read_index(std::stringstream& str_stream, int& dest, int total_num)
 {
     str_stream.clear();
@@ -241,17 +251,17 @@ ast_intersectable_list ObjReader::load(std::string filename, ast_material defaul
     return m;
 }
 
-void ObjReader::createMaterial(ObjMaterial material, QDir dir, std::string materialName)
+void ObjReader::createMaterial(const ObjMaterial &material, QDir dir, std::string materialName)
 {
     if(material.illum <= 2 || material.optical_density == 0)
     {
         if(!material.texture_filename.empty())
         {
             // This is a fix for broken mtl files that use the Windows path separator convention
-            std::replace(material.texture_filename.begin(), material.texture_filename.end(), '\\', '/');
-            material.texture_filename = dir.filePath(QString(material.texture_filename.c_str())).toStdString();
+            std::string texture_filename = dir.filePath(QString(material.texture_filename.c_str())).toStdString();
+            std::replace(texture_filename.begin(), texture_filename.end(), '\\', '/');
             ast_texture_material texture;
-            texture.filename = material.texture_filename;
+            texture.filename = texture_filename;
             if(material.diffuse_color.x != 0 || material.diffuse_color.y != 0 || material.diffuse_color.z != 0)
             {
                 texture.coefficient = material.diffuse_color;
