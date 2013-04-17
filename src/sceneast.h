@@ -45,6 +45,8 @@ struct ast_vector2_literal
 struct ast_vector3_literal
 {
   ast_vector3_literal() : x(0), y(0), z(0) {}
+  ast_vector3_literal(const QVector3D &v) : x(v.x()), y(v.y()), z(v.z()) {}
+  ast_vector3_literal(const cv::Vec3f &v) : x(v[2]), y(v[1]), z(v[0]) {}
   float x, y, z;
 
   QVector3D asQVector() const;
@@ -54,6 +56,7 @@ struct ast_vector3_literal
 struct ast_vector4_literal
 {
   ast_vector4_literal() : x(0), y(0), z(0), w(0) {}
+  ast_vector4_literal(const QVector4D &v) : x(v.x()), y(v.y()), z(v.z()), w(v.w()) {}
   float x, y, z, w;
 
   QVector4D asQVector() const;

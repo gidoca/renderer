@@ -48,6 +48,7 @@ public:
         return compBB(bb1, bb2);
     }
 
+private:
     bool compBB(AxisAlignedBox* bb1, AxisAlignedBox* bb2)
     {
         float leftCenter = get(bb1->getMax() + bb1->getMin(), splitAxis) / 2;
@@ -57,7 +58,6 @@ public:
         return leftCenter < rightCenter;
     }
 
-private:
     int splitAxis;
 };
 
@@ -124,13 +124,7 @@ ast_intersectable BVHNode::create(ast_intersectable_list list)
 
     ast_intersectable_list leftList = {left}, rightList = {right};
     ast_diffuse_material bb_mat = {ast_vector3_literal()};
-    ast_vector3_literal bb_min, bb_max;
-    bb_min.x = bb->getMin().x();
-    bb_min.y = bb->getMin().y();
-    bb_min.z = bb->getMin().z();
-    bb_max.x = bb->getMax().x();
-    bb_max.y = bb->getMax().y();
-    bb_max.z = bb->getMax().z();
+    ast_vector3_literal bb_min = bb->getMin(), bb_max = bb->getMax();
     ast_box ast_bb = {bb_min, bb_max, bb_mat};
     ast_bvh_node out = {create(leftList), create(rightList), ast_bb};
     return out;
