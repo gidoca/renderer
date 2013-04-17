@@ -39,18 +39,17 @@ public:
     bool operator()(Intersectable* a, Intersectable* b)
     {
         AxisAlignedBox *bb1 = a->boundingBox(), *bb2 = b->boundingBox();
-
-        float leftCenter = get(bb1->getMax() + bb1->getMin(), splitAxis) / 2;
-        float rightCenter = get(bb2->getMax() + bb2->getMin(), splitAxis) / 2;
-        delete bb1;
-        delete bb2;
-        return leftCenter < rightCenter;
+        return compBB(bb1, bb2);
     }
 
     bool operator()(ast_intersectable a, ast_intersectable b)
     {
         AxisAlignedBox *bb1 = getBoundingBoxFromAst(a), *bb2 = getBoundingBoxFromAst(b);
+        return compBB(bb1, bb2);
+    }
 
+    bool compBB(AxisAlignedBox* bb1, AxisAlignedBox* bb2)
+    {
         float leftCenter = get(bb1->getMax() + bb1->getMin(), splitAxis) / 2;
         float rightCenter = get(bb2->getMax() + bb2->getMin(), splitAxis) / 2;
         delete bb1;
