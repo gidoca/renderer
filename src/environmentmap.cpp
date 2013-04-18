@@ -36,7 +36,7 @@ cv::Vec3f EnvironmentMap::getIntensity(const HitRecord &hit, QVector3D &directio
   QVector3D at = hit.getIntersectingPoint();
   float pdf;
   direction = -sample.getCosineWeightedDirection(hit.getSurfaceNormal(), pdf);
-  Ray shadowRay(at, direction, -std::numeric_limits<float>::infinity(), 0);
+  Ray shadowRay(at, direction, -std::numeric_limits<float>::infinity(), -EPSILON);
   HitRecord shadowHit = scene.intersect(shadowRay);
   if(shadowHit.intersects())
   {

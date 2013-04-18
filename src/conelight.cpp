@@ -32,7 +32,7 @@ Vec3f ConeLight::getIntensity(const HitRecord &hit, QVector3D &direction, const 
 {
   QVector3D at = hit.getIntersectingPoint();
   direction = at - location;
-  HitRecord shadowHit = scene.intersect(Ray(at, -direction.normalized(), EPSILON, direction.length()));
+  HitRecord shadowHit = scene.intersect(Ray(at, -direction.normalized(), EPSILON, direction.length() - EPSILON));
   cv::Vec3f part = cv::Vec3f(1, 1, 1);
   float rayAngle = QVector3D::dotProduct(direction.normalized(), this->direction.normalized());
   if(0 <= acos(rayAngle) && acos(rayAngle) <= openingAngle && !shadowHit.intersects())

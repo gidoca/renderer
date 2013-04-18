@@ -38,7 +38,7 @@ cv::Vec3f AreaLight::getIntensity(const HitRecord & hit, QVector3D &direction, c
   QPointF p = sample.getSample();
   QVector3D lightLocation = getLocation(p);
   direction = at - lightLocation;
-  HitRecord shadowHit = scene.intersect(Ray(at, -direction.normalized(), EPSILON, direction.length()));
+  HitRecord shadowHit = scene.intersect(Ray(at, -direction.normalized(), EPSILON, direction.length() - EPSILON));
   cv::Vec3f part = cv::Vec3f(1, 1, 1);
 
   if(shadowHit.intersects())
