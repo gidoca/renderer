@@ -24,7 +24,7 @@ set(renderingproject_SRCS camera.cpp plane.cpp sphere.cpp intersectable.cpp
   win.cpp energyredistributionrenderer.cpp metropolissample.cpp
   mathhelper.cpp
   printfinished.cpp
-  environmentmap.cpp
+  environmentmap.cpp blacklight.cpp
 )
 QT4_WRAP_CPP(renderingproject_HEADERS_MOC ${renderingproject_HEADERS})
 

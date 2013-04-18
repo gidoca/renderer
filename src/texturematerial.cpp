@@ -49,7 +49,7 @@ inline float clamp(float x)
 bool TextureMaterial::load(std::string filename)
 {
     Mat img = imread(filename);
-    if(img.data == 0)
+    if(img.data == nullptr)
     {
         std::cerr << "Error loading texture \"" << filename << "\"" << std::endl;
         return false;

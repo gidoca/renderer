@@ -12,11 +12,24 @@
 
 #include <opencv2/highgui/highgui.hpp>
 
-EnvironmentMap::EnvironmentMap(const char *filename, cv::Vec3f coefficient) : coefficient(coefficient)
+EnvironmentMap::EnvironmentMap(cv::Vec3f coefficient) : coefficient(coefficient)
 {
-    image = cv::imread(filename, CV_LOAD_IMAGE_ANYDEPTH | CV_LOAD_IMAGE_COLOR);
 }
 
+bool EnvironmentMap::load(std::string filename)
+{
+    image = cv::imread(filename, CV_LOAD_IMAGE_ANYDEPTH | CV_LOAD_IMAGE_COLOR);
+    if(image.data == nullptr)
+    {
+        std::cerr << "Failed to load environment map " << filename << std::endl;
+        return false;
+    }
+    else
+    {
+        std::cerr << "Successfully loaded environment map " << filename << std::endl;
+        return true;
+    }
+}
 
 cv::Vec3f EnvironmentMap::getIntensity(const HitRecord &hit, QVector3D &direction, const Intersectable &scene, const Sample &sample) const
 {

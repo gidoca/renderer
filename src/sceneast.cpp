@@ -37,6 +37,7 @@
 #include "arealight.h"
 #include "conelight.h"
 #include "environmentmap.h"
+#include "blacklight.h"
 #include "objreader.h"
 #include "bvh.h"
 
@@ -505,7 +506,16 @@ struct light_builder : boost::static_visitor<const Light*>
 
     const Light* operator()(ast_environment_map envmap) const
     {
-        return new EnvironmentMap(envmap.filename.c_str(), envmap.coefficient.asSpectrum());
+        EnvironmentMap *out = new EnvironmentMap(envmap.coefficient.asSpectrum());
+        if(out->load(envmap.filename))
+        {
+            return out;
+        }
+        else
+        {
+            delete out;
+            return new BlackLight();
+        }
     }
 };
 
