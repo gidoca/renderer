@@ -30,7 +30,7 @@ cv::Vec3f PhongMaterial::shade(const HitRecord& hit, QVector3D direction) const
 {
   QVector3D normal = hit.getSurfaceNormal().normalized();
   QVector3D reflected = 2 * QVector3D::dotProduct(-direction, normal) * normal + direction;
-  float dp = std::max(QVector3D::dotProduct(reflected.normalized(), -hit.getRay().getDirection().normalized()), 0.);
+  float dp = std::max(QVector3D::dotProduct(reflected.normalized(), -hit.getRay().getDirection().normalized()), 0.f);
   float spec = pow(dp, specularCoefficient);
   return color * (1 / M_PI) + spec * specularColor;
 }

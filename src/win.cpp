@@ -41,7 +41,7 @@ void Win::saveImage()
   QList<QByteArray> formatsByte = QImageWriter::supportedImageFormats();
   QStringList formats;
 
-  for (int i=0; i<formats.count(); i++)
+  for (int i=0; i<formatsByte.count(); i++)
   {
     QString current = formatsByte[i];
     current.prepend("*.");
