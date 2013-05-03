@@ -63,7 +63,7 @@ struct ObjMeshVertex{
 typedef std::vector<ast_intersectable> ObjMesh;
 
 /* Internal structure */
-struct _ObjMeshFaceIndex{
+struct ObjMeshFaceIndex{
     int pos_index[3];
     int tex_index[3];
     int nor_index[3];
@@ -93,7 +93,7 @@ inline bool read_index(std::stringstream& str_stream, int& dest, int total_num)
     return true;
 }
 
-bool read_indices(_ObjMeshFaceIndex& face_index, int i, std::stringstream& str_stream, int num_positions, int num_texcoords, int num_normals)
+bool read_indices(ObjMeshFaceIndex& face_index, int i, std::stringstream& str_stream, int num_positions, int num_texcoords, int num_normals)
 {
     char interrupt;
     if(!read_index(str_stream, face_index.pos_index[i], num_positions)) return false;
@@ -134,7 +134,7 @@ ast_intersectable_list ObjReader::load(std::string filename, ast_material defaul
     std::vector<ast_vector3_literal>          positions;
     std::vector<ast_vector2_literal>          texcoords;
     std::vector<ast_vector3_literal>          normals;
-    std::vector<_ObjMeshFaceIndex>  triangles;
+    std::vector<ObjMeshFaceIndex>  triangles;
     /**
      * Load file, parse it
      * Lines beginning with:
@@ -184,7 +184,7 @@ ast_intersectable_list ObjReader::load(std::string filename, ast_material defaul
             str_stream >> nor.z;
             normals.push_back(nor);
         }else if(type_str == TOKEN_FACE){
-            _ObjMeshFaceIndex triangle_index;
+            ObjMeshFaceIndex triangle_index;
             triangle_index.material = currentMaterial;
             read_indices(triangle_index, 0, str_stream, positions.size(), texcoords.size(), normals.size());
             read_indices(triangle_index, 2, str_stream, positions.size(), texcoords.size(), normals.size());

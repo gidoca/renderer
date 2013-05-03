@@ -8,7 +8,7 @@
 using namespace std;
 
 struct AstVisitor;
-class ad;
+class ArgumentListPrinter;
 
 class MatrixPrinter : public boost::static_visitor<>
 {
@@ -31,7 +31,7 @@ public:
         out << T::function_name;
         out << "(";
         bool first = true;
-        boost::fusion::for_each(value, ad(&first, out));
+        boost::fusion::for_each(value, ArgumentListPrinter(&first, out));
         out << ')';
     }
 
@@ -39,10 +39,10 @@ private:
     std::ostream & out;
 };
 
-class ad
+class ArgumentListPrinter
 {
 public:
-    ad(bool *first, std::ostream & out) : first(first), out(out) {}
+    ArgumentListPrinter(bool *first, std::ostream & out) : first(first), out(out) {}
 
     void operator()(ast_vector2_literal v) const
     {
@@ -129,7 +129,7 @@ public:
         out << T::function_name;
         out << "(";
         bool first = true;
-        boost::fusion::for_each(value, ad(&first, out));
+        boost::fusion::for_each(value, ArgumentListPrinter(&first, out));
         out << ')';
     }
 private:
@@ -193,13 +193,13 @@ void AstVisitor::operator()(ast_intersectable_list value) const
     out << "}";
 }
 
-void ad::operator()(ast_material m) const
+void ArgumentListPrinter::operator()(ast_material m) const
 {
     c();
     boost::apply_visitor(AstVisitor(out), m);
 }
 
-void ad::operator()(ast_intersectable i) const
+void ArgumentListPrinter::operator()(ast_intersectable i) const
 {
     c();
     boost::apply_visitor(AstVisitor(out), i);
