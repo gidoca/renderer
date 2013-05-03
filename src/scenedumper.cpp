@@ -44,61 +44,8 @@ class ArgumentListPrinter
 public:
     ArgumentListPrinter(bool *first, std::ostream & out) : first(first), out(out) {}
 
-    void operator()(ast_vector2_literal v) const
-    {
-        c();
-        out << '[' << v.x << ' ' << v.y << ']';
-    }
-
-    void operator()(ast_vector3_literal v) const
-    {
-        c();
-        out << '[' << v.x << ' ' << v.y << ' ' << v.z << ']';
-    }
-
-    void operator()(ast_vector4_literal v) const
-    {
-        c();
-        out << '[' << v.x << ' ' << v.y << ' ' << v.z << ' ' << v.w << ']';
-    }
-
-    void operator()(float f) const
-    {
-        c();
-        out << f;
-    }
-
-    void operator()(std::string s) const
-    {
-        c();
-        out << '"' << s << '"';
-    }
-
-    //Needed to make it compile
-    void operator()(ast_box b) const
-    {
-        (*this)(ast_intersectable(b));
-    }
-
-    void operator()(ast_matrix m) const
-    {
-        c();
-        boost::apply_visitor(MatrixPrinter(out), m.first);
-        BOOST_FOREACH(ast_basic_matrix mat, m.mult)
-        {
-            out << '*';
-            boost::apply_visitor(MatrixPrinter(out), mat);
-        }
-    }
-
-    void operator()(ast_material m) const;
-    void operator()(ast_intersectable) const;
-
-private:
-    bool * const first;
-    std::ostream & out;
-
-    void c() const
+    template<typename T>
+    void operator()(T t) const
     {
         if(*first)
         {
@@ -108,7 +55,57 @@ private:
         {
             out << ',';
         }
+        print(t);
     }
+
+    void print(ast_vector2_literal v) const
+    {
+        out << '[' << v.x << ' ' << v.y << ']';
+    }
+
+    void print(ast_vector3_literal v) const
+    {
+        out << '[' << v.x << ' ' << v.y << ' ' << v.z << ']';
+    }
+
+    void print(ast_vector4_literal v) const
+    {
+        out << '[' << v.x << ' ' << v.y << ' ' << v.z << ' ' << v.w << ']';
+    }
+
+    void print(float f) const
+    {
+        out << f;
+    }
+
+    void print(std::string s) const
+    {
+        out << '"' << s << '"';
+    }
+
+    //Needed to make it compile
+    void print(ast_box b) const
+    {
+        print(ast_intersectable(b));
+    }
+
+    void print(ast_matrix m) const
+    {
+        boost::apply_visitor(MatrixPrinter(out), m.first);
+        BOOST_FOREACH(ast_basic_matrix mat, m.mult)
+        {
+            out << '*';
+            boost::apply_visitor(MatrixPrinter(out), mat);
+        }
+    }
+
+    void print(ast_material m) const;
+    void print(ast_intersectable) const;
+
+private:
+    bool * const first;
+    std::ostream & out;
+
 };
 
 class AstVisitor : public boost::static_visitor<>
@@ -193,14 +190,12 @@ void AstVisitor::operator()(ast_intersectable_list value) const
     out << "}";
 }
 
-void ArgumentListPrinter::operator()(ast_material m) const
+void ArgumentListPrinter::print(ast_material m) const
 {
-    c();
     boost::apply_visitor(AstVisitor(out), m);
 }
 
-void ArgumentListPrinter::operator()(ast_intersectable i) const
+void ArgumentListPrinter::print(ast_intersectable i) const
 {
-    c();
     boost::apply_visitor(AstVisitor(out), i);
 }
