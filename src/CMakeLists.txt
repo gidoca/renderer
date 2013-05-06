@@ -1,11 +1,9 @@
 cmake_minimum_required(VERSION 2.8.0)
 
-include_directories(${QT_INCLUDES} ${GSL_INCLUDE_DIR} ${OPENEXR_INCLUDE_PATHS} ${Boost_INCLUDE_DIRS} ${CMAKE_CURRENT_BINARY_DIR})
+include_directories(${Qt5Widgets_INCLUDE_DIRS} ${GSL_INCLUDE_DIR} ${OPENEXR_INCLUDE_PATHS} ${Boost_INCLUDE_DIRS} ${CMAKE_CURRENT_BINARY_DIR})
 
-include(${QT_USE_FILE})
-
-#set(CMAKE_AUTOMOC TRUE)
-ADD_DEFINITIONS(${QT_DEFINITIONS} -DQT_NO_KEYWORDS)
+set(CMAKE_AUTOMOC TRUE)
+add_definitions(${Qt5Widgets_DEFINITIONS} -DQT_NO_KEYWORDS)
 
 set(renderingproject_HEADERS win.h renderer.h printfinished.h)
 set(renderingproject_SRCS camera.cpp plane.cpp sphere.cpp intersectable.cpp
@@ -26,14 +24,13 @@ set(renderingproject_SRCS camera.cpp plane.cpp sphere.cpp intersectable.cpp
   printfinished.cpp
   environmentmap.cpp blacklight.cpp
 )
-QT4_WRAP_CPP(renderingproject_HEADERS_MOC ${renderingproject_HEADERS})
 
 add_executable(renderingproject main.cpp ${renderingproject_SRCS} ${renderingproject_HEADERS_MOC})
 
-target_link_libraries(renderingproject ${QT_LIBRARIES} ${GSL_LIBRARIES} ${OPENEXR_LIBRARIES} ${Boost_LIBRARIES} ${OpenCV_LIBS})
+target_link_libraries(renderingproject ${Qt5Widgets_LIBRARIES} ${GSL_LIBRARIES} ${OPENEXR_LIBRARIES} ${Boost_LIBRARIES} ${OpenCV_LIBS})
 
 #-Wno-unitialized suppresses warnings from boost
-set(COMMON_CXX_FLAGS "-Wextra -Wall -Wno-unused-parameter -Wno-uninitialized -std=c++0x")
+set(COMMON_CXX_FLAGS "-Wextra -Wall -Wno-unused-parameter -Wno-uninitialized -std=c++0x ${Qt5Widgets_EXECUTABLE_COMPILE_FLAGS}")
 
 set(CMAKE_CXX_FLAGS_RELEASE "${COMMON_CXX_FLAGS} -fopenmp -DNDEBUG -DUSE_OPENMP -march=native -O3 -fno-strict-aliasing ")
 set(CMAKE_CXX_FLAGS_DEBUG "${COMMON_CXX_FLAGS} -g -Wno-unknown-pragmas")
