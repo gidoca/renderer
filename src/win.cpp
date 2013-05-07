@@ -63,8 +63,8 @@ void Win::saveExr()
   QString formatString = "OpenEXR (*.exr)";
 
   QString filename = QFileDialog::getSaveFileName(this, "Save image as",  QString(), formatString);
-  if(!filename.endsWith(".exr")) filename += ".exr";
   if(filename.isNull()) return;
+  if(!filename.endsWith(".exr")) filename += ".exr";
   imwrite(filename.toStdString(), film);
 }
 
@@ -74,7 +74,6 @@ void Win::init()
     setPixmap(QPixmap(QSize(size.width, size.height)));
     connect(&timer, SIGNAL(timeout()), this, SLOT(update()));
     timer.setInterval(100);
-//    timer.start();
 
     setContextMenuPolicy(Qt::ActionsContextMenu);
 
@@ -116,7 +115,6 @@ inline void Win::rotate(short sign, bool horizontal)
     rot.rotate(sign * 3, axis);
     dir = rot.map(dir);
     scene.camera.setLookAt(scene.camera.getCOP() + dir);
-//    scene.camera.setUp(rot.map(scene.camera.getUp()));
 }
 
 void Win::keyReleaseEvent(QKeyEvent *event)
