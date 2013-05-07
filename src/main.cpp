@@ -21,8 +21,6 @@
 
 #include "global.h"
 
-#include "printfinished.h"
-
 #include <QtCore>
 #include <QApplication>
 #include <QTime>
@@ -134,6 +132,9 @@ int main(int argc, char **argv) {
   std::vector<ast_assignment> ast = parser.getAst();
   resolveVars(ast);
 
+  bool hasGui = vm.count("gui") || (!vm.count("save-exr") && !vm.count("save-img") && !vm.count("dump-bvh"));
+  bool saveToFile = vm.count("save-img") || vm.count("save-exr");
+
   if(vm.count("dump-bvh"))
   {
       ofstream bvhfile(vm["dump-bvh"].as<string>());
@@ -142,7 +143,7 @@ int main(int argc, char **argv) {
       if(vm.count("verbose")) cerr << "Writing BVH tree to " << vm["dump-bvh"].as<string>() << endl;
       d.dump(bvhAst);
       bvhfile.close();
-      if(!vm.count("gui") && !vm.count("save-exr") && !vm.count("save-img"))
+      if(!hasGui && !saveToFile)
       {
           if(vm.count("verbose")) cerr << "Dumping BVH complete, " << time.elapsed() / 1000 << "s elapsed." << endl;
           return 0;
@@ -166,39 +167,45 @@ int main(int argc, char **argv) {
 
   renderer->setOutput(film);
   renderer->setOptions(vm);
+
+  if(vm.count("verbose"))
+  {
+      QObject::connect(renderer, &Renderer::finishedRendering, [=](){
+          cerr << "Rendering complete, " << time.elapsed() / 1000 << "s elapsed." << endl;
+      });
+  }
   
-  if(vm.count("gui") || (!vm.count("save-exr") && !vm.count("save-img") && !vm.count("dump-bvh")))
+  Win l(*film, scene, tm);
+
+  if(hasGui)
   {
-    Win l(*film, scene, tm);
-    PrintFinished p(time);
-    QObject::connect(renderer, SIGNAL(finishedRendering()), &l, SLOT(complete()), Qt::QueuedConnection);
-    QObject::connect(renderer, SIGNAL(finishedRendering()), &p, SLOT(printTime()));
-    QObject::connect(renderer, SIGNAL(startingRendering()), &l, SLOT(starting()), Qt::QueuedConnection);
-    QObject::connect(&l, SIGNAL(rerender(Scene)), renderer, SLOT(startRendering(Scene)));
+    QObject::connect(renderer, &Renderer::finishedRendering, &l, &Win::complete, Qt::QueuedConnection);
+    QObject::connect(renderer, &Renderer::startingRendering, &l, &Win::starting, Qt::QueuedConnection);
+    QObject::connect(&l, &Win::rerender, renderer, &Renderer::startRendering);
     l.show();
+  }
 
-    renderer->startRendering(scene);
+  if(vm.count("save-exr"))
+  {
+      QObject::connect(renderer, &Renderer::finishedRendering, [=](){
+          imwrite(vm["save-exr"].as<string>(), *film);
+      });
+  }
 
-    return app.exec();
-  }
-  else if(vm.count("save-exr") || vm.count("save-img"))
+  if(vm.count("save-img"))
   {
-    renderer->startRendering(scene);
-    renderer->wait();
-    if(vm.count("save-exr"))
-    {
-        imwrite(vm["save-exr"].as<string>(), *film);
-    }
-    if(vm.count("save-img"))
-    {
-        QImage img = tm.tonemap(*film);
-        img.save(QString::fromStdString(vm["save-img"].as<string>()));
-    }
-    if(vm.count("verbose")) cerr << "Rendering complete, " << time.elapsed() / 1000 << "s elapsed." << endl;
-    return 0;
+      QObject::connect(renderer, &Renderer::finishedRendering, [&tm, film, vm](){
+          QImage img = tm.tonemap(*film);
+          img.save(QString::fromStdString(vm["save-img"].as<string>()));
+      });
   }
-  else
+
+  if(saveToFile && !hasGui)
   {
-    return 0;
+      QObject::connect(renderer, &Renderer::finishedRendering, &QApplication::quit);
   }
+
+  renderer->startRendering(scene);
+
+  return app.exec();
 }

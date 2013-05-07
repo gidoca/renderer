@@ -21,7 +21,6 @@ set(renderingproject_SRCS camera.cpp plane.cpp sphere.cpp intersectable.cpp
   symmetricfilter.cpp
   win.cpp energyredistributionrenderer.cpp metropolissample.cpp
   mathhelper.cpp
-  printfinished.cpp
   environmentmap.cpp blacklight.cpp
 )
 
