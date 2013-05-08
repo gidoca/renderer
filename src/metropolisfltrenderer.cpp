@@ -250,10 +250,13 @@ void MetropolisFltRenderer::render()
       filteredVar = varF.filter(noisy_variance, meanvar, varvar);
   }
 
-  imwrite("/tmp/film0.exr", films[0]);
-  imwrite("/tmp/film1.exr", films[1]);
-  imwrite("/tmp/film.exr", *film);
-  imwrite("/tmp/var.exr", filteredVar);
+  if(vm.count("metflt-debug-dir"))
+  {
+    imwrite(vm["metflt-debug-dir"].as<string>() + "/film0.exr", films[0]);
+    imwrite(vm["metflt-debug-dir"].as<string>() + "/film1.exr", films[1]);
+    imwrite(vm["metflt-debug-dir"].as<string>() + "/film.exr", *film);
+    imwrite(vm["metflt-debug-dir"].as<string>() + "/var.exr", filteredVar);
+  }
 
   vector<Mat> filteredFilms(num_films);
   Mat varOfFiltered;
@@ -286,8 +289,12 @@ void MetropolisFltRenderer::render()
 
     //Normalization needed for correct computation of weighted average
     importanceMap *= importanceMap.size().area() / sum(importanceMap)[0];
-    QString fn = QString("/tmp/importance%1.exr").arg(i);
-    imwrite(fn.toStdString(), importanceMap);
+    QString fn;
+    if(vm.count("metflt-debug-dir"))
+    {
+        fn = QString("%1/importance%2.exr").arg(QString::fromStdString(vm["metflt-debug-dir"].as<string>())).arg(i);
+        imwrite(fn.toStdString(), importanceMap);
+    }
     renderStep(film->size(), scene, importanceMap, films, biased_var, biased_mean, biased_m2, sumweight, seed + i, false);
     if(vm.count("verbose"))
     {
@@ -323,8 +330,11 @@ void MetropolisFltRenderer::render()
     {
         *film = filteredMean;
     }
-    fn = QString("/tmp/iteration%1.exr").arg(i);
-    imwrite(fn.toStdString(), *film);
+    if(vm.count("metflt-debug-dir"))
+    {
+        fn = QString("%1/iteration%2.exr").arg(QString::fromStdString(vm["metflt-debug-dir"].as<string>())).arg(i);
+        imwrite(fn.toStdString(), *film);
+    }
 
     if(doStop) return;
   }
@@ -339,7 +349,8 @@ options_description MetropolisFltRenderer::options()
       ("metflt-mutations", value<int>()->default_value(16), "average number of path mutations per pixel")
       ("metflt-omit-filter", "don't filter the image")
       ("metflt-omit-variance-filter", "filter the image using unfiltered guidance")
-      ("metflt-num-passes", value<int>()->default_value(3), "the number of filtering passes");
+      ("metflt-num-passes", value<int>()->default_value(3), "the number of filtering passes")
+      ("metflt-debug-dir", value<string>(), "dump intermediate results to the specified directory");
   return opts;
 }
 

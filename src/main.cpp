@@ -194,7 +194,7 @@ int main(int argc, char **argv) {
 
   if(vm.count("save-img"))
   {
-      QObject::connect(renderer, &Renderer::finishedRendering, [&tm, film, vm](){
+      QObject::connect(renderer, &Renderer::finishedRendering, [=]() mutable {
           QImage img = tm.tonemap(*film);
           img.save(QString::fromStdString(vm["save-img"].as<string>()));
       });
