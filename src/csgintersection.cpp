@@ -74,10 +74,10 @@ IntersectionParameter CSGIntersection::getCSGIntersection ( Ray ray ) const
     return result;
 }
 
-AxisAlignedBox * CSGIntersection::boundingBox() const
+const AxisAlignedBox * CSGIntersection::createBoundingBox()
 {
-    AxisAlignedBox * leftBB = left->boundingBox();
-    AxisAlignedBox * rightBB = right->boundingBox();
+    const AxisAlignedBox * leftBB = left->boundingBox();
+    const AxisAlignedBox * rightBB = right->boundingBox();
     QVector3D min ( std::max ( leftBB->getMin().x(), rightBB->getMin().x() ),
                     std::max ( leftBB->getMin().y(), rightBB->getMin().y() ),
                     std::max ( leftBB->getMin().z(), rightBB->getMin().z() ) );

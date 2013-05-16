@@ -501,6 +501,6 @@ void resolveVars(std::vector<ast_assignment> & assignments);
 std::vector<ast_assignment> createBVH(std::vector<ast_assignment> assignments);
 Scene buildScene(std::vector<ast_assignment> assignments);
 
-AxisAlignedBox* getBoundingBoxFromAst(ast_intersectable i);
+const AxisAlignedBox *getBoundingBoxFromAst(ast_intersectable i);
 
 #endif // SCENEAST_H

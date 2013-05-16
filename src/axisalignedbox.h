@@ -48,8 +48,6 @@ public:
 
   virtual ~AxisAlignedBox() {}
 
-  AxisAlignedBox * boundingBox() const;
-    
   IntersectionParameter getCSGIntersection(Ray ray) const;
 
   QVector3D getMin() const;
@@ -57,6 +55,9 @@ public:
     
   void includePoint(QVector3D point);
   void includeOther(const AxisAlignedBox *box);
+
+protected:
+  const AxisAlignedBox* createBoundingBox();
   
 private:
   Material* material;

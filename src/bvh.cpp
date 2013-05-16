@@ -38,32 +38,30 @@ public:
 
     bool operator()(Intersectable* a, Intersectable* b)
     {
-        AxisAlignedBox *bb1 = a->boundingBox(), *bb2 = b->boundingBox();
+        const AxisAlignedBox *bb1 = a->boundingBox(), *bb2 = b->boundingBox();
         return compBB(bb1, bb2);
     }
 
     bool operator()(ast_intersectable a, ast_intersectable b)
     {
-        AxisAlignedBox *bb1 = getBoundingBoxFromAst(a), *bb2 = getBoundingBoxFromAst(b);
+        const AxisAlignedBox *bb1 = getBoundingBoxFromAst(a), *bb2 = getBoundingBoxFromAst(b);
         return compBB(bb1, bb2);
     }
 
 private:
-    bool compBB(AxisAlignedBox* bb1, AxisAlignedBox* bb2)
+    bool compBB(const AxisAlignedBox* bb1, const AxisAlignedBox* bb2)
     {
         float leftCenter = get(bb1->getMax() + bb1->getMin(), splitAxis) / 2;
         float rightCenter = get(bb2->getMax() + bb2->getMin(), splitAxis) / 2;
-        delete bb1;
-        delete bb2;
         return leftCenter < rightCenter;
     }
 
     int splitAxis;
 };
 
-BVHNode::BVHNode(Intersectable* left, Intersectable* right, AxisAlignedBox* bb) : bb(bb), left(left), right(right)
+BVHNode::BVHNode(Intersectable* left, Intersectable* right, const AxisAlignedBox* bb) : left(left), right(right)
 {
-
+    this->bb = bb;
 }
 
 Intersectable* BVHNode::create(IntersectableList* list)
@@ -75,7 +73,7 @@ Intersectable* BVHNode::create(IntersectableList* list)
       return intersectables.front();
   }
   
-  AxisAlignedBox * bb = list->boundingBox();
+  const AxisAlignedBox * bb = list->boundingBox();
   QVector3D diff = bb->getMax() - bb->getMin();
   int splitAxis = (diff.x() > diff.y() && diff.x() > diff.z() ? 0 : (diff.y() > diff.z() ? 1 : 2));
   IntersectableComparator comparator(splitAxis);
@@ -98,7 +96,7 @@ ast_intersectable BVHNode::create(ast_intersectable_list list)
     std::vector<ast_intersectable> intersectables = list.children;
     if(intersectables.size() == 1) return intersectables.front();
 
-    AxisAlignedBox * bb = getBoundingBoxFromAst(list);
+    const AxisAlignedBox * bb = getBoundingBoxFromAst(list);
     QVector3D diff = bb->getMax() - bb->getMin();
     int splitAxis = (diff.x() > diff.y() && diff.x() > diff.z() ? 0 : (diff.y() > diff.z() ? 1 : 2));
     IntersectableComparator comparator(splitAxis);
@@ -130,11 +128,6 @@ ast_intersectable BVHNode::create(ast_intersectable_list list)
     return out;
 }
 
-AxisAlignedBox* BVHNode::boundingBox() const
-{
-  return new AxisAlignedBox(*bb);
-}
-
 HitRecord BVHNode::intersect(Ray ray) const
 {
   if(!bb->intersect(ray).intersects()) return HitRecord();
@@ -163,4 +156,9 @@ std::vector<Intersectable*> BVHNode::containedIntersectables()
 Intersectable* BVHNode::createBVH()
 {
     return this;
+}
+
+const AxisAlignedBox* BVHNode::createBoundingBox()
+{
+    throw std::exception();
 }

@@ -70,9 +70,9 @@ IntersectionParameter AxisAlignedBox::getCSGIntersection(Ray ray) const
   return result;
 }
 
-AxisAlignedBox* AxisAlignedBox::boundingBox() const
+const AxisAlignedBox* AxisAlignedBox::createBoundingBox()
 {
-  return new AxisAlignedBox(*this);
+  return this;
 }
 
 QVector3D AxisAlignedBox::getMin() const

@@ -35,12 +35,21 @@ class AxisAlignedBox;
 class Intersectable
 {
   public:
+    Intersectable() : bb(nullptr) {}
     virtual ~Intersectable() {}
     virtual HitRecord intersect(Ray ray) const = 0;
-    virtual AxisAlignedBox * boundingBox() const = 0;
+    inline const AxisAlignedBox * boundingBox()
+    {
+        if(bb == nullptr) bb = createBoundingBox();
+        return bb;
+    }
 
     virtual std::vector<Intersectable*> containedIntersectables();
     virtual Intersectable* createBVH();
+
+  protected:
+    virtual const AxisAlignedBox * createBoundingBox() = 0;
+    const AxisAlignedBox * bb;
 };
 
 #endif // INTERSECTABLE_H

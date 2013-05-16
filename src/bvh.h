@@ -28,18 +28,19 @@
 class BVHNode : public Intersectable
 {
 public:
-  BVHNode(Intersectable * left, Intersectable * right, AxisAlignedBox * bb);
+  BVHNode(Intersectable * left, Intersectable * right, const AxisAlignedBox *bb);
 
   // Note that this method will delete the list in the end
   static Intersectable* create(IntersectableList * list);
   static ast_intersectable create(ast_intersectable_list list);
-  virtual AxisAlignedBox* boundingBox() const;
   virtual HitRecord intersect(Ray ray) const;
   virtual std::vector<Intersectable*> containedIntersectables();
   virtual Intersectable* createBVH();
+
+protected:
+  const AxisAlignedBox* createBoundingBox();
   
 private:
-  AxisAlignedBox* bb;
   Intersectable *left, *right;
 };
 

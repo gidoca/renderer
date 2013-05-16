@@ -30,8 +30,7 @@
 
 class Plane : public Intersectable
 {
-
-  public:
+public:
     Plane(QVector4D planeVector, Material* material) : planeVector(planeVector), material(material)
     {
 
@@ -39,9 +38,11 @@ class Plane : public Intersectable
 
 
     HitRecord intersect(Ray ray) const;
-    AxisAlignedBox * boundingBox() const;
+
+protected:
+    const AxisAlignedBox * createBoundingBox();
     
-  private:
+private:
     QVector4D planeVector;
     Material* material;
 };

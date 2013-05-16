@@ -30,7 +30,9 @@ public:
   CSGIntersection(CSGObject* left, CSGObject* right) : left(left), right(right) {}
 
   IntersectionParameter getCSGIntersection(Ray ray) const;
-  AxisAlignedBox * boundingBox() const;
+
+protected:
+  const AxisAlignedBox * createBoundingBox();
 
 private:
   CSGObject *left, *right;

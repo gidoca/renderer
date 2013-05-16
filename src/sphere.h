@@ -30,16 +30,18 @@
 
 class Sphere : public CSGObject
 {
-  public:
+public:
     Sphere(QVector3D center, float radius, Material* material) : material(material), center(center), radius(radius)
     {
 
     }
 
     IntersectionParameter getCSGIntersection(Ray ray) const;
-    AxisAlignedBox * boundingBox() const;
+
+protected:
+    const AxisAlignedBox * createBoundingBox();
     
-  private:
+private:
     Material* material;
     QVector3D center;
     float radius;

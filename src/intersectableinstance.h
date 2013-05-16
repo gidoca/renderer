@@ -36,7 +36,9 @@ public:
   }
 
   HitRecord intersect(Ray ray) const;
-  AxisAlignedBox * boundingBox() const;
+
+protected:
+  const AxisAlignedBox * createBoundingBox();
 
 private:
   QMatrix4x4 transform;

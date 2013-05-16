@@ -29,9 +29,9 @@ HitRecord IntersectableInstance::intersect(Ray ray) const
   return hitRecord;
 }
 
-AxisAlignedBox * IntersectableInstance::boundingBox() const
+const AxisAlignedBox * IntersectableInstance::createBoundingBox()
 {
-  AxisAlignedBox * untransformed = intersectable->boundingBox();
+  const AxisAlignedBox * untransformed = intersectable->boundingBox();
   AxisAlignedBox * result = new AxisAlignedBox();
   QVector3D min = transform.map(untransformed->getMin()), max = transform.map(untransformed->getMax());
   result->includePoint(QVector3D(min.x(), min.y(), min.z()));
@@ -42,6 +42,5 @@ AxisAlignedBox * IntersectableInstance::boundingBox() const
   result->includePoint(QVector3D(max.x(), min.y(), max.z()));
   result->includePoint(QVector3D(max.x(), max.y(), min.z()));
   result->includePoint(QVector3D(max.x(), max.y(), max.z()));
-  delete untransformed;
   return result;
 }

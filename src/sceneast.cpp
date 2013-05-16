@@ -480,9 +480,8 @@ Intersectable* intersectable_builder::operator()(const ast_obj& o)
     ObjReader reader;
     ast_intersectable_list inters = reader.load(o.filename.c_str(), mat);
     Intersectable* mesh = (*this)(inters);
-    AxisAlignedBox* bb = mesh->boundingBox();
+    const AxisAlignedBox* bb = mesh->boundingBox();
     QVector3D min = bb->getMin(), max = bb->getMax();
-    delete bb;
     std::cerr << "Mesh bb min: " << min.x() << "," << min.y() << "," << min.z() << "; max: " << max.x() << "," << max.y() << "," << max.z() << std::endl;
     return mesh;
 }
@@ -582,10 +581,10 @@ struct scene_builder : boost::static_visitor<void>
     Scene getScene()
     {
         Scene result(cameras["camera"]);
-        result.object = intersectables["intersectable"]->createBVH();
-        AxisAlignedBox* bb = result.object->boundingBox();
+        Intersectable* intersectable = intersectables["intersectable"]->createBVH();
+        const AxisAlignedBox* bb = intersectable->boundingBox();
+        result.object = intersectable;
         QVector3D min = bb->getMin(), max = bb->getMax();
-        delete bb;
         std::cerr << "Mesh bb min: " << min.x() << "," << min.y() << "," << min.z() << "; max: " << max.x() << "," << max.y() << "," << max.z() << std::endl;
         result.light = lights["lights"];
         return result;
@@ -663,13 +662,13 @@ vector<ast_assignment> createBVH(vector<ast_assignment> assignments)
     return assignments;
 }
 
-AxisAlignedBox* getBoundingBoxFromAst(ast_intersectable i)
+const AxisAlignedBox* getBoundingBoxFromAst(ast_intersectable i)
 {
     ast_mat_map ast_materials;
     map<std::string, Material*> materials;
     intersectable_builder builder(materials, ast_materials, false);
     Intersectable * intersectable = boost::apply_visitor(builder, i);
-    AxisAlignedBox* bb = intersectable->boundingBox();
+    const AxisAlignedBox* bb = intersectable->boundingBox();
     delete intersectable;
     return bb;
 }

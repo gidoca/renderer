@@ -49,14 +49,13 @@ HitRecord IntersectableList::intersect(Ray ray) const
   return hit;
 }
 
-AxisAlignedBox * IntersectableList::boundingBox() const
+const AxisAlignedBox * IntersectableList::createBoundingBox()
 {
   AxisAlignedBox *out = new AxisAlignedBox;
   for(auto i = components.begin(); i != components.end(); i++)
   {
-    AxisAlignedBox * boundingBox = (*i)->boundingBox();
+    const AxisAlignedBox * boundingBox = (*i)->boundingBox();
     out->includeOther(boundingBox);
-    delete boundingBox;
   }
   return out;
 }

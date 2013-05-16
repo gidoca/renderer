@@ -33,7 +33,9 @@ HitRecord Quad::intersect(Ray ray) const
   }
 }
 
-AxisAlignedBox * Quad::boundingBox() const
+const AxisAlignedBox * Quad::createBoundingBox()
 {
-  return new AxisAlignedBox(bBox);
+    AxisAlignedBox * box = new AxisAlignedBox(*t1.boundingBox());
+    box->includeOther(t2.boundingBox());
+    return box;
 }

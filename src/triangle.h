@@ -38,7 +38,9 @@ class Triangle : public Intersectable
     Triangle(QVector3D p1, QVector3D p2, QVector3D p3, cv::Point2f t1, cv::Point2f t2, cv::Point2f t3, Material * material) : p1(p1), p2(p2), p3(p3), n1(QVector3D::crossProduct(p1 - p2, p1 - p3)), n2(n1), n3(n1), t1(t1), t2(t2), t3(t3), material(material) {}
 
     HitRecord intersect(Ray ray) const;
-    AxisAlignedBox * boundingBox() const;
+
+  protected:
+    const AxisAlignedBox * createBoundingBox();
     
   private:
     QVector3D p1, p2, p3, n1, n2, n3;

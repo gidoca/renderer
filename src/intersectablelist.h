@@ -29,8 +29,7 @@
 
 class IntersectableList : public Intersectable
 {
-
-  public:
+public:
     IntersectableList(std::vector<Intersectable*> components) : components(components)
     {
 
@@ -40,12 +39,14 @@ class IntersectableList : public Intersectable
 
 
     HitRecord intersect(Ray ray) const;
-    AxisAlignedBox* boundingBox() const;
     
     std::vector< Intersectable* > getComponents() const;
     virtual std::vector< Intersectable* > containedIntersectables();
 
-  private:
+protected:
+    const AxisAlignedBox* createBoundingBox();
+
+private:
     std::vector<Intersectable* > components;
   
 };

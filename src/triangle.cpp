@@ -46,7 +46,7 @@ HitRecord Triangle::intersect(Ray ray) const
     return HitRecord(t, ray, material, (1 - u - v) * n1 + u * n2 + v * n3, (1 - u - v) * t1 + u * t2 + v * t3);
 }
 
-AxisAlignedBox * Triangle::boundingBox() const
+const AxisAlignedBox * Triangle::createBoundingBox()
 {
   AxisAlignedBox * result = new AxisAlignedBox();
   result->includePoint(p1);
