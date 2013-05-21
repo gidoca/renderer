@@ -25,9 +25,9 @@
 HitRecord CSGObject::intersect(Ray ray) const
 {
   IntersectionParameter parameter = getCSGIntersection(ray);
-  std::list<float> intersections = parameter.intersections;
+  const std::list<float>& intersections = parameter.intersections;
   if(intersections.empty() || ray.getFrom() > intersections.back()) return HitRecord();
-  for(std::list<float>::iterator i = intersections.begin(); i != intersections.end(); i++)
+  for(auto i = intersections.begin(); i != intersections.end(); i++)
   {
     if(*i >= ray.getFrom())
     {

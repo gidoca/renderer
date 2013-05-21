@@ -38,7 +38,7 @@ class Integrator;
 class Intersectable;
 class IntersectableInstance;
 class IntersectableList;
-class IntersectionParamter;
+class IntersectionParameter;
 class JitteredSampler;
 class Light;
 class Material;
