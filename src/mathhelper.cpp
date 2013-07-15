@@ -50,6 +50,7 @@ void mean(Mat &out, vector<Mat> in)
 
 cv::Mat channelMean(const cv::Mat &in)
 {
+    assert(checkRange(in));
     vector<Mat> splitted;
     Mat outSingle = Mat::zeros(in.size(), CV_MAKETYPE(in.type(), 1));
     split(in, splitted);
@@ -58,6 +59,7 @@ cv::Mat channelMean(const cv::Mat &in)
         outSingle += splitted[i] / splitted.size();
     }
     return outSingle;
+    assert(checkRange(outSingle));
 //    return in;
 }
 
