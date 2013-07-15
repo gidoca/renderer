@@ -31,6 +31,11 @@ bool EnvironmentMap::load(std::string filename)
     }
 }
 
+inline float pixelFromNormalizedCoord(float coord, float size)
+{
+    return (((coord + 1.0) / 2.0) * size - 1);
+}
+
 cv::Vec3f EnvironmentMap::getIntensity(const HitRecord &hit, QVector3D &direction, const Intersectable &scene, const Sample &sample) const
 {
   QVector3D at = hit.getIntersectingPoint();
@@ -46,8 +51,8 @@ cv::Vec3f EnvironmentMap::getIntensity(const HitRecord &hit, QVector3D &directio
   {
     QVector2D imageCoords(direction.y(), direction.z());
     imageCoords *= acos(direction.x()) / (imageCoords.length() * M_PI);
-    float x = (((imageCoords.x() + 1.0) / 2.0) * image.size().width - 1);
-    float y = (((imageCoords.y() + 1.0) / 2.0) * image.size().height - 1);
+    float x = pixelFromNormalizedCoord(imageCoords.x(), image.size().width);
+    float y = pixelFromNormalizedCoord(imageCoords.y(), image.size().height);
 //    float at = atan(sqrt(direction.x() / (1 - direction.x())));
 //    return coefficient * M_PI / at * Spectrum(data.cols[index], data.cols[index + 1],data.cols[index + 2]);
     cv::Vec3f r = 1 / pdf * image.at<cv::Vec3f>(x, y).mul(coefficient);
