@@ -267,9 +267,9 @@ void MetropolisFltRenderer::render()
     {
         //blur(noisy_variance, filteredVar, Size(3, 3), Point(-1, -1), BORDER_CONSTANT);
         Mat ker = Mat::zeros(3, 1, CV_32F);
-        ker.at<float>(0) = .2;
+        ker.at<float>(0) = .1;
         ker.at<float>(1) = .8;
-        ker.at<float>(2) = .2;
+        ker.at<float>(2) = .1;
         sepFilter2D(noisy_variance, filteredVar, -1, ker, ker.t());
     }
     else
