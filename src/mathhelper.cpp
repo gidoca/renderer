@@ -58,8 +58,8 @@ cv::Mat channelMean(const cv::Mat &in)
     {
         outSingle += splitted[i] / splitted.size();
     }
-    return outSingle;
     assert(checkRange(outSingle));
+    return outSingle;
 //    return in;
 }
 
