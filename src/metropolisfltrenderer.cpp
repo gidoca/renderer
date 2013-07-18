@@ -38,6 +38,7 @@
 #endif
 
 #include <QTime>
+#include <QDir>
 
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
@@ -202,9 +203,10 @@ void MetropolisFltRenderer::render()
   QTime time;
   time.start();
 
-  if(vm.count("verbose"))
+  QDir debugDir;
+  if(vm.count("metflt-debug-dir"))
   {
-    cerr << "Starting initial rendering" << endl;
+      debugDir = QString::fromStdString(vm["metflt-debug-dir"].as<string>());
   }
 
   const int num_films = 2;
@@ -220,82 +222,37 @@ void MetropolisFltRenderer::render()
     sumweight[n] = Mat::zeros(film->size(), CV_32F);
   }
 
-  renderStep(film->size(), scene, films, biased_var, biased_mean, biased_m2, sumweight, seed, true);
-
-  if(vm.count("verbose"))
-  {
-    cerr << "Initial rendering complete, " << time.elapsed() / 1000 << "s elapsed, starting filtering" << endl;
-  }
-
   Mat noisy_variance;
-  var(*film, noisy_variance, films);
-
-  assert(checkRange(noisy_variance));
-
+  Mat newOut;
   Mat meanvar, varvar;
-  var(meanvar, varvar, biased_var);
-  assert(checkRange(meanvar));
-  assert(checkRange(varvar));
 
   SymmetricFilter f;
   SymmetricFilter varF(1, 2);
 
   Mat filteredVar;
-  if(vm.count("metflt-omit-filter") || vm.count("metflt-omit-variance-filter"))
-  {
-      filteredVar = noisy_variance;
-  }
-  else
-  {
-      filteredVar = varF.filter(noisy_variance, meanvar, varvar);
-  }
-
-  if(vm.count("metflt-debug-dir"))
-  {
-    imwrite(vm["metflt-debug-dir"].as<string>() + "/film0.exr", films[0]);
-    imwrite(vm["metflt-debug-dir"].as<string>() + "/film1.exr", films[1]);
-    imwrite(vm["metflt-debug-dir"].as<string>() + "/film.exr", *film);
-    imwrite(vm["metflt-debug-dir"].as<string>() + "/var.exr", filteredVar);
-  }
-
-  vector<Mat> filteredFilms(num_films);
   Mat varOfFiltered;
-  if(vm.count("metflt-omit-filter"))
-  {
-      filteredFilms = films;
-  }
-  else
-  {
-    filteredFilms[0] = f.filter(films[0], films[1], filteredVar);
-    filteredFilms[1] = f.filter(films[1], films[0], filteredVar);
-  }
   Mat filteredMean;
-  var(filteredMean, varOfFiltered, filteredFilms);
-  if(!vm.count("metflt-omit-filter"))
-  {
-      *film = filteredMean;
-  }
 
-  Mat newOut;
-
-  for(int i = 1; i < vm["metflt-num-passes"].as<int>(); i++)
+  for(int i = 0; i < vm["metflt-num-passes"].as<int>(); i++)
   {
     if(vm.count("verbose"))
     {
         cerr << time.elapsed() / 1000 << "s elapsed, starting rendering pass " << i << "/" << (vm["metflt-num-passes"].as<int>() - 1) << endl;
     }
 
-    Mat importanceMap = channelMean(varOfFiltered) / (channelMean(filteredMean).mul(channelMean(filteredMean)) + 1e-2) + 1e-8;
-
-    //Normalization needed for correct computation of weighted average
-    importanceMap *= importanceMap.size().area() / sum(importanceMap)[0];
-    QString fn;
-    if(vm.count("metflt-debug-dir"))
+    Mat importanceMap;
+    if(i == 0)
     {
-        fn = QString("%1/importance%2.exr").arg(QString::fromStdString(vm["metflt-debug-dir"].as<string>())).arg(i);
-        imwrite(fn.toStdString(), importanceMap);
+        importanceMap = Mat::ones(film->size(), CV_32F);
     }
-    renderStep(film->size(), scene, importanceMap, films, biased_var, biased_mean, biased_m2, sumweight, seed + i, false);
+    else
+    {
+        importanceMap = channelMean(varOfFiltered) / (channelMean(filteredMean).mul(channelMean(filteredMean)) + 1e-2) + 1e-8;
+        //Normalization needed for correct computation of weighted average
+        importanceMap *= importanceMap.size().area() / sum(importanceMap)[0];
+    }
+
+    renderStep(film->size(), scene, importanceMap, films, biased_var, biased_mean, biased_m2, sumweight, seed + i, i == 0);
     if(vm.count("verbose"))
     {
       cerr << time.elapsed() / 1000 << "s elapsed, starting filtering pass " << i << "/" << (vm["metflt-num-passes"].as<int>() - 1) << endl;
@@ -306,34 +263,50 @@ void MetropolisFltRenderer::render()
     {
         filteredVar = noisy_variance;
     }
+    else if(vm.count("metflt-simple-variance-filter"))
+    {
+        //blur(noisy_variance, filteredVar, Size(3, 3), Point(-1, -1), BORDER_CONSTANT);
+        Mat ker = Mat::zeros(3, 1, CV_32F);
+        ker.at<float>(0) = .1;
+        ker.at<float>(1) = .8;
+        ker.at<float>(2) = .1;
+        sepFilter2D(noisy_variance, filteredVar, -1, ker, ker.t());
+    }
     else
     {
-        filteredVar = f.filter(noisy_variance, meanvar, varvar);
+        filteredVar = varF.filter(noisy_variance, meanvar, varvar);
     }
-    if(vm.count("metflt-omit-filter"))
-    {
-        filteredFilms = films;
-    }
-    else
-    {
-      filteredFilms[0] = f.filter(films[0], films[1], filteredVar);
-      filteredFilms[1] = f.filter(films[1], films[0], filteredVar);
-    }
-    Mat filteredMean;
-    var(filteredMean, varOfFiltered, filteredFilms);
 
     if(vm.count("metflt-omit-filter"))
     {
+        varOfFiltered = filteredVar;
         *film = newOut;
+    }
+    else if(vm.count("metflt-no-crossfiltering"))
+    {
+        varOfFiltered = filteredVar;
+        *film = f.filter(newOut, newOut, filteredVar);
     }
     else
     {
-        *film = filteredMean;
+      vector<Mat> filteredFilms(num_films);
+      filteredFilms[0] = f.filter(films[0], films[1], filteredVar);
+      filteredFilms[1] = f.filter(films[1], films[0], filteredVar);
+      var(filteredMean, varOfFiltered, filteredFilms);
+      *film = filteredMean;
     }
+
     if(vm.count("metflt-debug-dir"))
     {
-        fn = QString("%1/iteration%2.exr").arg(QString::fromStdString(vm["metflt-debug-dir"].as<string>())).arg(i);
-        imwrite(fn.toStdString(), *film);
+        QString dirname = QString("iteration%1").arg(i);
+        debugDir.mkpath(dirname);
+        QString fn = QString("%1/%2/%3.exr").arg(debugDir.path()).arg(dirname);
+        imwrite(fn.arg("film0").toStdString(), films[0]);
+        imwrite(fn.arg("film1").toStdString(), films[1]);
+        imwrite(fn.arg("film").toStdString(), *film);
+        imwrite(fn.arg("unfiltered").toStdString(), newOut);
+        imwrite(fn.arg("var").toStdString(), filteredVar);
+        imwrite(fn.arg("importance").toStdString(), importanceMap);
     }
 
     if(doStop) return;
@@ -347,6 +320,8 @@ options_description MetropolisFltRenderer::options()
       ("metflt-large-step-prob", value<float>()->default_value(0.1f, "0.1"), "the probability for a mutation to be a large step mutation")
       ("metflt-bootstrap", value<int>()->default_value(1000), "number of bootstrapping samples")
       ("metflt-mutations", value<int>()->default_value(16), "average number of path mutations per pixel")
+      ("metflt-simple-variance-filter", "just use a box filter to filter the variance")
+      ("metflt-no-crossfiltering", "filter the average image instead of cross filtering")
       ("metflt-omit-filter", "don't filter the image")
       ("metflt-omit-variance-filter", "filter the image using unfiltered guidance")
       ("metflt-num-passes", value<int>()->default_value(3), "the number of filtering passes")

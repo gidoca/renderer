@@ -30,6 +30,8 @@
 #include <vector>
 #include <iostream>
 
+#include <QString>
+
 using namespace cv;
 using namespace std;
 
@@ -45,24 +47,28 @@ cv::Mat computeWeights(const Mat& source, const Mat& target, const Mat& var, con
 {
     assert(checkRange(source));
     assert(checkRange(target));
-    Mat weights, temp, temp2, diff, d2;
+    assert(checkRange(var));
+    assert(checkRange(shiftedVar));
+
+    Mat weights, temp, temp2, temp3, temp4, temp5, diff, d2;
     diff = source - target;
-//    Mat sqdiff = channelMean(diff);
     Mat sqdiff = diff.mul(diff);
-    blur(sqdiff, d2, Size(patchSize, patchSize), Point(-1, -1), BORDER_REFLECT);
-    assert(checkRange(sqdiff));
-//            exp(-max(d2 - 2 * pixvar, 0) / (1e-10f + h2 * pixvar), weights);
-    //use min(var1, pixvar)
-    exp(-max(channelMean(d2 - (var + min(shiftedVar, var))), 0) / (1e-8f * Mat::ones(source.size(), CV_32F) + h2 * channelMean(var + shiftedVar)), temp);
-//    exp(-(d2 - channelMean(var + shiftedVar)) / (1e-8f + h2 * channelMean(var + shiftedVar)), temp);
-//    exp(-(d2 - (var + shiftedVar)) / (1e-8f * Mat::ones(source.size(), source.type()) + h2 * (var + shiftedVar)), temp);
-    blur(temp, temp2, Size(patchSize, patchSize), Point(-1, -1), BORDER_REFLECT);
-    //threshold?
-//    weights = max(channelMean(temp2), 0);
-    weights = max(temp2, 0);
+    d2 = channelMean(sqdiff - (var + min(shiftedVar, var)));
+    assert(checkRange(d2));
+    Mat d2_blurred;
+    blur(d2, d2_blurred, Size(patchSize, patchSize), Point(-1, -1), BORDER_REFLECT);
+    temp2 = -max(d2_blurred, 0);
+    temp3 = 1e-8f * Mat::ones(source.size(), CV_32F);
+    temp4 = h2 * channelMean(var + shiftedVar);
+    Mat expin = temp2 / (temp3 + temp4);
+    assert(checkRange(expin));
+    exp(expin, temp5);
+    blur(temp5, temp, Size(patchSize, patchSize), Point(-1, -1), BORDER_REFLECT);
+    weights = max(temp, 0);
     assert(checkRange(weights));
     assert(weights.channels() == 1);
-//    return extend(weights);
+    Mat idx = weights < 0.05;
+    add(Mat::zeros(weights.size(), weights.type()), 0, weights, idx);
     return weights;
 }
 
@@ -85,14 +91,14 @@ cv::Mat SymmetricFilter::filter(const cv::Mat &image, const cv::Mat &guide, cons
     Mat paddedVariance = padArray(pixvar, padding);
 
 #pragma omp parallel for
-    for(int dy = -windowRadius; dy <= 0; dy++)
+    for(int dx = -windowRadius; dx <= 0; dx++)
     {
-        for(int dx = -windowRadius; dx <= windowRadius; dx++)
+        for(int dy = -windowRadius; dy <= windowRadius; dy++)
         {
-            Range yrange1(padding + dy, padding + dy + guide.size().height);
-            Range xrange1(padding + dx, padding + dx + guide.size().width);
-            Range yrange2(padding - dy, padding - dy + guide.size().height);
-            Range xrange2(padding - dx, padding - dx + guide.size().width);
+            Range yrange1(padding - dy, padding - dy + guide.size().height);
+            Range xrange1(padding - dx, padding - dx + guide.size().width);
+            Range yrange2(padding + dy, padding + dy + guide.size().height);
+            Range xrange2(padding + dx, padding + dx + guide.size().width);
             Mat source1 = paddedGuide(yrange1, xrange1);
             Mat source2 = paddedGuide(yrange2, xrange2);
             Mat source_S = (source1 + source2) / 2.;
@@ -108,7 +114,7 @@ cv::Mat SymmetricFilter::filter(const cv::Mat &image, const cv::Mat &guide, cons
 #pragma omp critical
                 {
                     add(area, Scalar(Vec3f(1, 1, 1)), area);
-                    acc += data1;
+                    acc += data1; // data1 == data2
                 }
                 break;
             }
