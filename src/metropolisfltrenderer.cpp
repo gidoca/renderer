@@ -149,16 +149,22 @@ void MetropolisFltRenderer::renderStep(Size size, const Scene& scene, Mat import
 #pragma omp parallel for
   for(int t = 0; t < numThreads; t++)
   {
+    if(doStop) continue;
+
     gsl_rng *rng = gsl_rng_alloc(gsl_rng_taus2);
     gsl_rng_set(rng, numThreads * seed + t);
     for(int n = 0; n < num_films; n++)
     {
+      if(doStop) continue;
+
       MetropolisSample currentSample = initialSample;
       Vec3f currentValue = integrator.integrate(initialSample.cameraPathFromSample(*scene.object, scene.camera), *scene.object, scene.light, initialSample.lightSample1, initialSample.lightIndex);
       Point currentPos = getPos(currentSample.cameraSample, size);
 
       for(int i = 0; i < numSamples; i++)
       {
+          if(doStop) continue;
+
           MetropolisSample newSample = currentSample.mutated(rng, largeStepProb);
           Point newPos = getPos(newSample.cameraSample, size);
           Vec3f newValue = integrator.integrate(newSample.cameraPathFromSample(*scene.object, scene.camera), *scene.object, scene.light, newSample.lightSample1, newSample.lightIndex);

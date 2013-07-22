@@ -140,6 +140,7 @@ void MetropolisRenderer::render()
 
         for(int i = 0; i < numSamples; i++)
         {
+            if(doStop) continue;
             MetropolisSample newSample = currentSample.mutated(rng, largeStepProb);
             currentPath = newSample.cameraPathFromSample(*scene.object, scene.camera);
             Vec3f newValue = integrator.integrate(currentPath, *scene.object, scene.light, newSample.lightSample1, newSample.lightIndex);
