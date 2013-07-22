@@ -50,21 +50,16 @@ cv::Mat computeWeights(const Mat& source, const Mat& target, const Mat& var, con
     assert(checkRange(var));
     assert(checkRange(shiftedVar));
 
-    Mat weights, temp, temp2, temp3, temp4, temp5, diff, d2;
+    Mat weights, blurred_weights, raw_weights, diff, d2;
     diff = source - target;
     Mat sqdiff = diff.mul(diff);
     d2 = channelMean(sqdiff - (var + min(shiftedVar, var)));
     assert(checkRange(d2));
     Mat d2_blurred;
     blur(d2, d2_blurred, Size(patchSize, patchSize), Point(-1, -1), BORDER_REFLECT);
-    temp2 = -max(d2_blurred, 0);
-    temp3 = 1e-8f * Mat::ones(source.size(), CV_32F);
-    temp4 = h2 * channelMean(var + shiftedVar);
-    Mat expin = temp2 / (temp3 + temp4);
-    assert(checkRange(expin));
-    exp(expin, temp5);
-    blur(temp5, temp, Size(patchSize, patchSize), Point(-1, -1), BORDER_REFLECT);
-    weights = max(temp, 0);
+    exp(-max(d2_blurred, 0) / (1e-8f * Mat::ones(source.size(), CV_32F) + h2 * channelMean(var + shiftedVar)), raw_weights);
+    blur(raw_weights, blurred_weights, Size(patchSize, patchSize), Point(-1, -1), BORDER_REFLECT);
+    weights = max(blurred_weights, 0);
     assert(checkRange(weights));
     assert(weights.channels() == 1);
     Mat idx = weights < 0.05;
