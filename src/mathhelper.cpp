@@ -23,6 +23,24 @@
 using namespace std;
 using namespace cv;
 
+cv::Mat reduceval(cv::Mat in, int rtype)
+{
+    cv::Mat temp1, temp2;
+    cv::reduce(in, temp1, 0, rtype);
+    cv::reduce(temp1, temp2, 1, rtype);
+    return temp2;
+}
+
+cv::Mat minval(Mat in)
+{
+    return reduceval(in, CV_REDUCE_MIN);
+}
+
+cv::Mat maxval(Mat in)
+{
+    return reduceval(in, CV_REDUCE_MAX);
+}
+
 void var(Mat &mean, Mat &var, vector<Mat> in)
 {
     Mat sum = Mat::zeros(in[0].size(), in[0].type()), sqr_sum = Mat::zeros(in[0].size(), in[0].type());
@@ -34,18 +52,16 @@ void var(Mat &mean, Mat &var, vector<Mat> in)
     }
 
     mean = sum * (1. / in.size());
-    var = max((sqr_sum - sum.mul(mean)) / (in.size() - 1), 0);
+    var = max((sqr_sum - sum.mul(mean)) / (in.size()), 0);
 }
 
 void mean(Mat &out, vector<Mat> in)
 {
-    Mat sum = Mat::zeros(in[0].size(), in[0].type());
+    out = Mat::zeros(in[0].size(), in[0].type());
     for(unsigned int i = 0; i < in.size(); i++)
     {
-      sum += in[i];
+      out += in[i] * (1. / in.size());
     }
-
-    out = sum * (1. / in.size());
 }
 
 cv::Mat channelMean(const cv::Mat &in)

@@ -23,6 +23,11 @@
 
 #include <vector>
 #include <opencv2/core/core.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
+
+cv::Mat reduceval(cv::Mat in, int rtype);
+cv::Mat minval(cv::Mat in);
+cv::Mat maxval(cv::Mat in);
 
 void var(cv::Mat &mean, cv::Mat &var, std::vector<cv::Mat> in);
 cv::Mat channelMean(const cv::Mat &in);

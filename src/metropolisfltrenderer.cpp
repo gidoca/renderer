@@ -311,7 +311,8 @@ void MetropolisFltRenderer::render()
         imwrite(fn.arg("film1").toStdString(), films[1]);
         imwrite(fn.arg("film").toStdString(), *film);
         imwrite(fn.arg("unfiltered").toStdString(), newOut);
-        imwrite(fn.arg("var").toStdString(), filteredVar);
+        imwrite(fn.arg("var").toStdString(), noisy_variance);
+        imwrite(fn.arg("filteredvar").toStdString(), filteredVar);
         imwrite(fn.arg("importance").toStdString(), importanceMap);
     }
 
