@@ -144,7 +144,7 @@ void MetropolisFltRenderer::renderStep(Size size, const Scene& scene, Mat import
     biased_m2[n] = extend(sumImportance / newSumImportance).mul(extend(sumImportance / newSumImportance).mul(biased_m2[n]));
   }
 
-  const int numSamples = numPixelSamples * size.area() / numThreads / vm["metflt-num-passes"].as<int>();
+  const int numSamples = numPixelSamples * size.area() / numThreads / numPasses;
 
 #pragma omp parallel for
   for(int t = 0; t < numThreads; t++)
@@ -173,11 +173,11 @@ void MetropolisFltRenderer::renderStep(Size size, const Scene& scene, Mat import
 
           if(norm(currentValue) > 0 && accept < 1)
           {
-              addSample(currentSample.cameraSample, (1 - accept) / newSumImportance.at<float>(currentPos), films[n], biased_mean[n], biased_m2[n], sumweight[n], currentValue * (1 / norm(currentValue) * b * vm["metflt-num-passes"].as<int>() / numPixelSamples));
+              addSample(currentSample.cameraSample, (1 - accept) / newSumImportance.at<float>(currentPos), films[n], biased_mean[n], biased_m2[n], sumweight[n], currentValue * (1 / norm(currentValue) * b * numPasses / numPixelSamples));
           }
           if(norm(newValue) > 0 && accept > 0)
           {
-              addSample(newSample.cameraSample, accept / newSumImportance.at<float>(newPos), films[n], biased_mean[n], biased_m2[n], sumweight[n], newValue * (1 / norm(newValue) * b * vm["metflt-num-passes"].as<int>() / numPixelSamples));
+              addSample(newSample.cameraSample, accept / newSumImportance.at<float>(newPos), films[n], biased_mean[n], biased_m2[n], sumweight[n], newValue * (1 / norm(newValue) * b * numPasses / numPixelSamples));
           }
           if(gsl_rng_uniform(rng) < accept)
           {
@@ -239,11 +239,11 @@ void MetropolisFltRenderer::render()
   Mat varOfFiltered;
   Mat filteredMean;
 
-  for(int i = 0; i < vm["metflt-num-passes"].as<int>(); i++)
+  for(int i = 0; i < numPasses; i++)
   {
     if(vm.count("verbose"))
     {
-        cerr << time.elapsed() / 1000 << "s elapsed, starting rendering pass " << i << "/" << (vm["metflt-num-passes"].as<int>() - 1) << endl;
+        cerr << time.elapsed() / 1000 << "s elapsed, starting rendering pass " << i << "/" << (numPasses - 1) << endl;
     }
 
     Mat importanceMap;
@@ -261,7 +261,7 @@ void MetropolisFltRenderer::render()
     renderStep(film->size(), scene, importanceMap, films, biased_var, biased_mean, biased_m2, sumweight, seed + i, i == 0);
     if(vm.count("verbose"))
     {
-      cerr << time.elapsed() / 1000 << "s elapsed, starting filtering pass " << i << "/" << (vm["metflt-num-passes"].as<int>() - 1) << endl;
+      cerr << time.elapsed() / 1000 << "s elapsed, starting filtering pass " << i << "/" << (numPasses - 1) << endl;
     }
     var(newOut, noisy_variance, films);
     var(meanvar, varvar, biased_var);
