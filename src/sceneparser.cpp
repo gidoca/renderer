@@ -131,6 +131,6 @@ bool SceneGrammar::parse(string filename)
   boost::spirit::istream_iterator end;*/
 
   //Argument order changed
-  bool r = qi::phrase_parse(begin, end, assignments_rule, boost::spirit::ascii::space, ast);
+  bool r = qi::phrase_parse(begin, end, assignments_rule, skipper, ast);
   return r && begin == end;
 }

@@ -39,7 +39,17 @@
 
 namespace qi = boost::spirit::qi;
 
-struct SceneGrammar : qi::grammar<std::string::iterator, std::vector<ast_assignment>(), boost::spirit::ascii::space_type>
+typedef std::string::iterator it;
+
+struct comment_skipper : public qi::grammar<it> {
+
+    comment_skipper() : comment_skipper::base_type(skip, "Comment") {
+        skip = boost::spirit::ascii::space | ("/*" >> *(qi::char_ - "*/") >> "*/");
+    }
+    qi::rule<it> skip;
+};
+
+struct SceneGrammar : qi::grammar<it, std::vector<ast_assignment>(), comment_skipper>
 {
 public:
   SceneGrammar();
@@ -52,51 +62,53 @@ public:
   }
 
 private:
-  qi::rule<std::string::iterator, std::vector<char>() > string_literal_rule;
-  qi::rule<std::string::iterator, std::vector<char>(), boost::spirit::ascii::space_type> identifier_rule;
+  qi::rule<it, std::vector<char>()> string_literal_rule;
+  qi::rule<it, std::vector<char>()> identifier_rule;
 
-  qi::rule<std::string::iterator, std::vector<ast_assignment>(), boost::spirit::ascii::space_type> assignments_rule;
-  qi::rule<std::string::iterator, ast_assignment(), boost::spirit::ascii::space_type> assignment_rule;
-  qi::rule<std::string::iterator, ast_value(), boost::spirit::ascii::space_type> value_rule;
+  qi::rule<it, std::vector<ast_assignment>(), comment_skipper> assignments_rule;
+  qi::rule<it, ast_assignment(), comment_skipper> assignment_rule;
+  qi::rule<it, ast_value(), comment_skipper> value_rule;
 
-  qi::rule<std::string::iterator, ast_intersectable_list(), boost::spirit::ascii::space_type> intersectable_list_rule;
-  qi::rule<std::string::iterator, ast_sphere(), boost::spirit::ascii::space_type> sphere_rule;
-  qi::rule<std::string::iterator, ast_box(), boost::spirit::ascii::space_type> box_rule;
-  qi::rule<std::string::iterator, ast_quad(), boost::spirit::ascii::space_type> quad_rule;
-  qi::rule<std::string::iterator, ast_plane(), boost::spirit::ascii::space_type> plane_rule;
-  qi::rule<std::string::iterator, ast_obj(), boost::spirit::ascii::space_type> obj_rule;
-  qi::rule<std::string::iterator, ast_triangle(), boost::spirit::ascii::space_type> triangle_rule;
-  qi::rule<std::string::iterator, ast_instance(), boost::spirit::ascii::space_type> instance_rule;
-  qi::rule<std::string::iterator, ast_bvh_node(), boost::spirit::ascii::space_type> bvh_node_rule;
-  qi::rule<std::string::iterator, ast_intersectable(), boost::spirit::ascii::space_type> intersectable_rule;
+  qi::rule<it, ast_intersectable_list(), comment_skipper> intersectable_list_rule;
+  qi::rule<it, ast_sphere(), comment_skipper> sphere_rule;
+  qi::rule<it, ast_box(), comment_skipper> box_rule;
+  qi::rule<it, ast_quad(), comment_skipper> quad_rule;
+  qi::rule<it, ast_plane(), comment_skipper> plane_rule;
+  qi::rule<it, ast_obj(), comment_skipper> obj_rule;
+  qi::rule<it, ast_triangle(), comment_skipper> triangle_rule;
+  qi::rule<it, ast_instance(), comment_skipper> instance_rule;
+  qi::rule<it, ast_bvh_node(), comment_skipper> bvh_node_rule;
+  qi::rule<it, ast_intersectable(), comment_skipper> intersectable_rule;
 
-  qi::rule<std::string::iterator, ast_vector2_literal(), boost::spirit::ascii::space_type> vector2_literal_rule;
-  qi::rule<std::string::iterator, ast_vector3_literal(), boost::spirit::ascii::space_type> vector3_literal_rule;
-  qi::rule<std::string::iterator, ast_vector4_literal(), boost::spirit::ascii::space_type> vector4_literal_rule;
-  qi::rule<std::string::iterator, ast_matrix_literal(), boost::spirit::ascii::space_type> matrix_literal_rule;
-  qi::rule<std::string::iterator, ast_matrix_translate(), boost::spirit::ascii::space_type> matrix_translate_rule;
-  qi::rule<std::string::iterator, ast_matrix_rotate(), boost::spirit::ascii::space_type> matrix_rotate_rule;
-  qi::rule<std::string::iterator, ast_matrix_scale(), boost::spirit::ascii::space_type> matrix_scale_rule;
-  qi::rule<std::string::iterator, ast_matrix_scale_vect(), boost::spirit::ascii::space_type> matrix_scale_vect_rule;
-  qi::rule<std::string::iterator, ast_basic_matrix(), boost::spirit::ascii::space_type> basic_matrix_rule;
-  qi::rule<std::string::iterator, ast_matrix(), boost::spirit::ascii::space_type> matrix_rule;
+  qi::rule<it, ast_vector2_literal(), comment_skipper> vector2_literal_rule;
+  qi::rule<it, ast_vector3_literal(), comment_skipper> vector3_literal_rule;
+  qi::rule<it, ast_vector4_literal(), comment_skipper> vector4_literal_rule;
+  qi::rule<it, ast_matrix_literal(), comment_skipper> matrix_literal_rule;
+  qi::rule<it, ast_matrix_translate(), comment_skipper> matrix_translate_rule;
+  qi::rule<it, ast_matrix_rotate(), comment_skipper> matrix_rotate_rule;
+  qi::rule<it, ast_matrix_scale(), comment_skipper> matrix_scale_rule;
+  qi::rule<it, ast_matrix_scale_vect(), comment_skipper> matrix_scale_vect_rule;
+  qi::rule<it, ast_basic_matrix(), comment_skipper> basic_matrix_rule;
+  qi::rule<it, ast_matrix(), comment_skipper> matrix_rule;
 
-  qi::rule<std::string::iterator, ast_diffuse_material(), boost::spirit::ascii::space_type> diffuse_material_rule;
-  qi::rule<std::string::iterator, ast_phong_material(), boost::spirit::ascii::space_type> phong_material_rule;
-  qi::rule<std::string::iterator, ast_mirror_material(), boost::spirit::ascii::space_type> mirror_material_rule;
-  qi::rule<std::string::iterator, ast_texture_material(), boost::spirit::ascii::space_type> texture_material_rule;
-  qi::rule<std::string::iterator, ast_refractive_material(), boost::spirit::ascii::space_type> refractive_material_rule;
-  qi::rule<std::string::iterator, ast_literal_material(), boost::spirit::ascii::space_type> material_literal_rule;
-  qi::rule<std::string::iterator, ast_material(), boost::spirit::ascii::space_type> material_rule;
+  qi::rule<it, ast_diffuse_material(), comment_skipper> diffuse_material_rule;
+  qi::rule<it, ast_phong_material(), comment_skipper> phong_material_rule;
+  qi::rule<it, ast_mirror_material(), comment_skipper> mirror_material_rule;
+  qi::rule<it, ast_texture_material(), comment_skipper> texture_material_rule;
+  qi::rule<it, ast_refractive_material(), comment_skipper> refractive_material_rule;
+  qi::rule<it, ast_literal_material(), comment_skipper> material_literal_rule;
+  qi::rule<it, ast_material(), comment_skipper> material_rule;
 
-  qi::rule<std::string::iterator, ast_camera(), boost::spirit::ascii::space_type> camera_rule;
+  qi::rule<it, ast_camera(), comment_skipper> camera_rule;
 
-  qi::rule<std::string::iterator, std::vector<ast_light>(), boost::spirit::ascii::space_type> light_list_rule;
-  qi::rule<std::string::iterator, ast_point_light(), boost::spirit::ascii::space_type> point_light_rule;
-  qi::rule<std::string::iterator, ast_area_light(), boost::spirit::ascii::space_type> area_light_rule;
-  qi::rule<std::string::iterator, ast_cone_light(), boost::spirit::ascii::space_type> cone_light_rule;
-  qi::rule<std::string::iterator, ast_environment_map(), boost::spirit::ascii::space_type> environment_map_rule;
-  qi::rule<std::string::iterator, ast_light(), boost::spirit::ascii::space_type> light_rule;
+  qi::rule<it, std::vector<ast_light>(), comment_skipper> light_list_rule;
+  qi::rule<it, ast_point_light(), comment_skipper> point_light_rule;
+  qi::rule<it, ast_area_light(), comment_skipper> area_light_rule;
+  qi::rule<it, ast_cone_light(), comment_skipper> cone_light_rule;
+  qi::rule<it, ast_environment_map(), comment_skipper> environment_map_rule;
+  qi::rule<it, ast_light(), comment_skipper> light_rule;
+
+  comment_skipper skipper;
 
   std::vector<ast_assignment> ast;
 };
