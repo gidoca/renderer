@@ -36,7 +36,7 @@ SceneGrammar::SceneGrammar() : SceneGrammar::base_type(assignments_rule, "inters
   using namespace boost::spirit;
 
   string_literal_rule %= boost::spirit::lit('"') >> *(boost::spirit::ascii::char_ - '"') >> '"';
-  identifier_rule %= *(boost::spirit::ascii::alnum | '_');
+  identifier_rule %= (boost::spirit::ascii::alpha | '_') >> *(boost::spirit::ascii::alnum | '_');
 
   assignments_rule %= *assignment_rule;
   assignment_rule %= identifier_rule >> "=" >> value_rule >> ";";
