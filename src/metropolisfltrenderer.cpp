@@ -144,7 +144,7 @@ void MetropolisFltRenderer::renderStep(Size size, const Scene& scene, Mat import
     biased_m2[n] = extend(sumImportance / newSumImportance).mul(extend(sumImportance / newSumImportance).mul(biased_m2[n]));
   }
 
-  const int numSamples = numPixelSamples * size.area() / numThreads / numPasses;
+  const int numSamples = numPixelSamples * size.area() / numThreads / numPasses / num_films;
 
 #pragma omp parallel for
   for(int t = 0; t < numThreads; t++)
