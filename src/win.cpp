@@ -70,8 +70,7 @@ void Win::saveExr()
 
 void Win::init()
 {
-    cv::Size size = film.size();
-    setPixmap(QPixmap(QSize(size.width, size.height)));
+    update();
     connect(&timer, SIGNAL(timeout()), this, SLOT(update()));
     timer.setInterval(100);
 
