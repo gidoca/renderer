@@ -48,7 +48,7 @@ public:
 
   virtual ~AxisAlignedBox() {}
 
-  IntersectionParameter getCSGIntersection(Ray ray) const;
+  std::list<IntersectionParameter> getCSGIntersection(Ray ray) const;
 
   QVector3D getMin() const;
   QVector3D getMax() const;

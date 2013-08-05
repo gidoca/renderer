@@ -36,7 +36,7 @@ public:
 
     }
 
-    IntersectionParameter getCSGIntersection(Ray ray) const;
+    std::list<IntersectionParameter> getCSGIntersection(Ray ray) const;
 
 protected:
     const AxisAlignedBox * createBoundingBox();

@@ -24,50 +24,36 @@
 
 #include <algorithm>
 
-IntersectionParameter CSGIntersection::getCSGIntersection ( Ray ray ) const
+std::list<IntersectionParameter> CSGIntersection::getCSGIntersection( Ray ray ) const
 {
     bool leftInside = false, rightInside = false;
-    IntersectionParameter leftIntersection = left->getCSGIntersection ( ray );
-    IntersectionParameter rightIntersection = right->getCSGIntersection ( ray );
+    std::list<IntersectionParameter> leftIntersection = left->getCSGIntersection ( ray );
+    std::list<IntersectionParameter> rightIntersection = right->getCSGIntersection ( ray );
 
-    IntersectionParameter result;
+    std::list<IntersectionParameter> result;
 
-    std::list<float>::iterator leftIterator = leftIntersection.intersections.begin();
-    std::list<float>::iterator rightIterator = rightIntersection.intersections.begin();
+    std::list<IntersectionParameter>::iterator leftIterator = leftIntersection.begin();
+    std::list<IntersectionParameter>::iterator rightIterator = rightIntersection.begin();
 
-    while ( leftIterator != leftIntersection.intersections.end() && rightIterator != rightIntersection.intersections.end() )
+    while ( leftIterator != leftIntersection.end() && rightIterator != rightIntersection.end() )
     {
-        if ( *leftIterator <= *rightIterator )
+        if ( leftIterator->t <= rightIterator->t )
         {
             leftInside = !leftInside;
-            if ( leftInside && rightInside )
+            if ( rightInside )
             {
-                result.intersections.push_back ( *leftIterator );
-                if ( result.material == 0 )
-                {
-                    result.material = leftIntersection.material;
-                    result.normal = leftIntersection.normal;
-                }
+                result.push_back(*leftIterator);
             }
             leftIterator++;
         }
         else
         {
             rightInside = !rightInside;
-            if ( leftInside && rightInside )
+            if ( leftInside )
             {
-                result.intersections.push_back ( *rightIterator );
-                if ( result.material == 0 )
-                {
-                    result.material = rightIntersection.material;
-                    result.normal = rightIntersection.normal;
-                }
+                result.push_back(*rightIterator);
             }
             rightIterator++;
-        }
-        if ( leftInside && rightInside )
-        {
-            result.intersections.push_back ( std::min ( *leftIterator, *rightIterator ) );
         }
     }
 

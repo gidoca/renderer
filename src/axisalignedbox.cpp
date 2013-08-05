@@ -27,9 +27,11 @@
 #include <cmath>
 #include <limits>
 
-IntersectionParameter AxisAlignedBox::getCSGIntersection(Ray ray) const
+std::list<IntersectionParameter> AxisAlignedBox::getCSGIntersection(Ray ray) const
 {
-  IntersectionParameter result;
+  std::list<IntersectionParameter> result;
+  IntersectionParameter param;
+  param.material = material;
   float a;
   float tmin = -std::numeric_limits<float>::infinity(), tmax = std::numeric_limits<float>::infinity(), temp_tmin, temp_tmax;
   QVector3D rayDirection = ray.getDirection();
@@ -56,17 +58,19 @@ IntersectionParameter AxisAlignedBox::getCSGIntersection(Ray ray) const
     if(temp_tmin > tmin)
     {
       tmin = temp_tmin;
-      result.normal = temp_normal;
+      param.normal = temp_normal;
     }
     if(temp_tmax < tmax) tmax = temp_tmax;
   }
 
   if(tmin <= tmax)
   {
-    result.intersections.push_back(tmin);
-    result.intersections.push_back(tmax);
+    param.t = tmin;
+    result.push_back(param);
+    param.t = tmax;
+    param.normal *= -1;
+    result.push_back(param);
   }
-  result.material = material;
   return result;
 }
 

@@ -26,24 +26,32 @@
 
 #include "axisalignedbox.h"
 
-IntersectionParameter Sphere::getCSGIntersection(Ray ray) const
+std::list<IntersectionParameter> Sphere::getCSGIntersection(Ray ray) const
 {
-  IntersectionParameter result;
+  std::list<IntersectionParameter> result;
   QVector3D diff = ray.getOrigin() - center;
   float radiusSquared = radius * radius;
   float a = ray.getDirection().lengthSquared();
   float b = 2 * QVector3D::dotProduct(ray.getDirection(), diff);
   float c = diff.lengthSquared() - radiusSquared;
-  if(b * b - 4 * a * c >= 0)
+  float discriminant = b * b - 4 * a * c;
+  if(discriminant >= 0)
   {
-    result.intersections.push_back((-b - sqrt(b * b - 4 * a * c)) / (2 * a));
-    result.intersections.push_back((-b + sqrt(b * b - 4 * a * c)) / (2 * a));
+    IntersectionParameter param;
+    param.material = material;
 
-    QVector3D location = ray.evaluate(result.intersections.front());
-    result.normal = location - center;
-    result.texcoord = cv::Point2f(acosf(result.normal.z() / radius) / M_PI, atan2(result.normal.x(), result.normal.y()) / M_PI / 2 + 0.5f);
+    float rootDiscriminant = sqrt(discriminant);
+
+    param.t = (-b - rootDiscriminant) / (2 * a);
+    param.normal = ray.evaluate(param.t) - center;
+    param.texcoord = cv::Point2f(acosf(param.normal.z() / radius) / M_PI, atan2(param.normal.x(), param.normal.y()) / M_PI / 2 + 0.5f);
+    result.push_back(param);
+
+    param.t = (-b + rootDiscriminant) / (2 * a);
+    param.normal = ray.evaluate(param.t) - center;
+    param.texcoord = cv::Point2f(acosf(param.normal.z() / radius) / M_PI, atan2(param.normal.x(), param.normal.y()) / M_PI / 2 + 0.5f);
+    result.push_back(param);
   }
-  result.material = material;
   return result;
 }
 

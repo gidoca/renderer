@@ -22,9 +22,12 @@
 #define CSGOBJECT_H
 
 #include "global.h"
+
 #include "intersectable.h"
 
 #include <opencv2/core/core.hpp>
+
+#include <list>
 
 class IntersectionParameter
 {
@@ -33,7 +36,7 @@ class IntersectionParameter
     {
       material = 0;
     }
-    std::list<float> intersections;
+    float t;
     QVector3D normal;
     cv::Point2f texcoord;
     Material* material;
@@ -43,7 +46,7 @@ class CSGObject : public Intersectable
 {
 public:
   HitRecord intersect(Ray ray) const;
-  virtual IntersectionParameter getCSGIntersection(Ray ray) const = 0;
+  virtual std::list<IntersectionParameter> getCSGIntersection(Ray ray) const = 0;
 };
 
 #endif // CSGOBJECT_H
