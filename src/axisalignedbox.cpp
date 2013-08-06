@@ -68,7 +68,6 @@ std::list<IntersectionParameter> AxisAlignedBox::getCSGIntersection(Ray ray) con
     param.t = tmin;
     result.push_back(param);
     param.t = tmax;
-    param.normal *= -1;
     result.push_back(param);
   }
   return result;
