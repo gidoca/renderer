@@ -130,7 +130,7 @@ ast_intersectable BVHNode::create(ast_intersectable_list list)
 
 HitRecord BVHNode::intersect(Ray ray) const
 {
-  if(!bb->intersect(ray).intersects()) return HitRecord();
+  if(!bb->intersect(Ray(ray.getOrigin(), ray.getDirection(), -std::numeric_limits<float>::infinity(), ray.getTo())).intersects()) return HitRecord();
   HitRecord lhit = left->intersect(ray);
   HitRecord rhit = right->intersect(ray);
   if(!rhit.intersects() || lhit.getRayParameter() < rhit.getRayParameter())
