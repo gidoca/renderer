@@ -58,5 +58,5 @@ std::list<IntersectionParameter> Sphere::getCSGIntersection(Ray ray) const
 const AxisAlignedBox* Sphere::createBoundingBox()
 {
   QVector3D radiusVector(radius, radius, radius);
-  return new AxisAlignedBox(center - radiusVector, center + radiusVector, DarkMatter::getInstance());
+  return new AxisAlignedBox(center - radiusVector, center + radiusVector);
 }
