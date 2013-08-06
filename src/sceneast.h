@@ -171,15 +171,20 @@ struct ast_matrix
 };
 
 typedef boost::variant<
-    boost::recursive_wrapper<ast_intersectable_list>,
-    ast_sphere,
     ast_box,
+    ast_sphere,
+    boost::recursive_wrapper<ast_csg_isect>
+    > ast_csg;
+
+typedef boost::variant<
+    boost::recursive_wrapper<ast_intersectable_list>,
     ast_quad,
     ast_plane,
     ast_obj,
     ast_triangle,
     boost::recursive_wrapper<ast_instance>,
-    boost::recursive_wrapper<ast_bvh_node>
+    boost::recursive_wrapper<ast_bvh_node>,
+    ast_csg
     > ast_intersectable;
 
 struct ast_intersectable_list
@@ -249,6 +254,14 @@ struct ast_bvh_node
 {
     ast_intersectable left, right;
     ast_box bb;
+
+    static const std::string function_name;
+};
+
+struct ast_csg_isect
+{
+    ast_csg left;
+    ast_csg right;
 
     static const std::string function_name;
 };
@@ -368,6 +381,12 @@ BOOST_FUSION_ADAPT_STRUCT(
     (ast_intersectable, left)
     (ast_intersectable, right)
     (ast_box, bb)
+)
+
+BOOST_FUSION_ADAPT_STRUCT(
+    ast_csg_isect,
+    (ast_csg, left)
+    (ast_csg, right)
 )
 
 BOOST_FUSION_ADAPT_STRUCT(

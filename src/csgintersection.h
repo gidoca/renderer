@@ -34,6 +34,8 @@ public:
 protected:
   const AxisAlignedBox * createBoundingBox();
 
+  bool isInside(bool leftInside, bool rightInside) const;
+
 private:
   CSGObject *left, *right;
 };

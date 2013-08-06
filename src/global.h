@@ -88,6 +88,7 @@ struct ast_obj;
 struct ast_triangle;
 struct ast_instance;
 struct ast_bvh_node;
+struct ast_csg_isect;
 struct ast_camera;
 struct ast_point_light;
 struct ast_area_light;

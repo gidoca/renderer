@@ -39,8 +39,10 @@ std::list<IntersectionParameter> CSGIntersection::getCSGIntersection( Ray ray ) 
     {
         if ( leftIterator->t <= rightIterator->t )
         {
+            bool wasInside = isInside(leftInside, rightInside);
             leftInside = !leftInside;
-            if ( rightInside )
+            bool inside = isInside(leftInside, rightInside);
+            if (wasInside != inside)
             {
                 result.push_back(*leftIterator);
             }
@@ -58,6 +60,11 @@ std::list<IntersectionParameter> CSGIntersection::getCSGIntersection( Ray ray ) 
     }
 
     return result;
+}
+
+bool CSGIntersection::isInside(bool leftInside, bool rightInside) const
+{
+    return leftInside && rightInside;
 }
 
 const AxisAlignedBox * CSGIntersection::createBoundingBox()

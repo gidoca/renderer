@@ -101,6 +101,7 @@ public:
 
     void print(ast_material m) const;
     void print(ast_intersectable) const;
+    void print(ast_csg) const;
 
 private:
     bool * const first;
@@ -119,6 +120,7 @@ public:
     void operator()(std::string value) const;
     void operator()(std::vector<char> value) const;
     void operator()(ast_intersectable_list value) const;
+    void operator()(ast_csg value) const;
 
     template<typename T>
     void operator()(T value) const
@@ -165,6 +167,11 @@ void AstVisitor::operator()(ast_intersectable value) const
     boost::apply_visitor(*this, value);
 }
 
+void AstVisitor::operator()(ast_csg value) const
+{
+    boost::apply_visitor(*this, value);
+}
+
 void AstVisitor::operator ()(ast_literal_material l) const
 {
     l.apply_visitor(*this);
@@ -196,6 +203,11 @@ void ArgumentListPrinter::print(ast_material m) const
 }
 
 void ArgumentListPrinter::print(ast_intersectable i) const
+{
+    boost::apply_visitor(AstVisitor(out), i);
+}
+
+void ArgumentListPrinter::print(ast_csg i) const
 {
     boost::apply_visitor(AstVisitor(out), i);
 }

@@ -40,6 +40,8 @@
 #include "blacklight.h"
 #include "objreader.h"
 #include "bvh.h"
+#include "csgobject.h"
+#include "csgintersection.h"
 
 #include <boost/foreach.hpp>
 #include <boost/variant/apply_visitor.hpp>
@@ -77,6 +79,7 @@ const std::string ast_obj::function_name = "obj";
 const std::string ast_triangle::function_name = "t";
 const std::string ast_instance::function_name = "instance";
 const std::string ast_bvh_node::function_name = "b";
+const std::string ast_csg_isect::function_name = "isect";
 const std::string ast_camera::function_name = "camera";
 const std::string ast_point_light::function_name = "pointlight";
 const std::string ast_area_light::function_name = "srealight";
@@ -387,9 +390,53 @@ Camera ast_camera::asCamera() const
     return Camera(eye.asQVector(), look_at.asQVector(), up.asQVector(), fov, QSize(xres, yres));
 }
 
+struct csg_builder : boost::static_visitor<CSGObject*>
+{
+    csg_builder(std::map<std::string, Material*>& materials, ast_mat_map &ast_materials, bool buildMaterials = true) : ast_materials(ast_materials), material_b(materials, ast_materials), buildMaterials(buildMaterials) {}
+
+    inline Material * getMaterial(ast_material m)
+    {
+        if(buildMaterials)
+        {
+            return boost::apply_visitor(material_b, m);
+        }
+        else
+        {
+            return DarkMatter::getInstance();
+        }
+    }
+
+    Sphere* operator()(const ast_sphere& s)
+    {
+      return new Sphere(s.center.asQVector(), s.radius, getMaterial(s.material));
+    }
+
+    AxisAlignedBox* operator()(const ast_box& b)
+    {
+      return new AxisAlignedBox(b.min.asQVector(), b.max.asQVector(), getMaterial(b.material));
+    }
+
+    CSGIntersection* operator()(const ast_csg_isect& c);
+
+private:
+    ast_mat_map &ast_materials;
+
+    material_builder material_b;
+
+    const bool buildMaterials;
+};
+
+CSGIntersection* csg_builder::operator ()(const ast_csg_isect& c)
+{
+    return new CSGIntersection(boost::apply_visitor(*this, c.left), boost::apply_visitor(*this, c.right));
+}
+
 struct intersectable_builder : boost::static_visitor<Intersectable*>
 {
-  intersectable_builder(std::map<std::string, Material*>& materials, ast_mat_map &ast_materials, bool buildMaterials = true) : ast_materials(ast_materials), materials(materials), material_b(materials, ast_materials), buildMaterials(buildMaterials) {}
+  intersectable_builder(std::map<std::string, Material*>& materials, ast_mat_map &ast_materials, bool buildMaterials = true) :
+    ast_materials(ast_materials), material_b(materials, ast_materials),
+    csg_b(materials, ast_materials, buildMaterials), buildMaterials(buildMaterials)
+        {}
 
   inline Material * getMaterial(ast_material m)
   {
@@ -401,16 +448,6 @@ struct intersectable_builder : boost::static_visitor<Intersectable*>
       {
           return DarkMatter::getInstance();
       }
-  }
-
-  Sphere* operator()(const ast_sphere& s)
-  {
-    return new Sphere(s.center.asQVector(), s.radius, getMaterial(s.material));
-  }
-
-  AxisAlignedBox* operator()(const ast_box& b)
-  {
-    return new AxisAlignedBox(b.min.asQVector(), b.max.asQVector(), getMaterial(b.material));
   }
 
   Quad* operator()(const ast_quad& q)
@@ -439,11 +476,12 @@ struct intersectable_builder : boost::static_visitor<Intersectable*>
   IntersectableInstance* operator()(const ast_instance& i);
   BVHNode* operator()(const ast_bvh_node& b);
   Intersectable* operator()(const ast_obj& o);
+  CSGObject* operator()(const ast_csg& c);
 
   ast_mat_map &ast_materials;
-  std::map<std::string, Material*>& materials;
 
   material_builder material_b;
+  csg_builder csg_b;
 
   const bool buildMaterials;
 };
@@ -469,7 +507,7 @@ IntersectableInstance* intersectable_builder::operator()(const ast_instance& i)
 BVHNode* intersectable_builder::operator ()(const ast_bvh_node& b)
 {
     Intersectable *left = boost::apply_visitor(*this, b.left), *right = boost::apply_visitor(*this, b.right);
-    AxisAlignedBox* bb = (*this)(b.bb);
+    AxisAlignedBox* bb = (csg_b)(b.bb);
     return new BVHNode(left, right, bb);
 }
 
@@ -484,6 +522,11 @@ Intersectable* intersectable_builder::operator()(const ast_obj& o)
     QVector3D min = bb->getMin(), max = bb->getMax();
     std::cerr << "Mesh bb min: " << min.x() << "," << min.y() << "," << min.z() << "; max: " << max.x() << "," << max.y() << "," << max.z() << std::endl;
     return mesh;
+}
+
+CSGObject* intersectable_builder::operator ()(const ast_csg& c)
+{
+    return boost::apply_visitor(csg_b, c);
 }
 
 struct light_builder : boost::static_visitor<const Light*>
