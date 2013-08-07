@@ -86,3 +86,8 @@ bool CSGUnion::isInside(bool leftInside, bool rightInside) const
     return leftInside || rightInside;
 }
 
+bool CSGDifference::isInside(bool leftInside, bool rightInside) const
+{
+    return leftInside && !rightInside;
+}
+

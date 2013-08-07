@@ -60,4 +60,13 @@ protected:
     bool isInside(bool leftInside, bool rightInside) const;
 };
 
+class CSGDifference : public CSGOperation
+{
+public:
+    CSGDifference(CSGObject* left, CSGObject* right) : CSGOperation(left, right) {}
+
+protected:
+    bool isInside(bool leftInside, bool rightInside) const;
+};
+
 #endif // CSGOPERATION_H
