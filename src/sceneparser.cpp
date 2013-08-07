@@ -42,7 +42,7 @@ SceneGrammar::SceneGrammar() : SceneGrammar::base_type(assignments_rule, "inters
   assignment_rule %= identifier_rule >> "=" >> value_rule >> ";";
   value_rule %= intersectable_rule | light_list_rule | camera_rule | material_literal_rule | identifier_rule;
 
-  intersectable_rule %= intersectable_list_rule | sphere_rule | box_rule | quad_rule | plane_rule | obj_rule | triangle_rule | instance_rule | bvh_node_rule;
+  intersectable_rule %= intersectable_list_rule | quad_rule | plane_rule | obj_rule | triangle_rule | instance_rule | bvh_node_rule | csg_rule;
   intersectable_rule.name("intersectable");
   intersectable_list_rule %= boost::spirit::lit("intersectables") >> boost::spirit::lit("{") >> *intersectable_rule >> boost::spirit::lit("}");
   intersectable_list_rule.name("list of intersectables");
@@ -50,6 +50,10 @@ SceneGrammar::SceneGrammar() : SceneGrammar::base_type(assignments_rule, "inters
   sphere_rule.name("sphere");
   box_rule %= boost::spirit::lit("box") >> "(" >> vector3_literal_rule >> "," >> vector3_literal_rule >> "," >> material_rule >> ")";
   box_rule.name("box");
+  csg_rule %= csg_isect_rule | sphere_rule | box_rule;
+  csg_rule.name("csg");
+  csg_isect_rule %= boost::spirit::lit("isect") >> "(" >> csg_rule >> "," >> csg_rule >> ")";
+  csg_isect_rule.name("csg intersection");
   quad_rule %= boost::spirit::lit("quad") >> "(" >> vector3_literal_rule >> "," >> vector3_literal_rule >> "," >> vector3_literal_rule >> "," >> vector3_literal_rule >> "," >> material_rule >> ")";
   quad_rule.name("quad");
   plane_rule %= boost::spirit::lit("plane") >> "(" >> vector4_literal_rule >> "," >> material_rule >> ")";
