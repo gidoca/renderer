@@ -24,6 +24,18 @@
 
 #include <algorithm>
 
+void CSGIntersection::processIntersection(bool & leftInside, bool & rightInside, bool & currentInside, std::list<IntersectionParameter> & result, std::list<IntersectionParameter>::iterator & currentIntersection) const
+{
+    bool wasInside = isInside(leftInside, rightInside);
+    currentInside = !currentInside;
+    bool inside = isInside(leftInside, rightInside);
+    if (wasInside != inside)
+    {
+        result.push_back(*currentIntersection);
+    }
+    currentIntersection++;
+}
+
 std::list<IntersectionParameter> CSGIntersection::getCSGIntersection( Ray ray ) const
 {
     bool leftInside = false, rightInside = false;
@@ -39,23 +51,11 @@ std::list<IntersectionParameter> CSGIntersection::getCSGIntersection( Ray ray ) 
     {
         if ( leftIterator->t <= rightIterator->t )
         {
-            bool wasInside = isInside(leftInside, rightInside);
-            leftInside = !leftInside;
-            bool inside = isInside(leftInside, rightInside);
-            if (wasInside != inside)
-            {
-                result.push_back(*leftIterator);
-            }
-            leftIterator++;
+            processIntersection(leftInside, rightInside, leftInside, result, leftIterator);
         }
         else
         {
-            rightInside = !rightInside;
-            if ( leftInside )
-            {
-                result.push_back(*rightIterator);
-            }
-            rightIterator++;
+            processIntersection(leftInside, rightInside, rightInside, result, rightIterator);
         }
     }
 

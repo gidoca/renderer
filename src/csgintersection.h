@@ -37,6 +37,8 @@ protected:
   bool isInside(bool leftInside, bool rightInside) const;
 
 private:
+  void processIntersection(bool & leftInside, bool & rightInside, bool & currentInside, std::list<IntersectionParameter> & result, std::list<IntersectionParameter>::iterator & currentIntersection) const;
+
   CSGObject *left, *right;
 };
 
