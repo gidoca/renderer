@@ -74,6 +74,7 @@ private:
   qi::rule<it, ast_box(), comment_skipper> box_rule;
   qi::rule<it, ast_csg(), comment_skipper> csg_rule;
   qi::rule<it, ast_csg_isect(), comment_skipper> csg_isect_rule;
+  qi::rule<it, ast_csg_union(), comment_skipper> csg_union_rule;
   qi::rule<it, ast_quad(), comment_skipper> quad_rule;
   qi::rule<it, ast_plane(), comment_skipper> plane_rule;
   qi::rule<it, ast_obj(), comment_skipper> obj_rule;

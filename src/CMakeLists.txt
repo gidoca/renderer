@@ -15,7 +15,7 @@ set(renderingproject_SRCS camera.cpp plane.cpp sphere.cpp intersectable.cpp
   axisalignedbox.cpp
   sampler.cpp jitteredsampler.cpp arealight.cpp
   simpleintegrator.cpp unidipathtracingintegrator.cpp bidipathtracingintegrator.cpp
-  quad.cpp csgobject.cpp csgintersection.cpp bvh.cpp
+  quad.cpp csgobject.cpp csgoperation.cpp bvh.cpp
   renderer.cpp perpixelrenderer.cpp metropolisrenderer.cpp metropolisfltrenderer.cpp
   tonemapper.cpp
   symmetricfilter.cpp

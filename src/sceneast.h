@@ -173,7 +173,8 @@ struct ast_matrix
 typedef boost::variant<
     ast_box,
     ast_sphere,
-    boost::recursive_wrapper<ast_csg_isect>
+    boost::recursive_wrapper<ast_csg_isect>,
+    boost::recursive_wrapper<ast_csg_union>
     > ast_csg;
 
 typedef boost::variant<
@@ -259,6 +260,14 @@ struct ast_bvh_node
 };
 
 struct ast_csg_isect
+{
+    ast_csg left;
+    ast_csg right;
+
+    static const std::string function_name;
+};
+
+struct ast_csg_union
 {
     ast_csg left;
     ast_csg right;
@@ -385,6 +394,12 @@ BOOST_FUSION_ADAPT_STRUCT(
 
 BOOST_FUSION_ADAPT_STRUCT(
     ast_csg_isect,
+    (ast_csg, left)
+    (ast_csg, right)
+)
+
+BOOST_FUSION_ADAPT_STRUCT(
+    ast_csg_union,
     (ast_csg, left)
     (ast_csg, right)
 )

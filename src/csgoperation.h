@@ -18,23 +18,23 @@
  * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
  * USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-#ifndef CSGINTERSECTION_H
-#define CSGINTERSECTION_H
+#ifndef CSGOPERATION_H
+#define CSGOPERATION_H
 
 #include "global.h"
 #include "csgobject.h"
 
-class CSGIntersection : public CSGObject
+class CSGOperation : public CSGObject
 {
 public:
-  CSGIntersection(CSGObject* left, CSGObject* right) : left(left), right(right) {}
+  CSGOperation(CSGObject* left, CSGObject* right) : left(left), right(right) {}
 
   std::list<IntersectionParameter> getCSGIntersection(Ray ray) const;
 
 protected:
   const AxisAlignedBox * createBoundingBox();
 
-  bool isInside(bool leftInside, bool rightInside) const;
+  virtual bool isInside(bool leftInside, bool rightInside) const = 0;
 
 private:
   void processIntersection(bool & leftInside, bool & rightInside, bool & currentInside, std::list<IntersectionParameter> & result, std::list<IntersectionParameter>::iterator & currentIntersection) const;
@@ -42,4 +42,22 @@ private:
   CSGObject *left, *right;
 };
 
-#endif // CSGINTERSECTION_H
+class CSGIntersection : public CSGOperation
+{
+public:
+    CSGIntersection(CSGObject* left, CSGObject* right) : CSGOperation(left, right) {}
+
+protected:
+    bool isInside(bool leftInside, bool rightInside) const;
+};
+
+class CSGUnion : public CSGOperation
+{
+public:
+    CSGUnion(CSGObject* left, CSGObject* right) : CSGOperation(left, right) {}
+
+protected:
+    bool isInside(bool leftInside, bool rightInside) const;
+};
+
+#endif // CSGOPERATION_H

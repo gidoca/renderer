@@ -18,13 +18,13 @@
  * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
  * USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-#include "csgintersection.h"
+#include "csgoperation.h"
 
 #include "axisalignedbox.h"
 
 #include <algorithm>
 
-void CSGIntersection::processIntersection(bool & leftInside, bool & rightInside, bool & currentInside, std::list<IntersectionParameter> & result, std::list<IntersectionParameter>::iterator & currentIntersection) const
+void CSGOperation::processIntersection(bool & leftInside, bool & rightInside, bool & currentInside, std::list<IntersectionParameter> & result, std::list<IntersectionParameter>::iterator & currentIntersection) const
 {
     bool wasInside = isInside(leftInside, rightInside);
     currentInside = !currentInside;
@@ -36,7 +36,7 @@ void CSGIntersection::processIntersection(bool & leftInside, bool & rightInside,
     currentIntersection++;
 }
 
-std::list<IntersectionParameter> CSGIntersection::getCSGIntersection( Ray ray ) const
+std::list<IntersectionParameter> CSGOperation::getCSGIntersection( Ray ray ) const
 {
     bool leftInside = false, rightInside = false;
     std::list<IntersectionParameter> leftIntersection = left->getCSGIntersection ( ray );
@@ -47,9 +47,9 @@ std::list<IntersectionParameter> CSGIntersection::getCSGIntersection( Ray ray ) 
     std::list<IntersectionParameter>::iterator leftIterator = leftIntersection.begin();
     std::list<IntersectionParameter>::iterator rightIterator = rightIntersection.begin();
 
-    while ( leftIterator != leftIntersection.end() && rightIterator != rightIntersection.end() )
+    while ( leftIterator != leftIntersection.end() || rightIterator != rightIntersection.end() )
     {
-        if ( leftIterator->t <= rightIterator->t )
+        if(leftIterator != leftIntersection.end() && (rightIterator == rightIntersection.end() || leftIterator->t <= rightIterator->t))
         {
             processIntersection(leftInside, rightInside, leftInside, result, leftIterator);
         }
@@ -62,12 +62,7 @@ std::list<IntersectionParameter> CSGIntersection::getCSGIntersection( Ray ray ) 
     return result;
 }
 
-bool CSGIntersection::isInside(bool leftInside, bool rightInside) const
-{
-    return leftInside && rightInside;
-}
-
-const AxisAlignedBox * CSGIntersection::createBoundingBox()
+const AxisAlignedBox * CSGOperation::createBoundingBox()
 {
     const AxisAlignedBox * leftBB = left->boundingBox();
     const AxisAlignedBox * rightBB = right->boundingBox();
@@ -79,5 +74,15 @@ const AxisAlignedBox * CSGIntersection::createBoundingBox()
                     std::min ( leftBB->getMax().z(), rightBB->getMax().z() ) );
     AxisAlignedBox * result = new AxisAlignedBox ( min, max );
     return result;
+}
+
+bool CSGIntersection::isInside(bool leftInside, bool rightInside) const
+{
+    return leftInside && rightInside;
+}
+
+bool CSGUnion::isInside(bool leftInside, bool rightInside) const
+{
+    return leftInside || rightInside;
 }
 
