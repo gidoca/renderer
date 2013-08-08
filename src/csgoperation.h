@@ -54,5 +54,6 @@ protected: \
 CSG_OPERATION(CSGIntersection)
 CSG_OPERATION(CSGUnion)
 CSG_OPERATION(CSGDifference)
+CSG_OPERATION(CSGXor)
 
 #endif // CSGOPERATION_H

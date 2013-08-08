@@ -82,6 +82,7 @@ const std::string ast_bvh_node::function_name = "b";
 const std::string ast_csg_isect::function_name = "isect";
 const std::string ast_csg_union::function_name = "union";
 const std::string ast_csg_difference::function_name = "diff";
+const std::string ast_csg_xor::function_name = "xor";
 const std::string ast_camera::function_name = "camera";
 const std::string ast_point_light::function_name = "pointlight";
 const std::string ast_area_light::function_name = "srealight";
@@ -421,6 +422,7 @@ struct csg_builder : boost::static_visitor<CSGObject*>
     CSGIntersection* operator()(const ast_csg_isect& c);
     CSGUnion* operator()(const ast_csg_union& c);
     CSGDifference* operator()(const ast_csg_difference& c);
+    CSGXor* operator()(const ast_csg_xor& c);
 
 private:
     ast_mat_map &ast_materials;
@@ -443,6 +445,11 @@ CSGUnion* csg_builder::operator ()(const ast_csg_union& c)
 CSGDifference* csg_builder::operator ()(const ast_csg_difference& c)
 {
     return new CSGDifference(boost::apply_visitor(*this, c.left), boost::apply_visitor(*this, c.right));
+}
+
+CSGXor* csg_builder::operator ()(const ast_csg_xor& c)
+{
+    return new CSGXor(boost::apply_visitor(*this, c.left), boost::apply_visitor(*this, c.right));
 }
 
 struct intersectable_builder : boost::static_visitor<Intersectable*>

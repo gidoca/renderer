@@ -50,7 +50,7 @@ SceneGrammar::SceneGrammar() : SceneGrammar::base_type(assignments_rule, "inters
   sphere_rule.name("sphere");
   box_rule %= boost::spirit::lit("box") >> "(" >> vector3_literal_rule >> "," >> vector3_literal_rule >> "," >> material_rule >> ")";
   box_rule.name("box");
-  csg_rule %= csg_isect_rule | csg_union_rule | csg_difference_rule | sphere_rule | box_rule;
+  csg_rule %= csg_isect_rule | csg_union_rule | csg_difference_rule | csg_xor_rule | sphere_rule | box_rule;
   csg_rule.name("csg");
   csg_isect_rule %= boost::spirit::lit("isect") >> "(" >> csg_rule >> "," >> csg_rule >> ")";
   csg_isect_rule.name("csg intersection");
@@ -58,6 +58,8 @@ SceneGrammar::SceneGrammar() : SceneGrammar::base_type(assignments_rule, "inters
   csg_union_rule.name("csg union");
   csg_difference_rule %= boost::spirit::lit("diff") >> "(" >> csg_rule >> "," >> csg_rule >> ")";
   csg_difference_rule.name("csg difference");
+  csg_xor_rule %= boost::spirit::lit("xor") >> "(" >> csg_rule >> "," >> csg_rule >> ")";
+  csg_xor_rule.name("csg xor");
   quad_rule %= boost::spirit::lit("quad") >> "(" >> vector3_literal_rule >> "," >> vector3_literal_rule >> "," >> vector3_literal_rule >> "," >> vector3_literal_rule >> "," >> material_rule >> ")";
   quad_rule.name("quad");
   plane_rule %= boost::spirit::lit("plane") >> "(" >> vector4_literal_rule >> "," >> material_rule >> ")";

@@ -91,3 +91,7 @@ bool CSGDifference::isInside(bool leftInside, bool rightInside) const
     return leftInside && !rightInside;
 }
 
+bool CSGXor::isInside(bool leftInside, bool rightInside) const
+{
+    return (!leftInside && rightInside) || (leftInside && !rightInside);
+}
