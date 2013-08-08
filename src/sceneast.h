@@ -260,27 +260,24 @@ struct ast_bvh_node
     static const std::string function_name;
 };
 
-struct ast_csg_isect
+struct ast_csg_operation
 {
     ast_csg left;
     ast_csg right;
+};
 
+struct ast_csg_isect : ast_csg_operation
+{
     static const std::string function_name;
 };
 
-struct ast_csg_union
+struct ast_csg_union : ast_csg_operation
 {
-    ast_csg left;
-    ast_csg right;
-
     static const std::string function_name;
 };
 
-struct ast_csg_difference
+struct ast_csg_difference : ast_csg_operation
 {
-    ast_csg left;
-    ast_csg right;
-
     static const std::string function_name;
 };
 

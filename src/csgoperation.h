@@ -42,31 +42,17 @@ private:
   CSGObject *left, *right;
 };
 
-class CSGIntersection : public CSGOperation
-{
-public:
-    CSGIntersection(CSGObject* left, CSGObject* right) : CSGOperation(left, right) {}
-
-protected:
-    bool isInside(bool leftInside, bool rightInside) const;
+#define CSG_OPERATION(name) \
+class name : public CSGOperation \
+{ \
+public: \
+    name(CSGObject* left, CSGObject* right) : CSGOperation(left, right) {} \
+protected: \
+    bool isInside(bool leftInside, bool rightInside) const; \
 };
 
-class CSGUnion : public CSGOperation
-{
-public:
-    CSGUnion(CSGObject* left, CSGObject* right) : CSGOperation(left, right) {}
-
-protected:
-    bool isInside(bool leftInside, bool rightInside) const;
-};
-
-class CSGDifference : public CSGOperation
-{
-public:
-    CSGDifference(CSGObject* left, CSGObject* right) : CSGOperation(left, right) {}
-
-protected:
-    bool isInside(bool leftInside, bool rightInside) const;
-};
+CSG_OPERATION(CSGIntersection)
+CSG_OPERATION(CSGUnion)
+CSG_OPERATION(CSGDifference)
 
 #endif // CSGOPERATION_H
