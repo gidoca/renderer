@@ -28,7 +28,9 @@ using namespace cv;
 
 inline int Tonemapper::clamp(float x)
 {
-  return x <= 0 ? 0 : (x >= 255 ? 255 : x);
+  return x <= 0   ? 0 :
+         x >= 255 ? 255 :
+                    x;
 }
 
 QImage Tonemapper::tonemap(const cv::Mat film)

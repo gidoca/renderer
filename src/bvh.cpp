@@ -75,7 +75,9 @@ Intersectable* BVHNode::create(IntersectableList* list)
   
   const AxisAlignedBox * bb = list->boundingBox();
   QVector3D diff = bb->getMax() - bb->getMin();
-  int splitAxis = (diff.x() > diff.y() && diff.x() > diff.z() ? 0 : (diff.y() > diff.z() ? 1 : 2));
+  int splitAxis = diff.x() > diff.y() && diff.x() > diff.z() ? 0 :
+                  diff.y() > diff.z()                        ? 1 :
+                                                               2;
   IntersectableComparator comparator(splitAxis);
   sort(intersectables.begin(), intersectables.end(), comparator);
   
@@ -98,7 +100,9 @@ ast_intersectable BVHNode::create(ast_intersectable_list list)
 
     const AxisAlignedBox * bb = getBoundingBoxFromAst(list);
     QVector3D diff = bb->getMax() - bb->getMin();
-    int splitAxis = (diff.x() > diff.y() && diff.x() > diff.z() ? 0 : (diff.y() > diff.z() ? 1 : 2));
+    int splitAxis = diff.x() > diff.y() && diff.x() > diff.z() ? 0 :
+                    diff.y() > diff.z()                        ? 1 :
+                                                                 2;
     IntersectableComparator comparator(splitAxis);
     sort(intersectables.begin(), intersectables.end(), comparator);
 

@@ -39,7 +39,6 @@ inline cv::Vec3f getColorSubpix(const cv::Mat& img, cv::Point2f pt)
 
 inline float clamp(float x)
 {
-//    float f = x <= 0 ? 0 : (x >= 1 ? 1 : x);
     float f = fmod(x, 1.d);
     if(f < 0) f += 1;
     assert(f >= 0 && f <= 1);
