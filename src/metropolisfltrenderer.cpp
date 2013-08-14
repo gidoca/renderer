@@ -243,7 +243,7 @@ void MetropolisFltRenderer::render()
   {
     if(vm.count("verbose"))
     {
-        cerr << time.elapsed() / 1000 << "s elapsed, starting rendering pass " << i << "/" << (numPasses - 1) << endl;
+        cerr << time.elapsed() / 1000 << "s elapsed, starting rendering pass " << i + 1 << "/" << numPasses << endl;
     }
 
     Mat importanceMap;
@@ -261,7 +261,7 @@ void MetropolisFltRenderer::render()
     renderStep(film->size(), scene, importanceMap, films, biased_var, biased_mean, biased_m2, sumweight, seed + i, i == 0);
     if(vm.count("verbose"))
     {
-      cerr << time.elapsed() / 1000 << "s elapsed, starting filtering pass " << i << "/" << (numPasses - 1) << endl;
+      cerr << time.elapsed() / 1000 << "s elapsed, starting filtering pass " << i + 1 << "/" << numPasses << endl;
     }
     var(newOut, noisy_variance, films);
     var(meanvar, varvar, biased_var);

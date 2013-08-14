@@ -33,6 +33,7 @@ class CSGUnion;
 class CSGDifference;
 class CSGOperation;
 class CSGObject;
+class CSGXor;
 class DarkMatter;
 class DiffuseMaterial;
 class EnergyRedistributionRenderer;

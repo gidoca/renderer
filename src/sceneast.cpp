@@ -682,7 +682,7 @@ Scene buildScene(vector<ast_assignment> assignments)
   scene_builder builder;
   BOOST_FOREACH(ast_assignment & assignment, assignments)
   {
-      /*if(assignment.name == "camera" || assignment.name == "lights" || assignment.name == "intersectable")*/ builder.addAssignment(assignment);
+      builder.addAssignment(assignment);
   }
   return builder.getScene();
 }

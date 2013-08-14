@@ -53,7 +53,6 @@ void Win::saveImage()
   QString filename = QFileDialog::getSaveFileName(this, "Save image as",  QString(), formatString);
   if(filename.isNull()) return;
 
-  Tonemapper tonemapper(QSize(film.size().width, film.size().height));
   QImage image = tonemapper.tonemap(film);
   image.save(filename);
 }

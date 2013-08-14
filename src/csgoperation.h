@@ -49,11 +49,11 @@ public: \
     name(CSGObject* left, CSGObject* right) : CSGOperation(left, right) {} \
 protected: \
     bool isInside(bool leftInside, bool rightInside) const; \
-};
+}
 
-CSG_OPERATION(CSGIntersection)
-CSG_OPERATION(CSGUnion)
-CSG_OPERATION(CSGDifference)
-CSG_OPERATION(CSGXor)
+CSG_OPERATION(CSGIntersection);
+CSG_OPERATION(CSGUnion);
+CSG_OPERATION(CSGDifference);
+CSG_OPERATION(CSGXor);
 
 #endif // CSGOPERATION_H
