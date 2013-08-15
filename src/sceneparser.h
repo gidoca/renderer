@@ -100,6 +100,7 @@ private:
   qi::rule<it, ast_phong_material(), comment_skipper> phong_material_rule;
   qi::rule<it, ast_mirror_material(), comment_skipper> mirror_material_rule;
   qi::rule<it, ast_texture_material(), comment_skipper> texture_material_rule;
+  qi::rule<it, ast_scaled_texture_material(), comment_skipper> scaled_texture_material_rule;
   qi::rule<it, ast_refractive_material(), comment_skipper> refractive_material_rule;
   qi::rule<it, ast_literal_material(), comment_skipper> material_literal_rule;
   qi::rule<it, ast_material(), comment_skipper> material_rule;

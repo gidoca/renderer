@@ -63,7 +63,9 @@ bool TextureMaterial::load(std::string filename)
 
 cv::Vec3f TextureMaterial::shade(const HitRecord & hit, QVector3D) const
 {
-    return get(hit.getTexCoords()) * (1. / M_PI);
+    Vec3f gammaCorrected;
+    pow(get(hit.getTexCoords()), gamma, gammaCorrected);
+    return gammaCorrected * (1. / M_PI);
 }
 
 cv::Vec3f TextureMaterial::get(Point2f location) const

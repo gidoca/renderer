@@ -33,7 +33,7 @@
 class TextureMaterial : public Material
 {
 public:
-    TextureMaterial(cv::Vec3f coefficient = cv::Vec3f(1, 1, 1)) : coefficient(coefficient) {}
+    TextureMaterial(cv::Vec3f coefficient = cv::Vec3f(1, 1, 1), float gamma = 1) : coefficient(coefficient), gamma(gamma) {}
     virtual ~TextureMaterial() {}
 
     bool load(std::string filename);
@@ -49,6 +49,7 @@ private:
 
     cv::Mat texture;
     cv::Vec3f coefficient;
+    float gamma;
 };
 
 #endif // TEXTUREMATERIAL_H

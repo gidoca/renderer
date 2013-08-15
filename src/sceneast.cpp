@@ -66,6 +66,7 @@ const std::string ast_diffuse_material::function_name = "diffuse";
 const std::string ast_phong_material::function_name = "phong";
 const std::string ast_mirror_material::function_name = "mirror";
 const std::string ast_texture_material::function_name = "texture";
+const std::string ast_scaled_texture_material::function_name = "texture";
 const std::string ast_refractive_material::function_name = "refractive";
 const std::string ast_matrix_translate::function_name = "translate";
 const std::string ast_matrix_rotate::function_name = "rotate";
@@ -325,7 +326,18 @@ struct material_builder : boost::static_visitor<Material*>
 
   Material* operator()(ast_texture_material material) const
   {
-    TextureMaterial* out = new TextureMaterial(material.coefficient.asSpectrum());
+      TextureMaterial* out = new TextureMaterial();
+      if(!out->load(material.filename))
+      {
+          delete out;
+          return DarkMatter::getInstance();
+      }
+      return out;
+  }
+
+  Material* operator()(ast_scaled_texture_material material) const
+  {
+    TextureMaterial* out = new TextureMaterial(material.coefficient.asSpectrum(), material.gamma);
     if(!out->load(material.filename))
     {
         delete out;

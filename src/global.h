@@ -75,6 +75,7 @@ struct ast_vector4_literal;
 struct ast_diffuse_material;
 struct ast_phong_material;
 struct ast_texture_material;
+struct ast_scaled_texture_material;
 struct ast_refractive_material;
 struct ast_mirror_material;
 struct ast_matrix_literal;

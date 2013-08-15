@@ -87,15 +87,23 @@ struct ast_mirror_material
 
 struct ast_texture_material
 {
-    ast_texture_material()
+    std::string filename;
+    static const std::string function_name;
+};
+
+
+struct ast_scaled_texture_material : ast_texture_material
+{
+    ast_scaled_texture_material()
     {
         coefficient.x = 1;
         coefficient.y = 1;
         coefficient.z = 1;
+        gamma = 1;
     }
 
-    std::string filename;
     ast_vector3_literal coefficient;
+    float gamma;
 
     static const std::string function_name;
 };
@@ -504,6 +512,13 @@ BOOST_FUSION_ADAPT_STRUCT(
 BOOST_FUSION_ADAPT_STRUCT(
     ast_texture_material,
     (std::string, filename)
+)
+
+BOOST_FUSION_ADAPT_STRUCT(
+    ast_scaled_texture_material,
+    (std::string, filename)
+    (ast_vector3_literal, coefficient)
+    (float, gamma)
 )
 
 BOOST_FUSION_ADAPT_STRUCT(

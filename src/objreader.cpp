@@ -260,7 +260,7 @@ void ObjReader::createMaterial(const ObjMaterial &material, QDir dir, std::strin
             // This is a fix for broken mtl files that use the Windows path separator convention
             std::string texture_filename = dir.filePath(QString(material.texture_filename.c_str())).toStdString();
             std::replace(texture_filename.begin(), texture_filename.end(), '\\', '/');
-            ast_texture_material texture;
+            ast_scaled_texture_material texture;
             texture.filename = texture_filename;
             if(material.diffuse_color.x != 0 || material.diffuse_color.y != 0 || material.diffuse_color.z != 0)
             {
