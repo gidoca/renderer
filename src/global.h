@@ -59,6 +59,7 @@ class PointLight;
 class Quad;
 class Ray;
 class Renderer;
+class RenderingManager;
 class Sample;
 class Sampler;
 class Scene;

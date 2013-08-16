@@ -27,8 +27,6 @@
 #include <string>
 
 #include <boost/program_options.hpp>
-#include <boost/mpl/list.hpp>
-#include <boost/mpl/for_each.hpp>
 
 #include <opencv2/core/core.hpp>
 
@@ -38,8 +36,6 @@
 #include "sampler.h"
 
 #define MAX_DEPTH 4
-
-typedef boost::mpl::list<MetropolisRenderer, MetropolisFltRenderer, PerPixelRenderer, EnergyRedistributionRenderer> renderers;
 
 class Renderer : public QThread
 {
@@ -58,6 +54,9 @@ public:
   {
       this->vm = vm;
   }
+
+  void prepareRenderingScene(Scene scene);
+  void stopRendering();
   
   static boost::program_options::options_description options();
 
@@ -82,7 +81,5 @@ protected:
   cv::Mat * film;
   boost::program_options::variables_map vm;
 };
-
-Renderer *getRendererByName(std::string name);
 
 #endif // RENDERER_H

@@ -46,6 +46,7 @@
 #include "win.h"
 #include "sceneparser.h"
 #include "scenedumper.h"
+#include "renderingmanager.h"
 
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
@@ -94,7 +95,7 @@ int main(int argc, char **argv) {
   command_line_options.add(image);
 
   //Yay, metaprogramming - because we can!
-  boost::mpl::for_each<renderers>(option_adder(&command_line_options));
+  boost::mpl::for_each<Renderers>(option_adder(&command_line_options));
 
   variables_map vm;
   try
@@ -158,7 +159,8 @@ int main(int argc, char **argv) {
 
   cv::Mat * film = new cv::Mat(scene.camera.getResolution().height(), scene.camera.getResolution().width(), CV_32FC3);
 
-  Renderer * renderer = getRendererByName(vm["renderer"].as<string>());
+  RenderingManager manager;
+  Renderer * renderer = manager.getRenderer(vm["renderer"].as<string>());
   if(renderer == nullptr)
   {
     cerr << "Unknown renderer: " << vm["renderer"].as<string>() << endl;

@@ -44,28 +44,6 @@
 
 using namespace std;
 
-struct initializer
-{
-  Renderer **renderer;
-  std::string name;
-  initializer(Renderer **renderer, std::string name) : renderer(renderer), name(name) {}
-
-  template< typename R > void operator()(R)
-  {
-    if(name == R::name && *renderer == nullptr)
-    {
-      *renderer = new R();
-    }
-  }
-};
-
-Renderer *getRendererByName(string name)
-{
-  Renderer * renderer = nullptr;
-  boost::mpl::for_each<renderers>(initializer(&renderer, name));
-  return renderer;
-}
-
 Path Renderer::createPath(const Ray &primaryRay, const Intersectable &scene, gsl_rng *rng, cv::Vec3f initialAlpha, float terminationProb)
 {
     JitteredSampler sampler(1, 1, rng);
@@ -146,13 +124,23 @@ unsigned long Renderer::getSeed(boost::program_options::variables_map vm)
   }
 }
 
-void Renderer::startRendering(Scene scene)
+void Renderer::stopRendering()
 {
     doStop = true;
     wait();
+}
+
+void Renderer::prepareRenderingScene(Scene scene)
+{
+    stopRendering();
     doStop = false;
     this->scene = scene;
     film->setTo(cv::Vec3f(0, 0, 0));
+}
+
+void Renderer::startRendering(Scene scene)
+{
+    prepareRenderingScene(scene);
     Q_EMIT startingRendering();
     start();
 }

@@ -17,6 +17,7 @@ set(renderingproject_SRCS camera.cpp plane.cpp sphere.cpp intersectable.cpp
   simpleintegrator.cpp unidipathtracingintegrator.cpp bidipathtracingintegrator.cpp
   quad.cpp csgobject.cpp csgoperation.cpp bvh.cpp
   renderer.cpp perpixelrenderer.cpp metropolisrenderer.cpp metropolisfltrenderer.cpp
+  renderingmanager.cpp
   tonemapper.cpp
   symmetricfilter.cpp
   win.cpp energyredistributionrenderer.cpp metropolissample.cpp
