@@ -23,7 +23,6 @@ class RenderingManager : public QObject
 public:
     RenderingManager(cv::Mat * film, const boost::program_options::variables_map vm);
 
-    Renderer* getRenderer(std::string name);
     void setCurrentRenderer(std::string name);
 
 public Q_SLOTS:

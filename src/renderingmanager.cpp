@@ -24,20 +24,21 @@ RenderingManager::RenderingManager(cv::Mat *film, const boost::program_options::
 {
     initializer init(renderers, film, vm);
     boost::mpl::for_each<Renderers>(init);
+    currentRenderer = nullptr;
 }
 
 void RenderingManager::setCurrentRenderer(std::string name)
 {
-    disconnect(currentRenderer);
+    if(currentRenderer != nullptr)
+    {
+        currentRenderer->stopRendering();
+        disconnect(currentRenderer);
+    }
+
     currentRenderer = renderers[name];
     connect(currentRenderer, &Renderer::finishedRendering, [=](){
         Q_EMIT finishedRendering();
     });
-}
-
-Renderer* RenderingManager::getRenderer(std::string name)
-{
-    return renderers[name];
 }
 
 void RenderingManager::startRendering(Scene scene)
