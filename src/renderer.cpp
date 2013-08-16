@@ -138,13 +138,6 @@ void Renderer::prepareRenderingScene(Scene scene)
     film->setTo(cv::Vec3f(0, 0, 0));
 }
 
-void Renderer::startRendering(Scene scene)
-{
-    prepareRenderingScene(scene);
-    Q_EMIT startingRendering();
-    start();
-}
-
 void Renderer::run()
 {
     if(doStop) return;

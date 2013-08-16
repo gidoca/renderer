@@ -159,20 +159,12 @@ int main(int argc, char **argv) {
 
   cv::Mat * film = new cv::Mat(scene.camera.getResolution().height(), scene.camera.getResolution().width(), CV_32FC3);
 
-  RenderingManager manager;
-  Renderer * renderer = manager.getRenderer(vm["renderer"].as<string>());
-  if(renderer == nullptr)
-  {
-    cerr << "Unknown renderer: " << vm["renderer"].as<string>() << endl;
-    return -1;
-  }
-
-  renderer->setOutput(film);
-  renderer->setOptions(vm);
+  RenderingManager manager(film, vm);
+  manager.setCurrentRenderer(vm["renderer"].as<string>());
 
   if(vm.count("verbose"))
   {
-      QObject::connect(renderer, &Renderer::finishedRendering, [=](){
+      QObject::connect(&manager, &RenderingManager::finishedRendering, [=](){
           cerr << "Rendering complete, " << time.elapsed() / 1000 << "s elapsed." << endl;
       });
   }
@@ -181,22 +173,22 @@ int main(int argc, char **argv) {
 
   if(hasGui)
   {
-    QObject::connect(renderer, &Renderer::finishedRendering, &l, &Win::complete, Qt::QueuedConnection);
-    QObject::connect(renderer, &Renderer::startingRendering, &l, &Win::starting, Qt::QueuedConnection);
-    QObject::connect(&l, &Win::rerender, renderer, &Renderer::startRendering);
+    QObject::connect(&manager, &RenderingManager::finishedRendering, &l, &Win::complete, Qt::QueuedConnection);
+    QObject::connect(&manager, &RenderingManager::startingRendering, &l, &Win::starting, Qt::QueuedConnection);
+    QObject::connect(&l, &Win::rerender, &manager, &RenderingManager::startRendering);
     l.show();
   }
 
   if(vm.count("save-exr"))
   {
-      QObject::connect(renderer, &Renderer::finishedRendering, [=](){
+      QObject::connect(&manager, &RenderingManager::finishedRendering, [=](){
           imwrite(vm["save-exr"].as<string>(), *film);
       });
   }
 
   if(vm.count("save-img"))
   {
-      QObject::connect(renderer, &Renderer::finishedRendering, [=]() mutable {
+      QObject::connect(&manager, &RenderingManager::finishedRendering, [=]() mutable {
           QImage img = tm.tonemap(*film);
           img.save(QString::fromStdString(vm["save-img"].as<string>()));
       });
@@ -204,10 +196,10 @@ int main(int argc, char **argv) {
 
   if(saveToFile && !hasGui)
   {
-      QObject::connect(renderer, &Renderer::finishedRendering, &QApplication::quit);
+      QObject::connect(&manager, &RenderingManager::finishedRendering, &QApplication::quit);
   }
 
-  renderer->startRendering(scene);
+  manager.startRendering(scene);
 
   return app.exec();
 }

@@ -63,11 +63,7 @@ public:
   static Path createPath(const Ray & primaryRay, const Intersectable & scene, gsl_rng *rng, cv::Vec3f initialAlpha = cv::Vec3f(1, 1, 1), float terminationProb = 0.f);
   static Path createPath(const Ray & primaryRay, const Intersectable & scene, Sample pathSamples[], cv::Vec3f initialAlpha = cv::Vec3f(1, 1, 1), int pathLength = MAX_DEPTH, float russianRoulettePdf = 1);
 
-public Q_SLOTS:
-  void startRendering(Scene scene);
-
 Q_SIGNALS:
-  void startingRendering();
   void finishedRendering();
 
 protected:
