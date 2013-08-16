@@ -27,8 +27,10 @@
 
 #include <opencv2/highgui/highgui.hpp>
 
-using namespace cv;
 #include <iostream>
+
+using namespace cv;
+
 void Win::update()
 {
     QImage image = tonemapper.tonemap(film);
@@ -178,6 +180,6 @@ void Win::starting()
 void Win::complete()
 {
     timer.stop();
-    update();
     setWindowTitle("Rendering complete.");
+    update();
 }
