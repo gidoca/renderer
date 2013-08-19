@@ -20,11 +20,10 @@ struct initializer
   }
 };
 
-RenderingManager::RenderingManager(cv::Mat *film, const boost::program_options::variables_map vm)
+RenderingManager::RenderingManager(cv::Mat *film, const boost::program_options::variables_map vm) : currentRenderer(nullptr)
 {
     initializer init(renderers, film, vm);
     boost::mpl::for_each<Renderers>(init);
-    currentRenderer = nullptr;
 }
 
 void RenderingManager::setCurrentRenderer(std::string name)
@@ -36,6 +35,10 @@ void RenderingManager::setCurrentRenderer(std::string name)
     }
 
     currentRenderer = renderers[name];
+    if(currentRenderer == nullptr)
+    {
+        throw "Renderer named " + name + " does not exist";
+    }
     connect(currentRenderer, &Renderer::finishedRendering, [=](){
         Q_EMIT finishedRendering();
     });
@@ -43,6 +46,7 @@ void RenderingManager::setCurrentRenderer(std::string name)
 
 void RenderingManager::startRendering(Scene scene)
 {
+    assert(currentRenderer != nullptr);
     currentRenderer->prepareRenderingScene(scene);
     Q_EMIT startingRendering();
     currentRenderer->start();

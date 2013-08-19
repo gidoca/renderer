@@ -59,6 +59,7 @@ private Q_SLOTS:
 
 Q_SIGNALS:
   void rerender(Scene scene);
+  void changeRenderer(std::string name);
 
 protected:
   void keyReleaseEvent(QKeyEvent * event);

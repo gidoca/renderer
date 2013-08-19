@@ -77,13 +77,13 @@ void Win::init()
 
     setContextMenuPolicy(Qt::ActionsContextMenu);
 
-    QAction *saveAct = new QAction("Save image as...", this);
-    connect(saveAct, SIGNAL(triggered()), this, SLOT(saveImage()));
-    insertAction(0, saveAct);
+    QAction *act = new QAction("Save image as...", this);
+    connect(act, SIGNAL(triggered()), this, SLOT(saveImage()));
+    addAction(act);
 
-    saveAct = new QAction("Save image as EXR...", this);
-    connect(saveAct, SIGNAL(triggered()), this, SLOT(saveExr()));
-    insertAction(0, saveAct);
+    act = new QAction("Save image as EXR...", this);
+    connect(act, SIGNAL(triggered()), this, SLOT(saveExr()));
+    addAction(act);
 
     setWindowTitle("Idle");
     setFixedSize(QSize(film.size().width, film.size().height));

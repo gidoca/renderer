@@ -102,7 +102,7 @@ int main(int argc, char **argv) {
   {
     store(parse_command_line(argc, argv, command_line_options), vm);
   }
-  catch(boost::program_options::error e)
+  catch(boost::program_options::error& e)
   {
     std::cerr << e.what() << endl;
     return -1;
@@ -160,7 +160,15 @@ int main(int argc, char **argv) {
   cv::Mat * film = new cv::Mat(scene.camera.getResolution().height(), scene.camera.getResolution().width(), CV_32FC3);
 
   RenderingManager manager(film, vm);
-  manager.setCurrentRenderer(vm["renderer"].as<string>());
+  try
+  {
+      manager.setCurrentRenderer(vm["renderer"].as<string>());
+  }
+  catch(std::string& error)
+  {
+      cerr << "Error: " << error << endl;
+      return -1;
+  }
 
   if(vm.count("verbose"))
   {
