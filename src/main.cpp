@@ -184,6 +184,10 @@ int main(int argc, char **argv) {
     QObject::connect(&manager, &RenderingManager::finishedRendering, &l, &Win::complete, Qt::QueuedConnection);
     QObject::connect(&manager, &RenderingManager::startingRendering, &l, &Win::starting, Qt::QueuedConnection);
     QObject::connect(&l, &Win::rerender, &manager, &RenderingManager::startRendering);
+    QObject::connect(&l, &Win::changeRenderer, [&](std::string name) mutable {
+        manager.setCurrentRenderer(name);
+        manager.startRendering(scene);
+    });
     l.show();
   }
 

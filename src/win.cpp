@@ -20,6 +20,12 @@
  */
 #include "win.h"
 
+#include "renderingmanager.h"
+#include "metropolisfltrenderer.h"
+#include "metropolisrenderer.h"
+#include "perpixelrenderer.h"
+#include "energyredistributionrenderer.h"
+
 #include <QImage>
 #include <QFileDialog>
 #include <QImageWriter>
@@ -27,7 +33,10 @@
 
 #include <opencv2/highgui/highgui.hpp>
 
+#include <boost/mpl/for_each.hpp>
+
 #include <iostream>
+#include <functional>
 
 using namespace cv;
 
@@ -69,6 +78,19 @@ void Win::saveExr()
   imwrite(filename.toStdString(), film);
 }
 
+struct renderer_adder
+{
+    std::function< void(std::string) > f;
+
+    renderer_adder(std::function< void(std::string) > f) : f(f) {}
+
+    template< typename T >
+    void operator()(T)
+    {
+        f(T::name);
+    }
+};
+
 void Win::init()
 {
     update();
@@ -84,6 +106,19 @@ void Win::init()
     act = new QAction("Save image as EXR...", this);
     connect(act, SIGNAL(triggered()), this, SLOT(saveExr()));
     addAction(act);
+
+    act = new QAction(this);
+    act->setSeparator(true);
+    addAction(act);
+
+    renderer_adder adder([=](std::string name) mutable {
+            QAction* action = new QAction(QString::fromStdString(name), this);
+            connect(action, &QAction::triggered, [=](){
+                Q_EMIT changeRenderer(name);
+            });
+            addAction(action);
+        });
+    boost::mpl::for_each< Renderers >(adder);
 
     setWindowTitle("Idle");
     setFixedSize(QSize(film.size().width, film.size().height));
