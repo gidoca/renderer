@@ -22,6 +22,15 @@
 
 #include <cmath>
 
+#define PRINT_CAM_ARG(arg, stream) \
+    stream << "[";\
+    stream << camera.arg().x();\
+    stream << " ";\
+    stream << camera.arg().y();\
+    stream << " ";\
+    stream << camera.arg().z();\
+    stream << "],"
+
 void Camera::init()
 {
   QVector3D w = (cop - lookAt).normalized();
@@ -51,27 +60,9 @@ Ray Camera::getRay(QPointF point) const
 std::ostream & operator<<(std::ostream & stream, const Camera & camera)
 {
     stream << "camera(";
-    stream << "[";
-    stream << camera.getCOP().x();
-    stream << " ";
-    stream << camera.getCOP().y();
-    stream << " ";
-    stream << camera.getCOP().z();
-    stream << "],";
-    stream << "[";
-    stream << camera.getLookAt().x();
-    stream << " ";
-    stream << camera.getLookAt().y();
-    stream << " ";
-    stream << camera.getLookAt().z();
-    stream << "],";
-    stream << "[";
-    stream << camera.getUp().x();
-    stream << " ";
-    stream << camera.getUp().y();
-    stream << " ";
-    stream << camera.getUp().z();
-    stream << "],";
+    PRINT_CAM_ARG(getCOP, stream);
+    PRINT_CAM_ARG(getLookAt, stream);
+    PRINT_CAM_ARG(getUp, stream);
     stream << camera.getFOV();
     stream << ",";
     stream << camera.getResolution().width();
