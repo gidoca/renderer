@@ -30,6 +30,7 @@
 #include <QFileDialog>
 #include <QImageWriter>
 #include <QKeyEvent>
+#include <QMenu>
 
 #include <opencv2/highgui/highgui.hpp>
 
@@ -107,18 +108,20 @@ void Win::init()
     connect(act, SIGNAL(triggered()), this, SLOT(saveExr()));
     addAction(act);
 
-    act = new QAction(this);
-    act->setSeparator(true);
+    act = new QAction("Renderer", this);
     addAction(act);
+    QMenu* rendererMenu = new QMenu(this);
+    act->setMenu(rendererMenu);
 
     renderer_adder adder([=](std::string name) mutable {
             QAction* action = new QAction(QString::fromStdString(name), this);
             connect(action, &QAction::triggered, [=](){
                 Q_EMIT changeRenderer(name);
             });
-            addAction(action);
+            rendererMenu->addAction(action);
         });
     boost::mpl::for_each< Renderers >(adder);
+
 
     setWindowTitle("Idle");
     setFixedSize(QSize(film.size().width, film.size().height));
