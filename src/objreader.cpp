@@ -95,6 +95,13 @@ inline bool read_index(std::stringstream& str_stream, int& dest, int total_num)
     return true;
 }
 
+std::string sanitizeMaterialName(std::string in)
+{
+    boost::algorithm::to_lower(in);
+    std::replace(in.begin(), in.end(), '-', '_');
+    return in;
+}
+
 bool read_indices(ObjMeshFaceIndex& face_index, int i, std::stringstream& str_stream, int num_positions, int num_texcoords, int num_normals)
 {
     char interrupt;
@@ -204,7 +211,7 @@ ast_intersectable_list ObjReader::load(std::string filename, ast_material defaul
         }else if(type_str == TOKEN_MATERIAL){
             std::string name;
             str_stream >> name;
-            boost::algorithm::to_lower(name);
+            name = sanitizeMaterialName(name);
             currentMaterial = std::vector<char>(name.begin(), name.end());
             if(currentMaterial.empty()){
                 std::cerr << "No such material: " << name << std::endl;
@@ -271,8 +278,12 @@ void ObjReader::createMaterial(const ObjMaterial &material, QDir dir, std::strin
             }
             materials[materialName] = texture;
         }
-        else if(material.diffuse_color.x != 0 || material.diffuse_color.y != 0 || material.diffuse_color.z != 0)
+        else
         {
+            if(material.diffuse_color.x == 0 && material.diffuse_color.y == 0 && material.diffuse_color.z == 0)
+            {
+                std::cerr << "Warning: material " << materialName << " is black" << std::endl;
+            }
             if((material.specular_color.x == 0 && material.specular_color.y == 0 && material.specular_color.z == 0) || material.specular_coefficient == 0)
             {
                 ast_diffuse_material diffuse = {material.diffuse_color};
@@ -317,7 +328,7 @@ void ObjReader::getMaterials(std::string filename)
                 currentMaterial = ObjMaterial();
             }
             str_stream >> current_material_name;
-            boost::algorithm::to_lower(current_material_name);
+            current_material_name = sanitizeMaterialName(current_material_name);
         }
         else if(type_str == TOKEN_ILLUMINATION)
         {
