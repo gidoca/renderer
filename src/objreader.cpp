@@ -33,7 +33,7 @@
 #include <map>
 #include <algorithm>
 
-#include <boost/algorithm/string.hpp>
+#include <boost/regex.hpp>
 
 #include <QVector3D>
 #include <QFileInfo>
@@ -97,8 +97,10 @@ inline bool read_index(std::stringstream& str_stream, int& dest, int total_num)
 
 std::string sanitizeMaterialName(std::string in)
 {
-    boost::algorithm::to_lower(in);
-    std::replace(in.begin(), in.end(), '-', '_');
+    boost::regex nonAlpha("[^\\w_]");
+    boost::regex startsWithDigit("^\\d");
+    in = boost::regex_replace(in, nonAlpha, std::string("_"));
+    in = boost::regex_replace(in, startsWithDigit, std::string("_"));
     return in;
 }
 

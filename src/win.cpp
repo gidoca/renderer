@@ -209,6 +209,18 @@ void Win::keyReleaseEvent(QKeyEvent *event)
     Q_EMIT rerender(scene);
 }
 
+void Win::wheelEvent(QWheelEvent *event)
+{
+    event->ignore();
+    int delta = event->angleDelta().ry();
+    if(delta == 0) return;
+    scene.camera.setFOV(pow(1.1, -delta / 120.f) * scene.camera.getFOV());
+
+    std::cerr << scene.camera << std::endl;
+
+    Q_EMIT rerender(scene);
+}
+
 void Win::starting()
 {
     setWindowTitle("Rendering...");

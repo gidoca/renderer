@@ -63,6 +63,7 @@ Q_SIGNALS:
 
 protected:
   void keyReleaseEvent(QKeyEvent * event);
+  void wheelEvent(QWheelEvent * event);
 
 private:
   void init();
