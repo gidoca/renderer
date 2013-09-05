@@ -120,6 +120,7 @@ typedef boost::variant<
     ast_phong_material,
     ast_mirror_material,
     ast_texture_material,
+    ast_scaled_texture_material,
     ast_refractive_material
     > ast_literal_material;
 
