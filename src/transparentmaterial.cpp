@@ -39,6 +39,6 @@ QVector3D TransparentMaterial::outDirection(QVector3D inDirection, QVector3D nor
     }
     else
     {
-        return coefficientRatio * inDirection + signum(cosOutgoingAngle) * (coefficientRatio * cosIncomingAngle - cosOutgoingAngle) * normal;
+        return coefficientRatio * inDirection + (coefficientRatio * cosIncomingAngle - signum(cosIncomingAngle) * cosOutgoingAngle) * normal;
     }
 }

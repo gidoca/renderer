@@ -71,6 +71,8 @@ void PerPixelRenderer::render()
     Vec3f * scanline = film->ptr<Vec3f>(i);
     for(int j = 0; j < film->size().width; j++)
     {
+      if(doStop) continue;
+
       JitteredSampler multiSampler(vm["pt-x-samples"].as<int>(), vm["pt-y-samples"].as<int>(), rng);
       std::list<Sample> samples = multiSampler.getSamples();
       QPointF point = QPoint(j, i);
