@@ -34,7 +34,7 @@ class Material
     virtual bool isMirror() const = 0;
     virtual const TransparentMaterial* refractive() const
     {
-        return 0;
+        return nullptr;
     }
 };
 
