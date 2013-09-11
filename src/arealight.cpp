@@ -23,6 +23,7 @@
 #include "path.h"
 #include "hitrecord.h"
 #include "intersectable.h"
+#include "axisalignedbox.h"
 
 #include <cassert>
 #include <cmath>
@@ -64,4 +65,16 @@ Ray AreaLight::getRandomRay(const Sample &sample1, const Sample &sample2, float 
 QVector3D AreaLight::getLocation(QPointF p) const
 {
   return origin + p.x() * uDirection + p.y() * vDirection;
+}
+
+HitRecord AreaLight::intersect(Ray ray) const
+{
+    //TODO implement
+    return HitRecord();
+}
+
+AxisAlignedBox* AreaLight::createBoundingBox()
+{
+    //TODO implement
+    return new AxisAlignedBox(QVector3D(), QVector3D());
 }

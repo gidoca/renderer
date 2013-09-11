@@ -6,7 +6,7 @@
 
 #include <opencv2/core/core.hpp>
 
-class EnvironmentMap : public Light
+class EnvironmentMap : public Light, public Material
 {
 public:
     EnvironmentMap(cv::Vec3f coefficient);
@@ -16,6 +16,13 @@ public:
 
     cv::Vec3f getIntensity(const HitRecord &hit, QVector3D &direction, const Intersectable &scene, const Sample &sample) const;
     Ray getRandomRay(const Sample &sample1, const Sample &, float &pdf) const;
+
+    HitRecord intersect(Ray ray) const;
+    AxisAlignedBox* createBoundingBox();
+
+    cv::Vec3f get(QVector3D direction) const;
+
+    cv::Vec3f emission(const HitRecord & hit) const;
 
 private:
     cv::Vec3f coefficient;

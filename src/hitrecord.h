@@ -36,8 +36,8 @@ class HitRecord
 
   public:
     HitRecord();
-    HitRecord(float rayParameter, Ray ray, Material* material, QVector3D surfaceNormal);
-    HitRecord(float rayParameter, Ray ray, Material * material, QVector3D surfaceNormal, cv::Point2f texcoords);
+    HitRecord(float rayParameter, Ray ray, const Material* material, QVector3D surfaceNormal);
+    HitRecord(float rayParameter, Ray ray, const Material * material, QVector3D surfaceNormal, cv::Point2f texcoords);
     
     void transform(QMatrix4x4 matrix);
     
@@ -50,7 +50,7 @@ class HitRecord
     cv::Point2f getTexCoords() const;
     
   private:
-    Material* material;
+    const Material* material;
     float rayParameter;
     QVector3D intersectingPoint;
     QVector3D surfaceNormal;
@@ -63,12 +63,12 @@ inline HitRecord::HitRecord() : material(DarkMatter::getInstance()), rayParamete
 }
 
 
-inline HitRecord::HitRecord(float rayParameter, Ray ray, Material * material, QVector3D surfaceNormal)
+inline HitRecord::HitRecord(float rayParameter, Ray ray, const Material * material, QVector3D surfaceNormal)
   : material(material), rayParameter(rayParameter), intersectingPoint(ray.evaluate(rayParameter)), surfaceNormal(surfaceNormal), ray(ray)
 {
 }
 
-inline HitRecord::HitRecord(float rayParameter, Ray ray, Material * material, QVector3D surfaceNormal, cv::Point2f texcoords)
+inline HitRecord::HitRecord(float rayParameter, Ray ray, const Material *material, QVector3D surfaceNormal, cv::Point2f texcoords)
   : material(material), rayParameter(rayParameter), intersectingPoint(ray.evaluate(rayParameter)), surfaceNormal(surfaceNormal), ray(ray), texcoords(texcoords)
 {
 }

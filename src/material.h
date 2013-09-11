@@ -30,11 +30,21 @@
 class Material
 {
   public:
-    virtual cv::Vec3f shade(const HitRecord & hit, QVector3D direction) const = 0;
-    virtual bool isMirror() const = 0;
+    virtual cv::Vec3f shade(const HitRecord & hit, QVector3D direction) const
+    {
+        return cv::Vec3f();
+    }
+    virtual bool isMirror() const
+    {
+        return false;
+    }
     virtual const TransparentMaterial* refractive() const
     {
         return nullptr;
+    }
+    virtual cv::Vec3f emission(const HitRecord &) const
+    {
+        return cv::Vec3f();
     }
 };
 

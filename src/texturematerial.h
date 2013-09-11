@@ -39,11 +39,6 @@ public:
     bool load(std::string filename);
     cv::Vec3f shade(const HitRecord & hit, QVector3D direction) const;
 
-    bool isMirror() const
-    {
-        return false;
-    }
-
 private:
     cv::Vec3f get(cv::Point2f location) const;
 

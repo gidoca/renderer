@@ -26,8 +26,9 @@
 #include <opencv2/core/core.hpp>
 
 #include "global.h"
+#include "intersectable.h"
 
-class Light
+class Light : public Intersectable
 {
 
   public:

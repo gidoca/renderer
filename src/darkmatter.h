@@ -27,9 +27,6 @@
 class DarkMatter : public Material
 {
 public:
-    cv::Vec3f shade(const HitRecord&, QVector3D direction) const;
-    virtual bool isMirror() const;
-
     static DarkMatter* getInstance();
 
 private:

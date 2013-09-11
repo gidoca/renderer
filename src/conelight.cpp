@@ -23,6 +23,7 @@
 #include "hitrecord.h"
 #include "intersectable.h"
 #include "sampler.h"
+#include "axisalignedbox.h"
 
 #include <cmath>
 
@@ -47,4 +48,14 @@ Vec3f ConeLight::getIntensity(const HitRecord &hit, QVector3D &direction, const 
 Ray ConeLight::getRandomRay(const Sample &sample, const Sample&, float &pdf) const
 {
   return Ray(location, sample.getCosineWeightedDirection(direction, pdf, openingAngle));
+}
+
+HitRecord ConeLight::intersect(Ray) const
+{
+    return HitRecord();
+}
+
+AxisAlignedBox* ConeLight::createBoundingBox()
+{
+    return new AxisAlignedBox(QVector3D(), QVector3D());
 }

@@ -23,6 +23,7 @@
 #include "hitrecord.h"
 #include "intersectable.h"
 #include "sampler.h"
+#include "axisalignedbox.h"
 
 #include <cmath>
 
@@ -57,4 +58,14 @@ bool PointLight::isOccluded(QVector3D location, const Intersectable & scene) con
   QVector3D direction = getDirection(location);
   HitRecord hit = scene.intersect(Ray(location, -direction.normalized(), EPSILON, direction.length() - EPSILON));
   return hit.intersects();
+}
+
+HitRecord PointLight::intersect(Ray) const
+{
+    return HitRecord();
+}
+
+AxisAlignedBox* PointLight::createBoundingBox()
+{
+    return new AxisAlignedBox(QVector3D(), QVector3D());
 }

@@ -33,11 +33,6 @@ class PhongMaterial : public Material
 
     }
 
-    bool isMirror() const
-    {
-        return false;
-    }
-
     cv::Vec3f shade(const HitRecord& hit, QVector3D direction) const;
 
   private:

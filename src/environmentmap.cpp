@@ -3,6 +3,8 @@
 #include "hitrecord.h"
 #include "intersectable.h"
 #include "sampler.h"
+#include "axisalignedbox.h"
+#include "material.h"
 
 #include <cmath>
 #include <limits>
@@ -45,23 +47,50 @@ cv::Vec3f EnvironmentMap::getIntensity(const HitRecord &hit, QVector3D &directio
   HitRecord shadowHit = scene.intersect(shadowRay);
   if(shadowHit.intersects())
   {
-    return cv::Vec3f();
+      return cv::Vec3f();
   }
   else
   {
+      return 1 / pdf * get(direction);
+  }
+}
+
+cv::Vec3f EnvironmentMap::get(QVector3D direction) const
+{
     QVector2D imageCoords(direction.y(), direction.z());
     imageCoords *= acos(direction.x()) / (imageCoords.length() * M_PI);
     float x = pixelFromNormalizedCoord(imageCoords.x(), image.size().width);
     float y = pixelFromNormalizedCoord(imageCoords.y(), image.size().height);
-//    float at = atan(sqrt(direction.x() / (1 - direction.x())));
-//    return coefficient * M_PI / at * Spectrum(data.cols[index], data.cols[index + 1],data.cols[index + 2]);
-    cv::Vec3f r = 1 / pdf * image.at<cv::Vec3f>(x, y).mul(coefficient);
-    return r;
-  }
+    return image.at<cv::Vec3f>(x, y).mul(coefficient);
 }
 
 Ray EnvironmentMap::getRandomRay(const Sample &sample1, const Sample &, float &pdf) const
 {
     pdf = 1;
     return Ray(QVector3D(), sample1.getUniformSphereDirection(), -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity());
+}
+
+HitRecord EnvironmentMap::intersect(Ray ray) const
+{
+    if(isinf(ray.getTo()))
+    {
+        return HitRecord(ray.getTo(), ray, this, -ray.getDirection().normalized());
+    }
+    else
+    {
+        return HitRecord();
+    }
+}
+
+AxisAlignedBox* EnvironmentMap::createBoundingBox()
+{
+    float inf = std::numeric_limits<float>::infinity();
+    QVector3D infvec = QVector3D(inf, inf, inf);
+    return new AxisAlignedBox(-infvec, infvec);
+}
+
+cv::Vec3f EnvironmentMap::emission(const HitRecord & hit) const
+{
+    assert(&hit.getMaterial() == this);
+    return get(hit.getRay().getDirection().normalized());
 }

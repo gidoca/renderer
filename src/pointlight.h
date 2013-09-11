@@ -41,6 +41,9 @@ public:
   QVector3D getDirection (QVector3D at) const;
   bool isOccluded(QVector3D location, const Intersectable & scene) const;
   
+  HitRecord intersect(Ray) const;
+  AxisAlignedBox* createBoundingBox();
+
 private:
   QVector3D location;
   cv::Vec3f intensity;

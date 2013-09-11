@@ -36,6 +36,9 @@ public:
     cv::Vec3f getIntensity(const HitRecord &hit, QVector3D &direction, const Intersectable &scene, const Sample &sample) const;
     Ray getRandomRay(const Sample &sample, const Sample&, float &pdf) const;
 
+    HitRecord intersect(Ray) const;
+    AxisAlignedBox* createBoundingBox();
+
 private:
     QVector3D location, direction;
     float openingAngle;

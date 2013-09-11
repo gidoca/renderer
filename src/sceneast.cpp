@@ -562,24 +562,24 @@ CSGObject* intersectable_builder::operator ()(const ast_csg& c)
     return boost::apply_visitor(csg_b, c);
 }
 
-struct light_builder : boost::static_visitor<const Light*>
+struct light_builder : boost::static_visitor<Light*>
 {
-    const Light* operator()(ast_point_light point_light) const
+    Light* operator()(ast_point_light point_light) const
     {
         return new PointLight(point_light.location.asQVector(), point_light.intensity.asSpectrum());
     }
 
-    const Light* operator()(ast_area_light area_light) const
+    Light* operator()(ast_area_light area_light) const
     {
         return new AreaLight(area_light.location.asQVector(), area_light.u_direction.asQVector(), area_light.v_direction.asQVector(), area_light.intensity.asSpectrum());
     }
 
-    const Light* operator()(ast_cone_light cone_light) const
+    Light* operator()(ast_cone_light cone_light) const
     {
         return new ConeLight(cone_light.location.asQVector(), cone_light.direction.asQVector(), cone_light.angle, cone_light.intensity.asSpectrum());
     }
 
-    const Light* operator()(ast_environment_map envmap) const
+    Light* operator()(ast_environment_map envmap) const
     {
         EnvironmentMap *out = new EnvironmentMap(envmap.coefficient.asSpectrum());
         if(out->load(envmap.filename))
@@ -617,7 +617,7 @@ struct scene_builder : boost::static_visitor<void>
 
     void operator()(std::vector<ast_light> lights)
     {
-        vector<const Light*> out;
+        vector<Light*> out;
         BOOST_FOREACH(ast_light light, lights)
         {
             out.push_back(boost::apply_visitor(light_b, light));
@@ -657,18 +657,22 @@ struct scene_builder : boost::static_visitor<void>
     Scene getScene()
     {
         Scene result(cameras["camera"]);
-        Intersectable* intersectable = intersectables["intersectable"]->createBVH();
+        std::vector<Intersectable*> intersectablelist;
+        intersectablelist.insert(intersectablelist.end(), lights["lights"].begin(), lights["lights"].end());
+        intersectablelist.push_back(intersectables["intersectable"]);
+        IntersectableList *list = new IntersectableList(intersectablelist);
+        Intersectable* intersectable = list->createBVH();
         const AxisAlignedBox* bb = intersectable->boundingBox();
         result.object = intersectable;
         QVector3D min = bb->getMin(), max = bb->getMax();
         std::cerr << "Mesh bb min: " << min.x() << "," << min.y() << "," << min.z() << "; max: " << max.x() << "," << max.y() << "," << max.z() << std::endl;
-        result.light = lights["lights"];
+        result.light.insert(result.light.end(), lights["lights"].begin(), lights["lights"].end());
         return result;
     }
 
     map<string, Camera> cameras;
     map<string, Intersectable*> intersectables;
-    map<string, vector<const Light*> > lights;
+    map<string, vector<Light*> > lights;
     map<string, Material*> materials;
 
     ast_mat_map ast_materials;
