@@ -35,7 +35,7 @@ AreaLight::AreaLight(QVector3D origin, QVector3D uDirection, QVector3D vDirectio
 
 cv::Vec3f AreaLight::getIntensity(const HitRecord & hit, QVector3D &direction, const Intersectable &scene, const Sample &sample) const
 {
-  QVector3D at = hit.getIntersectingPoint();
+  QVector3D at = hit.getIntersectingPoint().toVector3DAffine();
   QPointF p = sample.getSample();
   QVector3D lightLocation = getLocation(p);
   direction = at - lightLocation;

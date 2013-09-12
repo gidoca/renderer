@@ -23,12 +23,12 @@ bool EnvironmentMap::load(std::string filename)
     image = cv::imread(filename, CV_LOAD_IMAGE_ANYDEPTH | CV_LOAD_IMAGE_COLOR);
     if(image.data == nullptr)
     {
-        std::cerr << "Failed to load environment map " << filename << std::endl;
+        std::cerr << "Failed to load environment map \"" << filename << '"' << std::endl;
         return false;
     }
     else
     {
-        std::cerr << "Successfully loaded environment map " << filename << std::endl;
+        std::cerr << "Successfully loaded environment map \"" << filename << '"' << std::endl;
         return true;
     }
 }
@@ -40,7 +40,7 @@ inline float pixelFromNormalizedCoord(float coord, float size)
 
 cv::Vec3f EnvironmentMap::getIntensity(const HitRecord &hit, QVector3D &direction, const Intersectable &scene, const Sample &sample) const
 {
-  QVector3D at = hit.getIntersectingPoint();
+  QVector3D at = hit.getIntersectingPoint().toVector3DAffine();
   float pdf;
   direction = -sample.getCosineWeightedDirection(hit.getSurfaceNormal(), pdf);
   Ray shadowRay(at, direction, -std::numeric_limits<float>::infinity(), -EPSILON);
@@ -57,11 +57,11 @@ cv::Vec3f EnvironmentMap::getIntensity(const HitRecord &hit, QVector3D &directio
 
 cv::Vec3f EnvironmentMap::get(QVector3D direction) const
 {
-    QVector2D imageCoords(direction.y(), direction.z());
+    QVector2D imageCoords(direction.y(), -direction.z());
     imageCoords *= acos(direction.x()) / (imageCoords.length() * M_PI);
     float x = pixelFromNormalizedCoord(imageCoords.x(), image.size().width);
     float y = pixelFromNormalizedCoord(imageCoords.y(), image.size().height);
-    return image.at<cv::Vec3f>(x, y).mul(coefficient);
+    return image.at<cv::Vec3f>(y, x).mul(coefficient);
 }
 
 Ray EnvironmentMap::getRandomRay(const Sample &sample1, const Sample &, float &pdf) const

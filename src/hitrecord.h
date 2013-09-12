@@ -42,7 +42,7 @@ class HitRecord
     void transform(QMatrix4x4 matrix);
     
     float getRayParameter() const;
-    QVector3D getIntersectingPoint() const;
+    QVector4D getIntersectingPoint() const;
     const Material & getMaterial() const;
     QVector3D getSurfaceNormal() const;
     Ray getRay() const;
@@ -52,13 +52,13 @@ class HitRecord
   private:
     const Material* material;
     float rayParameter;
-    QVector3D intersectingPoint;
+    QVector4D intersectingPoint;
     QVector3D surfaceNormal;
     Ray ray;
     cv::Point2f texcoords;
 };
 
-inline HitRecord::HitRecord() : material(DarkMatter::getInstance()), rayParameter(std::numeric_limits< float >::infinity())
+inline HitRecord::HitRecord() : material(DarkMatter::getInstance()), rayParameter(std::numeric_limits< float >::quiet_NaN())
 {
 }
 
@@ -85,7 +85,7 @@ inline float HitRecord::getRayParameter() const
   return rayParameter;
 }
 
-inline QVector3D HitRecord::getIntersectingPoint() const
+inline QVector4D HitRecord::getIntersectingPoint() const
 {
   return intersectingPoint;
 }
@@ -107,7 +107,7 @@ inline Ray HitRecord::getRay() const
 
 inline bool HitRecord::intersects() const
 {
-  return rayParameter < std::numeric_limits< float >::infinity();
+  return !isnan(rayParameter);
 }
 
 inline cv::Point2f HitRecord::getTexCoords() const

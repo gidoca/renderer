@@ -78,23 +78,36 @@ Path Renderer::createPath(const Ray& primaryRay, const Intersectable &scene, Sam
 
     float pdf;
     QVector3D outDirection;
-    if(hit.getMaterial().isMirror())
+    if(hit.getMaterial().emission(hit) != cv::Vec3f())
+    {
+        if(i + 1 < pathLength)
+        {
+            //Not needed for light sources
+            result.alphaValues.push_back(cv::Vec3f());
+            result.hitRecords.push_back(hit);
+        }
+        return result;
+    }
+    else if(hit.getMaterial().isMirror())
     {
       QVector3D oldRayDirection = hit.getRay().getDirection();
       QVector3D surfaceNormal = hit.getSurfaceNormal();
       surfaceNormal.normalize();
       outDirection = oldRayDirection - 2 * QVector3D::dotProduct(oldRayDirection, surfaceNormal) * surfaceNormal;
+      //std::cerr << "m " << outDirection.length() << std::endl;
     }
     else if(hit.getMaterial().refractive())
     {
         const TransparentMaterial* transparentMaterial = hit.getMaterial().refractive();
         outDirection = transparentMaterial->outDirection(hit.getRay().getDirection(), hit.getSurfaceNormal());
+        //std::cerr << "r " << outDirection.length() << std::endl;
         //Try not to terminate on refractive vertices
         if(i == pathLength - 1 && pathLength < MAX_DEPTH) pathLength++;
     }
     else
     {
       outDirection = pathSamples[i].getCosineWeightedDirection(hit.getSurfaceNormal(), pdf);
+      //std::cerr << "d " << outDirection.length() << std::endl;
       if(pdf == 0) return result;
       cv::Vec3f brdf = hit.getMaterial().shade(hit, -outDirection);
       float cos = QVector3D::dotProduct(outDirection.normalized(), hit.getSurfaceNormal().normalized());

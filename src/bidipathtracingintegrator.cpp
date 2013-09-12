@@ -61,7 +61,7 @@ Vec3f BiDiPathTracingIntegrator::integrate(const Ray &ray, const Intersectable &
 
     while(eyeAlphaIt != eyePath.alphaValues.end() && eyeHitIt != eyePath.hitRecords.end())
     {
-      QVector3D connDirection = lightHitIt->getIntersectingPoint() - eyeHitIt->getIntersectingPoint();
+      QVector3D connDirection = lightHitIt->getIntersectingPoint().toVector3DAffine() - eyeHitIt->getIntersectingPoint().toVector3DAffine();
       float geometryTerm = QVector3D::dotProduct(connDirection.normalized(), eyeHitIt->getSurfaceNormal().normalized()) * QVector3D::dotProduct(-connDirection.normalized(), lightHitIt->getSurfaceNormal().normalized()) / connDirection.lengthSquared();
       if(geometryTerm > 0)
       {

@@ -43,12 +43,12 @@ std::list<IntersectionParameter> Sphere::getCSGIntersection(Ray ray) const
     float rootDiscriminant = sqrt(discriminant);
 
     param.t = (-b - rootDiscriminant) / (2 * a);
-    param.normal = ray.evaluate(param.t) - center;
+    param.normal = ray.evaluate(param.t).toVector3DAffine() - center;
     param.texcoord = cv::Point2f(acosf(param.normal.z() / radius) / M_PI, atan2(param.normal.x(), param.normal.y()) / M_PI / 2 + 0.5f);
     result.push_back(param);
 
     param.t = (-b + rootDiscriminant) / (2 * a);
-    param.normal = center - ray.evaluate(param.t);
+    param.normal = center - ray.evaluate(param.t).toVector3DAffine();
     param.texcoord = cv::Point2f(acosf(param.normal.z() / radius) / M_PI, atan2(param.normal.x(), param.normal.y()) / M_PI / 2 + 0.5f);
     result.push_back(param);
   }

@@ -22,6 +22,7 @@
 #define RAY_H
 
 #include "global.h"
+#include "mathhelper.h"
 
 #include <limits>
 #include <cassert>
@@ -44,7 +45,7 @@ class Ray
     float getFrom() const;
     float getTo() const;
 
-    QVector3D evaluate(float u) const;
+    QVector4D evaluate(float u) const;
     bool inRange(float u) const;
     
     Ray transform(QMatrix4x4 matrix);
@@ -100,9 +101,16 @@ inline void Ray::init(QVector4D origin, QVector4D direction, float from, float t
     this-> to = to;
 }
 
-inline QVector3D Ray::evaluate(float u) const
+inline QVector4D Ray::evaluate(float u) const
 {
-  return origin + u * direction;
+    if(isinf(u))
+    {
+        return signum(u) * QVector4D(direction.normalized(), 0);
+    }
+    else
+    {
+        return QVector4D(origin + u * direction, 1);
+    }
 }
 
 inline bool Ray::inRange(float u) const

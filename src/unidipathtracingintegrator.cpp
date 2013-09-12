@@ -52,13 +52,28 @@ Vec3f UniDiPathTracingIntegrator::integrate(const Path &path, const Intersectabl
   std::list<Vec3f>::const_iterator alphaIt = path.alphaValues.begin();
   std::list<HitRecord>::const_iterator hitIt = path.hitRecords.begin();
 
+  if(hitIt != path.hitRecords.end() && hitIt->getMaterial().emission(*hitIt) != cv::Vec3f())
+  {
+      return hitIt->getMaterial().emission(*hitIt);
+  }
+
   int i = 0;
 
   while(alphaIt != path.alphaValues.end() && hitIt != path.hitRecords.end())
   {
     QVector3D direction;
-
-    Vec3f lightIntensity = light[lightIndex[i]]->getIntensity(*hitIt, direction, scene, lightSamples[i]);
+    Vec3f lightIntensity;
+    auto nextHitIt = hitIt;
+    nextHitIt++;
+    HitRecord nextHit = *nextHitIt;
+    if(nextHitIt != path.hitRecords.end() && nextHit.getMaterial().emission(nextHit) != cv::Vec3f())
+    {
+        lightIntensity = nextHit.getMaterial().emission(nextHit);
+    }
+    else
+    {
+        lightIntensity = light[lightIndex[i]]->getIntensity(*hitIt, direction, scene, lightSamples[i]);
+    }
     float inCos;
     inCos = QVector3D::dotProduct(-direction.normalized(), hitIt->getSurfaceNormal().normalized());
     Vec3f brdf;

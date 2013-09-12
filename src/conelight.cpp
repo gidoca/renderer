@@ -31,7 +31,7 @@ using namespace cv;
 
 Vec3f ConeLight::getIntensity(const HitRecord &hit, QVector3D &direction, const Intersectable &scene, const Sample &) const
 {
-  QVector3D at = hit.getIntersectingPoint();
+  QVector3D at = hit.getIntersectingPoint().toVector3DAffine();
   direction = at - location;
   HitRecord shadowHit = scene.intersect(Ray(at, -direction.normalized(), EPSILON, direction.length() - EPSILON));
   float rayAngle = acos(QVector3D::dotProduct(direction.normalized(), this->direction.normalized()));

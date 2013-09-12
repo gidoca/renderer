@@ -29,7 +29,7 @@
 
 cv::Vec3f PointLight::getIntensity (const HitRecord &hit, QVector3D& direction, const Intersectable& scene, const Sample&) const
 {
-  QVector3D at = hit.getIntersectingPoint();
+  QVector3D at = hit.getIntersectingPoint().toVector3DAffine();
   direction = getDirection(at);
   if(isOccluded(at, scene))
   {
