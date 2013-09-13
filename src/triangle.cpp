@@ -43,7 +43,15 @@ HitRecord Triangle::intersect(Ray ray) const
     float v = -QVector3D::dotProduct(adxde, p2 - p1) / w;
     if(v < 0 || u + v > 1) return HitRecord();
 
-    return HitRecord(t, ray, material, (1 - u - v) * n1 + u * n2 + v * n3, (1 - u - v) * t1 + u * t2 + v * t3);
+    QVector3D normal = (1 - u - v) * n1 + u * n2 + v * n3;
+    if(normal == QVector3D())
+    {
+        return HitRecord();
+    }
+    else
+    {
+        return HitRecord(t, ray, material, normal, (1 - u - v) * t1 + u * t2 + v * t3);
+    }
 }
 
 const AxisAlignedBox * Triangle::createBoundingBox()
