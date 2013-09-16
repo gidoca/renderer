@@ -66,30 +66,31 @@ Vec3f UniDiPathTracingIntegrator::integrate(const Path &path, const Intersectabl
     auto nextHitIt = hitIt;
     nextHitIt++;
     HitRecord nextHit = *nextHitIt;
+    Vec3f brdf;
     if(nextHitIt != path.hitRecords.end() && nextHit.getMaterial().emission(nextHit) != cv::Vec3f())
     {
         lightIntensity = nextHit.getMaterial().emission(nextHit);
         QVector4D lightPos = nextHit.getIntersectingPoint();
         if(lightPos.w() == 0)
         {
-            direction = lightPos.toVector3D();
+            direction = -lightPos.toVector3D();
         }
         else
         {
-            direction = lightPos.toVector3DAffine() - hitIt->getIntersectingPoint().toVector3DAffine();
+            direction = hitIt->getIntersectingPoint().toVector3DAffine() - lightPos.toVector3DAffine();
         }
+        brdf = cv::Vec3f(1, 1, 1);
     }
     else
     {
         lightIntensity = light[lightIndex[i]]->getIntensity(*hitIt, direction, scene, lightSamples[i]);
+        brdf = hitIt->getMaterial().shade(*hitIt, direction);
     }
     float inCos;
     inCos = QVector3D::dotProduct(-direction.normalized(), hitIt->getSurfaceNormal().normalized());
-    Vec3f brdf;
     if(inCos > 0)
     {
 //      assert(!isnan(lightIntensity.x()) && !isnan(lightIntensity.y()) && !isnan(lightIntensity.z()));
-      brdf = hitIt->getMaterial().shade(*hitIt, direction);
 //      assert(!isnan(brdf.x()) && !isnan(brdf.y()) && !isnan(brdf.z()));
 //      assert(!isnan(alphaIt->x()) && !isnan(alphaIt->y()) && !isnan(alphaIt->z()));
 //      assert(brdf.x() >= 0 && brdf.y() >= 0 && brdf.z() >= 0);
