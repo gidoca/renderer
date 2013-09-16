@@ -28,7 +28,7 @@
 #include <QtGui/QVector3D>
 #include <QtCore/QPointF>
 
-class AreaLight : public Light
+class AreaLight : public Light, public Material
 {
 public:
     AreaLight(QVector3D origin, QVector3D uDirection, QVector3D vDirection, cv::Vec3f intensity);
@@ -39,8 +39,11 @@ public:
     HitRecord intersect(Ray ray) const;
     AxisAlignedBox* createBoundingBox();
 
+    cv::Vec3f emission(const HitRecord &hit) const;
+
 private:
     QVector3D getLocation(QPointF p) const;
+    cv::Vec3f getIntensity(QVector3D direction) const;
 
     QVector3D origin;
     QVector3D uDirection;

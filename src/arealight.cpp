@@ -40,7 +40,6 @@ cv::Vec3f AreaLight::getIntensity(const HitRecord & hit, QVector3D &direction, c
   QVector3D lightLocation = getLocation(p);
   direction = at - lightLocation;
   HitRecord shadowHit = scene.intersect(Ray(at, -direction.normalized(), EPSILON, direction.length() - EPSILON));
-  cv::Vec3f part = cv::Vec3f(1, 1, 1);
 
   if(shadowHit.intersects())
   {
@@ -48,11 +47,16 @@ cv::Vec3f AreaLight::getIntensity(const HitRecord & hit, QVector3D &direction, c
   }
   else
   {
+      return getIntensity(direction);
+  }
+}
+
+cv::Vec3f AreaLight::getIntensity(QVector3D direction) const
+{
     float c = QVector3D::dotProduct(direction.normalized(), normal.normalized()) / direction.lengthSquared() * normal.length();
     assert(!isnan(c));
     if(c < 0) c = 0;
-    return c * intensity.mul(part);
-  }
+    return c * intensity;
 }
 
 Ray AreaLight::getRandomRay(const Sample &sample1, const Sample &sample2, float &pdf) const
@@ -69,12 +73,35 @@ QVector3D AreaLight::getLocation(QPointF p) const
 
 HitRecord AreaLight::intersect(Ray ray) const
 {
-    //TODO implement
-    return HitRecord();
+    QVector3D ad = ray.getOrigin() - origin;
+    QVector3D abxac = QVector3D::crossProduct(uDirection, vDirection);
+
+    float w = -QVector3D::dotProduct(abxac, ray.getDirection());
+    if(w == 0) return HitRecord();
+    float t = QVector3D::dotProduct(abxac, ad) / w;
+    if(t < ray.getFrom() || t > ray.getTo()) return HitRecord();
+
+    QVector3D adxde = QVector3D::crossProduct(ad, ray.getDirection());
+    float u = QVector3D::dotProduct(adxde, vDirection) / w;
+    if(u < 0 || u > 1) return HitRecord();
+    float v = -QVector3D::dotProduct(adxde, uDirection) / w;
+    if(v < 0 || v > 1) return HitRecord();
+
+    return HitRecord(t, ray, this, normal);
 }
 
 AxisAlignedBox* AreaLight::createBoundingBox()
 {
-    //TODO implement
-    return new AxisAlignedBox(QVector3D(), QVector3D());
+    AxisAlignedBox* result = new AxisAlignedBox();
+    result->includePoint(origin);
+    result->includePoint(origin + uDirection);
+    result->includePoint(origin + vDirection);
+    result->includePoint(origin + uDirection + vDirection);
+    return result;
+}
+
+cv::Vec3f AreaLight::emission(const HitRecord & hit) const
+{
+    assert(hit.getMaterial() == this);
+    return getIntensity(-hit.getRay().getDirection());
 }
