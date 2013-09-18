@@ -93,8 +93,8 @@ void MetropolisRenderer::render()
 //    int currentImageY = (int)(sample.cameraSample.getSample().y() * film.size().height);
 //    float currentImportance = importanceMap.at<float>(currentImageY, currentImageX);
 
-    sumI += norm(l);
-    bootstrapI.push_back(norm(l));
+    sumI += lum(l);
+    bootstrapI.push_back(lum(l));
     bootstrapSamples.push_back(sample);
   }
   const float b = sumI / numInitialSamples;
@@ -148,18 +148,18 @@ void MetropolisRenderer::render()
             int newImageY = (int)(newSample.cameraSample.getSample().y() * film->size().height);
             float newImportance = importanceMap.at<float>(newImageY, newImageX);
 
-            float accept = min(1., norm(newValue) * newImportance / (norm(currentValue) * currentImportance));
+            float accept = min<float>(1., lum(newValue) * newImportance / (lum(currentValue) * currentImportance));
             assert(!isnan(accept));
 
-            if(norm(currentValue) > 0)
+            if(lum(currentValue) > 0)
             {
-                addSample(currentSample.cameraSample, 1 - accept, *film, currentValue * (1.f / norm(currentValue) * b / numPixelSamples));
+                addSample(currentSample.cameraSample, 1 - accept, *film, currentValue * (1.f / lum(currentValue) * b / numPixelSamples));
                 virtualSamples.at<float>(currentImageY, currentImageX) += (1 - accept) / currentImportance;
                 realSamples.at<float>(currentImageY, currentImageX) += 1 - accept;
             }
-            if(norm(newValue) > 0)
+            if(lum(newValue) > 0)
             {
-                addSample(newSample.cameraSample, accept, *film, newValue * (1.f / norm(newValue) * b / numPixelSamples));
+                addSample(newSample.cameraSample, accept, *film, newValue * (1.f / lum(newValue) * b / numPixelSamples));
                 virtualSamples.at<float>(newImageY, newImageX) += accept / newImportance;
                 realSamples.at<float>(newImageY, newImageX) += accept;
             }
