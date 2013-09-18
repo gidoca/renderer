@@ -98,3 +98,8 @@ cv::Mat extend(const cv::Mat &in, int nchan)
     merge(vector<Mat>(nchan, in), out);
     return out;
 }
+
+float lum(Vec3f in)
+{
+    return .299 * in[2] + .587 * in[1] + .114 * in[0];
+}

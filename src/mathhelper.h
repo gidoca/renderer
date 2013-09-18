@@ -51,4 +51,6 @@ int signum(T x) {
     return signum(x, std::is_signed<T>());
 }
 
+float lum(cv::Vec3f in);
+
 #endif
