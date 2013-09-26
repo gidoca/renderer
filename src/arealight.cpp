@@ -102,6 +102,6 @@ AxisAlignedBox* AreaLight::createBoundingBox()
 
 cv::Vec3f AreaLight::emission(const HitRecord & hit) const
 {
-    assert(hit.getMaterial() == this);
+    assert(&hit.getMaterial() == this);
     return getIntensity(-hit.getRay().getDirection());
 }
