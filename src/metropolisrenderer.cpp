@@ -98,6 +98,10 @@ void MetropolisRenderer::render()
     bootstrapSamples.push_back(sample);
   }
   const float b = sumI / numInitialSamples;
+  if(vm.count("verbose"))
+  {
+    std::cerr << "Luminance: " << b << std::endl;
+  }
 
   const float contribOffset = gsl_rng_uniform(globalrng) * sumI;
   sumI = 0;
@@ -113,7 +117,7 @@ void MetropolisRenderer::render()
   gsl_rng_free(globalrng);
 
   const int numPixelSamples = vm["met-mutations"].as<int>();
-#ifdef NDEBUG
+#ifdef USE_OPENMP
   const int numThreads = omp_get_max_threads();
 #else
   const int numThreads = 1;

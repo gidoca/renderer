@@ -213,6 +213,7 @@ void MetropolisFltRenderer::render()
   if(vm.count("metflt-debug-dir"))
   {
       debugDir = QString::fromStdString(vm["metflt-debug-dir"].as<string>());
+      QDir::root().mkpath(debugDir.path());
   }
 
   const int num_films = 2;
