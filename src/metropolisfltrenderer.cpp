@@ -69,6 +69,7 @@ void MetropolisFltRenderer::addSample(const Sample &cameraSample, float weight, 
 {
     Point2i pos = getPos(cameraSample, film.size());
     Vec3f depositValue = weight * value;
+    assert(!isnan(depositValue[0]) && !isnan(depositValue[1]) && !isnan(depositValue[2]));
 
 #pragma omp critical
     {
@@ -120,6 +121,7 @@ void MetropolisFltRenderer::renderStep(Size size, const Scene& scene, Mat import
         bootstrapSamples.push_back(initialSample);
       }
       b = sumI / numInitialSamples;
+      assert(!isnan(b));
       const float contribOffset = gsl_rng_uniform(globalrng) * sumI;
       sumI = 0;
       for(int i = 0; i < numInitialSamples; i++)
@@ -133,6 +135,9 @@ void MetropolisFltRenderer::renderStep(Size size, const Scene& scene, Mat import
   else
   {
       b = sum(channelNorm(films[0]).mul(importanceMap))[0] / films[0].size().area();
+      assert(checkRange(films[0]));
+      assert(checkRange(importanceMap));
+      assert(!isnan(b));
   }
 
 
@@ -159,6 +164,7 @@ void MetropolisFltRenderer::renderStep(Size size, const Scene& scene, Mat import
 
       MetropolisSample currentSample = initialSample;
       Vec3f currentValue = integrator.integrate(initialSample.cameraPathFromSample(*scene.object, scene.camera), *scene.object, scene.light, initialSample.lightSample1, initialSample.lightIndex);
+      assert(checkRange(currentValue));
       Point currentPos = getPos(currentSample.cameraSample, size);
 
       for(int i = 0; i < numSamples; i++)
@@ -168,6 +174,7 @@ void MetropolisFltRenderer::renderStep(Size size, const Scene& scene, Mat import
           MetropolisSample newSample = currentSample.mutated(rng, largeStepProb);
           Point newPos = getPos(newSample.cameraSample, size);
           Vec3f newValue = integrator.integrate(newSample.cameraPathFromSample(*scene.object, scene.camera), *scene.object, scene.light, newSample.lightSample1, newSample.lightIndex);
+          assert(checkRange(newValue));
           float accept = min(1., norm(newValue) * importanceMap.at<float>(newPos) / (norm(currentValue) * importanceMap.at<float>(currentPos)));
           assert(!isnan(accept));
 
@@ -257,6 +264,7 @@ void MetropolisFltRenderer::render()
         importanceMap = channelMean(varOfFiltered) / (channelMean(filteredMean).mul(channelMean(filteredMean)) + 1e-2) + 1e-8;
         //Normalization needed for correct computation of weighted average
         importanceMap *= importanceMap.size().area() / sum(importanceMap)[0];
+        assert(checkRange(importanceMap));
     }
 
     renderStep(film->size(), scene, importanceMap, films, biased_var, biased_mean, biased_m2, sumweight, seed + i, i == 0);
@@ -287,12 +295,12 @@ void MetropolisFltRenderer::render()
     if(vm.count("metflt-omit-filter"))
     {
         varOfFiltered = filteredVar;
-        *film = newOut;
+        filteredMean = newOut;
     }
     else if(vm.count("metflt-no-crossfiltering"))
     {
         varOfFiltered = filteredVar;
-        *film = f.filter(newOut, newOut, filteredVar);
+        filteredMean = f.filter(newOut, newOut, filteredVar);
     }
     else
     {
@@ -300,8 +308,10 @@ void MetropolisFltRenderer::render()
       filteredFilms[0] = f.filter(films[0], films[1], filteredVar);
       filteredFilms[1] = f.filter(films[1], films[0], filteredVar);
       var(filteredMean, varOfFiltered, filteredFilms);
-      *film = filteredMean;
     }
+    *film = filteredMean;
+    assert(checkRange(varOfFiltered));
+    assert(checkRange(filteredMean));
 
     if(vm.count("metflt-debug-dir"))
     {
