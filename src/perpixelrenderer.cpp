@@ -56,6 +56,8 @@ void PerPixelRenderer::render()
   time.start();
 
   unsigned long seed = getSeed(vm);
+
+  cv::Vec3f sumI;
   
   #pragma omp parallel for schedule(dynamic)
   for(int i = 0; i < film->size().height; i++)
@@ -84,10 +86,18 @@ void PerPixelRenderer::render()
         assert(!isnan(s[0]) && !isnan(s[1]) && !isnan(s[2]));
         assert(s[0] >= 0 && s[1] >= 0 && s[2] >= 0);
         scanline[j] += s * (1.f / samples.size());
+#pragma omp critical
+        sumI += s * (1.f / samples.size());
+      }
+      if(j == 569 && i == 1)
+      {
+          std::cerr << "f" << std::endl;
       }
     }
     gsl_rng_free(rng);
   }
+
+  std::cerr << "Luminance: " << sumI[2] / film->size().area() << " " << sumI[1] / film->size().area() << " " << sumI[0] / film->size().area() << " " << std::endl;
 }
 
 options_description PerPixelRenderer::options()
