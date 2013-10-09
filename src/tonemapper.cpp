@@ -21,6 +21,7 @@
 #include "tonemapper.h"
 
 #include <cmath>
+#include <iostream>
 
 #include <opencv2/core/core.hpp>
 
@@ -49,7 +50,7 @@ QImage Tonemapper::tonemap(const cv::Mat film)
 QRgb Tonemapper::map(const cv::Mat &film, int row, int column)
 {
   Vec3f irradiance = film.at<Vec3f>(row, column);
-  assert(checkRange(irradiance));
+  if(!checkRange(irradiance)) std::cerr << "nan " << row << " " << column << std::endl;
   //OpenCV uses BGR byte order
   return qRgb(clamp(255 * pow(irradiance[2], 1./gamma)), clamp(255 * pow(irradiance[1], 1./gamma)), clamp(255 * pow(irradiance[0], 1./gamma)));
 }

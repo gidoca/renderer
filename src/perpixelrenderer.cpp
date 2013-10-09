@@ -82,16 +82,16 @@ void PerPixelRenderer::render()
       {
         QPointF samplePoint = point + it->getSample();
         Ray ray = scene.camera.getRay(samplePoint);
+        if(j == 569 && i == 300)
+        {
+            std::cerr << "f" << std::endl;
+        }
         Vec3f s = integrator->integrate(ray, *scene.object, scene.light, rng);
         assert(!isnan(s[0]) && !isnan(s[1]) && !isnan(s[2]));
         assert(s[0] >= 0 && s[1] >= 0 && s[2] >= 0);
         scanline[j] += s * (1.f / samples.size());
 #pragma omp critical
         sumI += s * (1.f / samples.size());
-      }
-      if(j == 569 && i == 1)
-      {
-          std::cerr << "f" << std::endl;
       }
     }
     gsl_rng_free(rng);

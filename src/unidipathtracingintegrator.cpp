@@ -67,7 +67,7 @@ Vec3f UniDiPathTracingIntegrator::integrate(const Path &path, const Intersectabl
     nextHitIt++;
     HitRecord nextHit = *nextHitIt;
     Vec3f brdf;
-    if(nextHitIt != path.hitRecords.end() && nextHit.getMaterial().emission(nextHit) != cv::Vec3f())
+    if(nextHitIt != path.hitRecords.end() && nextHit.getMaterial().emitsLight())
     {
         lightIntensity = nextHit.getMaterial().emission(nextHit);
         QVector4D lightPos = nextHit.getIntersectingPoint();

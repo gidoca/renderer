@@ -78,14 +78,8 @@ Path Renderer::createPath(const Ray& primaryRay, const Intersectable &scene, Sam
 
     float pdf;
     QVector3D outDirection;
-    if(hit.getMaterial().emission(hit) != cv::Vec3f())
+    if(hit.getMaterial().emitsLight())
     {
-        if(i + 1 < pathLength)
-        {
-            //Not needed for light sources
-            result.alphaValues.push_back(cv::Vec3f());
-            result.hitRecords.push_back(hit);
-        }
         return result;
     }
     else if(hit.getMaterial().isMirror())

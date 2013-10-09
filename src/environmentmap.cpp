@@ -94,3 +94,8 @@ cv::Vec3f EnvironmentMap::emission(const HitRecord & hit) const
     assert(&hit.getMaterial() == this);
     return get(hit.getRay().getDirection().normalized());
 }
+
+bool EnvironmentMap::emitsLight() const
+{
+    return true;
+}

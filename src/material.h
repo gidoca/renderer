@@ -46,6 +46,10 @@ class Material
     {
         return cv::Vec3f();
     }
+    virtual bool emitsLight() const
+    {
+        return false;
+    }
 };
 
 #endif

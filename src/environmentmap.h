@@ -23,6 +23,7 @@ public:
     cv::Vec3f get(QVector3D direction) const;
 
     cv::Vec3f emission(const HitRecord & hit) const;
+    bool emitsLight() const;
 
 private:
     cv::Vec3f coefficient;

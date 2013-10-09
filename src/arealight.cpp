@@ -105,3 +105,8 @@ cv::Vec3f AreaLight::emission(const HitRecord & hit) const
     assert(&hit.getMaterial() == this);
     return getIntensity(-hit.getRay().getDirection());
 }
+
+bool AreaLight::emitsLight() const
+{
+    return true;
+}

@@ -40,6 +40,7 @@ public:
     AxisAlignedBox* createBoundingBox();
 
     cv::Vec3f emission(const HitRecord &hit) const;
+    bool emitsLight() const;
 
 private:
     QVector3D getLocation(QPointF p) const;
