@@ -79,13 +79,12 @@ Vec3f UniDiPathTracingIntegrator::integrate(const Path &path, const Intersectabl
         {
             direction = hitIt->getIntersectingPoint().toVector3DAffine() - lightPos.toVector3DAffine();
         }
-        brdf = cv::Vec3f(1, 1, 1);
     }
     else
     {
         lightIntensity = light[lightIndex[i]]->getIntensity(*hitIt, direction, scene, lightSamples[i]);
-        brdf = hitIt->getMaterial().shade(*hitIt, direction);
     }
+    brdf = hitIt->getMaterial().shade(*hitIt, direction);
     float inCos;
     inCos = QVector3D::dotProduct(-direction.normalized(), hitIt->getSurfaceNormal().normalized());
     if(inCos > 0)

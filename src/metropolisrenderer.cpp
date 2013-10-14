@@ -175,6 +175,10 @@ void MetropolisRenderer::render()
                 currentImageY = newImageY;
                 currentImportance = newImportance;
             }
+            if(vm.count("verbose") && i % 10000 == 0)
+            {
+                std::cerr << "Thread " << t + 1 << " of " << numThreads << ": " << 100 * i / (numSamples - 1) << "%" << std::endl;
+            }
         }
         gsl_rng_free(rng);
   }
