@@ -70,9 +70,9 @@ std::vector<Intersectable*> IntersectableList::containedIntersectables()
 {
     std::vector<Intersectable*> out;
     out.reserve(components.size());
-    for(auto i = components.begin(); i != components.end(); i++)
+    for(auto& i: components)
     {
-        std::vector<Intersectable*> subcomponents = (*i)->containedIntersectables();
+        std::vector<Intersectable*> subcomponents = i->containedIntersectables();
         out.insert(out.end(), subcomponents.begin(), subcomponents.end());
     }
 
