@@ -73,13 +73,13 @@ Path Renderer::createPath(const Ray& primaryRay, const Intersectable &scene, Sam
   {
     if(!hit.intersects()) return result;
 
-    result.alphaValues.push_back(alpha);
-    result.hitRecords.push_back(hit);
 
     float pdf;
     QVector3D outDirection;
     if(hit.getMaterial().emitsLight())
     {
+        result.alphaValues.push_back(alpha);
+        result.hitRecords.push_back(hit);
         return result;
     }
     else if(hit.getMaterial().isMirror())
@@ -100,6 +100,8 @@ Path Renderer::createPath(const Ray& primaryRay, const Intersectable &scene, Sam
     }
     else
     {
+      result.alphaValues.push_back(alpha);
+      result.hitRecords.push_back(hit);
       outDirection = pathSamples[i].getCosineWeightedDirection(hit.getSurfaceNormal(), pdf);
       //std::cerr << "d " << outDirection.length() << std::endl;
       if(pdf == 0) return result;
