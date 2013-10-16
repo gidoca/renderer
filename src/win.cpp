@@ -212,6 +212,7 @@ void Win::keyReleaseEvent(QKeyEvent *event)
 void Win::wheelEvent(QWheelEvent *event)
 {
     event->ignore();
+    if(event->modifiers() != Qt::KeyboardModifier::ControlModifier) return;
     int delta = event->angleDelta().ry();
     if(delta == 0) return;
     scene.camera.setFOV(pow(1.1, -delta / 120.f) * scene.camera.getFOV());
