@@ -58,8 +58,8 @@ MetropolisFltRenderer::MetropolisFltRenderer() :
 
 Point2i getPos(const Sample& cameraSample, Size size)
 {
-    int x = (int)(cameraSample.getSample().x() * size.width);
-    int y = (int)(cameraSample.getSample().y() * size.height);
+    int x = min<int>(cameraSample.getSample().x() * size.width, size.width - 1);
+    int y = min<int>(cameraSample.getSample().y() * size.height, size.height - 1);
     assert(0 <= x && x < size.width);
     assert(0 <= y && y < size.height);
     return Point2i(x, y);

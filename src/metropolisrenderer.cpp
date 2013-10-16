@@ -44,8 +44,8 @@ using namespace cv;
 
 void addSample(const Sample &cameraSample, float weight, Mat &film, Vec3f value)
 {
-    int x = (int)(cameraSample.getSample().x() * film.size().width);
-    int y = (int)(cameraSample.getSample().y() * film.size().height);
+    int x = min<int>(cameraSample.getSample().x() * film.size().width, film.size().width - 1);
+    int y = min<int>(cameraSample.getSample().y() * film.size().height, film.size().height - 1);
     assert(0 <= x && x < film.size().width);
     assert(0 <= y && y < film.size().height);
 
@@ -122,7 +122,7 @@ void MetropolisRenderer::render()
 #else
   const int numThreads = 1;
 #endif
-  const int numSamples = numPixelSamples * film->size().area() / numThreads;
+  const long numSamples = numPixelSamples * film->size().area() / numThreads;
 
   Mat virtualSamples = Mat::zeros(film->size(), CV_32F);
   Mat realSamples = Mat::zeros(film->size(), CV_32F);
@@ -142,7 +142,7 @@ void MetropolisRenderer::render()
         int currentImageY = (int)(currentSample.cameraSample.getSample().y() * film->size().height);
         float currentImportance = importanceMap.at<float>(currentImageY, currentImageX);
 
-        for(int i = 0; i < numSamples; i++)
+        for(long i = 0; i < numSamples; i++)
         {
             if(doStop) continue;
             MetropolisSample newSample = currentSample.mutated(rng, largeStepProb);
@@ -175,7 +175,7 @@ void MetropolisRenderer::render()
                 currentImageY = newImageY;
                 currentImportance = newImportance;
             }
-            if(vm.count("verbose") && i % 10000 == 0)
+            if(vm.count("verbose") && i % 100000 == 0)
             {
                 std::cerr << "Thread " << t + 1 << " of " << numThreads << ": " << 100 * i / (numSamples - 1) << "%" << std::endl;
             }
