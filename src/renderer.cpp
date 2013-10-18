@@ -93,7 +93,7 @@ Path Renderer::createPath(const Ray& primaryRay, const Intersectable &scene, Sam
     else if(hit.getMaterial().refractive())
     {
         const TransparentMaterial* transparentMaterial = hit.getMaterial().refractive();
-        outDirection = transparentMaterial->outDirection(hit.getRay().getDirection(), hit.getSurfaceNormal());
+        outDirection = transparentMaterial->outDirection(hit.getRay().getDirection(), hit.getSurfaceNormal(), pathSamples[i]);
         //std::cerr << "r " << outDirection.length() << std::endl;
         //Try not to terminate on refractive vertices
         if(i == pathLength - 1 && pathLength < MAX_DEPTH) pathLength++;

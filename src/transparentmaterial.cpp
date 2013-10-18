@@ -26,14 +26,16 @@ TransparentMaterial::TransparentMaterial(float refractionCoeff) : refractionCoef
 {
 }
 
-QVector3D TransparentMaterial::outDirection(QVector3D inDirection, QVector3D normal) const
+QVector3D TransparentMaterial::outDirection(QVector3D inDirection, QVector3D normal, Sample s) const
 {
     inDirection.normalize();
     normal.normalize();
     float cosIncomingAngle = QVector3D::dotProduct(normal, -inDirection);
     float coefficientRatio = 1 / refractionCoeff;
     float cosOutgoingAngle = sqrt(1 - coefficientRatio * coefficientRatio * (1 - cosIncomingAngle * cosIncomingAngle));
-    if(abs(cosOutgoingAngle) >= 1)
+    float rPerp = (cosIncomingAngle - cosOutgoingAngle) / (cosIncomingAngle + cosOutgoingAngle);
+    float reflectance = (1 + coefficientRatio * coefficientRatio) / 2 * rPerp * rPerp;
+    if(abs(cosOutgoingAngle) >= 1 || s.getSample().x() < reflectance)
     {
         return inDirection + 2 * cosIncomingAngle * normal;
     }

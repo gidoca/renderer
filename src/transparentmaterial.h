@@ -22,6 +22,7 @@
 #define TRANSPARENTMATERIAL_H
 
 #include "material.h"
+#include "sampler.h"
 
 #include <QVector3D>
 
@@ -35,7 +36,7 @@ public:
         return this;
     }
 
-    QVector3D outDirection(QVector3D inDirection, QVector3D normal) const;
+    QVector3D outDirection(QVector3D inDirection, QVector3D normal, Sample s) const;
 
 private:
     float refractionCoeff;
