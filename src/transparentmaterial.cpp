@@ -20,6 +20,9 @@
  */
 #include "transparentmaterial.h"
 
+#include <iostream>
+#include <QMatrix4x4>
+
 #include "mathhelper.h"
 
 TransparentMaterial::TransparentMaterial(float refractionCoeff) : refractionCoeff(refractionCoeff)
@@ -30,17 +33,37 @@ QVector3D TransparentMaterial::outDirection(QVector3D inDirection, QVector3D nor
 {
     inDirection.normalize();
     normal.normalize();
-    float cosIncomingAngle = QVector3D::dotProduct(normal, -inDirection);
-    float coefficientRatio = 1 / refractionCoeff;
-    float cosOutgoingAngle = sqrt(1 - coefficientRatio * coefficientRatio * (1 - cosIncomingAngle * cosIncomingAngle));
-    float rPerp = (cosIncomingAngle - cosOutgoingAngle) / (cosIncomingAngle + cosOutgoingAngle);
-    float reflectance = (1 + coefficientRatio * coefficientRatio) / 2 * rPerp * rPerp;
-    if(abs(cosOutgoingAngle) >= 1 || s.getSample().x() < reflectance)
+    float coefficientRatio;
+    if(QVector3D::dotProduct(-normal, inDirection) < 0.)
+    {
+        normal *= -1;
+        coefficientRatio = refractionCoeff;
+    }
+    else
+    {
+        coefficientRatio = 1 / refractionCoeff;
+    }
+    float cosIncomingAngle = QVector3D::dotProduct(-normal, inDirection);
+    float sinOutgoingAngle = coefficientRatio * sqrt(std::max(0., 1. - cosIncomingAngle * cosIncomingAngle));
+    //float sinIncomingAngle = sqrt(1 - cosIncomingAngle * cosIncomingAngle);
+    //std::cerr << sinOutgoingAngle / sinIncomingAngle << std::endl;
+    float cosOutgoingAngle = sqrt(1 - coefficientRatio * coefficientRatio * std::max(0., 1. - cosIncomingAngle * cosIncomingAngle));
+    float rPerp = (cosIncomingAngle - coefficientRatio * cosOutgoingAngle) / (cosIncomingAngle + coefficientRatio * cosOutgoingAngle);
+    float rPara = (coefficientRatio * cosIncomingAngle - cosOutgoingAngle) / (coefficientRatio * cosIncomingAngle + cosOutgoingAngle);
+    float reflectance = 1 / 2. * (rPerp * rPerp + rPara * rPara);
+    if(sinOutgoingAngle > 1 || s.getSample().x() < reflectance)
     {
         return inDirection + 2 * cosIncomingAngle * normal;
     }
     else
     {
-        return coefficientRatio * inDirection + (coefficientRatio * cosIncomingAngle - signum(cosIncomingAngle) * cosOutgoingAngle) * normal;
+        QVector3D v = coefficientRatio * inDirection + (coefficientRatio * cosIncomingAngle - signum(cosIncomingAngle) * cosOutgoingAngle) * normal;
+        //std::cerr << sqrt(1 - QVector3D::dotProduct(v, -normal) * QVector3D::dotProduct(v, -normal)) / sqrt(1 - cosIncomingAngle * cosIncomingAngle) << std::endl;
+        /*QMatrix4x4 m;
+        m.setColumn(0, v);
+        m.setColumn(1, normal);
+        m.setColumn(2, inDirection);
+        std::cerr << m.determinant() << std::endl;*/
+        return v;
     }
 }

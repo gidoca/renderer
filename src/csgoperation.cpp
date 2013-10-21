@@ -66,12 +66,12 @@ const AxisAlignedBox * CSGOperation::createBoundingBox()
 {
     const AxisAlignedBox * leftBB = left->boundingBox();
     const AxisAlignedBox * rightBB = right->boundingBox();
-    QVector3D min ( std::max ( leftBB->getMin().x(), rightBB->getMin().x() ),
-                    std::max ( leftBB->getMin().y(), rightBB->getMin().y() ),
-                    std::max ( leftBB->getMin().z(), rightBB->getMin().z() ) );
-    QVector3D max ( std::min ( leftBB->getMax().x(), rightBB->getMax().x() ),
-                    std::min ( leftBB->getMax().y(), rightBB->getMax().y() ),
-                    std::min ( leftBB->getMax().z(), rightBB->getMax().z() ) );
+    QVector3D min ( std::min ( leftBB->getMin().x(), rightBB->getMin().x() ),
+                    std::min ( leftBB->getMin().y(), rightBB->getMin().y() ),
+                    std::min ( leftBB->getMin().z(), rightBB->getMin().z() ) );
+    QVector3D max ( std::max ( leftBB->getMax().x(), rightBB->getMax().x() ),
+                    std::max ( leftBB->getMax().y(), rightBB->getMax().y() ),
+                    std::max ( leftBB->getMax().z(), rightBB->getMax().z() ) );
     AxisAlignedBox * result = new AxisAlignedBox ( min, max );
     return result;
 }

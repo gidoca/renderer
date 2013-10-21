@@ -100,8 +100,6 @@ SceneGrammar::SceneGrammar() : SceneGrammar::base_type(assignments_rule, "inters
   phong_material_rule.name("phong material");
   mirror_material_rule %= boost::spirit::lit("mirror") >> "(" >> boost::spirit::tag::float_() >> ")";
   mirror_material_rule.name("mirror material");
-  texture_material_rule %= boost::spirit::lit("texture") >> "(" >> string_literal_rule >> ")";
-  texture_material_rule.name("texture material");
   texture_material_rule %= boost::spirit::lit("texture") >> "(" >> string_literal_rule >> "," >> vector3_literal_rule >> "," >> boost::spirit::tag::float_() >> ")";
   texture_material_rule.name("scaled texture material");
   refractive_material_rule %= boost::spirit::lit("refractive") >> "(" >> boost::spirit::tag::float_() >> ")";
