@@ -44,7 +44,7 @@ typedef std::string::iterator it;
 struct comment_skipper : public qi::grammar<it> {
 
     comment_skipper() : comment_skipper::base_type(skip, "Comment") {
-        skip = boost::spirit::ascii::space | ("/*" >> *(qi::char_ - "*/") >> "*/");
+        skip = boost::spirit::ascii::space | ("/*" >> *(qi::char_ - "*/") >> "*/") | ("//" >> *(qi::char_ - "\n") >> "\n");
     }
     qi::rule<it> skip;
 };
