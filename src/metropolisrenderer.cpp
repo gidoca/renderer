@@ -122,7 +122,7 @@ void MetropolisRenderer::render()
 #else
   const int numThreads = 1;
 #endif
-  const long numSamples = numPixelSamples * film->size().area() / numThreads;
+  const long numSamples = (long)numPixelSamples * film->size().area() / numThreads;
 
   Mat virtualSamples = Mat::zeros(film->size(), CV_32F);
   Mat realSamples = Mat::zeros(film->size(), CV_32F);
