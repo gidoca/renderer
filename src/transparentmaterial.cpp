@@ -47,13 +47,14 @@ QVector3D TransparentMaterial::outDirection(QVector3D inDirection, QVector3D nor
     float sinOutgoingAngle = coefficientRatio * sqrt(std::max(0., 1. - cosIncomingAngle * cosIncomingAngle));
     //float sinIncomingAngle = sqrt(1 - cosIncomingAngle * cosIncomingAngle);
     //std::cerr << sinOutgoingAngle / sinIncomingAngle << std::endl;
-    float cosOutgoingAngle = sqrt(1 - coefficientRatio * coefficientRatio * std::max(0., 1. - cosIncomingAngle * cosIncomingAngle));
+    float cosOutgoingAngle = sqrt(std::max(0., 1 - coefficientRatio * coefficientRatio * std::max(0., 1. - cosIncomingAngle * cosIncomingAngle)));
     float rPerp = (cosIncomingAngle - coefficientRatio * cosOutgoingAngle) / (cosIncomingAngle + coefficientRatio * cosOutgoingAngle);
     float rPara = (coefficientRatio * cosIncomingAngle - cosOutgoingAngle) / (coefficientRatio * cosIncomingAngle + cosOutgoingAngle);
     float reflectance = 1 / 2. * (rPerp * rPerp + rPara * rPara);
     if(sinOutgoingAngle > 1 || s.getSample().x() < reflectance)
     {
-        return inDirection + 2 * cosIncomingAngle * normal;
+        QVector3D v = inDirection + 2 * cosIncomingAngle * normal;
+        return v;
     }
     else
     {

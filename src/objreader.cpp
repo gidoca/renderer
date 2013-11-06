@@ -75,6 +75,7 @@ struct ObjMeshFaceIndex{
 
 struct ObjMaterial
 {
+    ObjMaterial() : specular_coefficient(0), optical_density(0), illum(0) {}
     ast_vector3_literal diffuse_color;
     std::string texture_filename;
     ast_vector3_literal specular_color;
@@ -265,7 +266,7 @@ ast_intersectable_list ObjReader::load(std::string filename, ast_material defaul
 
 void ObjReader::createMaterial(const ObjMaterial &material, QDir dir, std::string materialName)
 {
-    if(material.illum <= 2 || material.optical_density == 0)
+    if(material.illum <= 2)
     {
         if(!material.texture_filename.empty())
         {
@@ -297,6 +298,11 @@ void ObjReader::createMaterial(const ObjMaterial &material, QDir dir, std::strin
                 materials[materialName] = phong;
             }
         }
+    }
+    else if(material.illum == 11)
+    {
+        ast_mirror_material mirror;
+        materials[materialName] = mirror;
     }
     else
     {

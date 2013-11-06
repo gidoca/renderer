@@ -59,9 +59,10 @@ cv::Vec3f EnvironmentMap::get(QVector3D direction) const
 {
     QVector2D imageCoords(direction.y(), -direction.z());
     imageCoords *= acos(direction.x()) / (imageCoords.length() * M_PI);
-    float x = pixelFromNormalizedCoord(imageCoords.x(), image.size().width);
-    float y = pixelFromNormalizedCoord(imageCoords.y(), image.size().height);
-    return image.at<cv::Vec3f>(y, x).mul(coefficient);
+    int x = pixelFromNormalizedCoord(imageCoords.x(), image.size().width);
+    int y = pixelFromNormalizedCoord(imageCoords.y(), image.size().height);
+    //std::cerr << x << ',' << y << std::endl;
+    return image.at<cv::Vec3f>(std::min(y, image.size().width - 1), std::min(x, image.size().height - 1)).mul(coefficient);
 }
 
 Ray EnvironmentMap::getRandomRay(const Sample &sample1, const Sample &, float &pdf) const
