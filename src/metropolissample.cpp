@@ -58,20 +58,21 @@ void mutate(qreal &s, gsl_rng *rng)
   assert(0 <= s && s <= 1);
 }
 
+void mutate(QPointF &s, gsl_rng *rng)
+{
+    mutate(s.rx(), rng);
+    mutate(s.ry(), rng);
+}
+
 void MetropolisSample::smallStep(gsl_rng *rng)
 {
-  mutate(cameraSample.getSample().rx(), rng);
-  mutate(cameraSample.getSample().ry(), rng);
+  mutate(cameraSample.getSample(), rng);
   for(int i = 0; i < MAX_DEPTH; i++)
   {
-      mutate(lightPathSamples[i].getSample().rx(), rng);
-      mutate(lightPathSamples[i].getSample().ry(), rng);
-      mutate(cameraPathSamples[i].getSample().rx(), rng);
-      mutate(cameraPathSamples[i].getSample().ry(), rng);
-      mutate(lightSample1[i].getSample().rx(), rng);
-      mutate(lightSample1[i].getSample().ry(), rng);
-      mutate(lightSample2[i].getSample().rx(), rng);
-      mutate(lightSample2[i].getSample().ry(), rng);
+      mutate(lightPathSamples[i].getSample(), rng);
+      mutate(cameraPathSamples[i].getSample(), rng);
+      mutate(lightSample1[i].getSample(), rng);
+      mutate(lightSample2[i].getSample(), rng);
   }
 }
 

@@ -261,7 +261,10 @@ void MetropolisFltRenderer::render()
     }
     else
     {
-        importanceMap = channelMean(varOfFiltered) / (channelMean(filteredMean).mul(channelMean(filteredMean)) + 1e-2) + 1e-8;
+        Mat relativeVariance = channelMean(varOfFiltered) / (channelMean(filteredMean).mul(channelMean(filteredMean)) + 1e-2) + 1e-8;
+        Mat mappedRelativeVariance;
+        exp(-relativeVariance, mappedRelativeVariance);
+        importanceMap = -20 * (mappedRelativeVariance - 1);
         //Normalization needed for correct computation of weighted average
         importanceMap *= importanceMap.size().area() / sum(importanceMap)[0];
         assert(checkRange(importanceMap));
