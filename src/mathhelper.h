@@ -29,7 +29,7 @@ cv::Mat reduceval(cv::Mat in, int rtype);
 cv::Mat minval(cv::Mat in);
 cv::Mat maxval(cv::Mat in);
 
-void var(cv::Mat &mean, cv::Mat &var, std::vector<cv::Mat> in);
+void var(cv::Mat &mean, cv::Mat &var, const std::vector<cv::Mat>& in);
 cv::Mat channelMean(const cv::Mat &in);
 cv::Mat channelNorm(const cv::Mat &in);
 cv::Mat extend(const cv::Mat &in, int nchan = 3);

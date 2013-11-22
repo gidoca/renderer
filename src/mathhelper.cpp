@@ -41,7 +41,7 @@ cv::Mat maxval(Mat in)
     return reduceval(in, CV_REDUCE_MAX);
 }
 
-void var(Mat &mean, Mat &var, vector<Mat> in)
+void var(Mat &mean, Mat &var, const std::vector<Mat> &in)
 {
     Mat sum = Mat::zeros(in[0].size(), in[0].type()), sqr_sum = Mat::zeros(in[0].size(), in[0].type());
 
