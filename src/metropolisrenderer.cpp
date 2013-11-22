@@ -130,11 +130,17 @@ void MetropolisRenderer::render()
 #pragma omp parallel for
   for(int t = 0; t < numThreads; t++)
   {
+      int nacc = 0;
         if(doStop) continue;
+
+        Mat threadLocalFilm = Mat::zeros(film->size(), film->type());
+        Mat threadLocalVirtualSamples = Mat::zeros(virtualSamples.size(), virtualSamples.type());
+        Mat threadLocalRealSamples = Mat::zeros(virtualSamples.size(), realSamples.type());
 
         gsl_rng *rng = gsl_rng_alloc(gsl_rng_taus2);
         gsl_rng_set(rng, numThreads * seed + t);
         MetropolisSample currentSample = sample;
+        //sample.largeStep(rng);
         Vec3f currentValue = value;
         Path currentPath = path;
 
@@ -157,15 +163,15 @@ void MetropolisRenderer::render()
 
             if(lum(currentValue) > 0)
             {
-                addSample(currentSample.cameraSample, 1 - accept, *film, currentValue * (1.f / lum(currentValue) * b / numPixelSamples));
-                virtualSamples.at<float>(currentImageY, currentImageX) += (1 - accept) / currentImportance;
-                realSamples.at<float>(currentImageY, currentImageX) += 1 - accept;
+                addSample(currentSample.cameraSample, 1 - accept, threadLocalFilm, currentValue * (1.f / lum(currentValue) * b / numPixelSamples));
+                threadLocalVirtualSamples.at<float>(currentImageY, currentImageX) += (1 - accept) / currentImportance;
+                threadLocalRealSamples.at<float>(currentImageY, currentImageX) += 1 - accept;
             }
             if(lum(newValue) > 0)
             {
-                addSample(newSample.cameraSample, accept, *film, newValue * (1.f / lum(newValue) * b / numPixelSamples));
-                virtualSamples.at<float>(newImageY, newImageX) += accept / newImportance;
-                realSamples.at<float>(newImageY, newImageX) += accept;
+                addSample(newSample.cameraSample, accept, threadLocalFilm, newValue * (1.f / lum(newValue) * b / numPixelSamples));
+                threadLocalVirtualSamples.at<float>(newImageY, newImageX) += accept / newImportance;
+                threadLocalRealSamples.at<float>(newImageY, newImageX) += accept;
             }
             if(gsl_rng_uniform(rng) < accept)
             {
@@ -174,11 +180,20 @@ void MetropolisRenderer::render()
                 currentImageX = newImageX;
                 currentImageY = newImageY;
                 currentImportance = newImportance;
+                nacc++;
             }
             if(vm.count("verbose") && i % 100000 == 0)
             {
                 std::cerr << "Thread " << t + 1 << " of " << numThreads << ": " << 100 * i / (numSamples - 1) << "%" << std::endl;
             }
+
+        }
+        std::cerr << (float)nacc / numSamples << std::endl;
+#pragma omp critical
+        {
+            *film += threadLocalFilm;
+            virtualSamples += threadLocalVirtualSamples;
+            realSamples += threadLocalRealSamples;
         }
         gsl_rng_free(rng);
   }
