@@ -32,6 +32,7 @@
 #include <cassert>
 #include <algorithm>
 #include <iostream>
+#include <iomanip>
 
 #ifdef USE_OPENMP
 #include <omp.h>
@@ -264,7 +265,7 @@ void MetropolisFltRenderer::render()
         Mat relativeVariance = channelMean(varOfFiltered) / (channelMean(filteredMean).mul(channelMean(filteredMean)) + 1e-2) + 1e-8;
         Mat mappedRelativeVariance;
         exp(-relativeVariance, mappedRelativeVariance);
-        importanceMap = -20 * (mappedRelativeVariance - 1);
+        importanceMap = -20 * (mappedRelativeVariance - 1) + 1;
         //Normalization needed for correct computation of weighted average
         importanceMap *= importanceMap.size().area() / sum(importanceMap)[0];
         assert(checkRange(importanceMap));
