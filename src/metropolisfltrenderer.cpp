@@ -59,8 +59,8 @@ MetropolisFltRenderer::MetropolisFltRenderer() :
 
 Point2i getPos(const Sample& cameraSample, Size size)
 {
-    int x = min<int>(cameraSample.getSample().x() * size.width, size.width - 1);
-    int y = min<int>(cameraSample.getSample().y() * size.height, size.height - 1);
+    int x = max(0, min<int>(cameraSample.getSample().x() * size.width, size.width - 1));
+    int y = max(0, min<int>(cameraSample.getSample().y() * size.height, size.height - 1));
     assert(0 <= x && x < size.width);
     assert(0 <= y && y < size.height);
     return Point2i(x, y);
@@ -94,6 +94,7 @@ void MetropolisFltRenderer::renderStep(Size size, const Scene& scene, Mat import
 {
   const int numInitialSamples = vm["metflt-bootstrap"].as<int>();
   const float largeStepProb = vm["metflt-large-step-prob"].as<float>();
+  const float terminationProb = vm["metflt-termination-prob"].as<float>();
   const int numPixelSamples = vm["metflt-mutations"].as<int>();
 
   gsl_rng *globalrng = gsl_rng_alloc(gsl_rng_taus2);
@@ -172,7 +173,7 @@ void MetropolisFltRenderer::renderStep(Size size, const Scene& scene, Mat import
       {
           if(doStop) continue;
 
-          MetropolisSample newSample = currentSample.mutated(rng, largeStepProb);
+          MetropolisSample newSample = currentSample.mutated(rng, largeStepProb, terminationProb);
           Point newPos = getPos(newSample.cameraSample, size);
           Vec3f newValue = integrator.integrate(newSample.cameraPathFromSample(*scene.object, scene.camera), *scene.object, scene.light, newSample.lightSample1, newSample.lightIndex);
           assert(checkRange(newValue));
@@ -340,6 +341,7 @@ options_description MetropolisFltRenderer::options()
   options_description opts("Metropolis-Filter renderer options");
   opts.add_options()
       ("metflt-large-step-prob", value<float>()->default_value(0.1f, "0.1"), "the probability for a mutation to be a large step mutation")
+      ("metflt-termination-prob", value<float>()->default_value(0.5f, "0.5"))
       ("metflt-bootstrap", value<int>()->default_value(1000), "number of bootstrapping samples")
       ("metflt-mutations", value<int>()->default_value(16), "average number of path mutations per pixel")
       ("metflt-simple-variance-filter", "just use a box filter to filter the variance")

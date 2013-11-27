@@ -31,12 +31,13 @@
 class MetropolisSample
 {
 public:
-  MetropolisSample(int numLights) : numLights(numLights) {}
+  MetropolisSample(int numLights) : numLights(numLights), terminationProb(1), pathLength(MAX_DEPTH) {}
 
   void largeStep(gsl_rng *rng);
   void smallStep(gsl_rng *rng);
+  void mutatePathLength(gsl_rng *rng, float terminationProb);
   void initAtPixel(QPointF pixel, gsl_rng *rng);
-  MetropolisSample mutated(gsl_rng *rng, float largeStepProb);
+  MetropolisSample mutated(gsl_rng *rng, float largeStepProb, float terminationProb);
   Path cameraPathFromSample(const Intersectable & scene, const Camera & camera);
 
   Sample lightSample1[MAX_DEPTH], lightSample2[MAX_DEPTH];
@@ -47,6 +48,9 @@ public:
   unsigned long int lightIndex[MAX_DEPTH];
 
   int numLights;
+
+  float terminationProb;
+  int pathLength;
 };
 
 #endif // METROPOLISSAMPLE_H

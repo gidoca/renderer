@@ -44,8 +44,8 @@ using namespace cv;
 
 void addSample(const Sample &cameraSample, float weight, Mat &film, Vec3f value)
 {
-    int x = min<int>(cameraSample.getSample().x() * film.size().width, film.size().width - 1);
-    int y = min<int>(cameraSample.getSample().y() * film.size().height, film.size().height - 1);
+    int x = max(0, min<int>(cameraSample.getSample().x() * film.size().width, film.size().width - 1));
+    int y = max(0, min<int>(cameraSample.getSample().y() * film.size().height, film.size().height - 1));
     assert(0 <= x && x < film.size().width);
     assert(0 <= y && y < film.size().height);
 
@@ -80,6 +80,7 @@ void MetropolisRenderer::render()
 
   const int numInitialSamples = vm["met-bootstrap"].as<int>();
   const float largeStepProb = vm["met-large-step-prob"].as<float>();
+  const float terminationProb = vm["met-termination-prob"].as<float>();
 
   float sumI = 0;
   vector<float> bootstrapI;
@@ -124,8 +125,8 @@ void MetropolisRenderer::render()
 #endif
   const long numSamples = (long)numPixelSamples * film->size().area() / numThreads;
 
-  Mat virtualSamples = Mat::zeros(film->size(), CV_32F);
-  Mat realSamples = Mat::zeros(film->size(), CV_32F);
+  //Mat virtualSamples = Mat::zeros(film->size(), CV_32F);
+  //Mat realSamples = Mat::zeros(film->size(), CV_32F);
 
 #pragma omp parallel for
   for(int t = 0; t < numThreads; t++)
@@ -134,8 +135,8 @@ void MetropolisRenderer::render()
         if(doStop) continue;
 
         Mat threadLocalFilm = Mat::zeros(film->size(), film->type());
-        Mat threadLocalVirtualSamples = Mat::zeros(virtualSamples.size(), virtualSamples.type());
-        Mat threadLocalRealSamples = Mat::zeros(virtualSamples.size(), realSamples.type());
+        //Mat threadLocalVirtualSamples = Mat::zeros(virtualSamples.size(), virtualSamples.type());
+        //Mat threadLocalRealSamples = Mat::zeros(virtualSamples.size(), realSamples.type());
 
         gsl_rng *rng = gsl_rng_alloc(gsl_rng_taus2);
         gsl_rng_set(rng, numThreads * seed + t);
@@ -151,7 +152,7 @@ void MetropolisRenderer::render()
         for(long i = 0; i < numSamples; i++)
         {
             if(doStop) continue;
-            MetropolisSample newSample = currentSample.mutated(rng, largeStepProb);
+            MetropolisSample newSample = currentSample.mutated(rng, largeStepProb, terminationProb);
             currentPath = newSample.cameraPathFromSample(*scene.object, scene.camera);
             Vec3f newValue = integrator.integrate(currentPath, *scene.object, scene.light, newSample.lightSample1, newSample.lightIndex);
             int newImageX = (int)(newSample.cameraSample.getSample().x() * film->size().width);
@@ -164,14 +165,14 @@ void MetropolisRenderer::render()
             if(lum(currentValue) > 0)
             {
                 addSample(currentSample.cameraSample, 1 - accept, threadLocalFilm, currentValue * (1.f / lum(currentValue) * b / numPixelSamples));
-                threadLocalVirtualSamples.at<float>(currentImageY, currentImageX) += (1 - accept) / currentImportance;
-                threadLocalRealSamples.at<float>(currentImageY, currentImageX) += 1 - accept;
+                //threadLocalVirtualSamples.at<float>(currentImageY, currentImageX) += (1 - accept) / currentImportance;
+                //threadLocalRealSamples.at<float>(currentImageY, currentImageX) += 1 - accept;
             }
             if(lum(newValue) > 0)
             {
                 addSample(newSample.cameraSample, accept, threadLocalFilm, newValue * (1.f / lum(newValue) * b / numPixelSamples));
-                threadLocalVirtualSamples.at<float>(newImageY, newImageX) += accept / newImportance;
-                threadLocalRealSamples.at<float>(newImageY, newImageX) += accept;
+                //threadLocalVirtualSamples.at<float>(newImageY, newImageX) += accept / newImportance;
+                //threadLocalRealSamples.at<float>(newImageY, newImageX) += accept;
             }
             if(gsl_rng_uniform(rng) < accept)
             {
@@ -192,12 +193,12 @@ void MetropolisRenderer::render()
 #pragma omp critical
         {
             *film += threadLocalFilm;
-            virtualSamples += threadLocalVirtualSamples;
-            realSamples += threadLocalRealSamples;
+            //virtualSamples += threadLocalVirtualSamples;
+            //realSamples += threadLocalRealSamples;
         }
         gsl_rng_free(rng);
   }
-  *film = film->mul(extend(virtualSamples / realSamples));
+  //*film = film->mul(extend(virtualSamples / realSamples));
 }
 
 options_description MetropolisRenderer::options()
@@ -205,6 +206,7 @@ options_description MetropolisRenderer::options()
   options_description opts("Metropolis renderer options");
   opts.add_options()
       ("met-large-step-prob", value<float>()->default_value(0.1f, "0.1"), "the probability for a mutation to be a large step mutation")
+      ("met-termination-prob", value<float>()->default_value(0.5f, "0.5"))
       ("met-bootstrap", value<int>()->default_value(1000), "number of bootstrapping samples")
       ("met-mutations", value<int>()->default_value(16), "average number of path mutations per pixel");
   return opts;
