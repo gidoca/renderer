@@ -31,8 +31,6 @@
 #include <fstream>
 #include <functional>
 
-#include <boost/program_options.hpp>
-
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 
@@ -66,6 +64,7 @@ struct option_adder
   }
 };
 
+variables_map vm;
 
 
 int main(int argc, char **argv) {
@@ -97,7 +96,6 @@ int main(int argc, char **argv) {
   //Yay, metaprogramming - because we can!
   boost::mpl::for_each<Renderers>(option_adder(&command_line_options));
 
-  variables_map vm;
   try
   {
     store(parse_command_line(argc, argv, command_line_options), vm);
@@ -159,7 +157,7 @@ int main(int argc, char **argv) {
 
   cv::Mat * film = new cv::Mat(scene.camera.getResolution().height(), scene.camera.getResolution().width(), CV_32FC3);
 
-  RenderingManager manager(film, vm);
+  RenderingManager manager(film);
   try
   {
       manager.setCurrentRenderer(vm["renderer"].as<string>());

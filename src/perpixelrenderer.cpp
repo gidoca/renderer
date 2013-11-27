@@ -55,7 +55,7 @@ void PerPixelRenderer::render()
   QTime time;
   time.start();
 
-  unsigned long seed = getSeed(vm);
+  unsigned long seed = getSeed();
 
   cv::Vec3f sumI;
   

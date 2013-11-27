@@ -21,7 +21,7 @@ class RenderingManager : public QObject
     Q_OBJECT
 
 public:
-    RenderingManager(cv::Mat * film, const boost::program_options::variables_map vm);
+    RenderingManager(cv::Mat * film);
 
     void setCurrentRenderer(std::string name);
 

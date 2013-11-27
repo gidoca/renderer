@@ -43,16 +43,12 @@ class Renderer : public QThread
 
 public:
   Renderer() : doStop(true) {}
-  Renderer(const Renderer& other) : QThread(), doStop(other.doStop), scene(other.scene), film(other.film), vm(other.vm) {}
+  Renderer(const Renderer& other) : QThread(), doStop(other.doStop), scene(other.scene), film(other.film) {}
   virtual ~Renderer() {}
 
   void setOutput(cv::Mat * film)
   {
       this->film = film;
-  }
-  void setOptions(const boost::program_options::variables_map vm)
-  {
-      this->vm = vm;
   }
 
   void prepareRenderingScene(Scene scene);
@@ -67,7 +63,7 @@ Q_SIGNALS:
   void finishedRendering();
 
 protected:
-  unsigned long getSeed(boost::program_options::variables_map vm);
+  unsigned long getSeed();
 
   void run();
   virtual void render() = 0;
@@ -75,7 +71,6 @@ protected:
   bool doStop;
   Scene scene;
   cv::Mat * film;
-  boost::program_options::variables_map vm;
 };
 
 #endif // RENDERER_H

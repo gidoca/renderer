@@ -9,20 +9,18 @@ struct initializer
 {
   std::map<std::string, Renderer*> &renderers;
   cv::Mat *film;
-  const boost::program_options::variables_map vm;
-  initializer(std::map<std::string, Renderer*> &renderers, cv::Mat *film, const boost::program_options::variables_map vm) : renderers(renderers), film(film), vm(vm) {}
+  initializer(std::map<std::string, Renderer*> &renderers, cv::Mat *film) : renderers(renderers), film(film) {}
 
   template< typename R > void operator()(R)
   {
       renderers[R::name] = new R();
       renderers[R::name]->setOutput(film);
-      renderers[R::name]->setOptions(vm);
   }
 };
 
-RenderingManager::RenderingManager(cv::Mat *film, const boost::program_options::variables_map vm) : currentRenderer(nullptr)
+RenderingManager::RenderingManager(cv::Mat *film) : currentRenderer(nullptr)
 {
-    initializer init(renderers, film, vm);
+    initializer init(renderers, film);
     boost::mpl::for_each<Renderers>(init);
 }
 

@@ -209,7 +209,7 @@ void MetropolisFltRenderer::renderStep(Size size, const Scene& scene, Mat import
 
 void MetropolisFltRenderer::render()
 {
-  const int seed = getSeed(vm);
+  const int seed = getSeed();
   numPasses = vm["metflt-num-passes"].as<int>();
 
   sumImportance = Mat::zeros(film->size(), CV_32F);

@@ -68,7 +68,7 @@ void MetropolisRenderer::render()
     importanceMap *= importanceMap.size().area() / sum(importanceMap)[0];
 
   gsl_rng *globalrng = gsl_rng_alloc(gsl_rng_taus2);
-  const unsigned long seed = getSeed(vm);
+  const unsigned long seed = getSeed();
   gsl_rng_set(globalrng, seed);
 
 

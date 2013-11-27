@@ -43,7 +43,7 @@ public:
 
 private:
   float computeEd(const Scene & scene, gsl_rng *rng, int pathsPerPixel);
-  void equalDispositionFlow(MetropolisSample sample, const Intersectable& scene, const std::vector<const Light*> light, const Camera & camera, gsl_rng *rng, float ed, boost::program_options::variables_map vm);
+  void equalDispositionFlow(MetropolisSample sample, const Intersectable& scene, const std::vector<const Light*> light, const Camera & camera, gsl_rng *rng, float ed);
 };
 
 #endif // ENERGYREDISTRIBUTIONRENDERER_H

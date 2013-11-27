@@ -121,7 +121,7 @@ boost::program_options::options_description Renderer::options()
   return boost::program_options::options_description("Renderer");
 }
 
-unsigned long Renderer::getSeed(boost::program_options::variables_map vm)
+unsigned long Renderer::getSeed()
 {
   if(vm.count("fixed-seed"))
   {

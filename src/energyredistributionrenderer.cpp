@@ -37,7 +37,7 @@ using namespace cv;
 
 void EnergyRedistributionRenderer::render()
 {
-  const unsigned long seed = getSeed(vm);
+  const unsigned long seed = getSeed();
 
   gsl_rng *globalrng = gsl_rng_alloc(gsl_rng_taus2);
   gsl_rng_set(globalrng, seed);
@@ -72,7 +72,7 @@ void EnergyRedistributionRenderer::render()
         point.ry() /= size.height;
         MetropolisSample initialSample(scene.light.size());
         initialSample.initAtPixel(point, rng);
-        equalDispositionFlow(initialSample, *scene.object, scene.light, scene.camera, rng, ed, vm);
+        equalDispositionFlow(initialSample, *scene.object, scene.light, scene.camera, rng, ed);
       }
     }
     gsl_rng_free(rng);
@@ -80,7 +80,7 @@ void EnergyRedistributionRenderer::render()
 
 }
 
-void EnergyRedistributionRenderer::equalDispositionFlow(MetropolisSample initialSample, const Intersectable &scene, std::vector<const Light *>light, const Camera & camera, gsl_rng *rng, float ed, variables_map vm)
+void EnergyRedistributionRenderer::equalDispositionFlow(MetropolisSample initialSample, const Intersectable &scene, std::vector<const Light *>light, const Camera & camera, gsl_rng *rng, float ed)
 {
   UniDiPathTracingIntegrator integrator(0.1);
   Path initialPath = initialSample.cameraPathFromSample(scene, camera);

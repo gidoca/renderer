@@ -21,6 +21,8 @@
 #ifndef GLOBAL_H
 #define GLOBAL_H
 
+#include <boost/program_options.hpp>
+
 class AreaLight;
 class AxisAlignedBox;
 class BiDiPathTracingIntegrator;
@@ -105,5 +107,7 @@ struct ast_cone_light;
 struct ast_intersectable_assignment;
 struct ast_camera_assignment;
 struct ast_light_assignment;
+
+extern boost::program_options::variables_map vm;
 
 #endif // GLOBAL_H
