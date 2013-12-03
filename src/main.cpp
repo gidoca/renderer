@@ -29,6 +29,7 @@
 #include <vector>
 #include <iostream>
 #include <fstream>
+#include <iomanip>
 #include <functional>
 
 #include <opencv2/core/core.hpp>
@@ -81,6 +82,7 @@ int main(int argc, char **argv) {
       ("gui,u", "display the result in a window")
       ("save-exr,e", value<string>(), "write the result to the specified EXR file")
       ("save-img,i", value<string>(), "write the result to the specified LDR image file")
+      ("save-mat,m", value<string>(), "write the result to the specified matlab file")
       ("dump-bvh,b", value<string>(), "write the bvh tree to the specified file");
   command_line_options.add(general); 
 	
@@ -201,6 +203,30 @@ int main(int argc, char **argv) {
       QObject::connect(&manager, &RenderingManager::finishedRendering, [=]() mutable {
           QImage img = tm.tonemap(*film);
           img.save(QString::fromStdString(vm["save-img"].as<string>()));
+      });
+  }
+
+  if(vm.count("save-mat"))
+  {
+      QObject::connect(&manager, &RenderingManager::finishedRendering, [=]() {
+          ofstream file(vm["save-mat"].as<string>());
+          file << fixed << setw(10);
+          auto size = film->size();
+          file << "im = zeros(" << size.height << "," << size.width << ",3);" << endl;
+          for(int c = 0; c < 3; c++)
+          {
+              file << "im(:, :, " << 3 - c << ")=[";
+              for(int i = 0; i < size.height; i++)
+              {
+                  for(int j = 0; j < size.width; j++)
+                  {
+                      file << film->at<cv::Vec3f>(i, j)[c];
+                      file << ",";
+                  }
+                  file << ";";
+              }
+              file << "];" << endl;
+          }
       });
   }
 
