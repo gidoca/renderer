@@ -65,7 +65,7 @@ Path Renderer::createPath(const Ray &primaryRay, const Intersectable &scene, gsl
     return createPath(primaryRay, scene, pathSamples, initialAlpha, pathLength, terminationProb);
 }
 
-Path Renderer::createPath(const Ray& primaryRay, const Intersectable &scene, Sample pathSamples[], cv::Vec3f alpha, int pathLength, float russianRoulettePdf)
+Path Renderer::createPath(const Ray& primaryRay, const Intersectable &scene, const Sample pathSamples[], cv::Vec3f alpha, int pathLength, float russianRoulettePdf)
 {
   Path result;
   HitRecord hit = scene.intersect(primaryRay);

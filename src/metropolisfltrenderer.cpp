@@ -57,18 +57,9 @@ MetropolisFltRenderer::MetropolisFltRenderer() :
 {
 }
 
-Point2i getPos(const Sample& cameraSample, Size size)
+void MetropolisFltRenderer::addSample(const MetropolisSample &cameraSample, float weight, Mat &film, Mat &mean, Mat &m2, Mat &sumweight, Vec3f value)
 {
-    int x = max(0, min<int>(cameraSample.getSample().x() * size.width, size.width - 1));
-    int y = max(0, min<int>(cameraSample.getSample().y() * size.height, size.height - 1));
-    assert(0 <= x && x < size.width);
-    assert(0 <= y && y < size.height);
-    return Point2i(x, y);
-}
-
-void MetropolisFltRenderer::addSample(const Sample &cameraSample, float weight, Mat &film, Mat &mean, Mat &m2, Mat &sumweight, Vec3f value)
-{
-    Point2i pos = getPos(cameraSample, film.size());
+    Point2i pos = cameraSample.getPos(film.size());
     Vec3f depositValue = weight * value;
     assert(!isnan(depositValue[0]) && !isnan(depositValue[1]) && !isnan(depositValue[2]));
 
@@ -117,7 +108,7 @@ void MetropolisFltRenderer::renderStep(Size size, const Scene& scene, Mat import
         initialSample.largeStep(globalrng);
         Path initialPath = initialSample.cameraPathFromSample(*scene.object, scene.camera);
         Vec3f l = integrator.integrate(initialPath, *scene.object, scene.light, initialSample.lightSample1, initialSample.lightIndex);
-        float v = norm(l) * importanceMap.at<float>(getPos(initialSample.cameraSample, size));
+        float v = norm(l) * importanceMap.at<float>(initialSample.getPos(size));
         sumI += v;
         bootstrapI.push_back(v);
         bootstrapSamples.push_back(initialSample);
@@ -167,14 +158,14 @@ void MetropolisFltRenderer::renderStep(Size size, const Scene& scene, Mat import
       MetropolisSample currentSample = initialSample;
       Vec3f currentValue = integrator.integrate(initialSample.cameraPathFromSample(*scene.object, scene.camera), *scene.object, scene.light, initialSample.lightSample1, initialSample.lightIndex);
       assert(checkRange(currentValue));
-      Point currentPos = getPos(currentSample.cameraSample, size);
+      Point currentPos = currentSample.getPos(size);
 
       for(int i = 0; i < numSamples; i++)
       {
           if(doStop) continue;
 
           MetropolisSample newSample = currentSample.mutated(rng, largeStepProb, terminationProb);
-          Point newPos = getPos(newSample.cameraSample, size);
+          Point newPos = newSample.getPos(size);
           Vec3f newValue = integrator.integrate(newSample.cameraPathFromSample(*scene.object, scene.camera), *scene.object, scene.light, newSample.lightSample1, newSample.lightIndex);
           assert(checkRange(newValue));
           float accept = min(1., norm(newValue) * importanceMap.at<float>(newPos) / (norm(currentValue) * importanceMap.at<float>(currentPos)));
@@ -182,11 +173,11 @@ void MetropolisFltRenderer::renderStep(Size size, const Scene& scene, Mat import
 
           if(norm(currentValue) > 0 && accept < 1)
           {
-              addSample(currentSample.cameraSample, (1 - accept) / newSumImportance.at<float>(currentPos), films[n], biased_mean[n], biased_m2[n], sumweight[n], currentValue * (1 / norm(currentValue) * b * numPasses / numPixelSamples));
+              addSample(currentSample, (1 - accept) / newSumImportance.at<float>(currentPos), films[n], biased_mean[n], biased_m2[n], sumweight[n], currentValue * (1 / norm(currentValue) * b * numPasses / numPixelSamples));
           }
           if(norm(newValue) > 0 && accept > 0)
           {
-              addSample(newSample.cameraSample, accept / newSumImportance.at<float>(newPos), films[n], biased_mean[n], biased_m2[n], sumweight[n], newValue * (1 / norm(newValue) * b * numPasses / numPixelSamples));
+              addSample(newSample, accept / newSumImportance.at<float>(newPos), films[n], biased_mean[n], biased_m2[n], sumweight[n], newValue * (1 / norm(newValue) * b * numPasses / numPixelSamples));
           }
           if(gsl_rng_uniform(rng) < accept)
           {

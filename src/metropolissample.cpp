@@ -61,7 +61,7 @@ void mutate(qreal &s, gsl_rng *rng)
 {
   JitteredSampler sampler(1, 1, rng);
   Sample sample = sampler.getSamples().front();
-  static const float a = 1. / 1024., b = 1. / 16.;
+  static const float a = 1. / 1024., b = 1. / 64.;
   static const float logRatio = -log(b / a);
   float delta = b * exp(logRatio * sample.getSample().x());
   if(sample.getSample().y() < 0.5)
@@ -99,7 +99,7 @@ void MetropolisSample::initAtPixel(QPointF cameraSample, gsl_rng *rng)
   this->cameraSample = Sample(cameraSample);
 }
 
-MetropolisSample MetropolisSample::mutated(gsl_rng *rng, float largeStepProb, float terminationProb)
+MetropolisSample MetropolisSample::mutated(gsl_rng *rng, float largeStepProb, float terminationProb) const
 {
   MetropolisSample result = *this;
   result.mutatePathLength(rng, terminationProb);
@@ -115,11 +115,20 @@ MetropolisSample MetropolisSample::mutated(gsl_rng *rng, float largeStepProb, fl
   return result;
 }
 
-Path MetropolisSample::cameraPathFromSample(const Intersectable & scene, const Camera& camera)
+Path MetropolisSample::cameraPathFromSample(const Intersectable & scene, const Camera& camera) const
 {
   QPointF pixel = cameraSample.getSample();
   pixel.rx() *= camera.getResolution().width();
   pixel.ry() *= camera.getResolution().height();
   Path result = Renderer::createPath(camera.getRay(pixel), scene, cameraPathSamples, cv::Vec3f(1, 1, 1), pathLength, terminationProb);
   return result;
+}
+
+cv::Point2i MetropolisSample::getPos(cv::Size size) const
+{
+    int x = std::max(0, std::min<int>(cameraSample.getSample().x() * size.width, size.width - 1));
+    int y = std::max(0, std::min<int>(cameraSample.getSample().y() * size.height, size.height - 1));
+    assert(0 <= x && x < size.width);
+    assert(0 <= y && y < size.height);
+    return cv::Point2i(x, y);
 }

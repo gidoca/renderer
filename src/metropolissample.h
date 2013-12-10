@@ -28,6 +28,8 @@
 
 #include <QPointF>
 
+#include <opencv2/core/core.hpp>
+
 class MetropolisSample
 {
 public:
@@ -37,8 +39,9 @@ public:
   void smallStep(gsl_rng *rng);
   void mutatePathLength(gsl_rng *rng, float terminationProb);
   void initAtPixel(QPointF pixel, gsl_rng *rng);
-  MetropolisSample mutated(gsl_rng *rng, float largeStepProb, float terminationProb);
-  Path cameraPathFromSample(const Intersectable & scene, const Camera & camera);
+  MetropolisSample mutated(gsl_rng *rng, float largeStepProb, float terminationProb) const;
+  Path cameraPathFromSample(const Intersectable & scene, const Camera & camera) const;
+  cv::Point2i getPos(cv::Size size) const;
 
   Sample lightSample1[MAX_DEPTH], lightSample2[MAX_DEPTH];
   Sample cameraSample;

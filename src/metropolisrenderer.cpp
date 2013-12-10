@@ -113,7 +113,7 @@ void MetropolisRenderer::render()
     sumI += bootstrapI[i];
     if(sumI > contribOffset) break;
   }
-//  sample.largeStep(globalrng);
+  sample.largeStep(globalrng);
 
   gsl_rng_free(globalrng);
 
@@ -128,10 +128,12 @@ void MetropolisRenderer::render()
   //Mat virtualSamples = Mat::zeros(film->size(), CV_32F);
   //Mat realSamples = Mat::zeros(film->size(), CV_32F);
 
+  int nacc = 0;
+
 #pragma omp parallel for
   for(int t = 0; t < numThreads; t++)
   {
-      int nacc = 0;
+      int threadLocalNacc = 0;
         if(doStop) continue;
 
         Mat threadLocalFilm = Mat::zeros(film->size(), film->type());
@@ -145,8 +147,8 @@ void MetropolisRenderer::render()
         Vec3f currentValue = value;
         Path currentPath = path;
 
-        int currentImageX = (int)(currentSample.cameraSample.getSample().x() * film->size().width);
-        int currentImageY = (int)(currentSample.cameraSample.getSample().y() * film->size().height);
+        int currentImageX = currentSample.getPos(film->size()).x;
+        int currentImageY = currentSample.getPos(film->size()).y;
         float currentImportance = importanceMap.at<float>(currentImageY, currentImageX);
 
         for(long i = 0; i < numSamples; i++)
@@ -181,7 +183,7 @@ void MetropolisRenderer::render()
                 currentImageX = newImageX;
                 currentImageY = newImageY;
                 currentImportance = newImportance;
-                nacc++;
+                threadLocalNacc++;
             }
             if(vm.count("verbose") && i % 100000 == 0)
             {
@@ -189,15 +191,16 @@ void MetropolisRenderer::render()
             }
 
         }
-        std::cerr << (float)nacc / numSamples << std::endl;
 #pragma omp critical
         {
             *film += threadLocalFilm;
             //virtualSamples += threadLocalVirtualSamples;
             //realSamples += threadLocalRealSamples;
+            nacc += threadLocalNacc;
         }
         gsl_rng_free(rng);
   }
+  std::cerr << 100.f * nacc / numSamples / numThreads << "% accpeted" << std::endl;
   //*film = film->mul(extend(virtualSamples / realSamples));
 }
 
