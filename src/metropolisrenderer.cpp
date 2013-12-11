@@ -42,17 +42,13 @@ using namespace std;
 using namespace boost::program_options;
 using namespace cv;
 
-void addSample(const Sample &cameraSample, float weight, Mat &film, Vec3f value)
+void addSample(const MetropolisSample &sample, float weight, Mat &film, Vec3f value)
 {
-    int x = max(0, min<int>(cameraSample.getSample().x() * film.size().width, film.size().width - 1));
-    int y = max(0, min<int>(cameraSample.getSample().y() * film.size().height, film.size().height - 1));
-    assert(0 <= x && x < film.size().width);
-    assert(0 <= y && y < film.size().height);
-
+    Point2i pos = sample.getPos(film.size());
     Vec3f depositValue = weight * value;
 
 #pragma omp critical
-    film.at<Vec3f>(y, x) += depositValue;
+    film.at<Vec3f>(pos) += depositValue;
 }
 
 void MetropolisRenderer::render()
@@ -166,13 +162,13 @@ void MetropolisRenderer::render()
 
             if(lum(currentValue) > 0)
             {
-                addSample(currentSample.cameraSample, 1 - accept, threadLocalFilm, currentValue * (1.f / lum(currentValue) * b / numPixelSamples));
+                addSample(currentSample, 1 - accept, threadLocalFilm, currentValue * (1.f / lum(currentValue) * b / numPixelSamples));
                 //threadLocalVirtualSamples.at<float>(currentImageY, currentImageX) += (1 - accept) / currentImportance;
                 //threadLocalRealSamples.at<float>(currentImageY, currentImageX) += 1 - accept;
             }
             if(lum(newValue) > 0)
             {
-                addSample(newSample.cameraSample, accept, threadLocalFilm, newValue * (1.f / lum(newValue) * b / numPixelSamples));
+                addSample(newSample, accept, threadLocalFilm, newValue * (1.f / lum(newValue) * b / numPixelSamples));
                 //threadLocalVirtualSamples.at<float>(newImageY, newImageX) += accept / newImportance;
                 //threadLocalRealSamples.at<float>(newImageY, newImageX) += accept;
             }
