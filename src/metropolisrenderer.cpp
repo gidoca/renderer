@@ -143,9 +143,8 @@ void MetropolisRenderer::render()
         Vec3f currentValue = value;
         Path currentPath = path;
 
-        int currentImageX = currentSample.getPos(film->size()).x;
-        int currentImageY = currentSample.getPos(film->size()).y;
-        float currentImportance = importanceMap.at<float>(currentImageY, currentImageX);
+        cv::Point2i currentImagePos = currentSample.getPos(film->size());
+        float currentImportance = importanceMap.at<float>(currentImagePos);
 
         for(long i = 0; i < numSamples; i++)
         {
@@ -153,9 +152,9 @@ void MetropolisRenderer::render()
             MetropolisSample newSample = currentSample.mutated(rng, largeStepProb, terminationProb);
             currentPath = newSample.cameraPathFromSample(*scene.object, scene.camera);
             Vec3f newValue = integrator.integrate(currentPath, *scene.object, scene.light, newSample.lightSample1, newSample.lightIndex);
-            int newImageX = (int)(newSample.cameraSample.getSample().x() * film->size().width);
-            int newImageY = (int)(newSample.cameraSample.getSample().y() * film->size().height);
-            float newImportance = importanceMap.at<float>(newImageY, newImageX);
+
+            cv::Point2i newImagePos = newSample.getPos(film->size());
+            float newImportance = importanceMap.at<float>(newImagePos);
 
             float accept = min<float>(1., lum(newValue) * newImportance / (lum(currentValue) * currentImportance));
             assert(!isnan(accept));
@@ -176,8 +175,7 @@ void MetropolisRenderer::render()
             {
                 currentSample = newSample;
                 currentValue = newValue;
-                currentImageX = newImageX;
-                currentImageY = newImageY;
+                currentImagePos = newImagePos;
                 currentImportance = newImportance;
                 threadLocalNacc++;
             }
