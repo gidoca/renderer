@@ -41,6 +41,7 @@ std::list<IntersectionParameter> AxisAlignedBox::getCSGIntersection(Ray ray) con
   for(int i = 0; i < 3; i++)
   {
     a = 1 / get(rayDirection, i);
+    temp_normal = QVector3D();
     if(a >= 0)
     {
       temp_tmin = get(min - rayOrigin, i);
@@ -61,15 +62,13 @@ std::list<IntersectionParameter> AxisAlignedBox::getCSGIntersection(Ray ray) con
       param.normal = temp_normal;
     }
     if(temp_tmax < tmax) tmax = temp_tmax;
+    if(tmin > tmax) return result;
   }
 
-  if(tmin <= tmax)
-  {
-    param.t = tmin;
-    result.push_back(param);
-    param.t = tmax;
-    result.push_back(param);
-  }
+  param.t = tmin;
+  result.push_back(param);
+  param.t = tmax;
+  result.push_back(param);
   return result;
 }
 

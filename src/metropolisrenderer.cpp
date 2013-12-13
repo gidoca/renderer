@@ -194,7 +194,7 @@ void MetropolisRenderer::render()
         }
         gsl_rng_free(rng);
   }
-  std::cerr << 100.f * nacc / numSamples / numThreads << "% accpeted" << std::endl;
+  std::cerr << 100.f * nacc / numSamples / numThreads << "% accepted" << std::endl;
   //*film = film->mul(extend(virtualSamples / realSamples));
 }
 
