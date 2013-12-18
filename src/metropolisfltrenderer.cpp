@@ -270,7 +270,7 @@ void MetropolisFltRenderer::render()
     }
     var(newOut, noisy_variance, films);
     var(meanvar, varvar, biased_var);
-    if(vm.count("metflt-omit-filter") || vm.count("metflt-omit-variance-filter"))
+    if(vm.count("metflt-no-filter") || vm.count("metflt-no-variance-filter"))
     {
         filteredVar = noisy_variance;
     }
@@ -288,7 +288,7 @@ void MetropolisFltRenderer::render()
         filteredVar = varF.filter(noisy_variance, meanvar, varvar);
     }
 
-    if(vm.count("metflt-omit-filter"))
+    if(vm.count("metflt-no-filter"))
     {
         varOfFiltered = filteredVar;
         filteredMean = newOut;
@@ -337,8 +337,8 @@ options_description MetropolisFltRenderer::options()
       ("metflt-mutations", value<int>()->default_value(16), "average number of path mutations per pixel")
       ("metflt-simple-variance-filter", "just use a box filter to filter the variance")
       ("metflt-no-crossfiltering", "filter the average image instead of cross filtering")
-      ("metflt-omit-filter", "don't filter the image")
-      ("metflt-omit-variance-filter", "filter the image using unfiltered guidance")
+      ("metflt-no-filter", "don't filter the image")
+      ("metflt-no-variance-filter", "filter the image using unfiltered guidance")
       ("metflt-num-passes", value<int>()->default_value(3), "the number of filtering passes")
       ("metflt-debug-dir", value<string>(), "dump intermediate results to the specified directory");
   return opts;

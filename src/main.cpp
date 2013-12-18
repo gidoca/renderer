@@ -92,6 +92,7 @@ int main(int argc, char **argv) {
       ("fixed-seed,d", "use a fixed seed for the RNG to make the resulting image deterministic")
       ("seed", value<unsigned long>()->default_value(0), "the random generator seed to use when the --fixed-seed option is set")
       ("scene,s", value<string>(), "the scene description file (mandatory)")
+      ("no-bvh", "Disable generating the BVH tree; this incurs a severe performance penalty")
       ("gamma,g", value<float>()->default_value(2.2f, "2.2"), "the gamma correction to apply to the display and to LDR image file output");
   command_line_options.add(image);
 

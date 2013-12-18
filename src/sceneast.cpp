@@ -661,7 +661,15 @@ struct scene_builder : boost::static_visitor<void>
         intersectablelist.insert(intersectablelist.end(), lights["lights"].begin(), lights["lights"].end());
         intersectablelist.push_back(intersectables["intersectable"]);
         IntersectableList *list = new IntersectableList(intersectablelist);
-        Intersectable* intersectable = list->createBVH();
+        Intersectable* intersectable;
+        if(vm.count("no-bvh"))
+        {
+            intersectable = list;
+        }
+        else
+        {
+            intersectable = list->createBVH();
+        }
         const AxisAlignedBox* bb = intersectable->boundingBox();
         result.object = intersectable;
         QVector3D min = bb->getMin(), max = bb->getMax();
