@@ -36,14 +36,12 @@ HitRecord IntersectableList::intersect(Ray ray) const
   for(auto i = components.begin(); i != components.end(); i++)
   {
     const Intersectable & component = **i;
-    if(ray.getTo() > hit.getRayParameter())
-    {
-        ray = Ray(ray.getOrigin(), ray.getDirection(), ray.getFrom(), hit.getRayParameter());
-    }
     HitRecord currentHit = component.intersect(ray);
     if(currentHit.intersects())
     {
-      hit = currentHit;
+        assert(!hit.intersects() || currentHit.getRayParameter() <= hit.getRayParameter());
+        ray = Ray(ray.getOrigin(), ray.getDirection(), ray.getFrom(), currentHit.getRayParameter());
+        hit = currentHit;
     }
   }
   return hit;

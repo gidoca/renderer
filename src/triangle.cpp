@@ -50,6 +50,7 @@ HitRecord Triangle::intersect(Ray ray) const
     }
     else
     {
+        assert(ray.getFrom() <= t && t <= ray.getTo());
         return HitRecord(t, ray, material, normal, (1 - u - v) * t1 + u * t2 + v * t3);
     }
 }

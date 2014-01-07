@@ -120,7 +120,7 @@ inline bool Ray::inRange(float u) const
 
 inline Ray Ray::transform(QMatrix4x4 matrix)
 {
-  return Ray(matrix.map(QVector4D(origin, 1)), matrix.map(QVector4D(direction, 0)));
+  return Ray(matrix.map(QVector4D(origin, 1)), matrix.map(QVector4D(direction, 0)), from, to);
 }
 
 #endif // RAY_H
