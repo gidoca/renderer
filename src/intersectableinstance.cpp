@@ -33,14 +33,14 @@ const AxisAlignedBox * IntersectableInstance::createBoundingBox()
 {
   const AxisAlignedBox * untransformed = intersectable->boundingBox();
   AxisAlignedBox * result = new AxisAlignedBox();
-  QVector3D min = transform.map(untransformed->getMin()), max = transform.map(untransformed->getMax());
-  result->includePoint(QVector3D(min.x(), min.y(), min.z()));
-  result->includePoint(QVector3D(min.x(), min.y(), max.z()));
-  result->includePoint(QVector3D(min.x(), max.y(), min.z()));
-  result->includePoint(QVector3D(min.x(), max.y(), max.z()));
-  result->includePoint(QVector3D(max.x(), min.y(), min.z()));
-  result->includePoint(QVector3D(max.x(), min.y(), max.z()));
-  result->includePoint(QVector3D(max.x(), max.y(), min.z()));
-  result->includePoint(QVector3D(max.x(), max.y(), max.z()));
+  QVector3D min = untransformed->getMin(), max = untransformed->getMax();
+  result->includePoint(transform.map(QVector3D(min.x(), min.y(), min.z())));
+  result->includePoint(transform.map(QVector3D(min.x(), min.y(), max.z())));
+  result->includePoint(transform.map(QVector3D(min.x(), max.y(), min.z())));
+  result->includePoint(transform.map(QVector3D(min.x(), max.y(), max.z())));
+  result->includePoint(transform.map(QVector3D(max.x(), min.y(), min.z())));
+  result->includePoint(transform.map(QVector3D(max.x(), min.y(), max.z())));
+  result->includePoint(transform.map(QVector3D(max.x(), max.y(), min.z())));
+  result->includePoint(transform.map(QVector3D(max.x(), max.y(), max.z())));
   return result;
 }
