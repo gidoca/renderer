@@ -23,6 +23,16 @@ set(renderingproject_SRCS camera.cpp plane.cpp sphere.cpp intersectable.cpp
   win.cpp energyredistributionrenderer.cpp metropolissample.cpp
   mathhelper.cpp
   environmentmap.cpp blacklight.cpp
+
+  light.h
+  vechelper.h
+  scene.h
+  hitrecord.h
+  path.h
+  ray.h
+  material.h
+  global.h
+  integrator.h
 )
 
 add_executable(renderingproject main.cpp ${renderingproject_SRCS} ${renderingproject_HEADERS_MOC})
