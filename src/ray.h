@@ -115,7 +115,7 @@ inline QVector4D Ray::evaluate(float u) const
 
 inline bool Ray::inRange(float u) const
 {
-    return from < u && u < to;
+    return from <= u && u <= to;
 }
 
 inline Ray Ray::transform(QMatrix4x4 matrix)

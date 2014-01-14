@@ -79,7 +79,7 @@ HitRecord AreaLight::intersect(Ray ray) const
     float w = -QVector3D::dotProduct(abxac, ray.getDirection());
     if(w == 0) return HitRecord();
     float t = QVector3D::dotProduct(abxac, ad) / w;
-    if(t < ray.getFrom() || t > ray.getTo()) return HitRecord();
+    if(!ray.inRange(t)) return HitRecord();
 
     QVector3D adxde = QVector3D::crossProduct(ad, ray.getDirection());
     float u = QVector3D::dotProduct(adxde, vDirection) / w;

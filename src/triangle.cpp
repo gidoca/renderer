@@ -35,7 +35,7 @@ HitRecord Triangle::intersect(Ray ray) const
     float w = -QVector3D::dotProduct(abxac, ray.getDirection());
     if(w == 0) return HitRecord();
     float t = QVector3D::dotProduct(abxac, ad) / w;
-    if(t < ray.getFrom() || t > ray.getTo()) return HitRecord();
+    if(!ray.inRange(t)) return HitRecord();
 
     QVector3D adxde = QVector3D::crossProduct(ad, ray.getDirection());
     float u = QVector3D::dotProduct(adxde, p3 - p1) / w;
@@ -50,7 +50,7 @@ HitRecord Triangle::intersect(Ray ray) const
     }
     else
     {
-        assert(ray.getFrom() <= t && t <= ray.getTo());
+        assert(ray.inRange(t));
         return HitRecord(t, ray, material, normal, (1 - u - v) * t1 + u * t2 + v * t3);
     }
 }
