@@ -25,6 +25,8 @@ public:
     cv::Vec3f emission(const HitRecord & hit) const;
     bool emitsLight() const;
 
+    QVector3D outDirection(QVector3D, QVector3D, Sample, float &pdf) const;
+
 private:
     cv::Vec3f coefficient;
 

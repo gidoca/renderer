@@ -31,12 +31,9 @@ class TransparentMaterial : public Material
 public:
     TransparentMaterial(float refractionCoeff);
 
-    virtual const TransparentMaterial* refractive() const
-    {
-        return this;
-    }
+    QVector3D outDirection(QVector3D inDirection, QVector3D normal, Sample s, float& pdf) const;
 
-    QVector3D outDirection(QVector3D inDirection, QVector3D normal, Sample s) const;
+    bool isSpecular() const;
 
 private:
     float refractionCoeff;

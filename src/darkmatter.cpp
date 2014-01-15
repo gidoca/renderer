@@ -20,9 +20,19 @@
  */
 #include "darkmatter.h"
 
+#include "sampler.h"
+
+#include <QVector3D>
+
 DarkMatter::DarkMatter()
 {
 
+}
+
+QVector3D DarkMatter::outDirection(QVector3D, QVector3D, Sample, float &pdf) const
+{
+    pdf = 0;
+    return QVector3D();
 }
 
 DarkMatter* DarkMatter::instance(new DarkMatter());

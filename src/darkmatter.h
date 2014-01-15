@@ -29,6 +29,8 @@ class DarkMatter : public Material
 public:
     static DarkMatter* getInstance();
 
+    QVector3D outDirection(QVector3D, QVector3D, Sample, float &pdf) const;
+
 private:
     DarkMatter();
     static DarkMatter* instance;

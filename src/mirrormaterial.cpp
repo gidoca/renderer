@@ -23,8 +23,18 @@
 #include "hitrecord.h"
 #include "intersectable.h"
 #include "light.h"
+#include "sampler.h"
 
-bool MirrorMaterial::isMirror() const
+#include <QVector3D>
+
+QVector3D MirrorMaterial::outDirection(QVector3D inDirection, QVector3D surfaceNormal, Sample, float &pdf) const
+{
+    pdf = 1;
+    surfaceNormal.normalize();
+    return inDirection - 2 * QVector3D::dotProduct(inDirection, surfaceNormal) * surfaceNormal;
+}
+
+bool MirrorMaterial::isSpecular() const
 {
   return true;
 }

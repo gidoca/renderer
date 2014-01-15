@@ -34,13 +34,9 @@ class Material
     {
         return cv::Vec3f();
     }
-    virtual bool isMirror() const
+    virtual bool isSpecular() const
     {
         return false;
-    }
-    virtual const TransparentMaterial* refractive() const
-    {
-        return nullptr;
     }
     virtual cv::Vec3f emission(const HitRecord &) const
     {
@@ -50,6 +46,7 @@ class Material
     {
         return false;
     }
+    virtual QVector3D outDirection(QVector3D inDirection, QVector3D surfaceNormal, Sample s, float& pdf) const = 0;
 };
 
 #endif

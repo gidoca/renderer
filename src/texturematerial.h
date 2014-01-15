@@ -22,7 +22,7 @@
 #define TEXTUREMATERIAL_H
 
 #include "global.h"
-#include "material.h"
+#include "abstractdiffusematerial.h"
 
 #include <string>
 
@@ -30,7 +30,7 @@
 
 #include <QVector3D>
 
-class TextureMaterial : public Material
+class TextureMaterial : public AbstractDiffuseMaterial
 {
 public:
     TextureMaterial(cv::Vec3f coefficient = cv::Vec3f(1, 1, 1), float gamma = 1) : coefficient(coefficient), gamma(gamma) {}

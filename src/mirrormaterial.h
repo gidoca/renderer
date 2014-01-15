@@ -33,7 +33,9 @@ public:
 
   }
 
-  bool isMirror() const;
+  QVector3D outDirection(QVector3D inDirection, QVector3D surfaceNormal, Sample, float &pdf) const;
+
+  bool isSpecular() const;
   
 private:
   float coefficient;

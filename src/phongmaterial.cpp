@@ -21,6 +21,7 @@
 #include "phongmaterial.h"
 #include "hitrecord.h"
 #include "light.h"
+#include "sampler.h"
 
 #include <cmath>
 #include <algorithm>
@@ -33,4 +34,9 @@ cv::Vec3f PhongMaterial::shade(const HitRecord& hit, QVector3D direction) const
   float dp = std::max(QVector3D::dotProduct(reflected.normalized(), -hit.getRay().getDirection().normalized()), 0.f);
   float spec = pow(dp, specularCoefficient);
   return color * (1 / M_PI) + spec * specularColor;
+}
+
+QVector3D PhongMaterial::outDirection(QVector3D, QVector3D surfaceNormal, Sample s, float &pdf) const
+{
+    return s.getCosineWeightedDirection(surfaceNormal, pdf);
 }

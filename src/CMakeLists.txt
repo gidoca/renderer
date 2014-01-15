@@ -9,12 +9,12 @@ set(renderingproject_HEADERS win.h renderer.h printfinished.h)
 set(renderingproject_SRCS camera.cpp plane.cpp sphere.cpp intersectable.cpp
   sceneast.cpp sceneparser.cpp scenedumper.cpp
   triangle.cpp intersectableinstance.cpp
-  darkmatter.cpp diffusematerial.cpp phongmaterial.cpp texturematerial.cpp transparentmaterial.cpp
+  darkmatter.cpp diffusematerial.cpp phongmaterial.cpp texturematerial.cpp transparentmaterial.cpp mirrormaterial.cpp abstractdiffusematerial.cpp
   conelight.cpp intersectablelist.cpp
-  pointlight.cpp objreader.cpp mirrormaterial.cpp
+  pointlight.cpp objreader.cpp
   axisalignedbox.cpp
   sampler.cpp jitteredsampler.cpp arealight.cpp
-  simpleintegrator.cpp unidipathtracingintegrator.cpp bidipathtracingintegrator.cpp
+  unidipathtracingintegrator.cpp bidipathtracingintegrator.cpp
   quad.cpp csgobject.cpp csgoperation.cpp bvh.cpp
   renderer.cpp perpixelrenderer.cpp metropolisrenderer.cpp metropolisfltrenderer.cpp
   renderingmanager.cpp

@@ -100,3 +100,10 @@ bool EnvironmentMap::emitsLight() const
 {
     return true;
 }
+
+QVector3D EnvironmentMap::outDirection(QVector3D, QVector3D, Sample, float &pdf) const
+{
+    pdf = 0;
+    return QVector3D();
+}
+

@@ -29,8 +29,9 @@ TransparentMaterial::TransparentMaterial(float refractionCoeff) : refractionCoef
 {
 }
 
-QVector3D TransparentMaterial::outDirection(QVector3D inDirection, QVector3D normal, Sample s) const
+QVector3D TransparentMaterial::outDirection(QVector3D inDirection, QVector3D normal, Sample s, float &pdf) const
 {
+    pdf = 1;
     inDirection.normalize();
     normal.normalize();
     float coefficientRatio;
@@ -67,4 +68,9 @@ QVector3D TransparentMaterial::outDirection(QVector3D inDirection, QVector3D nor
         std::cerr << m.determinant() << std::endl;*/
         return v;
     }
+}
+
+bool TransparentMaterial::isSpecular() const
+{
+    return true;
 }

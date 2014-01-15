@@ -22,13 +22,14 @@
 #define DIFFUSEMATERIAL_H
 
 #include "global.h"
-#include "material.h"
+#include "abstractdiffusematerial.h"
 
-class DiffuseMaterial : public Material
+class DiffuseMaterial : public AbstractDiffuseMaterial
 {
 public:
     DiffuseMaterial(cv::Vec3f color) : color(color) {}
     cv::Vec3f shade(const HitRecord& hit, QVector3D direction) const;
+
 protected:
     const cv::Vec3f color;
 };

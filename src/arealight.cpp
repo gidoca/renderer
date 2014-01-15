@@ -110,3 +110,10 @@ bool AreaLight::emitsLight() const
 {
     return true;
 }
+
+QVector3D AreaLight::outDirection(QVector3D, QVector3D, Sample, float &pdf) const
+{
+    pdf = 0;
+    return QVector3D();
+}
+

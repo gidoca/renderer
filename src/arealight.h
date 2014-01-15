@@ -42,6 +42,8 @@ public:
     cv::Vec3f emission(const HitRecord &hit) const;
     bool emitsLight() const;
 
+    QVector3D outDirection(QVector3D, QVector3D, Sample, float &pdf) const;
+
 private:
     QVector3D getLocation(QPointF p) const;
     cv::Vec3f getIntensity(QVector3D direction) const;

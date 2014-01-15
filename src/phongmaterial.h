@@ -35,6 +35,8 @@ class PhongMaterial : public Material
 
     cv::Vec3f shade(const HitRecord& hit, QVector3D direction) const;
 
+    QVector3D outDirection(QVector3D, QVector3D surfaceNormal, Sample s, float &pdf) const;
+
   private:
     const cv::Vec3f color, specularColor;
     const float specularCoefficient;
