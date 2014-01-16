@@ -40,6 +40,8 @@ public:
   QPointF& getSample();
   QVector3D getCosineWeightedDirection(QVector3D w, float & pdf) const;
   QVector3D getCosineWeightedDirection(QVector3D w, float &pdf, float openingAngle) const;
+  QVector3D getCosinePowerWeightedDirection(QVector3D w, float &pdf, float cosineExponent) const;
+  QVector3D getCosinePowerWeightedDirection(QVector3D w, float &pdf, float cosineExponent, float openingAngle) const;
   QVector3D getUniformSphereDirection() const;
 
 private:

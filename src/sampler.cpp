@@ -32,44 +32,25 @@
 
 QVector3D Sample::getCosineWeightedDirection(QVector3D w, float & pdf) const
 {
-  w.normalize();
-  QVector3D normalizedDirection = QVector3D(cos(2 * M_PI * sample.y()) * sqrt(sample.x()), sin(2 * M_PI * sample.y()) * sqrt(sample.x()), sqrt(1 - sample.x()));
-  pdf = normalizedDirection.z() / M_PI;
-  QVector3D v;
-  if(abs(w.x()) < abs(w.y()) && abs(w.x()) < abs(w.z()))
-  {
-    v = QVector3D(0, w.z(), -w.y());
-  }
-  else if(abs(w.y()) < abs(w.z()))
-  {
-    v = QVector3D(w.z(), 0, -w.x());
-  }
-  else
-  {
-    v = QVector3D(w.y(), -w.x(), 0);
-  }
-  v.normalize();
-  QVector3D u = QVector3D::crossProduct(v, w);
-  QMatrix4x4 transform;
-  transform.setColumn(0, u);
-  transform.setColumn(1, v);
-  transform.setColumn(2, w);
-  QVector3D randomDirection = transform.map(normalizedDirection);
-  float dp = QVector3D::dotProduct(randomDirection, w);
-  if(dp < 0)
-  {
-      randomDirection -= 2 * dp * w;
-  }
-  assert(QVector3D::dotProduct(randomDirection, w) >= 0);
-  return randomDirection;
+    return getCosinePowerWeightedDirection(w, pdf, 1);
 }
 
 QVector3D Sample::getCosineWeightedDirection(QVector3D w, float &pdf, float openingAngle) const
 {
+    return getCosinePowerWeightedDirection(w, pdf, 1, openingAngle);
+}
+
+QVector3D Sample::getCosinePowerWeightedDirection(QVector3D w, float &pdf, float cosineExponent) const
+{
+    return getCosinePowerWeightedDirection(w, pdf, cosineExponent, M_PI / 2);
+}
+
+QVector3D Sample::getCosinePowerWeightedDirection(QVector3D w, float &pdf, float cosineExponent, float openingAngle) const
+{
   float radiusFactor = sin(openingAngle);
   w.normalize();
-  QVector3D normalizedDirection = QVector3D(cos(2 * M_PI * sample.y()) * sqrt(sample.x()) * radiusFactor, sin(2 * M_PI * sample.y()) * sqrt(sample.x()) * radiusFactor, sqrt(1 - sample.x() * radiusFactor * radiusFactor));
-  pdf = normalizedDirection.z() / M_PI;
+  QVector3D normalizedDirection = QVector3D(cos(2 * M_PI * sample.y()) * sqrt(1 - pow(sample.x(), 2 / (cosineExponent + 1)) * radiusFactor * radiusFactor), sin(2 * M_PI * sample.y()) * sqrt(1 - pow(sample.x(), 2 /(cosineExponent + 1)) * radiusFactor * radiusFactor), pow(sample.x(), 1 / (cosineExponent + 1)) * radiusFactor);
+  pdf =  pow(normalizedDirection.z(), cosineExponent) * (cosineExponent + 1) / (2 * M_PI);
   QVector3D v;
   if(abs(w.x()) < abs(w.y()) && abs(w.x()) < abs(w.z()))
   {

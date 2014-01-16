@@ -21,11 +21,10 @@ set(renderingproject_SRCS camera.cpp plane.cpp sphere.cpp intersectable.cpp
   tonemapper.cpp
   symmetricfilter.cpp
   win.cpp energyredistributionrenderer.cpp metropolissample.cpp
-  mathhelper.cpp
+  mathhelper.cpp vechelper.cpp
   environmentmap.cpp blacklight.cpp
 
   light.h
-  vechelper.h
   scene.h
   hitrecord.h
   path.h

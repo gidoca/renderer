@@ -24,6 +24,7 @@
 #include <QMatrix4x4>
 
 #include "mathhelper.h"
+#include "vechelper.h"
 
 TransparentMaterial::TransparentMaterial(float refractionCoeff) : refractionCoeff(refractionCoeff)
 {
@@ -54,8 +55,7 @@ QVector3D TransparentMaterial::outDirection(QVector3D inDirection, QVector3D nor
     float reflectance = 1 / 2. * (rPerp * rPerp + rPara * rPara);
     if(sinOutgoingAngle > 1 || s.getSample().x() < reflectance)
     {
-        QVector3D v = inDirection + 2 * cosIncomingAngle * normal;
-        return v;
+        return reflect(inDirection, normal);
     }
     else
     {

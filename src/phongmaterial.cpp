@@ -32,11 +32,32 @@ cv::Vec3f PhongMaterial::shade(const HitRecord& hit, QVector3D direction) const
   QVector3D normal = hit.getSurfaceNormal().normalized();
   QVector3D reflected = 2 * QVector3D::dotProduct(-direction, normal) * normal + direction;
   float dp = std::max(QVector3D::dotProduct(reflected.normalized(), -hit.getRay().getDirection().normalized()), 0.f);
-  float spec = pow(dp, specularCoefficient);
+  float spec = /*(specularCoefficient + 2) / (2 * M_PI) */ pow(dp, specularCoefficient);
   return color * (1 / M_PI) + spec * specularColor;
 }
 
-QVector3D PhongMaterial::outDirection(QVector3D, QVector3D surfaceNormal, Sample s, float &pdf) const
+QVector3D PhongMaterial::outDirection(QVector3D inDirection, QVector3D surfaceNormal, Sample s, float &pdf) const
 {
-    return s.getCosineWeightedDirection(surfaceNormal, pdf);
+    surfaceNormal.normalize();
+    QVector3D specularDirection = inDirection - 2 * QVector3D::dotProduct(inDirection, surfaceNormal) * surfaceNormal;
+    float rho_d = lum(color);
+    float rho_s = lum(specularColor);
+    assert(rho_d + rho_s <= 1);
+    if(s.getSample().x() < rho_d)
+    {
+        s.getSample().rx() /= rho_d;
+        return s.getCosineWeightedDirection(surfaceNormal, pdf);
+    }
+    else if(s.getSample().x() < rho_d + rho_s)
+    {
+        s.getSample().rx() = (s.getSample().x() - rho_d) / rho_s;
+        QVector3D out = s.getCosinePowerWeightedDirection(specularDirection, pdf, specularCoefficient);
+        if(QVector3D::dotProduct(out, surfaceNormal) < 1) pdf = 0;
+        return out;
+    }
+    else
+    {
+        pdf = 0;
+        return QVector3D();
+    }
 }

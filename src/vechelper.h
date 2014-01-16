@@ -46,4 +46,6 @@ inline void set(QVector3D& v, int i, float val)
     }
 }
 
+QVector3D reflect(const QVector3D& v, const QVector3D& normal);
+
 #endif

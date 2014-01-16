@@ -24,6 +24,7 @@
 #include "intersectable.h"
 #include "light.h"
 #include "sampler.h"
+#include "vechelper.h"
 
 #include <QVector3D>
 
@@ -31,7 +32,7 @@ QVector3D MirrorMaterial::outDirection(QVector3D inDirection, QVector3D surfaceN
 {
     pdf = 1;
     surfaceNormal.normalize();
-    return inDirection - 2 * QVector3D::dotProduct(inDirection, surfaceNormal) * surfaceNormal;
+    return reflect(inDirection, surfaceNormal);
 }
 
 bool MirrorMaterial::isSpecular() const
