@@ -28,7 +28,7 @@ class DiffuseMaterial : public AbstractDiffuseMaterial
 {
 public:
     DiffuseMaterial(cv::Vec3f color) : color(color) {}
-    cv::Vec3f shade(const HitRecord& hit, QVector3D direction) const;
+    cv::Vec3f brdf(const HitRecord& hit, QVector3D direction) const;
 
 protected:
     const cv::Vec3f color;

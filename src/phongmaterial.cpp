@@ -28,7 +28,7 @@
 #include <algorithm>
 #include <cassert>
 
-cv::Vec3f PhongMaterial::shade(const HitRecord& hit, QVector3D direction) const
+cv::Vec3f PhongMaterial::brdf(const HitRecord& hit, QVector3D direction) const
 {
   QVector3D normal = hit.getSurfaceNormal().normalized();
   QVector3D reflected = reflect(direction, normal);
@@ -37,10 +37,11 @@ cv::Vec3f PhongMaterial::shade(const HitRecord& hit, QVector3D direction) const
   return color * (1 / M_PI) + spec * specularColor;
 }
 
-QVector3D PhongMaterial::outDirection(QVector3D inDirection, QVector3D surfaceNormal, Sample s, float &pdf) const
+QVector3D PhongMaterial::outDirection(const HitRecord &hit, Sample s, float &pdf, cv::Vec3f &brdf) const
 {
+    QVector3D surfaceNormal = hit.getSurfaceNormal();
     surfaceNormal.normalize();
-    QVector3D specularDirection = reflect(inDirection, surfaceNormal);
+    QVector3D specularDirection = reflect(hit.getRay().getDirection(), surfaceNormal);
     float rho_d = lum(color);
     float rho_s = lum(specularColor);
     assert(rho_d + rho_s <= 1);

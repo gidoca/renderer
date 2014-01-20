@@ -29,8 +29,9 @@ DarkMatter::DarkMatter()
 
 }
 
-QVector3D DarkMatter::outDirection(QVector3D, QVector3D, Sample, float &pdf) const
+QVector3D DarkMatter::outDirection(const HitRecord &, Sample, float &pdf, cv::Vec3f &brdf) const
 {
+    brdf = cv::Vec3f();
     pdf = 0;
     return QVector3D();
 }

@@ -37,7 +37,7 @@ public:
     virtual ~TextureMaterial() {}
 
     bool load(std::string filename);
-    cv::Vec3f shade(const HitRecord & hit, QVector3D direction) const;
+    cv::Vec3f brdf(const HitRecord & hit, QVector3D direction) const;
 
 private:
     cv::Vec3f get(cv::Point2f location) const;

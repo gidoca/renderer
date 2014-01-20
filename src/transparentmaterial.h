@@ -31,7 +31,7 @@ class TransparentMaterial : public Material
 public:
     TransparentMaterial(float refractionCoeff);
 
-    QVector3D outDirection(QVector3D inDirection, QVector3D normal, Sample s, float& pdf) const;
+    QVector3D outDirection(const HitRecord & hit, Sample s, float& pdf, cv::Vec3f& brdf) const;
 
     bool isSpecular() const;
 

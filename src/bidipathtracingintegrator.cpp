@@ -65,8 +65,8 @@ Vec3f BiDiPathTracingIntegrator::integrate(const Ray &ray, const Intersectable &
       float geometryTerm = QVector3D::dotProduct(connDirection.normalized(), eyeHitIt->getSurfaceNormal().normalized()) * QVector3D::dotProduct(-connDirection.normalized(), lightHitIt->getSurfaceNormal().normalized()) / connDirection.lengthSquared();
       if(geometryTerm > 0)
       {
-        Vec3f eyeBrdf = eyeHitIt->getMaterial().shade(*eyeHitIt, connDirection);
-        Vec3f lightBrdf = lightHitIt->getMaterial().shade(*lightHitIt, -connDirection);
+        Vec3f eyeBrdf = eyeHitIt->getMaterial().brdf(*eyeHitIt, connDirection);
+        Vec3f lightBrdf = lightHitIt->getMaterial().brdf(*lightHitIt, -connDirection);
         int pathLength = eyeInd + lightInd + 1;
         //number of paths of the same length
         int nPaths = std::min<int>(pathLength - 1, eyePath.alphaValues.size()) + std::min<int>(pathLength - 2, lightPath.alphaValues.size()) + 2 - pathLength;
@@ -97,7 +97,7 @@ Vec3f BiDiPathTracingIntegrator::integrate(const Ray &ray, const Intersectable &
     if(inCos > 0)
     {
 //      assert(!isnan(lightIntensity.x()) && !isnan(lightIntensity.y()) && !isnan(lightIntensity.z()));
-      brdf = eyeHitIt->getMaterial().shade(*eyeHitIt, lightDirection);
+      brdf = eyeHitIt->getMaterial().brdf(*eyeHitIt, lightDirection);
 //      assert(brdf.x() >= 0 && brdf.y() >= 0 && brdf.z() >= 0);
       int nPaths = std::min<int>(eyeInd - 1, eyePath.alphaValues.size()) + 2 - eyeInd;
       assert(nPaths > 0);

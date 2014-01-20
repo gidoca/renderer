@@ -75,7 +75,8 @@ Path Renderer::createPath(const Ray& primaryRay, const Intersectable &scene, con
 
 
     float pdf;
-    QVector3D outDirection = hit.getMaterial().outDirection(hit.getRay().getDirection(), hit.getSurfaceNormal(), pathSamples[i], pdf);
+    cv::Vec3f brdf;
+    QVector3D outDirection = hit.getMaterial().outDirection(hit, pathSamples[i], pdf, brdf);
     if(hit.getMaterial().emitsLight())
     {
         result.alphaValues.push_back(alpha);
@@ -92,7 +93,6 @@ Path Renderer::createPath(const Ray& primaryRay, const Intersectable &scene, con
       result.alphaValues.push_back(alpha);
       result.hitRecords.push_back(hit);
       if(pdf == 0) return result;
-      cv::Vec3f brdf = hit.getMaterial().shade(hit, -outDirection);
       float cos = QVector3D::dotProduct(outDirection.normalized(), hit.getSurfaceNormal().normalized());
       assert(cos >= 0 && !isnan(pdf));
       assert(pdf > 0 && !isnan(pdf));

@@ -33,7 +33,7 @@ public:
 
   }
 
-  QVector3D outDirection(QVector3D inDirection, QVector3D surfaceNormal, Sample, float &pdf) const;
+  QVector3D outDirection(const HitRecord & hit, Sample, float &pdf, cv::Vec3f& brdf) const;
 
   bool isSpecular() const;
   

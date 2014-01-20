@@ -30,7 +30,7 @@
 class Material
 {
   public:
-    virtual cv::Vec3f shade(const HitRecord & hit, QVector3D direction) const
+    virtual cv::Vec3f brdf(const HitRecord &, QVector3D) const
     {
         return cv::Vec3f();
     }
@@ -46,7 +46,7 @@ class Material
     {
         return false;
     }
-    virtual QVector3D outDirection(QVector3D inDirection, QVector3D surfaceNormal, Sample s, float& pdf) const = 0;
+    virtual QVector3D outDirection(const HitRecord & hit, Sample s, float& pdf, cv::Vec3f& brdf) const = 0;
 };
 
 #endif

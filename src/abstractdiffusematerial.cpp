@@ -1,10 +1,13 @@
 #include "abstractdiffusematerial.h"
 
 #include "sampler.h"
+#include "hitrecord.h"
 
 #include <QVector3D>
 
-QVector3D AbstractDiffuseMaterial::outDirection(QVector3D, QVector3D surfaceNormal, Sample s, float &pdf) const
+QVector3D AbstractDiffuseMaterial::outDirection(const HitRecord &hit, Sample s, float &pdf, cv::Vec3f &brdf) const
 {
-    return s.getCosineWeightedDirection(surfaceNormal, pdf);
+    QVector3D out = s.getCosineWeightedDirection(hit.getSurfaceNormal(), pdf);
+    brdf = this->brdf(hit, out);
+    return out;
 }

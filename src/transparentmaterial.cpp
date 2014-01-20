@@ -25,18 +25,22 @@
 
 #include "mathhelper.h"
 #include "vechelper.h"
+#include "hitrecord.h"
 
 TransparentMaterial::TransparentMaterial(float refractionCoeff) : refractionCoeff(refractionCoeff)
 {
 }
 
-QVector3D TransparentMaterial::outDirection(QVector3D inDirection, QVector3D normal, Sample s, float &pdf) const
+QVector3D TransparentMaterial::outDirection(const HitRecord &hit, Sample s, float &pdf, cv::Vec3f &brdf) const
 {
     pdf = 1;
-    inDirection.normalize();
+    brdf = cv::Vec3f();
+    QVector3D direction = hit.getRay().getDirection();
+    QVector3D normal = hit.getSurfaceNormal();
+    direction.normalize();
     normal.normalize();
     float coefficientRatio;
-    if(QVector3D::dotProduct(-normal, inDirection) < 0.)
+    if(QVector3D::dotProduct(-normal, direction) < 0.)
     {
         normal *= -1;
         coefficientRatio = refractionCoeff;
@@ -45,7 +49,7 @@ QVector3D TransparentMaterial::outDirection(QVector3D inDirection, QVector3D nor
     {
         coefficientRatio = 1 / refractionCoeff;
     }
-    float cosIncomingAngle = QVector3D::dotProduct(-normal, inDirection);
+    float cosIncomingAngle = QVector3D::dotProduct(-normal, direction);
     float sinOutgoingAngle = coefficientRatio * sqrt(std::max(0., 1. - cosIncomingAngle * cosIncomingAngle));
     //float sinIncomingAngle = sqrt(1 - cosIncomingAngle * cosIncomingAngle);
     //std::cerr << sinOutgoingAngle / sinIncomingAngle << std::endl;
@@ -55,11 +59,11 @@ QVector3D TransparentMaterial::outDirection(QVector3D inDirection, QVector3D nor
     float reflectance = 1 / 2. * (rPerp * rPerp + rPara * rPara);
     if(sinOutgoingAngle > 1 || s.getSample().x() < reflectance)
     {
-        return reflect(inDirection, normal);
+        return reflect(direction, normal);
     }
     else
     {
-        QVector3D v = coefficientRatio * inDirection + (coefficientRatio * cosIncomingAngle - signum(cosIncomingAngle) * cosOutgoingAngle) * normal;
+        QVector3D v = coefficientRatio * direction + (coefficientRatio * cosIncomingAngle - signum(cosIncomingAngle) * cosOutgoingAngle) * normal;
         //std::cerr << sqrt(1 - QVector3D::dotProduct(v, -normal) * QVector3D::dotProduct(v, -normal)) / sqrt(1 - cosIncomingAngle * cosIncomingAngle) << std::endl;
         /*QMatrix4x4 m;
         m.setColumn(0, v);

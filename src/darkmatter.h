@@ -29,7 +29,7 @@ class DarkMatter : public Material
 public:
     static DarkMatter* getInstance();
 
-    QVector3D outDirection(QVector3D, QVector3D, Sample, float &pdf) const;
+    QVector3D outDirection(const HitRecord &, Sample, float &pdf, cv::Vec3f& brdf) const;
 
 private:
     DarkMatter();

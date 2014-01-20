@@ -6,7 +6,7 @@
 class AbstractDiffuseMaterial : public Material
 {
 public:
-    QVector3D outDirection(QVector3D, QVector3D surfaceNormal, Sample s, float &pdf) const;
+    QVector3D outDirection(const HitRecord & hit, Sample s, float &pdf, cv::Vec3f& brdf) const;
 
 
 };

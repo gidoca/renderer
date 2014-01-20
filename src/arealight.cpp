@@ -111,8 +111,9 @@ bool AreaLight::emitsLight() const
     return true;
 }
 
-QVector3D AreaLight::outDirection(QVector3D, QVector3D, Sample, float &pdf) const
+QVector3D AreaLight::outDirection(const HitRecord &, Sample, float &pdf, cv::Vec3f &brdf) const
 {
+    brdf = cv::Vec3f();
     pdf = 0;
     return QVector3D();
 }

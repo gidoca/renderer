@@ -61,7 +61,7 @@ bool TextureMaterial::load(std::string filename)
     return true;
 }
 
-cv::Vec3f TextureMaterial::shade(const HitRecord & hit, QVector3D) const
+cv::Vec3f TextureMaterial::brdf(const HitRecord & hit, QVector3D) const
 {
     Vec3f gammaCorrected;
     pow(get(hit.getTexCoords()), gamma, gammaCorrected);

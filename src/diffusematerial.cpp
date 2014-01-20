@@ -22,7 +22,7 @@
 
 #include <cmath>
 
-cv::Vec3f DiffuseMaterial::shade(const HitRecord&, QVector3D) const
+cv::Vec3f DiffuseMaterial::brdf(const HitRecord&, QVector3D) const
 {
   return color * (1 / M_PI);
 }

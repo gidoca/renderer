@@ -101,8 +101,9 @@ bool EnvironmentMap::emitsLight() const
     return true;
 }
 
-QVector3D EnvironmentMap::outDirection(QVector3D, QVector3D, Sample, float &pdf) const
+QVector3D EnvironmentMap::outDirection(const HitRecord &, Sample, float &pdf, cv::Vec3f &brdf) const
 {
+    brdf = cv::Vec3f();
     pdf = 0;
     return QVector3D();
 }

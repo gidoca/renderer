@@ -28,11 +28,11 @@
 
 #include <QVector3D>
 
-QVector3D MirrorMaterial::outDirection(QVector3D inDirection, QVector3D surfaceNormal, Sample, float &pdf) const
+QVector3D MirrorMaterial::outDirection(const HitRecord &hit, Sample, float &pdf, cv::Vec3f &brdf) const
 {
     pdf = 1;
-    surfaceNormal.normalize();
-    return reflect(inDirection, surfaceNormal);
+    brdf = cv::Vec3f();
+    return reflect(hit.getRay().getDirection(), hit.getSurfaceNormal().normalized());
 }
 
 bool MirrorMaterial::isSpecular() const
