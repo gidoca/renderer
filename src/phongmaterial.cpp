@@ -22,6 +22,7 @@
 #include "hitrecord.h"
 #include "light.h"
 #include "sampler.h"
+#include "vechelper.h"
 
 #include <cmath>
 #include <algorithm>
@@ -30,20 +31,20 @@
 cv::Vec3f PhongMaterial::shade(const HitRecord& hit, QVector3D direction) const
 {
   QVector3D normal = hit.getSurfaceNormal().normalized();
-  QVector3D reflected = 2 * QVector3D::dotProduct(-direction, normal) * normal + direction;
+  QVector3D reflected = reflect(direction, normal);
   float dp = std::max(QVector3D::dotProduct(reflected.normalized(), -hit.getRay().getDirection().normalized()), 0.f);
-  float spec = /*(specularCoefficient + 2) / (2 * M_PI) */ pow(dp, specularCoefficient);
+  float spec = (specularCoefficient + 2) / (2 * M_PI) * pow(dp, specularCoefficient);
   return color * (1 / M_PI) + spec * specularColor;
 }
 
 QVector3D PhongMaterial::outDirection(QVector3D inDirection, QVector3D surfaceNormal, Sample s, float &pdf) const
 {
     surfaceNormal.normalize();
-    QVector3D specularDirection = inDirection - 2 * QVector3D::dotProduct(inDirection, surfaceNormal) * surfaceNormal;
+    QVector3D specularDirection = reflect(inDirection, surfaceNormal);
     float rho_d = lum(color);
     float rho_s = lum(specularColor);
     assert(rho_d + rho_s <= 1);
-    if(s.getSample().x() < rho_d)
+    if(s.getSample().x() < rho_d / (rho_d + rho_s))
     {
         s.getSample().rx() /= rho_d;
         return s.getCosineWeightedDirection(surfaceNormal, pdf);
