@@ -159,6 +159,11 @@ ast_intersectable_list ObjReader::load(std::string filename, ast_material defaul
 
     std::ifstream filestream;
     filestream.open(filename.c_str());
+    if(!filestream)
+    {
+        std::cerr << "Error opening file " << filename << std::endl;
+        return ast_intersectable_list();
+    }
 
     QFileInfo objInfo = QFileInfo(QString::fromStdString(filename));
 

@@ -32,6 +32,7 @@
 #include <QVector3D>
 #include <QVector4D>
 #include <QMatrix4x4>
+#include <QDir>
 
 #include <opencv2/core/core.hpp>
 
@@ -574,6 +575,7 @@ BOOST_FUSION_ADAPT_STRUCT(
 void resolveVars(std::vector<ast_assignment> & assignments);
 std::vector<ast_assignment> createBVH(std::vector<ast_assignment> assignments);
 Scene buildScene(std::vector<ast_assignment> assignments);
+void applyPath(std::vector<ast_assignment> & assignments, QDir dir);
 
 const AxisAlignedBox *getBoundingBoxFromAst(ast_intersectable i);
 
