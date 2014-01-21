@@ -26,6 +26,7 @@
 #include <string>
 
 #include <boost/foreach.hpp>
+#include <boost/variant.hpp>
 
 using namespace std;
 
@@ -127,6 +128,9 @@ SceneGrammar::SceneGrammar() : SceneGrammar::base_type(assignments_rule, "inters
 
 bool SceneGrammar::parse(string filename)
 {
+
+  fileDir = QFileInfo(QString::fromStdString(filename)).dir();
+
   ifstream in(filename.c_str(), ifstream::in);
   if(!in.is_open() || in.eof())
   {
@@ -142,5 +146,6 @@ bool SceneGrammar::parse(string filename)
 
   //Argument order changed
   bool r = qi::phrase_parse(begin, end, assignments_rule, skipper, ast);
+  applyPath(ast, fileDir);
   return r && begin == end;
 }

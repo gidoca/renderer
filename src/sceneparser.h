@@ -35,6 +35,9 @@
 #include <vector>
 #include <string>
 
+#include <QFileInfo>
+#include <QDir>
+
 #include "sceneast.h"
 
 namespace qi = boost::spirit::qi;
@@ -113,6 +116,8 @@ private:
   qi::rule<it, ast_cone_light(), comment_skipper> cone_light_rule;
   qi::rule<it, ast_environment_map(), comment_skipper> environment_map_rule;
   qi::rule<it, ast_light(), comment_skipper> light_rule;
+
+  QDir fileDir;
 
   comment_skipper skipper;
 

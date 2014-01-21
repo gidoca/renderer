@@ -49,7 +49,6 @@
 #include <boost/fusion/include/equal_to.hpp>
 #include <boost/functional/hash.hpp>
 #include <boost/fusion/algorithm/iteration/fold.hpp>
-#include <boost/version.hpp>
 
 #include <list>
 #include <vector>
@@ -94,9 +93,21 @@ const std::string ast_environment_map::function_name = "environmentmap";
 template<typename V>
 struct IntersectableAssignmentVisitor : boost::static_visitor<ast_value>
 {
+    IntersectableAssignmentVisitor() {}
+
+    IntersectableAssignmentVisitor(V v) : v(v) {}
+
     void apply(ast_assignment &a)
     {
         a.value = boost::apply_visitor(*this, a.value);
+    }
+
+    void applyAll(std::vector<ast_assignment> &as)
+    {
+        for(ast_assignment& a: as)
+        {
+            apply(a);
+        }
     }
 
     ast_value operator()(ast_intersectable i)
@@ -759,4 +770,53 @@ const AxisAlignedBox* getBoundingBoxFromAst(ast_intersectable i)
     const AxisAlignedBox* bb = intersectable->boundingBox();
     delete intersectable;
     return bb;
+}
+
+struct PathVisitor : boost::static_visitor<ast_intersectable>
+{
+    PathVisitor(QDir dir) : dir(dir) {}
+
+    template<typename T>
+    ast_intersectable operator()(T t) const
+    {
+        return t;
+    }
+
+    ast_intersectable operator()(ast_instance i) const
+    {
+        i.intersectable = boost::apply_visitor(*this, i.intersectable);
+        return i;
+    }
+
+    ast_intersectable operator()(ast_bvh_node b) const
+    {
+        b.left = boost::apply_visitor(*this, b.left);
+        b.right = boost::apply_visitor(*this, b.right);
+        return b;
+    }
+
+    ast_intersectable operator()(ast_intersectable_list l) const
+    {
+        for(unsigned int i = 0; i < l.children.size(); i++)
+        {
+            l.children[i] = boost::apply_visitor(*this, l.children[i]);
+        }
+        return l;
+    }
+
+    ast_intersectable operator()(ast_obj obj) const
+    {
+        obj.filename = dir.filePath(QString::fromStdString(obj.filename)).toStdString();
+        return obj;
+    }
+
+private:
+    QDir dir;
+};
+
+void applyPath(std::vector<ast_assignment> &assignments, QDir dir)
+{
+    PathVisitor pv(dir);
+    IntersectableAssignmentVisitor<PathVisitor> apv(pv);
+    apv.applyAll(assignments);
 }
