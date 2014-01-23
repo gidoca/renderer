@@ -116,7 +116,7 @@ void Win::init()
     renderer_adder adder([=](std::string name) mutable {
             QAction* action = new QAction(QString::fromStdString(name), this);
             connect(action, &QAction::triggered, [=](){
-                Q_EMIT changeRenderer(name);
+                Q_EMIT changeRenderer(name, scene);
             });
             rendererMenu->addAction(action);
         });

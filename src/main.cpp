@@ -134,8 +134,8 @@ int main(int argc, char **argv) {
   std::vector<ast_assignment> ast = parser.getAst();
   resolveVars(ast);
 
-  bool hasGui = vm.count("gui") || (!vm.count("save-exr") && !vm.count("save-img") && !vm.count("dump-bvh"));
-  bool saveToFile = vm.count("save-img") || vm.count("save-exr");
+  bool saveToFile = vm.count("save-img") || vm.count("save-exr") || vm.count("save-mat");
+  bool hasGui = vm.count("gui") || (!saveToFile && !vm.count("dump-bvh"));
 
   if(vm.count("dump-bvh"))
   {
@@ -185,7 +185,7 @@ int main(int argc, char **argv) {
     QObject::connect(&manager, &RenderingManager::finishedRendering, &l, &Win::complete, Qt::QueuedConnection);
     QObject::connect(&manager, &RenderingManager::startingRendering, &l, &Win::starting, Qt::QueuedConnection);
     QObject::connect(&l, &Win::rerender, &manager, &RenderingManager::startRendering);
-    QObject::connect(&l, &Win::changeRenderer, [&](std::string name) mutable {
+    QObject::connect(&l, &Win::changeRenderer, [&](std::string name, Scene scene) mutable {
         manager.setCurrentRenderer(name);
         manager.startRendering(scene);
     });
