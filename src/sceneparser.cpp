@@ -99,6 +99,8 @@ SceneGrammar::SceneGrammar() : SceneGrammar::base_type(assignments_rule, "inters
   diffuse_material_rule.name("diffuse material");
   phong_material_rule %= lit("phong") >> "(" >> vector3_literal_rule >> "," >> vector3_literal_rule >> "," >> tag::float_() >> ")";
   phong_material_rule.name("phong material");
+  blinn_material_rule %= lit("blinn") >> "(" >> vector3_literal_rule >> "," >> vector3_literal_rule >> "," >> tag::float_() >> ")";
+  blinn_material_rule.name("blinn material");
   mirror_material_rule %= lit("mirror") >> "(" >> tag::float_() >> ")";
   mirror_material_rule.name("mirror material");
   texture_material_rule %= lit("texture") >> "(" >> string_literal_rule >> "," >> vector3_literal_rule >> "," >> tag::float_() >> ")";
@@ -107,7 +109,7 @@ SceneGrammar::SceneGrammar() : SceneGrammar::base_type(assignments_rule, "inters
   refractive_material_rule.name("refractive material");
   material_rule %= material_literal_rule | identifier_rule;
   material_rule.name("material");
-  material_literal_rule %= diffuse_material_rule | phong_material_rule | mirror_material_rule | texture_material_rule | refractive_material_rule;
+  material_literal_rule %= diffuse_material_rule | phong_material_rule | blinn_material_rule | mirror_material_rule | texture_material_rule | refractive_material_rule;
   material_literal_rule.name("material literal");
 
   camera_rule %= lit("camera") >> "(" >> vector3_literal_rule >> "," >> vector3_literal_rule >> "," >> vector3_literal_rule >> "," >> tag::float_() >> "," >> tag::float_() >> "," >> tag::float_() >> ")";

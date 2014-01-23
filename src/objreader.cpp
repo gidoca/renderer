@@ -299,8 +299,8 @@ void ObjReader::createMaterial(const ObjMaterial &material, QDir dir, std::strin
             }
             else
             {
-                ast_phong_material phong = {material.diffuse_color, material.specular_color, material.specular_coefficient};
-                materials[materialName] = phong;
+                ast_blinn_material blinn = {material.diffuse_color, material.specular_color, material.specular_coefficient};
+                materials[materialName] = blinn;
             }
         }
     }

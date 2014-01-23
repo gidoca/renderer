@@ -79,6 +79,15 @@ struct ast_phong_material
   static const std::string function_name;
 };
 
+struct ast_blinn_material
+{
+    ast_vector3_literal diffuse;
+    ast_vector3_literal specular;
+    float specular_coeff;
+
+    static const std::string function_name;
+};
+
 struct ast_mirror_material
 {
   float coefficient;
@@ -119,6 +128,7 @@ struct ast_refractive_material
 typedef boost::variant<
     ast_diffuse_material,
     ast_phong_material,
+    ast_blinn_material,
     ast_mirror_material,
     ast_texture_material,
     ast_scaled_texture_material,
@@ -501,6 +511,13 @@ BOOST_FUSION_ADAPT_STRUCT(
 
 BOOST_FUSION_ADAPT_STRUCT(
     ast_phong_material,
+    (ast_vector3_literal, diffuse)
+    (ast_vector3_literal, specular)
+    (float, specular_coeff)
+)
+
+BOOST_FUSION_ADAPT_STRUCT(
+    ast_blinn_material,
     (ast_vector3_literal, diffuse)
     (ast_vector3_literal, specular)
     (float, specular_coeff)

@@ -28,6 +28,7 @@
 #include "intersectablelist.h"
 #include "diffusematerial.h"
 #include "phongmaterial.h"
+#include "blinnmaterial.h"
 #include "mirrormaterial.h"
 #include "texturematerial.h"
 #include "transparentmaterial.h"
@@ -63,6 +64,7 @@ using namespace std;
 
 const std::string ast_diffuse_material::function_name = "diffuse";
 const std::string ast_phong_material::function_name = "phong";
+const std::string ast_blinn_material::function_name = "blinn";
 const std::string ast_mirror_material::function_name = "mirror";
 const std::string ast_texture_material::function_name = "texture";
 const std::string ast_scaled_texture_material::function_name = "texture";
@@ -268,10 +270,11 @@ struct matrix_evaluator : boost::static_visitor<QMatrix4x4>
 
 QMatrix4x4 ast_matrix::asQMatrix4x4() const
 {
-    QMatrix4x4 first = boost::apply_visitor(matrix_evaluator(), this->first);
+    matrix_evaluator evaluator;
+    QMatrix4x4 first = boost::apply_visitor(evaluator, this->first);
     BOOST_FOREACH(ast_basic_matrix mat, this->mult)
     {
-        first *= boost::apply_visitor(matrix_evaluator(), mat);
+        first *= boost::apply_visitor(evaluator, mat);
     }
 
     return first;
@@ -328,6 +331,11 @@ struct material_builder : boost::static_visitor<Material*>
   Material* operator()(ast_phong_material material) const
   {
     return new PhongMaterial(material.diffuse.asSpectrum(), material.specular.asSpectrum(), material.specular_coeff);
+  }
+
+  Material* operator()(ast_blinn_material material) const
+  {
+    return new BlinnMaterial(material.diffuse.asSpectrum(), material.specular.asSpectrum(), material.specular_coeff);
   }
 
   Material* operator()(ast_mirror_material material) const

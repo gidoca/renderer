@@ -211,6 +211,7 @@ int main(int argc, char **argv) {
   {
       QObject::connect(&manager, &RenderingManager::finishedRendering, [=]() {
           ofstream file(vm["save-mat"].as<string>());
+          if(!file) return;
           file << fixed << setw(10);
           auto size = film->size();
           file << "im = zeros(" << size.height << "," << size.width << ",3);" << endl;

@@ -9,7 +9,7 @@ set(renderingproject_HEADERS win.h renderer.h printfinished.h)
 set(renderingproject_SRCS camera.cpp plane.cpp sphere.cpp intersectable.cpp
   sceneast.cpp sceneparser.cpp scenedumper.cpp
   triangle.cpp intersectableinstance.cpp
-  darkmatter.cpp diffusematerial.cpp phongmaterial.cpp texturematerial.cpp transparentmaterial.cpp mirrormaterial.cpp abstractdiffusematerial.cpp
+  darkmatter.cpp diffusematerial.cpp phongmaterial.cpp texturematerial.cpp transparentmaterial.cpp mirrormaterial.cpp abstractdiffusematerial.cpp blinnmaterial.cpp
   conelight.cpp intersectablelist.cpp
   pointlight.cpp objreader.cpp
   axisalignedbox.cpp

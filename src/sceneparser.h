@@ -101,6 +101,7 @@ private:
 
   qi::rule<it, ast_diffuse_material(), comment_skipper> diffuse_material_rule;
   qi::rule<it, ast_phong_material(), comment_skipper> phong_material_rule;
+  qi::rule<it, ast_blinn_material(), comment_skipper> blinn_material_rule;
   qi::rule<it, ast_mirror_material(), comment_skipper> mirror_material_rule;
   qi::rule<it, ast_texture_material(), comment_skipper> texture_material_rule;
   qi::rule<it, ast_scaled_texture_material(), comment_skipper> scaled_texture_material_rule;
