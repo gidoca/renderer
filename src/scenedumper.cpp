@@ -3,6 +3,7 @@
 #include <boost/variant/apply_visitor.hpp>
 
 #include <iostream>
+#include <iomanip>
 
 using namespace std;
 
@@ -134,7 +135,10 @@ private:
     std::ostream & out;
 };
 
-SceneDumper::SceneDumper(std::ostream &out) : out(out) {}
+SceneDumper::SceneDumper(std::ostream &out) : out(out)
+{
+    out << setw(10);
+}
 
 void SceneDumper::dump(ast_assignment assignment)
 {
