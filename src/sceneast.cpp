@@ -44,7 +44,6 @@
 #include "csgobject.h"
 #include "csgoperation.h"
 
-#include <boost/foreach.hpp>
 #include <boost/variant/apply_visitor.hpp>
 #include <boost/variant/get.hpp>
 #include <boost/fusion/include/equal_to.hpp>
@@ -210,7 +209,7 @@ struct Flattener : boost::static_visitor<ast_intersectable_list>
     ast_intersectable_list operator()(ast_intersectable_list l)
     {
         ast_intersectable_list out;
-        BOOST_FOREACH(ast_intersectable i, l.children)
+        for(ast_intersectable& i: l.children)
         {
             ast_intersectable_list current = boost::apply_visitor(*this, i);
             out.children.insert(out.children.end(), current.children.begin(), current.children.end());
@@ -272,7 +271,7 @@ QMatrix4x4 ast_matrix::asQMatrix4x4() const
 {
     matrix_evaluator evaluator;
     QMatrix4x4 first = boost::apply_visitor(evaluator, this->first);
-    BOOST_FOREACH(ast_basic_matrix mat, this->mult)
+    for(ast_basic_matrix mat: this->mult)
     {
         first *= boost::apply_visitor(evaluator, mat);
     }
@@ -543,7 +542,7 @@ IntersectableList* intersectable_builder::operator()(ast_intersectable_list cons
   vector<Intersectable*> intersectables;
   intersectables.reserve(l.children.size());
 
-  BOOST_FOREACH( ast_intersectable n, l.children )
+  for( ast_intersectable n: l.children )
   {
     intersectables.push_back(boost::apply_visitor(*this, n));
   }
@@ -637,7 +636,7 @@ struct scene_builder : boost::static_visitor<void>
     void operator()(std::vector<ast_light> lights)
     {
         vector<Light*> out;
-        BOOST_FOREACH(ast_light light, lights)
+        for(ast_light& light: lights)
         {
             out.push_back(boost::apply_visitor(light_b, light));
         }
@@ -723,7 +722,7 @@ private:
 Scene buildScene(vector<ast_assignment> assignments)
 {
   scene_builder builder;
-  BOOST_FOREACH(ast_assignment & assignment, assignments)
+  for(ast_assignment & assignment: assignments)
   {
       builder.addAssignment(assignment);
   }
@@ -734,14 +733,13 @@ void resolveVars(vector<ast_assignment> &assignments)
 {
     std::cerr << "Loading OBJs..." << std::endl;
     IntersectableAssignmentVisitor<ObjLoader> ol;
-    BOOST_FOREACH(ast_assignment & assignment, assignments)
+    for(ast_assignment & assignment: assignments)
     {
       ol.apply(assignment);
     }
 
     std::map<std::string, ast_literal_material> objMaterials = ol.getVisitor().getMaterials();
-    typedef std::pair<std::string, ast_literal_material> PairType;
-    BOOST_FOREACH(PairType material, objMaterials)
+    for(auto material: objMaterials)
     {
         ast_assignment a;
         a.name = material.first;
@@ -754,14 +752,14 @@ vector<ast_assignment> createBVH(vector<ast_assignment> assignments)
 {
     std::cerr << "Flattening..." << std::endl;
     IntersectableAssignmentVisitor<Flattener> fl;
-    BOOST_FOREACH(ast_assignment & assignment, assignments)
+    for(ast_assignment & assignment: assignments)
     {
         fl.apply(assignment);
     }
 
     std::cerr << "Creating BVH tree..." << std::endl;
     IntersectableAssignmentVisitor<BVHCreator> bc;
-    BOOST_FOREACH(ast_assignment & assignment, assignments)
+    for(ast_assignment & assignment: assignments)
     {
       bc.apply(assignment);
     }
