@@ -1,6 +1,5 @@
 #include "scenedumper.h"
 
-#include <boost/foreach.hpp>
 #include <boost/variant/apply_visitor.hpp>
 
 #include <iostream>
@@ -92,7 +91,7 @@ public:
     void print(ast_matrix m) const
     {
         boost::apply_visitor(MatrixPrinter(out), m.first);
-        BOOST_FOREACH(ast_basic_matrix mat, m.mult)
+        for(ast_basic_matrix& mat: m.mult)
         {
             out << '*';
             boost::apply_visitor(MatrixPrinter(out), mat);
@@ -146,7 +145,8 @@ void SceneDumper::dump(ast_assignment assignment)
 
 void SceneDumper::dump(vector<ast_assignment> assignments)
 {
-    BOOST_FOREACH(ast_assignment assignment, assignments) {
+    for(ast_assignment& assignment: assignments)
+    {
         dump(assignment);
     }
 }
@@ -155,7 +155,7 @@ void SceneDumper::dump(vector<ast_assignment> assignments)
 void AstVisitor::operator()(std::vector<ast_light> value) const
 {
     out << "lights{";
-    BOOST_FOREACH(ast_light l, value)
+    for(ast_light& l: value)
     {
         l.apply_visitor(*this);
     }
@@ -190,7 +190,7 @@ void AstVisitor::operator()(std::string value) const
 void AstVisitor::operator()(ast_intersectable_list value) const
 {
     out << "intersectables{";
-    BOOST_FOREACH(ast_intersectable i, value.children)
+    for(ast_intersectable& i: value.children)
     {
         boost::apply_visitor(*this, i);
     }
