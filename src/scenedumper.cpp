@@ -7,7 +7,7 @@
 
 using namespace std;
 
-struct AstVisitor;
+class AstVisitor;
 class ArgumentListPrinter;
 
 class MatrixPrinter : public boost::static_visitor<>
@@ -26,14 +26,7 @@ public:
     }
 
     template<typename T>
-    void operator()(T value) const
-    {
-        out << T::function_name;
-        out << "(";
-        bool first = true;
-        boost::fusion::for_each(value, ArgumentListPrinter(&first, out));
-        out << ')';
-    }
+    void operator()(T value) const;
 
 private:
     std::ostream & out;
@@ -108,6 +101,16 @@ private:
     std::ostream & out;
 
 };
+
+template<typename T>
+void MatrixPrinter::operator()(T value) const
+{
+    out << T::function_name;
+    out << "(";
+    bool first = true;
+    boost::fusion::for_each(value, ArgumentListPrinter(&first, out));
+    out << ')';
+}
 
 class AstVisitor : public boost::static_visitor<>
 {

@@ -24,6 +24,7 @@
 #include "global.h"
 #include "light.h"
 #include "jitteredsampler.h"
+#include "axisalignedbox.h"
 
 #include <QtGui/QVector3D>
 #include <QtCore/QPointF>

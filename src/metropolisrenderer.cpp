@@ -33,7 +33,9 @@
 #include <algorithm>
 #include <iostream>
 
+#ifdef USE_OPENMP
 #include <omp.h>
+#endif
 
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>

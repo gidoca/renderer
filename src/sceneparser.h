@@ -52,7 +52,7 @@ struct comment_skipper : public qi::grammar<it> {
     qi::rule<it> skip;
 };
 
-struct SceneGrammar : qi::grammar<it, std::vector<ast_assignment>(), comment_skipper>
+class SceneGrammar : qi::grammar<it, std::vector<ast_assignment>(), comment_skipper>
 {
 public:
   SceneGrammar();

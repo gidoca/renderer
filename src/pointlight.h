@@ -23,6 +23,7 @@
 
 #include "global.h"
 #include "light.h"
+#include "axisalignedbox.h"
 
 #include <QVector3D>
 
