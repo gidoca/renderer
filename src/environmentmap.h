@@ -3,6 +3,7 @@
 
 #include "light.h"
 #include "ray.h"
+#include "axisalignedbox.h"
 
 #include <opencv2/core/core.hpp>
 

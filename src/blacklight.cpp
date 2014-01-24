@@ -1,7 +1,6 @@
 #include "blacklight.h"
 
 #include "ray.h"
-#include "axisalignedbox.h"
 
 cv::Vec3f BlackLight::getIntensity(const HitRecord &, QVector3D &, const Intersectable &, const Sample &) const
 {

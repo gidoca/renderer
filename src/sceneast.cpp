@@ -418,7 +418,7 @@ Camera ast_camera::asCamera() const
 
 struct csg_builder : boost::static_visitor<CSGObject*>
 {
-    csg_builder(std::map<std::string, Material*>& materials, ast_mat_map &ast_materials, bool buildMaterials = true) : ast_materials(ast_materials), material_b(materials, ast_materials), buildMaterials(buildMaterials) {}
+    csg_builder(std::map<std::string, Material*>& materials, ast_mat_map &ast_materials, bool buildMaterials = true) : material_b(materials, ast_materials), buildMaterials(buildMaterials) {}
 
     inline Material * getMaterial(ast_material m)
     {
@@ -448,8 +448,6 @@ struct csg_builder : boost::static_visitor<CSGObject*>
     CSGXor* operator()(const ast_csg_xor& c);
 
 private:
-    ast_mat_map &ast_materials;
-
     material_builder material_b;
 
     const bool buildMaterials;

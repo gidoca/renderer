@@ -23,7 +23,6 @@
 #include "path.h"
 #include "hitrecord.h"
 #include "intersectable.h"
-#include "axisalignedbox.h"
 
 #include <cassert>
 #include <cmath>

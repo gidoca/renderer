@@ -23,7 +23,9 @@
 
 #include "global.h"
 
+#define BOOST_NO_CXX11_RVALUE_REFERENCES
 #include <boost/variant/recursive_variant.hpp>
+#undef BOOST_NO_CXX11_RVALUE_REFERENCES
 #include <boost/fusion/include/adapt_struct.hpp>
 #include <boost/fusion/include/equal_to.hpp>
 

@@ -37,9 +37,6 @@ public:
   static boost::program_options::options_description options();
 
   static const std::string name;
-	
-private:
-  Integrator * integrator;
 };
 
 #endif // PERPIXELRENDERER_H

@@ -4,6 +4,7 @@
 #include "global.h"
 
 #include "light.h"
+#include "axisalignedbox.h"
 
 class BlackLight : public Light
 {
