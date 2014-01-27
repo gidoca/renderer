@@ -28,7 +28,7 @@ class MirrorMaterial : public Material
 {
 
 public:
-  MirrorMaterial(float coefficient): coefficient(coefficient)
+  MirrorMaterial(float)
   {
 
   }
@@ -36,9 +36,6 @@ public:
   QVector3D outDirection(const HitRecord & hit, Sample, float &pdf, cv::Vec3f& brdf) const;
 
   bool isSpecular() const;
-  
-private:
-  float coefficient;
 };
 
 #endif // MIRRORMATERIAL_H
