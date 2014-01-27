@@ -42,6 +42,11 @@ target_link_libraries(renderingproject ${Qt5Widgets_LIBRARIES} ${GSL_LIBRARIES} 
 #-Wno-unitialized suppresses warnings from boost
 set(COMMON_CXX_FLAGS "-Wextra -Wall -Wno-unused-parameter -Wno-uninitialized -std=c++11 ${Qt5Widgets_EXECUTABLE_COMPILE_FLAGS}")
 
-set(CMAKE_CXX_FLAGS_RELEASE "${COMMON_CXX_FLAGS} -fopenmp -DNDEBUG -DUSE_OPENMP -march=native -O3 -fno-strict-aliasing ")
+set(CMAKE_CXX_FLAGS_RELEASE "${COMMON_CXX_FLAGS} -DNDEBUG -march=native -O3 -fno-strict-aliasing ")
 set(CMAKE_CXX_FLAGS_DEBUG "${COMMON_CXX_FLAGS} -g -Wno-unknown-pragmas")
 
+if(OPENMP_FOUND)
+  set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} ${OpenMP_CXX_FLAGS} -DUSE_OPENMP")
+else()
+  set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -Wno-unknown-pragmas")
+endif()

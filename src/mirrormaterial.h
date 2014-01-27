@@ -28,15 +28,12 @@ class MirrorMaterial : public Material
 {
 
 public:
-  MirrorMaterial(float coefficient): coefficient(coefficient)
+  MirrorMaterial(float)
   {
 
   }
 
   bool isMirror() const;
-  
-private:
-  float coefficient;
 };
 
 #endif // MIRRORMATERIAL_H
