@@ -37,12 +37,12 @@ cv::Mat extend(const cv::Mat &in, int nchan = 3);
 void mean(cv::Mat &out, std::vector<cv::Mat> in);
 
 template <typename T> inline constexpr
-int signum(T x, std::false_type is_signed) {
+int signum(T x, std::false_type ) {
     return T(0) < x;
 }
 
 template <typename T> inline constexpr
-int signum(T x, std::true_type is_signed) {
+int signum(T x, std::true_type ) {
     return (T(0) < x) - (x < T(0));
 }
 
