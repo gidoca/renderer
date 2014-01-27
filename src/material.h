@@ -30,7 +30,7 @@
 class Material
 {
   public:
-    virtual cv::Vec3f shade(const HitRecord & hit, QVector3D direction) const
+    virtual cv::Vec3f shade(const HitRecord &, QVector3D) const
     {
         return cv::Vec3f();
     }
