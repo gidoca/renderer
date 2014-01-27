@@ -38,6 +38,9 @@ class PhongMaterial : public Material
     QVector3D outDirection(const HitRecord & hit, Sample s, float &pdf, cv::Vec3f& brdf) const;
 
   private:
+    cv::Vec3f diffuseBrdf() const;
+    cv::Vec3f specularBrdf(const HitRecord& hit, QVector3D direction) const;
+
     const cv::Vec3f color, specularColor;
     const float specularCoefficient;
 };

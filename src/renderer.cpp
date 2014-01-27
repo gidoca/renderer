@@ -110,7 +110,7 @@ boost::program_options::options_description Renderer::options()
 
 unsigned long Renderer::getSeed()
 {
-  if(vm.count("fixed-seed"))
+  if(vm.count("fixed-seed") || vm.count("seed"))
   {
       return vm["seed"].as<unsigned long>();
   }

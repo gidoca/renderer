@@ -54,17 +54,19 @@ cv::Vec3f BlinnMaterial::brdf(const HitRecord &hit, QVector3D direction) const
 
 QVector3D BlinnMaterial::outDirection(const HitRecord &hit, Sample s, float &pdf, cv::Vec3f &brdf) const
 {
-    QVector3D wo = -hit.getRay().getDirection();
+    QVector3D wo = -hit.getRay().getDirection().normalized();
     QVector3D wh = s.getCosinePowerWeightedDirection(hit.getSurfaceNormal(), pdf, exponent);
     if(QVector3D::dotProduct(wh, hit.getSurfaceNormal()) < 0) wh *= -1;
-    QVector3D out = reflect(wo, wh);
-    if(QVector3D::dotProduct(wo, wh) <= 0)
+    QVector3D out = -reflect(wo, wh);
+    if(QVector3D::dotProduct(out, hit.getSurfaceNormal()) <= 0)
     {
         pdf = 0;
     }
     else
     {
+        assert(pdf >= 0);
         pdf /= 4 * QVector3D::dotProduct(wo, wh);
+        assert(pdf >= 0);
     }
     brdf = this->brdf(hit, out);
     return out;

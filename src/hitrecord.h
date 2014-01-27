@@ -64,13 +64,13 @@ inline HitRecord::HitRecord() : material(DarkMatter::getInstance()), rayParamete
 
 
 inline HitRecord::HitRecord(float rayParameter, Ray ray, const Material * material, QVector3D surfaceNormal)
-  : material(material), rayParameter(rayParameter), intersectingPoint(ray.evaluate(rayParameter)), surfaceNormal(surfaceNormal), ray(ray)
+  : material(material), rayParameter(rayParameter), intersectingPoint(ray.evaluate(rayParameter)), surfaceNormal(surfaceNormal.normalized()), ray(ray)
 {
     assert(ray.getFrom() <= rayParameter && rayParameter <= ray.getTo());
 }
 
 inline HitRecord::HitRecord(float rayParameter, Ray ray, const Material *material, QVector3D surfaceNormal, cv::Point2f texcoords)
-  : material(material), rayParameter(rayParameter), intersectingPoint(ray.evaluate(rayParameter)), surfaceNormal(surfaceNormal), ray(ray), texcoords(texcoords)
+  : material(material), rayParameter(rayParameter), intersectingPoint(ray.evaluate(rayParameter)), surfaceNormal(surfaceNormal.normalized()), ray(ray), texcoords(texcoords)
 {
     assert(ray.getFrom() <= rayParameter && rayParameter <= ray.getTo());
 }

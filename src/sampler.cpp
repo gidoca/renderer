@@ -72,7 +72,7 @@ QVector3D Sample::getCosinePowerWeightedDirection(QVector3D w, float &pdf, float
   transform.setColumn(2, w);
   QVector3D randomDirection = transform.map(normalizedDirection);
   assert(QVector3D::dotProduct(randomDirection, w) >= 0);
-  return randomDirection;
+  return randomDirection.normalized();
 }
 
 QVector3D Sample::getUniformSphereDirection() const
