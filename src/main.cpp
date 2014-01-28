@@ -189,6 +189,7 @@ int main(int argc, char **argv) {
         manager.setCurrentRenderer(name);
         manager.startRendering(scene);
     });
+    QObject::connect(&app, &QApplication::lastWindowClosed, &manager, &RenderingManager::stopRendering);
     l.show();
   }
 

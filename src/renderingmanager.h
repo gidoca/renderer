@@ -27,6 +27,7 @@ public:
 
 public Q_SLOTS:
   void startRendering(Scene scene);
+  void stopRendering();
 
 Q_SIGNALS:
   void startingRendering();

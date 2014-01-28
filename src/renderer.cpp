@@ -51,7 +51,7 @@ Path Renderer::createPath(const Ray &primaryRay, const Intersectable &scene, gsl
     int pathLength;
     if(terminationProb > 0)
     {
-      pathLength = 1 + min<int>(gsl_ran_negative_binomial(rng, terminationProb, 1), MAX_DEPTH - 1);
+      pathLength = min<int>(1 + gsl_ran_negative_binomial(rng, terminationProb, 1), MAX_DEPTH);
     }
     else
     {
@@ -138,5 +138,6 @@ void Renderer::run()
 {
     if(doStop) return;
     render();
+    if(doStop) return;
     Q_EMIT finishedRendering();
 }

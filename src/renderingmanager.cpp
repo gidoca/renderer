@@ -50,3 +50,10 @@ void RenderingManager::startRendering(Scene scene)
     currentRenderer->start();
 }
 
+void RenderingManager::stopRendering()
+{
+    if(currentRenderer != nullptr)
+    {
+        currentRenderer->stopRendering();
+    }
+}
