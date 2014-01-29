@@ -52,11 +52,11 @@ QVector3D Sample::getCosinePowerWeightedDirection(QVector3D w, float &pdf, float
   QVector3D normalizedDirection = QVector3D(cos(2 * M_PI * sample.y()) * sqrt(1 - pow(sample.x(), 2 / (cosineExponent + 1)) * radiusFactor * radiusFactor), sin(2 * M_PI * sample.y()) * sqrt(1 - pow(sample.x(), 2 /(cosineExponent + 1)) * radiusFactor * radiusFactor), pow(sample.x(), 1 / (cosineExponent + 1)) * radiusFactor);
   pdf =  pow(normalizedDirection.z(), cosineExponent) * (cosineExponent + 1) / (2 * M_PI);
   QVector3D v;
-  if(abs(w.x()) < abs(w.y()) && abs(w.x()) < abs(w.z()))
+  if(fabs(w.x()) < fabs(w.y()) && fabs(w.x()) < fabs(w.z()))
   {
     v = QVector3D(0, w.z(), -w.y());
   }
-  else if(abs(w.y()) < abs(w.z()))
+  else if(fabs(w.y()) < fabs(w.z()))
   {
     v = QVector3D(w.z(), 0, -w.x());
   }

@@ -85,15 +85,17 @@ Vec3f UniDiPathTracingIntegrator::integrate(const Path &path, const Intersectabl
         lightIntensity = light[lightIndex[i]]->getIntensity(*hitIt, direction, scene, lightSamples[i]);
     }
     brdf = hitIt->getMaterial().brdf(*hitIt, direction);
-    float inCos;
-    inCos = QVector3D::dotProduct(-direction.normalized(), hitIt->getSurfaceNormal().normalized());
-    if(inCos > 0)
+    float inCos = QVector3D::dotProduct(-direction.normalized(), hitIt->getSurfaceNormal().normalized());
+    float outCos = QVector3D::dotProduct(-hitIt->getRay().getDirection().normalized(), hitIt->getSurfaceNormal().normalized());
+    if(signum(inCos) == signum(outCos))
     {
-//      assert(!isnan(lightIntensity.x()) && !isnan(lightIntensity.y()) && !isnan(lightIntensity.z()));
-//      assert(!isnan(brdf.x()) && !isnan(brdf.y()) && !isnan(brdf.z()));
-//      assert(!isnan(alphaIt->x()) && !isnan(alphaIt->y()) && !isnan(alphaIt->z()));
-//      assert(brdf.x() >= 0 && brdf.y() >= 0 && brdf.z() >= 0);
-      color += alphaIt->mul(brdf).mul(lightIntensity) * inCos;
+      assert(!isnan(lightIntensity[0]) && !isnan(lightIntensity[1]) && !isnan(lightIntensity[2]));
+      assert(!isnan(brdf[0]) && !isnan(brdf[1]) && !isnan(brdf[2]));
+      assert(!isnan((*alphaIt)[0]) && !isnan((*alphaIt)[1]) && !isnan((*alphaIt)[2]));
+      assert(brdf[0] >= 0 && brdf[1] >= 0 && brdf[2] >= 0);
+      assert(lightIntensity[0] >= 0 && lightIntensity[1] >= 0 && lightIntensity[2] >= 0);
+      assert((*alphaIt)[0] >= 0 && (*alphaIt)[1] >= 0 && (*alphaIt)[2] >= 0);
+      color += alphaIt->mul(brdf).mul(lightIntensity) * fabs(inCos);
     }
 
     alphaIt++;

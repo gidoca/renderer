@@ -93,7 +93,7 @@ Path Renderer::createPath(const Ray& primaryRay, const Intersectable &scene, con
       result.alphaValues.push_back(alpha);
       result.hitRecords.push_back(hit);
       if(pdf == 0) return result;
-      float cos = QVector3D::dotProduct(outDirection.normalized(), hit.getSurfaceNormal().normalized());
+      float cos = fabs(QVector3D::dotProduct(outDirection.normalized(), hit.getSurfaceNormal().normalized()));
       assert(cos >= 0 && !isnan(pdf));
       assert(pdf > 0 && !isnan(pdf));
       alpha = alpha.mul(brdf) * (cos / pdf / russianRoulettePdf);
