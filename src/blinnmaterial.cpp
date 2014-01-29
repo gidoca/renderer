@@ -46,28 +46,33 @@ float BlinnMaterial::D(const QVector3D& wh, const QVector3D& normal) const
 
 cv::Vec3f BlinnMaterial::brdf(const HitRecord &hit, QVector3D direction) const
 {
+    QVector3D normal = hit.getSurfaceNormal();
+    normal.normalize();
     QVector3D wo = -hit.getRay().getDirection();
-    QVector3D wh = direction + wo;
+    QVector3D wi = -direction.normalized();
+    if(signum(QVector3D::dotProduct(normal, wo)) != signum(QVector3D::dotProduct(normal, wi)))
+    {
+        return cv::Vec3f();
+    }
+    if(QVector3D::dotProduct(normal, wo) < 0) normal *= -1;
+    QVector3D wh = wi + wo;
     wh.normalize();
-    return kd * (1 / M_PI) + ks * D(wh, hit.getSurfaceNormal()) * G(direction, wo, hit.getSurfaceNormal()) / (4 * QVector3D::dotProduct(wo, hit.getSurfaceNormal()) * QVector3D::dotProduct(direction, hit.getSurfaceNormal()));
+    return kd * (1 / M_PI) + ks * D(wh, normal) * G(wi, wo, normal) / (4 * QVector3D::dotProduct(wo, normal) * QVector3D::dotProduct(wi, normal));
 }
 
 QVector3D BlinnMaterial::outDirection(const HitRecord &hit, Sample s, float &pdf, cv::Vec3f &brdf) const
 {
+    QVector3D normal = hit.getSurfaceNormal();
+    normal.normalize();
     QVector3D wo = -hit.getRay().getDirection().normalized();
-    QVector3D wh = s.getCosinePowerWeightedDirection(hit.getSurfaceNormal(), pdf, exponent);
-    if(QVector3D::dotProduct(wh, hit.getSurfaceNormal()) < 0) wh *= -1;
-    QVector3D out = -reflect(wo, wh);
-    if(QVector3D::dotProduct(out, hit.getSurfaceNormal()) <= 0)
-    {
-        pdf = 0;
-    }
-    else
-    {
-        assert(pdf >= 0);
-        pdf /= 4 * QVector3D::dotProduct(wo, wh);
-        assert(pdf >= 0);
-    }
+    if(QVector3D::dotProduct(normal, wo) < 0) normal *= -1;
+    QVector3D wh = s.getCosinePowerWeightedDirection(normal, pdf, exponent);
+    //if(QVector3D::dotProduct(wh, normal) < 0) wh *= -1;
+    QVector3D out = reflect(wo, wh);
+    assert(pdf >= 0);
+    pdf /= 4 * std::max(QVector3D::dotProduct(wo, wh), .0001f);
+    assert(pdf >= 0);
     brdf = this->brdf(hit, out);
+    assert(brdf[0] >= 0 && brdf[1] >= 0 && brdf[2] >= 0);
     return out;
 }
