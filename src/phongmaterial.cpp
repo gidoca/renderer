@@ -51,6 +51,7 @@ cv::Vec3f PhongMaterial::specularBrdf(const HitRecord& hit, QVector3D direction)
 QVector3D PhongMaterial::outDirection(const HitRecord &hit, Sample s, float &pdf, cv::Vec3f &brdf) const
 {
     QVector3D surfaceNormal = hit.getSurfaceNormal();
+    if(QVector3D::dotProduct(hit.getRay().getDirection(), surfaceNormal) > 0) surfaceNormal *= -1;
     surfaceNormal.normalize();
     QVector3D specularDirection = reflect(hit.getRay().getDirection(), surfaceNormal);
     float rho_d = lum(color);
