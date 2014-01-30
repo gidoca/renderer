@@ -51,8 +51,6 @@ class Ray
     Ray transform(QMatrix4x4 matrix);
 
   private:
-    void init(QVector4D origin, QVector4D direction, float from = EPSILON, float to = std::numeric_limits<float>::infinity());
-    
     QVector3D origin, direction;
     float from, to;
 };
@@ -77,28 +75,16 @@ inline float Ray::getTo() const
     return to;
 }
 
-inline Ray::Ray()
+inline Ray::Ray() : Ray(QVector3D(), QVector3D())
 {
-  init(QVector4D(), QVector4D());
 }
 
-inline Ray::Ray(QVector3D origin, QVector3D direction, float from, float to)
+inline Ray::Ray(QVector3D origin, QVector3D direction, float from, float to) : origin(origin), direction(direction), from(from), to(to)
 {
-  init(QVector4D(origin, 1), direction, from, to);
 }
 
-inline Ray::Ray(QVector4D origin, QVector4D direction, float from, float to)
+inline Ray::Ray(QVector4D origin, QVector4D direction, float from, float to) : origin(origin.toVector3DAffine()), direction(direction.toVector3D()), from(from), to(to)
 {
-  init(origin, direction, from, to);
-}
-
-inline void Ray::init(QVector4D origin, QVector4D direction, float from, float to)
-{
-    assert(from <= to);
-    this->origin = origin.toVector3DAffine();
-    this->direction = direction.toVector3D();
-    this->from = from;
-    this-> to = to;
 }
 
 inline QVector4D Ray::evaluate(float u) const

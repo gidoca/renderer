@@ -24,6 +24,7 @@
 #include <QtCore>
 #include <QApplication>
 #include <QTime>
+#include <QFileInfo>
 
 #include <list>
 #include <vector>
@@ -211,14 +212,17 @@ int main(int argc, char **argv) {
   if(vm.count("save-mat"))
   {
       QObject::connect(&manager, &RenderingManager::finishedRendering, [=]() {
-          ofstream file(vm["save-mat"].as<string>());
+          std::string filename = vm["save-mat"].as<string>();
+          QFileInfo fileinfo(QString::fromStdString(filename));
+          ofstream file(filename);
           if(!file) return;
           file << fixed << setw(10);
           auto size = film->size();
-          file << "im = zeros(" << size.height << "," << size.width << ",3);" << endl;
+          file << "function im = " << fileinfo.baseName().toStdString() << "()" << endl;
+          file << "  im = zeros(" << size.height << "," << size.width << ",3);" << endl;
           for(int c = 0; c < 3; c++)
           {
-              file << "im(:, :, " << 3 - c << ")=[";
+              file << "  im(:, :, " << 3 - c << ")=[";
               for(int i = 0; i < size.height; i++)
               {
                   for(int j = 0; j < size.width; j++)
@@ -230,6 +234,7 @@ int main(int argc, char **argv) {
               }
               file << "];" << endl;
           }
+          file << "end" << endl;
       });
   }
 
