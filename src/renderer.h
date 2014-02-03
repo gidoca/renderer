@@ -35,7 +35,7 @@
 #include "path.h"
 #include "sampler.h"
 
-#define MAX_DEPTH 3
+#define MAX_DEPTH 5
 
 class Renderer : public QThread
 {
