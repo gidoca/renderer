@@ -4,3 +4,4 @@ CMakeCache.txt
 CMakeLists.txt.user*
 cmake_install.cmake
 *.autosave
+*.orig
