@@ -96,13 +96,12 @@ inline bool read_index(std::stringstream& str_stream, int& dest, int total_num)
     return true;
 }
 
-std::string sanitizeMaterialName(std::string in)
+void sanitizeMaterialName(std::string& in)
 {
     boost::regex nonAlpha("[^\\w_]");
     boost::regex startsWithDigit("^\\d");
     in = boost::regex_replace(in, nonAlpha, std::string("_"));
     in = boost::regex_replace(in, startsWithDigit, std::string("_"));
-    return in;
 }
 
 bool read_indices(ObjMeshFaceIndex& face_index, int i, std::stringstream& str_stream, int num_positions, int num_texcoords, int num_normals)
@@ -219,7 +218,7 @@ ast_intersectable_list ObjReader::load(std::string filename, ast_material defaul
         }else if(type_str == TOKEN_MATERIAL){
             std::string name;
             str_stream >> name;
-            name = sanitizeMaterialName(name);
+            sanitizeMaterialName(name);
             currentMaterial = std::vector<char>(name.begin(), name.end());
             if(currentMaterial.empty()){
                 std::cerr << "No such material: " << name << std::endl;
@@ -341,7 +340,7 @@ void ObjReader::getMaterials(std::string filename)
                 currentMaterial = ObjMaterial();
             }
             str_stream >> current_material_name;
-            current_material_name = sanitizeMaterialName(current_material_name);
+            sanitizeMaterialName(current_material_name);
         }
         else if(type_str == TOKEN_ILLUMINATION)
         {

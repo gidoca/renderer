@@ -28,6 +28,9 @@
 #include <boost/foreach.hpp>
 #include <boost/variant.hpp>
 
+#include <QFileInfo>
+#include <QDir>
+
 using namespace std;
 
 SceneGrammar::SceneGrammar() : SceneGrammar::base_type(assignments_rule, "intersectable")
@@ -133,7 +136,7 @@ SceneGrammar::SceneGrammar() : SceneGrammar::base_type(assignments_rule, "inters
 bool SceneGrammar::parse(string filename)
 {
 
-  fileDir = QFileInfo(QString::fromStdString(filename)).dir();
+  QDir fileDir = QFileInfo(QString::fromStdString(filename)).dir();
 
   ifstream in(filename.c_str(), ifstream::in);
   if(!in.is_open() || in.eof())
