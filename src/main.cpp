@@ -76,6 +76,10 @@ int main(int argc, char **argv) {
   QApplication app(argc, argv);
   options_description command_line_options;
 
+  positional_options_description scene_options;
+  scene_options.add("scene", 1);
+  //command_line_options.add(scene_options);
+
   options_description general("General options");
   general.add_options()
       ("help,h", "display the help")
@@ -91,7 +95,7 @@ int main(int argc, char **argv) {
   image.add_options()
       ("renderer,r", value<string>()->default_value("pathtracing"), "the rendering algorithm to be used (either pathtracing (the default), energyredist, metropolisflt, or metropolis)")
       ("fixed-seed,d", "use a fixed seed for the RNG to make the resulting image deterministic")
-      ("seed", value<unsigned long>()->default_value(0), "the random generator seed to use when the --fixed-seed option is set")
+      ("seed", value<unsigned long>()->default_value(0), "the random generator seed; can be used to make sure different invocations have a different seed")
       ("scene,s", value<string>(), "the scene description file (mandatory)")
       ("no-bvh", "Disable generating the BVH tree; this incurs a severe performance penalty")
       ("gamma,g", value<float>()->default_value(2.2f, "2.2"), "the gamma correction to apply to the display and to LDR image file output");
@@ -102,12 +106,12 @@ int main(int argc, char **argv) {
 
   try
   {
-    store(parse_command_line(argc, argv, command_line_options), vm);
+      store(command_line_parser(argc, argv).options(command_line_options).positional(scene_options).run(), vm);
   }
   catch(boost::program_options::error& e)
   {
-    std::cerr << e.what() << endl;
-    return -1;
+      std::cerr << e.what() << endl;
+      return -1;
   }
 
   notify(vm);
