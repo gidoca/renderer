@@ -104,8 +104,8 @@ options_description PerPixelRenderer::options()
 {
   options_description opts("Path tracer options");
   opts.add_options()
-      ("pt-integrator", value<string>()->default_value("unidi"), "the path tracing method (unidi or bidi)")
-      ("pt-termination-prob", value<float>()->default_value(0.5f, "0.5"), "the roussian roulette path termination probability (use 0 to disable roussian roulette path termination)")
+      ("pt-integrator", value<string>()->default_value("unidi"), "the path tracing method (unidi or bidi [currently broken])")
+      ("pt-termination-prob", value<float>()->default_value(0.5f, "0.5"), "the roussian roulette path termination probability (use 0 to disable russian roulette path termination)")
       ("pt-x-samples", value<int>()->default_value(4), "number of samples per pixel in x direction")
       ("pt-y-samples", value<int>()->default_value(4), "number of samples per pixel in y direction");
   return opts;
