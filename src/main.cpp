@@ -54,7 +54,6 @@
 using namespace std;
 using namespace boost::program_options;
 
-
 struct option_adder
 {
   options_description * desc;
@@ -68,6 +67,28 @@ struct option_adder
 
 variables_map vm;
 
+std::string getUniqueFilename(std::string filename)
+{
+    std::string uniqueFilename = filename;
+    size_t endingPos = filename.find_last_of('.');
+    int i = 0;
+    while(QFileInfo(QString::fromStdString(uniqueFilename)).exists())
+    {
+        uniqueFilename = filename.substr(0, endingPos) + std::to_string(i) + filename.substr(endingPos, filename.size());
+        i++;
+    }
+    return uniqueFilename;
+}
+
+std::string getUniqueFilenameArgument(std::string argname)
+{
+    string filename = vm[argname].as<string>();
+    if(!vm.count("force"))
+    {
+        filename = getUniqueFilename(filename);
+    }
+    return filename;
+}
 
 int main(int argc, char **argv) {
   QTime time;
@@ -88,7 +109,8 @@ int main(int argc, char **argv) {
       ("save-exr,e", value<string>(), "write the result to the specified EXR file")
       ("save-img,i", value<string>(), "write the result to the specified LDR image file")
       ("save-mat,m", value<string>(), "write the result to the specified matlab file")
-      ("dump-bvh,b", value<string>(), "write the bvh tree to the specified file");
+      ("dump-bvh,b", value<string>(), "write the bvh tree to the specified file")
+      ("force,f", "Overwrite existing files");
   command_line_options.add(general); 
 	
   options_description image("Image options");
@@ -144,7 +166,7 @@ int main(int argc, char **argv) {
 
   if(vm.count("dump-bvh"))
   {
-      ofstream bvhfile(vm["dump-bvh"].as<string>());
+      ofstream bvhfile(getUniqueFilenameArgument("dump-bvh"));
       SceneDumper d(bvhfile);
       std::vector<ast_assignment> bvhAst = createBVH(ast);
       if(vm.count("verbose")) cerr << "Writing BVH tree to " << vm["dump-bvh"].as<string>() << endl;
@@ -201,7 +223,7 @@ int main(int argc, char **argv) {
   if(vm.count("save-exr"))
   {
       QObject::connect(&manager, &RenderingManager::finishedRendering, [=](){
-          imwrite(vm["save-exr"].as<string>(), *film);
+          imwrite(getUniqueFilenameArgument("save-exr"), *film);
       });
   }
 
@@ -209,14 +231,14 @@ int main(int argc, char **argv) {
   {
       QObject::connect(&manager, &RenderingManager::finishedRendering, [=]() mutable {
           QImage img = tm.tonemap(*film);
-          img.save(QString::fromStdString(vm["save-img"].as<string>()));
+          img.save(QString::fromStdString(getUniqueFilenameArgument("save-img")));
       });
   }
 
   if(vm.count("save-mat"))
   {
       QObject::connect(&manager, &RenderingManager::finishedRendering, [=]() {
-          std::string filename = vm["save-mat"].as<string>();
+          std::string filename = getUniqueFilenameArgument("save-mat");
           QFileInfo fileinfo(QString::fromStdString(filename));
           ofstream file(filename);
           if(!file) return;
