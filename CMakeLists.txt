@@ -1,5 +1,10 @@
 project(renderingproject)
 cmake_minimum_required(VERSION 2.6)
+if(NOT CMAKE_BUILD_TYPE)
+  message(STATUS "No build type selected, default to Release")
+  set(CMAKE_BUILD_TYPE "Release")
+endif()
+
 set(CMAKE_MODULE_PATH "${renderingproject_SOURCE_DIR}/cmake/modules")
 find_package(Qt5Widgets REQUIRED)
 find_package(GSL REQUIRED)
