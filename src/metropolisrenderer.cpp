@@ -72,9 +72,7 @@ void MetropolisRenderer::render()
 
   MetropolisSample sample(scene.light.size());
   sample.largeStep(globalrng);
-  Path path = sample.cameraPathFromSample(*scene.object, scene.camera);
   UniDiPathTracingIntegrator integrator;
-  Vec3f value = integrator.integrate(path, *scene.object, scene.light, sample.lightSample1, sample.lightIndex);
 
   const int numInitialSamples = vm["met-bootstrap"].as<int>();
   const float largeStepProb = vm["met-large-step-prob"].as<float>();
@@ -86,7 +84,7 @@ void MetropolisRenderer::render()
   for(int i = 0; i < numInitialSamples; i++)
   {
     sample.largeStep(globalrng);
-    path = sample.cameraPathFromSample(*scene.object, scene.camera);
+    Path path = sample.cameraPathFromSample(*scene.object, scene.camera);
     Vec3f l = integrator.integrate(path, *scene.object, scene.light, sample.lightSample1, sample.lightIndex);
 //    int currentImageX = (int)(sample.cameraSample.getSample().x() * film.size().width);
 //    int currentImageY = (int)(sample.cameraSample.getSample().y() * film.size().height);
@@ -106,12 +104,14 @@ void MetropolisRenderer::render()
   sumI = 0;
   for(int i = 0; i < numInitialSamples; i++)
   {
-    sample.largeStep(globalrng);
+    //sample.largeStep(globalrng);
     sample = bootstrapSamples[i];
     sumI += bootstrapI[i];
     if(sumI > contribOffset) break;
   }
-  sample.largeStep(globalrng);
+  //sample.largeStep(globalrng);
+  Path path = sample.cameraPathFromSample(*scene.object, scene.camera);
+  Vec3f value = integrator.integrate(path, *scene.object, scene.light, sample.lightSample1, sample.lightIndex);
 
   gsl_rng_free(globalrng);
 
