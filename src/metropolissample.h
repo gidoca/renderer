@@ -54,6 +54,8 @@ public:
 
   float terminationProb;
   int pathLength;
+
+  static const int terminateRoussianRouletteIndex;
 };
 
 #endif // METROPOLISSAMPLE_H

@@ -27,12 +27,14 @@
 #include <cmath>
 #include <algorithm>
 
+const int MetropolisSample::terminateRoussianRouletteIndex = 3;
+
 void MetropolisSample::mutatePathLength(gsl_rng *rng, float terminationProb)
 {
     if(terminationProb > 0)
     {
       this->terminationProb = terminationProb;
-      pathLength = 1 + std::min<int>(gsl_ran_negative_binomial(rng, terminationProb, 1), MAX_DEPTH - 1);
+      pathLength = std::min<int>(terminateRoussianRouletteIndex + gsl_ran_negative_binomial(rng, terminationProb, 1), MAX_DEPTH);
     }
     else
     {
@@ -120,7 +122,7 @@ Path MetropolisSample::cameraPathFromSample(const Intersectable & scene, const C
   QPointF pixel = cameraSample.getSample();
   pixel.rx() *= camera.getResolution().width();
   pixel.ry() *= camera.getResolution().height();
-  Path result = Renderer::createPath(camera.getRay(pixel), scene, cameraPathSamples, cv::Vec3f(1, 1, 1), pathLength, terminationProb);
+  Path result = Renderer::createPath(camera.getRay(pixel), scene, cameraPathSamples, cv::Vec3f(1, 1, 1), pathLength, terminationProb, terminateRoussianRouletteIndex);
   return result;
 }
 

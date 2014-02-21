@@ -49,9 +49,10 @@ Path Renderer::createPath(const Ray &primaryRay, const Intersectable &scene, gsl
     JitteredSampler sampler(1, 1, rng);
     Sample pathSamples[MAX_DEPTH];
     int pathLength;
+    const int roussianRouletteStart = 3;
     if(terminationProb > 0)
     {
-      pathLength = min<int>(1 + gsl_ran_negative_binomial(rng, terminationProb, 1), MAX_DEPTH);
+      pathLength = min<int>(roussianRouletteStart + gsl_ran_negative_binomial(rng, terminationProb, 1), MAX_DEPTH);
     }
     else
     {
@@ -62,10 +63,10 @@ Path Renderer::createPath(const Ray &primaryRay, const Intersectable &scene, gsl
     {
       pathSamples[i] = sampler.getSamples().front();
     }
-    return createPath(primaryRay, scene, pathSamples, initialAlpha, pathLength, terminationProb);
+    return createPath(primaryRay, scene, pathSamples, initialAlpha, pathLength, terminationProb, roussianRouletteStart);
 }
 
-Path Renderer::createPath(const Ray& primaryRay, const Intersectable &scene, const Sample pathSamples[], cv::Vec3f alpha, int pathLength, float russianRoulettePdf)
+Path Renderer::createPath(const Ray& primaryRay, const Intersectable &scene, const Sample pathSamples[], cv::Vec3f alpha, int pathLength, float russianRoulettePdf, int russianRouletteStartIndex)
 {
   Path result;
   HitRecord hit = scene.intersect(primaryRay);
@@ -96,7 +97,8 @@ Path Renderer::createPath(const Ray& primaryRay, const Intersectable &scene, con
       float cos = fabs(QVector3D::dotProduct(outDirection.normalized(), hit.getSurfaceNormal().normalized()));
       assert(cos >= 0 && !isnan(pdf));
       assert(pdf > 0 && !isnan(pdf));
-      alpha = alpha.mul(brdf) * (cos / pdf / russianRoulettePdf);
+      alpha = alpha.mul(brdf) * (cos / pdf);
+      if(i > russianRouletteStartIndex) alpha *= (1 / russianRoulettePdf);
     }
     hit = scene.intersect(Ray(hit.getIntersectingPoint(), outDirection));
   }

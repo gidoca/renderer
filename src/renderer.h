@@ -57,7 +57,7 @@ public:
   static boost::program_options::options_description options();
 
   static Path createPath(const Ray & primaryRay, const Intersectable & scene, gsl_rng *rng, cv::Vec3f initialAlpha = cv::Vec3f(1, 1, 1), float terminationProb = 0.f);
-  static Path createPath(const Ray & primaryRay, const Intersectable & scene, const Sample pathSamples[], cv::Vec3f initialAlpha = cv::Vec3f(1, 1, 1), int pathLength = MAX_DEPTH, float russianRoulettePdf = 1);
+  static Path createPath(const Ray & primaryRay, const Intersectable & scene, const Sample pathSamples[], cv::Vec3f initialAlpha = cv::Vec3f(1, 1, 1), int pathLength = MAX_DEPTH, float russianRoulettePdf = 1, int russianRouletteStartIndex = 1);
 
 Q_SIGNALS:
   void finishedRendering();
