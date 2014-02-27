@@ -206,7 +206,7 @@ options_description MetropolisRenderer::options()
   opts.add_options()
       ("met-large-step-prob", value<float>()->default_value(0.1f, "0.1"), "the probability for a mutation to be a large step mutation")
       ("met-termination-prob", value<float>()->default_value(0.5f, "0.5"))
-      ("met-bootstrap", value<int>()->default_value(1000), "number of bootstrapping samples")
+      ("met-bootstrap", value<int>()->default_value(10000), "number of bootstrapping samples")
       ("met-mutations", value<int>()->default_value(16), "average number of path mutations per pixel");
   return opts;
 }
