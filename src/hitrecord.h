@@ -30,6 +30,7 @@
 #include <opencv2/core/core.hpp>
 
 #include <limits>
+#include <cmath>
 
 class HitRecord
 {
@@ -109,7 +110,7 @@ inline Ray HitRecord::getRay() const
 
 inline bool HitRecord::intersects() const
 {
-  return !isnan(rayParameter);
+  return !std::isnan(rayParameter);
 }
 
 inline cv::Point2f HitRecord::getTexCoords() const

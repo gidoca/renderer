@@ -72,7 +72,7 @@ Ray EnvironmentMap::getRandomRay(const Sample &sample1, const Sample &, float &p
 
 HitRecord EnvironmentMap::intersect(Ray ray) const
 {
-    if(isinf(ray.getTo()))
+    if(std::isinf(ray.getTo()))
     {
         return HitRecord(ray.getTo(), ray, this, -ray.getDirection().normalized());
     }

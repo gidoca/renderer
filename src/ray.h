@@ -26,6 +26,7 @@
 
 #include <limits>
 #include <cassert>
+#include <cmath>
 
 #include <QtGui/QVector3D>
 #include <QtGui/QMatrix4x4>
@@ -89,7 +90,7 @@ inline Ray::Ray(QVector4D origin, QVector4D direction, float from, float to) : o
 
 inline QVector4D Ray::evaluate(float u) const
 {
-    if(isinf(u))
+    if(std::isinf(u))
     {
         return signum(u) * QVector4D(direction.normalized(), 0);
     }
